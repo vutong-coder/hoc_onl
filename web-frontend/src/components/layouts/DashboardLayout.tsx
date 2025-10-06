@@ -2,10 +2,12 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import Header from './Header'
 import Sidebar from './Sidebar'
+import ThemeToggle from '../atoms/ThemeToggle'
 
 export default function DashboardLayout(): JSX.Element {
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+			<ThemeToggle />
 			<Header />
 
 			<div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
@@ -22,5 +24,3 @@ export default function DashboardLayout(): JSX.Element {
 		</div>
 	)
 }
-
-

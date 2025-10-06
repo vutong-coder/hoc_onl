@@ -1,8 +1,8 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import DashboardLayout from '../components/organisms/DashboardLayout'
+import DashboardLayout from '../components/layouts/DashboardLayout'
+import AuthLayout from '../components/layouts/AuthLayout'
 import DashboardPage from '../pages/DashboardPage'
-import LoginPage from '../pages/LoginPage'
 import ExamPage from '../pages/ExamPage'
 import MonitorPage from '../pages/MonitorPage'
 import RewardPage from '../pages/RewardPage'
@@ -22,7 +22,8 @@ export default function AppRoutes(): JSX.Element {
 	return (
 		<BrowserRouter>
 			<Routes>
-				<Route path="/login" element={<LoginPage />} />
+				<Route path="/auth/*" element={<AuthLayout />} />
+				<Route path="/login" element={<Navigate to="/auth" replace />} />
 				<Route path="/" element={<DashboardLayout />}>
 					<Route index element={<Navigate to="/dashboard" replace />} />
 					<Route path="dashboard" element={<DashboardPage />} />
