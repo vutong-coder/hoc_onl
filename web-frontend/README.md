@@ -131,6 +131,291 @@ npm run preview
 - **Forgot Password**: Quên mật khẩu
 - **Password Strength**: Kiểm tra độ mạnh mật khẩu
 
+## 📹 Hệ thống Thi với Giám sát Camera
+
+### Tổng quan
+Hệ thống thi với giám sát camera được thiết kế để đảm bảo tính công bằng và minh bạch trong quá trình làm bài thi trực tuyến. Hệ thống sử dụng camera để giám sát người dùng trong suốt quá trình thi.
+
+### Luồng hoạt động (Exam Flow)
+
+```
+Người dùng nhấn "Start Exam" từ Dashboard
+    ↓
+ExamPreCheckPage (/exam/:examId/pre-check)
+    ↓ Kiểm tra camera và hướng dẫn
+ExamTakingPage (/exam/:examId/take)
+    ↓ Làm bài thi với giám sát
+ExamResultPage (/exam/:examId/result)
+```
+
+### Các thành phần chi tiết
+
+#### 1. ExamPreCheckPage
+- Hiển thị hướng dẫn làm bài thi
+- Yêu cầu quyền truy cập camera/microphone
+- Kiểm tra camera hoạt động
+- Xác nhận người dùng sẵn sàng
+- **Components**: `CameraCheckSection`, `ExamInstructionsSection`, `ExamReadySection`
+
+#### 2. ExamTakingPage
+Giao diện chính gồm:
+- **Main Content**: Hiển thị câu hỏi và các lựa chọn
+- **Sidebar**:
+  - Đồng hồ đếm ngược (`CountdownTimer`)
+  - Navigation câu hỏi (`ExamProgressIndicator`)
+  - Camera giám sát (`ProctoringView`)
+
+**Tính năng tự động**:
+- Auto-save câu trả lời mỗi 30 giây
+- Chụp ảnh màn hình mỗi 10 giây
+- Tự động nộp bài khi hết giờ
+- Cảnh báo khi sắp hết giờ (5 phút, 1 phút)
+
+#### 3. ExamResultPage
+- Hiển thị điểm số với biểu đồ trực quan
+- Thống kê chi tiết (số câu đúng, thời gian làm bài)
+- Trạng thái đạt/không đạt
+- Các bước tiếp theo (xem chi tiết, về dashboard)
+
+### Components chi tiết
+
+#### ProctoringView Component
+```
+┌─────────────────────────────────────┐
+│          ProctoringView             │
+├─────────────────────────────────────┤
+│ [●] Camera giám sát    [⚙][-]      │
+│                                     │
+│         Video Stream                │
+│      (User's Camera)                │
+│                                     │
+│ Camera đang được sử dụng để         │
+│ giám sát quá trình làm bài thi      │
+└─────────────────────────────────────┘
+```
+- Hiển thị video stream từ camera
+- Điều khiển camera (bật/tắt, thu nhỏ/mở rộng)
+- Hiển thị trạng thái camera (sẵn sàng/lỗi)
+
+#### CountdownTimer Component
+- Đồng hồ đếm ngược chính xác
+- Thanh tiến trình thời gian
+- Cảnh báo màu sắc khi sắp hết giờ
+- Hiển thị phút:giây
+
+#### ExamQuestion Component
+```
+┌─────────────────────────────────────┐
+│ [C3/25] [4 điểm] [Trắc nghiệm] [🚩] │
+│                                     │
+│ Câu hỏi: ...                        │
+│                                     │
+│ ○ A. Đáp án 1                       │
+│ ● B. Đáp án 2 (đã chọn)            │
+│ ○ C. Đáp án 3                       │
+│ ○ D. Đáp án 4                       │
+│                                     │
+│ [← Câu trước]  [Sau →]              │
+└─────────────────────────────────────┘
+```
+- Hỗ trợ nhiều loại câu hỏi (trắc nghiệm, code, tự luận)
+- Đánh dấu câu hỏi để xem lại
+- Theo dõi thời gian làm từng câu
+- Navigation giữa các câu
+
+### Hooks & Services
+
+#### useCamera Hook
+Quản lý camera và microphone:
+- Yêu cầu quyền truy cập camera/microphone
+- Cung cấp stream video
+- Chụp ảnh màn hình để giám sát
+- Xử lý lỗi camera
+- Dọn dẹp tài nguyên khi kết thúc
+
+**Cấu hình camera**:
+```typescript
+const mediaStream = await navigator.mediaDevices.getUserMedia({
+  video: {
+    width: { ideal: 1280 },
+    height: { ideal: 720 },
+    facingMode: 'user'
+  },
+  audio: true
+})
+```
+
+#### examService
+Quản lý API liên quan đến bài thi:
+- `fetchExamDetails(examId)`: Lấy thông tin bài thi
+- `startExamSession(examId)`: Bắt đầu session thi
+- `saveAnswer(questionId, answer)`: Lưu câu trả lời tạm thời
+- `submitExam(examId, answers)`: Nộp bài thi
+- `sendScreenshot(examId, imageData)`: Gửi ảnh giám sát
+
+#### examSlice (Redux)
+State management cho bài thi:
+```typescript
+{
+  currentExam: ExamDetails
+  questions: ExamQuestion[]
+  currentQuestionIndex: number
+  answers: Record<number, ExamAnswer>
+  timeRemaining: number
+  status: 'idle' | 'loading' | 'taking' | 'completed'
+  isCameraReady: boolean
+  visitedQuestions: Set<number>
+  flaggedQuestions: Set<number>
+}
+```
+
+### Tính năng bảo mật
+
+#### 1. Giám sát camera
+- Yêu cầu quyền truy cập camera và microphone
+- Hiển thị video stream trực tiếp
+- Chụp ảnh màn hình định kỳ (mỗi 10 giây)
+- Gửi ảnh về server để phân tích
+
+#### 2. Bảo mật dữ liệu
+- Sử dụng HTTPS để truy cập camera
+- Không lưu video stream, chỉ chụp ảnh
+- Ảnh giám sát được mã hóa trước khi gửi
+- Session timeout handling
+
+#### 3. Chống gian lận
+- Không cho phép rời khỏi tab
+- Giám sát liên tục qua camera
+- Ghi lại âm thanh
+- Phát hiện hành vi bất thường
+- Tab focus monitoring
+
+### API Flow
+
+```
+┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │    Backend      │
+└─────────┬───────┘    └─────────┬───────┘
+          │                      │
+          │ fetchExamDetails     │
+          ├─────────────────────►│
+          │                      │
+          │ startExamSession     │
+          ├─────────────────────►│
+          │                      │
+          │ saveAnswer (30s)     │
+          ├─────────────────────►│
+          │                      │
+          │ sendScreenshot (10s) │
+          ├─────────────────────►│
+          │                      │
+          │ submitExam           │
+          ├─────────────────────►│
+          │                      │
+          │ ◄────────────────────┤
+          │    Result            │
+```
+
+### Xử lý lỗi (Error Handling)
+
+#### Camera Errors
+- **Permission denied**: Thông báo yêu cầu cấp quyền
+- **Camera not found**: Hướng dẫn kiểm tra thiết bị
+- **Stream failed**: Thử refresh trang
+
+#### Network Errors
+- **Save answer failed**: Retry mechanism
+- **Submit exam failed**: Lưu local và sync sau
+- **Screenshot upload failed**: Queue và retry
+
+#### UI Errors
+- **Timer sync issues**: Đồng bộ với server
+- **Navigation problems**: Fallback navigation
+- **State corruption**: Recovery mechanism
+
+### Cách sử dụng
+
+#### 1. Bắt đầu thi
+```typescript
+// Từ component UpcomingExams
+const handleStartExam = (examId: string) => {
+  navigate(`/exam/${examId}/pre-check`)
+}
+```
+
+#### 2. Kiểm tra camera
+```typescript
+// Trong ExamPreCheckPage
+const { startCamera, isCameraOn, error } = useCamera()
+
+useEffect(() => {
+  startCamera()
+}, [])
+```
+
+#### 3. Làm bài thi
+```typescript
+// Trong ExamTakingPage
+const handleAnswerChange = (answer: any) => {
+  dispatch(updateAnswer({ questionId: currentQuestion.id, answer }))
+}
+```
+
+#### 4. Nộp bài
+```typescript
+const handleSubmitExam = async () => {
+  await dispatch(submitExam())
+  navigate(`/exam/${examId}/result`)
+}
+```
+
+### Troubleshooting
+
+#### Camera không hoạt động
+1. Kiểm tra quyền truy cập camera trong browser settings
+2. Đảm bảo camera không bị ứng dụng khác sử dụng
+3. Kiểm tra kết nối internet
+4. Thử refresh trang hoặc restart browser
+
+#### Lỗi khi lưu câu trả lời
+1. Kiểm tra kết nối internet
+2. Câu trả lời sẽ được lưu tự động khi kết nối ổn định
+3. Liên hệ hỗ trợ nếu vấn đề tiếp tục
+
+#### Hết giờ đột ngột
+1. Kiểm tra đồng hồ hệ thống
+2. Đảm bảo không có ứng dụng khác làm chậm máy
+3. Liên hệ hỗ trợ để kiểm tra log
+
+### Yêu cầu hệ thống cho thi
+
+#### Browser hỗ trợ
+- Chrome/Edge (khuyến nghị): 90+
+- Firefox: 88+
+- Safari: 14+
+
+#### Thiết bị
+- Camera: Độ phân giải tối thiểu 720p
+- Microphone: Hoạt động tốt
+- Internet: Tốc độ ổn định >= 2Mbps
+- RAM: >= 4GB khuyến nghị
+
+### Phát triển tiếp
+
+#### Tính năng có thể thêm
+1. Phát hiện gian lận bằng AI
+2. Ghi âm toàn bộ quá trình thi
+3. Theo dõi chuyển động mắt (eye tracking)
+4. Phân tích hành vi bất thường
+5. Tích hợp blockchain để xác thực kết quả
+
+#### Cải tiến hiệu suất
+1. WebRTC cho video streaming
+2. Compression ảnh giám sát
+3. Batch upload ảnh
+4. Offline support với sync sau
+5. Service Worker cho PWA
+
 ## 🎯 Routing Structure
 
 ```
