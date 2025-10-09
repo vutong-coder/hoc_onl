@@ -3,51 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Education Platform Dashboard</title>
+    <title>Dashboard - MyApp</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.0.0/dist/flowbite.min.js"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lora:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
 :root {
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.15 0 0);
-  --card: oklch(1.0 0 0);
-  --card-foreground: oklch(0.15 0 0);
-  --popover: oklch(1.0 0 0);
-  --popover-foreground: oklch(0.15 0 0);
-  --primary: oklch(0.6 0.15 160);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.9 0.05 160);
-  --secondary-foreground: oklch(0.15 0 0);
-  --muted: oklch(0.92 0 0);
-  --muted-foreground: oklch(0.5 0 0);
-  --accent: oklch(0.85 0.1 50);
-  --accent-foreground: oklch(0.15 0 0);
-  --destructive: oklch(0.6 0.2 20);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.88 0 0);
-  --input: oklch(0.88 0 0);
-  --ring: oklch(0.7 0.1 160);
-  --chart-1: oklch(0.6 0.15 160);
-  --chart-2: oklch(0.7 0.1 50);
-  --chart-3: oklch(0.5 0.2 200);
-  --chart-4: oklch(0.8 0.1 300);
-  --chart-5: oklch(0.6 0.15 260);
-  --sidebar: oklch(0.95 0 0);
-  --sidebar-foreground: oklch(0.15 0 0);
-  --sidebar-primary: oklch(0.6 0.15 160);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.85 0.1 50);
-  --sidebar-accent-foreground: oklch(0.15 0 0);
-  --sidebar-border: oklch(0.88 0 0);
-  --sidebar-ring: oklch(0.7 0.1 160);
-  --font-sans: 'Poppins', sans-serif;
-  --font-serif: 'Lora', serif;
-  --font-mono: 'Space Mono', monospace;
-  --radius: 0.5rem;
-  --spacing: 0.25rem;
-  --shadow-2xs: 0 1px 2px 0px hsl(0 0% 0% / 0.05);
+  --background: oklch(0.1450 0 0);
+  --foreground: oklch(0.9850 0 0);
+  --card: oklch(0.2050 0 0);
+  --card-foreground: oklch(0.9850 0 0);
+  --popover: oklch(0.2050 0 0);
+  --popover-foreground: oklch(0.9850 0 0);
+  --primary: oklch(0.6489 0.2370 26.9728);
+  --primary-foreground: oklch(0.9850 0 0);
+  --secondary: oklch(0.9700 0 0);
+  --secondary-foreground: oklch(0.2050 0 0);
+  --muted: oklch(0.9700 0 0);
+  --muted-foreground: oklch(0.5560 0 0);
+  --accent: oklch(0.7323 0.2492 142.4953);
+  --accent-foreground: oklch(0.2050 0 0);
+  --destructive: oklch(0.5770 0.2450 27.3250);
+  --destructive-foreground: oklch(0.9850 0 0);
+  --border: oklch(0.9220 0 0);
+  --input: oklch(0.9220 0 0);
+  --ring: oklch(0.7080 0 0);
+  --chart-1: oklch(0.8100 0.1000 252);
+  --chart-2: oklch(0.6200 0.1900 260);
+  --chart-3: oklch(0.5500 0.2200 263);
+  --chart-4: oklch(0.4900 0.2200 264);
+  --chart-5: oklch(0.4200 0.1800 266);
+  --sidebar: oklch(0.9850 0 0);
+  --sidebar-foreground: oklch(0.1450 0 0);
+  --sidebar-primary: oklch(0.2050 0 0);
+  --sidebar-primary-foreground: oklch(0.9850 0 0);
+  --sidebar-accent: oklch(0.9700 0 0);
+  --sidebar-accent-foreground: oklch(0.2050 0 0);
+  --sidebar-border: oklch(0.9220 0 0);
+  --sidebar-ring: oklch(0.7080 0 0);
+  --font-sans: Inter, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --radius: 0.625rem;
+  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
   --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
@@ -56,6 +54,7 @@
   --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10);
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   --tracking-normal: 0em;
+  --spacing: 0.25rem;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -63,167 +62,173 @@
 }
 </style>
     <style>
-        /* Custom styles for animations */
-        @keyframes slide-in {
-            from { transform: translateX(-250px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            font-family: 'Inter', sans-serif;
         }
-        @keyframes fade-up {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+
+        .card {
+            background-color: var(--card);
+            border: 1px solid oklch(0.25 0 0);
+            border-radius: var(--radius-lg);
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
         }
-        @keyframes bounce {
-            0% { transform: scale(0.9); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px -4px hsl(0 0% 0% / 0.2);
+            border-color: var(--accent);
         }
-        .sidebar-slide-in { animation: slide-in 300ms ease-out forwards; }
-        .content-fade-up { animation: fade-up 400ms ease-out forwards; }
-        .widget-load { animation: fade-up 500ms ease-out forwards; }
-        .notification-pop { animation: bounce 600ms ease-out forwards; }
-        .menu-item-select { transition: background-color 200ms, opacity 200ms; }
-        .hover-effect:hover { transform: scale(1.05); box-shadow: 0 4px 6px -1px hsl(0 0% 0% / 0.1); transition: transform 200ms, box-shadow 200ms; }
-        .button-click:active { transform: scale(0.95); transition: transform 150ms; }
+
+        /* Animation for staggered load */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stagger-load {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
     </style>
 </head>
-<body class="bg-[var(--background)] text-[var(--foreground)] font-[var(--font-sans)]">
-    <div class="flex flex-col h-screen">
-        <!-- Header -->
-        <header class="bg-[var(--card)] shadow-sm border-b border-[var(--border)] px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center">
-                <i data-lucide="graduation-cap" class="w-8 h-8 text-[var(--primary)] mr-2"></i>
-                <h1 class="text-xl font-semibold">EduPlatform</h1>
+<body class="w-full">
+
+    <!-- Top Navigation Bar -->
+    <header class="fixed top-0 left-0 right-0 z-10 bg-[var(--background)] border-b border-b-oklch(0.25 0 0) shadow-sm">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-8">
+                <a href="#" class="text-2xl font-bold font-mono text-[var(--foreground)]">MyApp</a>
+                <div class="relative hidden md:block">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--muted-foreground)]"></i>
+                    <input type="text" placeholder="Search challenges..." class="w-64 bg-oklch(0.2 0 0) border border-oklch(0.25 0 0) rounded-md pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-[var(--ring)] focus:outline-none">
+                </div>
             </div>
+            <nav class="hidden lg:flex items-center space-x-6 text-sm font-semibold">
+                <a href="#" class="text-[var(--foreground)] hover:text-[var(--accent)] transition-colors">Prepare</a>
+                <a href="#" class="text-[var(--foreground)] hover:text-[var(--accent)] transition-colors">Certify</a>
+                <a href="#" class="text-[var(--foreground)] hover:text-[var(--accent)] transition-colors">Compete</a>
+            </nav>
             <div class="flex items-center space-x-4">
-                <button class="relative p-2 rounded-full text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover-effect">
-                    <i data-lucide="bell" class="w-5 h-5"></i>
-                    <span class="absolute top-1 right-1.5 w-2 h-2 bg-[var(--destructive)] rounded-full notification-pop"></span>
+                <button class="p-2 rounded-full hover:bg-oklch(0.2 0 0)">
+                    <i data-lucide="bell" class="w-5 h-5 text-[var(--muted-foreground)]"></i>
                 </button>
-                <div class="flex items-center space-x-2">
-                    <img src="https://placehold.co/40x40" alt="Profile" class="w-10 h-10 rounded-full border border-[var(--border)]">
-                    <div class="hidden md:block">
-                        <p class="text-sm font-medium">Admin User</p>
-                        <p class="text-xs text-[var(--muted-foreground)]">Administrator</p>
+                <button class="flex items-center space-x-2 p-1 rounded-full hover:bg-oklch(0.2 0 0)">
+                    <img src="https://placehold.co/32x32/2d3748/a0aec0.png" alt="User Avatar" class="w-8 h-8 rounded-full">
+                    <span class="hidden md:block text-sm font-medium">User</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-24 container mx-auto px-6">
+        <div class="flex flex-col lg:flex-row gap-8">
+
+            <!-- Left: Main Content Area -->
+            <div class="w-full lg:w-2/3 space-y-8">
+                <!-- Welcome Banner -->
+                <div class="card p-6 stagger-load" style="animation-delay: 100ms;">
+                    <h1 class="text-2xl font-bold">Welcome back, User!</h1>
+                    <div class="flex items-center space-x-4 mt-2">
+                        <span class="inline-flex items-center bg-[var(--primary)] text-xs font-semibold px-2.5 py-0.5 rounded-full text-[var(--primary-foreground)]">
+                            <i data-lucide="star" class="w-3 h-3 mr-1.5"></i> Level 5
+                        </span>
+                        <span class="text-sm text-[var(--muted-foreground)]">2,500 XP</span>
                     </div>
                 </div>
-                <button class="p-2 rounded-full text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover-effect button-click">
-                    <i data-lucide="settings" class="w-5 h-5"></i>
-                </button>
-            </div>
-        </header>
 
-        <div class="flex flex-1 overflow-hidden">
-            <!-- Sidebar -->
-            <aside class="bg-[var(--sidebar)] border-r border-[var(--sidebar-border)] w-64 md:w-72 overflow-y-auto hidden md:block sidebar-slide-in">
-                <nav class="px-4 py-6 space-y-1">
-                    <a href="#" class="flex items-center px-4 py-3 rounded-lg bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)] menu-item-select">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
-                        <span>Dashboard</span>
-                    </a>
-                    <a href="#" class="flex items-center px-4 py-3 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] menu-item-select">
-                        <i data-lucide="users" class="w-5 h-5 mr-3"></i>
-                        <span>User Management</span>
-                    </a>
-                    <a href="#" class="flex items-center px-4 py-3 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] menu-item-select">
-                        <i data-lucide="file-text" class="w-5 h-5 mr-3"></i>
-                        <span>Exam Management</span>
-                    </a>
-                    <a href="#" class="flex items-center px-4 py-3 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] menu-item-select">
-                        <i data-lucide="monitor" class="w-5 h-5 mr-3"></i>
-                        <span>Online Exam</span>
-                    </a>
-                    <a href="#" class="flex items-center px-4 py-3 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] menu-item-select">
-                        <i data-lucide="video" class="w-5 h-5 mr-3"></i>
-                        <span>Proctoring & Anti-cheating</span>
-                    </a>
-                    <a href="#" class="flex items-center px-4 py-3 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] menu-item-select">
-                        <i data-lucide="lock" class="w-5 h-5 mr-3"></i>
-                        <span>Security & Blockchain</span>
-                    </a>
-                    <a href="#" class="flex items-center px-4 py-3 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] menu-item-select">
-                        <i data-lucide="award" class="w-5 h-5 mr-3"></i>
-                        <span>Token Reward System</span>
-                    </a>
-                    <a href="#" class="flex items-center px-4 py-3 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] menu-item-select">
-                        <i data-lucide="book-open" class="w-5 h-5 mr-3"></i>
-                        <span>Course Management</span>
-                    </a>
-                    <a href="#" class="flex items-center px-4 py-3 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] menu-item-select">
-                        <i data-lucide="building" class="w-5 h-5 mr-3"></i>
-                        <span>Organization Management</span>
-                    </a>
-                    <a href="#" class="flex items-center px-4 py-3 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] menu-item-select">
-                        <i data-lucide="server" class="w-5 h-5 mr-3"></i>
-                        <span>System Admin</span>
-                    </a>
-                    <a href="#" class="flex items-center px-4 py-3 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] menu-item-select">
-                        <i data-lucide="bar-chart" class="w-5 h-5 mr-3"></i>
-                        <span>Analytics & Reports</span>
-                    </a>
-                    <a href="#" class="flex items-center px-4 py-3 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] menu-item-select">
-                        <i data-lucide="copyright" class="w-5 h-5 mr-3"></i>
-                        <span>Document Copyright</span>
-                    </a>
-                </nav>
+                <!-- Continue Practice -->
+                <div class="card p-6 stagger-load" style="animation-delay: 200ms;">
+                    <h2 class="font-semibold mb-3">Continue Practice</h2>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-medium">Problem Solving (Basic)</p>
+                            <p class="text-sm text-[var(--muted-foreground)]">Arrays, Strings, Sorting</p>
+                        </div>
+                        <a href="#" class="bg-[var(--primary)] text-[var(--primary-foreground)] px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity">Resume</a>
+                    </div>
+                </div>
+
+                <!-- Prepare by Topic -->
+                <div class="stagger-load" style="animation-delay: 300ms;">
+                    <h2 class="text-xl font-bold mb-4">Prepare by Topic</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="card p-5 text-center">
+                            <i data-lucide="puzzle" class="w-10 h-10 mx-auto mb-3 text-[var(--accent)]"></i>
+                            <h3 class="font-semibold">Problem Solving</h3>
+                        </div>
+                        <div class="card p-5 text-center">
+                            <i data-lucide="database" class="w-10 h-10 mx-auto mb-3 text-[var(--accent)]"></i>
+                            <h3 class="font-semibold">SQL</h3>
+                        </div>
+                        <div class="card p-5 text-center">
+                            <i data-lucide="binary" class="w-10 h-10 mx-auto mb-3 text-[var(--accent)]"></i>
+                            <h3 class="font-semibold">Algorithms</h3>
+                        </div>
+                        <div class="card p-5 text-center">
+                            <i data-lucide="braces" class="w-10 h-10 mx-auto mb-3 text-[var(--accent)]"></i>
+                            <h3 class="font-semibold">Data Structures</h3>
+                        </div>
+                        <div class="card p-5 text-center">
+                            <i data-lucide="code" class="w-10 h-10 mx-auto mb-3 text-[var(--accent)]"></i>
+                            <h3 class="font-semibold">Python</h3>
+                        </div>
+                        <div class="card p-5 text-center">
+                            <i data-lucide="file-json" class="w-10 h-10 mx-auto mb-3 text-[var(--accent)]"></i>
+                            <h3 class="font-semibold">JavaScript</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <aside class="w-full lg:w-1/3 space-y-8">
+                <!-- Your Next Cert -->
+                <div class="card p-6 stagger-load" style="animation-delay: 400ms;">
+                    <h2 class="font-semibold mb-4">Your Next Certification</h2>
+                    <div class="border border-oklch(0.3 0 0) rounded-lg p-4 flex items-center space-x-4">
+                        <i data-lucide="award" class="w-8 h-8 text-[var(--accent)]"></i>
+                        <div>
+                            <h3 class="font-medium">Python (Basic)</h3>
+                            <a href="#" class="text-sm text-[var(--accent)] hover:underline">Get Certified</a>
+                        </div>
+                    </div>
+                    <a href="#" class="block text-center mt-4 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)]">View all certifications</a>
+                </div>
+
+                <!-- Daily Streak -->
+                <div class="card p-6 stagger-load" style="animation-delay: 500ms;">
+                    <h2 class="font-semibold mb-4">Daily Streak</h2>
+                    <div class="flex justify-around mb-2">
+                        <div class="text-center"><p class="text-xs text-[var(--muted-foreground)]">S</p><div class="w-5 h-5 rounded-full bg-[var(--primary)] mt-1"></div></div>
+                        <div class="text-center"><p class="text-xs text-[var(--muted-foreground)]">M</p><div class="w-5 h-5 rounded-full bg-[var(--primary)] mt-1"></div></div>
+                        <div class="text-center"><p class="text-xs text-[var(--muted-foreground)]">T</p><div class="w-5 h-5 rounded-full bg-[var(--primary)] mt-1"></div></div>
+                        <div class="text-center"><p class="text-xs text-[var(--muted-foreground)]">W</p><div class="w-5 h-5 rounded-full bg-oklch(0.25 0 0) mt-1"></div></div>
+                        <div class="text-center"><p class="text-xs text-[var(--muted-foreground)]">T</p><div class="w-5 h-5 rounded-full bg-oklch(0.25 0 0) mt-1"></div></div>
+                        <div class="text-center"><p class="text-xs text-[var(--muted-foreground)]">F</p><div class="w-5 h-5 rounded-full bg-oklch(0.25 0 0) mt-1"></div></div>
+                        <div class="text-center"><p class="text-xs text-[var(--muted-foreground)]">S</p><div class="w-5 h-5 rounded-full bg-oklch(0.25 0 0) mt-1"></div></div>
+                    </div>
+                    <p class="text-center text-sm font-medium">Current Streak: <span class="text-[var(--accent)]">3 Days</span></p>
+                </div>
             </aside>
 
-            <!-- Main Content -->
-            <main class="flex-1 overflow-y-auto p-6 content-fade-up">
-                <h2 class="text-2xl font-bold mb-6">Dashboard Overview</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Quick Stats -->
-                    <div class="bg-[var(--card)] p-6 rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] widget-load" style="animation-delay: 0ms;">
-                        <h3 class="text-lg font-semibold mb-2">Quick Stats</h3>
-                        <p class="text-3xl font-bold text-[var(--primary)]">1,234</p>
-                        <p class="text-sm text-[var(--muted-foreground)]">Active Users</p>
-                    </div>
-                    <!-- Recent Exams -->
-                    <div class="bg-[var(--card)] p-6 rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] widget-load" style="animation-delay: 100ms;">
-                        <h3 class="text-lg font-semibold mb-2">Recent Exams</h3>
-                        <p class="text-3xl font-bold text-[var(--primary)]">5</p>
-                        <p class="text-sm text-[var(--muted-foreground)]">Scheduled this week</p>
-                    </div>
-                    <!-- Token Balance -->
-                    <div class="bg-[var(--card)] p-6 rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] widget-load" style="animation-delay: 200ms;">
-                        <h3 class="text-lg font-semibold mb-2">Token Balance</h3>
-                        <p class="text-3xl font-bold text-[var(--primary)]">10,500</p>
-                        <p class="text-sm text-[var(--muted-foreground)]">Total Tokens Distributed</p>
-                    </div>
-                    <!-- Course Progress -->
-                    <div class="bg-[var(--card)] p-6 rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] widget-load" style="animation-delay: 300ms;">
-                        <h3 class="text-lg font-semibold mb-2">Course Progress</h3>
-                        <div class="w-full bg-[var(--muted)] rounded-full h-2.5">
-                            <div class="bg-[var(--primary)] h-2.5 rounded-full" style="width: 65%;"></div>
-                        </div>
-                        <p class="text-sm text-[var(--muted-foreground)] mt-2">65% Completion Rate</p>
-                    </div>
-                    <!-- Upload Document -->
-                    <div class="bg-[var(--card)] p-6 rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] widget-load hover-effect" style="animation-delay: 400ms;">
-                        <h3 class="text-lg font-semibold mb-2">Upload Document</h3>
-                        <p class="text-sm text-[var(--muted-foreground)] mb-4">Securely upload academic materials</p>
-                        <button class="bg-[var(--primary)] text-[var(--primary-foreground)] px-4 py-2 rounded-[var(--radius-md)] hover:bg-[var(--primary)]/90 button-click">Upload Now</button>
-                    </div>
-                    <!-- Analytics -->
-                    <div class="bg-[var(--card)] p-6 rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] widget-load hover-effect" style="animation-delay: 500ms;">
-                        <h3 class="text-lg font-semibold mb-2">Analytics</h3>
-                        <p class="text-sm text-[var(--muted-foreground)] mb-4">View detailed reports and insights</p>
-                        <button class="bg-[var(--primary)] text-[var(--primary-foreground)] px-4 py-2 rounded-[var(--radius-md)] hover:bg-[var(--primary)]/90 button-click">View Reports</button>
-                    </div>
-                </div>
-            </main>
         </div>
-
-        <!-- Footer -->
-        <footer class="bg-[var(--card)] border-t border-[var(--border)] px-6 py-4 text-center text-sm text-[var(--muted-foreground)]">
-            <p>EduPlatform © 2023 | Version 1.0.0 | <a href="#" class="hover:text-[var(--foreground)]">Help & Support</a></p>
-        </footer>
-    </div>
+    </main>
 
     <script>
-        // Initialize Lucide icons
         lucide.createIcons();
+
+        // Stagger load animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.stagger-load');
+            elements.forEach((el) => {
+                // Trigger reflow to restart animation if needed
+                void el.offsetWidth;
+            });
+        });
     </script>
 </body>
 </html>
 
-Above is the design implementation, please use that as a reference to build a similar UI component. Make sure to follow modern React and TypeScript best practices.

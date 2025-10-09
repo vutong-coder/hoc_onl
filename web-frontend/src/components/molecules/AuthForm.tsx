@@ -9,8 +9,10 @@ interface AuthFormProps {
 	onSubmit: (e: React.FormEvent) => void
 	buttonText: string
 	loading?: boolean
+	error?: string | null
 	footer?: React.ReactNode
 	buttonStyle?: React.CSSProperties
+	afterButton?: React.ReactNode
 }
 
 export default function AuthForm({
@@ -20,8 +22,10 @@ export default function AuthForm({
 	onSubmit,
 	buttonText,
 	loading = false,
+	error,
 	footer,
-	buttonStyle = {}
+	buttonStyle = {},
+	afterButton
 }: AuthFormProps): JSX.Element {
 	return (
 		<div style={{
@@ -61,10 +65,29 @@ export default function AuthForm({
 			}}>
 				{children}
 				
+				{error && (
+					<div style={{
+						padding: '0.75rem',
+						background: 'var(--destructive)',
+						color: 'var(--destructive-foreground)',
+						borderRadius: 'var(--radius-md)',
+						fontSize: '0.875rem',
+						textAlign: 'center'
+					}}>
+						{error}
+					</div>
+				)}
+				
 				<Button type="submit" loading={loading} style={{ marginTop: '0.5rem', ...buttonStyle }}>
 					{buttonText}
 				</Button>
 			</form>
+
+			{afterButton && (
+				<div style={{ marginTop: '1.5rem' }}>
+					{afterButton}
+				</div>
+			)}
 
 			{footer && (
 				<div style={{

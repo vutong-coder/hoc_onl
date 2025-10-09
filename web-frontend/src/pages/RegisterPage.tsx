@@ -1,15 +1,12 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import AuthForm from '../components/molecules/AuthForm'
 import Input from '../components/atoms/Input'
 import PasswordStrength from '../components/atoms/PasswordStrength'
+import SocialAuthButtons from '../components/molecules/SocialAuthButtons'
 import { validateEmail, validatePassword, validateName, validateConfirmPassword, checkPasswordStrength } from '../utils/authValidation'
-import { AuthPageType } from '../components/layouts/AuthLayout'
 
-interface RegisterPageProps {
-	onNavigate: (page: AuthPageType) => void
-}
-
-export default function RegisterPage({ onNavigate }: RegisterPageProps): JSX.Element {
+export default function RegisterPage(): JSX.Element {
 	const [formData, setFormData] = useState({
 		name: '',
 		email: '',
@@ -65,6 +62,21 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps): JSX.Ele
 		}, 1000)
 	}
 
+	const handleGoogleAuth = () => {
+		console.log('Google authentication')
+		// TODO: Implement Google OAuth
+	}
+
+	const handleFacebookAuth = () => {
+		console.log('Facebook authentication')
+		// TODO: Implement Facebook OAuth
+	}
+
+	const handleGitHubAuth = () => {
+		console.log('GitHub authentication')
+		// TODO: Implement GitHub OAuth
+	}
+
 	return (
 		<AuthForm
 			title="Create Account"
@@ -72,12 +84,17 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps): JSX.Ele
 			onSubmit={handleSubmit}
 			buttonText="Create Account"
 			loading={loading}
+			afterButton={
+				<SocialAuthButtons
+					onGoogleAuth={handleGoogleAuth}
+					onGitHubAuth={handleGitHubAuth}
+				/>
+			}
 			footer={
 				<p style={{ margin: 0 }}>
 					Already have an account?{' '}
-					<button
-						type="button"
-						onClick={() => onNavigate('login')}
+					<Link 
+						to="/auth/login"
 						style={{
 							background: 'none',
 							border: 'none',
@@ -89,7 +106,7 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps): JSX.Ele
 						}}
 					>
 						Sign in
-					</button>
+					</Link>
 				</p>
 			}
 		>
@@ -125,8 +142,6 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps): JSX.Ele
 					placeholder="Create a password"
 					error={errors.password}
 					required
-					showPassword={showPassword}
-					onTogglePassword={() => setShowPassword(!showPassword)}
 				/>
 				<PasswordStrength strength={passwordStrength} />
 			</div>
@@ -140,8 +155,6 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps): JSX.Ele
 				placeholder="Confirm your password"
 				error={errors.confirmPassword}
 				required
-				showPassword={showConfirmPassword}
-				onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
 			/>
 		</AuthForm>
 	)

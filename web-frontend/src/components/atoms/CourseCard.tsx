@@ -1,0 +1,152 @@
+import React from 'react'
+import { BookOpen, Play, Award, Clock } from 'lucide-react'
+
+interface Course {
+	id: string
+	title: string
+	progress: number
+	totalLessons: number
+	completedLessons: number
+	duration: string
+	nextLesson?: string
+	certificate?: boolean
+}
+
+interface CourseCardProps {
+	course: Course
+	onContinueCourse?: (courseId: string) => void
+	onViewCourse?: (courseId: string) => void
+}
+
+export default function CourseCard({ course, onContinueCourse, onViewCourse }: CourseCardProps): JSX.Element {
+	const getProgressColor = (progress: number) => {
+		if (progress >= 80) return '#10b981'
+		if (progress >= 60) return '#3b82f6'
+		if (progress >= 40) return '#f59e0b'
+		return '#ef4444'
+	}
+
+	return (
+		<div style={{ 
+			padding: '16px', 
+			borderRadius: 'var(--radius-md)', 
+			border: '1px solid var(--border)', 
+			background: 'var(--card)',
+			transition: 'border-color var(--transition-normal)',
+			cursor: 'pointer'
+		}}
+		onMouseEnter={(e) => {
+			e.currentTarget.style.borderColor = 'var(--accent)'
+		}}
+		onMouseLeave={(e) => {
+			e.currentTarget.style.borderColor = 'var(--border)'
+		}}>
+			<div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+				<div style={{ flex: 1 }}>
+					<div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+						<BookOpen style={{ width: '16px', height: '16px', color: 'var(--accent)', marginRight: '8px' }} />
+						<h4 style={{ fontSize: '14px', fontWeight: 500, margin: 0 }}>
+							{course.title}
+						</h4>
+					</div>
+					
+					<div style={{ display: 'flex', alignItems: 'center', fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '8px' }}>
+						<Clock style={{ width: '12px', height: '12px', marginRight: '4px' }} />
+						{course.duration} • {course.completedLessons}/{course.totalLessons} lessons
+					</div>
+
+					{/* Progress Bar */}
+					<div style={{ marginBottom: '8px' }}>
+						<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+							<span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
+								Progress
+							</span>
+							<span style={{ fontSize: '12px', fontWeight: 600, color: getProgressColor(course.progress) }}>
+								{course.progress}%
+							</span>
+						</div>
+						<div style={{ 
+							width: '100%', 
+							height: '6px', 
+							background: 'var(--muted)', 
+							borderRadius: '3px', 
+							overflow: 'hidden' 
+						}}>
+							<div style={{ 
+								width: `${course.progress}%`, 
+								height: '100%', 
+								background: getProgressColor(course.progress), 
+								borderRadius: '3px',
+								transition: 'width 0.3s ease'
+							}} />
+						</div>
+					</div>
+
+					{course.nextLesson && (
+						<div style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '8px' }}>
+							Next: {course.nextLesson}
+						</div>
+					)}
+
+					{course.certificate && (
+						<div style={{ display: 'flex', alignItems: 'center', marginTop: '8px' }}>
+							<span style={{ 
+								fontSize: '12px', 
+								background: 'var(--accent)', 
+								color: 'var(--accent-foreground)', 
+								padding: '2px 8px', 
+								borderRadius: '9999px' 
+							}}>
+								Certificate Available
+							</span>
+						</div>
+					)}
+				</div>
+
+				<div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginLeft: '12px' }}>
+					<button 
+						onClick={() => onContinueCourse?.(course.id)}
+						style={{ 
+							background: 'var(--primary)', 
+							color: 'var(--primary-foreground)', 
+							padding: '6px 12px', 
+							borderRadius: 'var(--radius-md)', 
+							fontSize: '12px', 
+							fontWeight: 500, 
+							border: 'none', 
+							cursor: 'pointer',
+							transition: 'background-color var(--transition-normal)',
+							display: 'flex',
+							alignItems: 'center',
+							gap: '4px'
+						}}
+						onMouseEnter={(e) => {
+							e.currentTarget.style.background = 'var(--accent)'
+						}}
+						onMouseLeave={(e) => {
+							e.currentTarget.style.background = 'var(--primary)'
+						}}
+					>
+						<Play style={{ width: '12px', height: '12px' }} />
+						Continue
+					</button>
+					
+					<button 
+						onClick={() => onViewCourse?.(course.id)}
+						style={{ 
+							fontSize: '12px', 
+							color: 'var(--muted-foreground)', 
+							background: 'none', 
+							border: 'none', 
+							cursor: 'pointer',
+							textDecoration: 'underline',
+							transition: 'color var(--transition-normal)'
+						}}
+					>
+						View Details
+					</button>
+				</div>
+			</div>
+		</div>
+	)
+}

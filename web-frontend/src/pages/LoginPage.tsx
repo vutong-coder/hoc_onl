@@ -1,23 +1,41 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
 import AuthForm from '../components/molecules/AuthForm'
 import Input from '../components/atoms/Input'
 import Checkbox from '../components/atoms/Checkbox'
+import SocialAuthButtons from '../components/molecules/SocialAuthButtons'
 import { validateEmail, validatePassword } from '../utils/authValidation'
-import { AuthPageType } from '../components/layouts/AuthLayout'
+import { loginUser, clearError } from '../store/slices/authSlice'
 
-interface LoginPageProps {
-	onNavigate: (page: AuthPageType) => void
-}
-
-export default function LoginPage({ onNavigate }: LoginPageProps): JSX.Element {
+export default function LoginPage(): JSX.Element {
 	const [formData, setFormData] = useState({
 		email: '',
 		password: ''
 	})
 	const [errors, setErrors] = useState<Record<string, string>>({})
-	const [loading, setLoading] = useState(false)
 	const [rememberMe, setRememberMe] = useState(false)
 	const [showPassword, setShowPassword] = useState(false)
+
+	const dispatch = useAppDispatch()
+	const navigate = useNavigate()
+	const { loading, error, loggedIn, role } = useAppSelector((state) => state.auth)
+
+	// Redirect based on role after successful login
+	useEffect(() => {
+		if (loggedIn) {
+			if (role === 'admin') {
+				navigate('/admin/dashboard')
+			} else if (role === 'user') {
+				navigate('/user')
+			}
+		}
+	}, [loggedIn, role, navigate])
+
+	// Clear error when component mounts
+	useEffect(() => {
+		dispatch(clearError())
+	}, [dispatch])
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
@@ -44,13 +62,26 @@ export default function LoginPage({ onNavigate }: LoginPageProps): JSX.Element {
 			return
 		}
 
-		setLoading(true)
-		
-		// Simulate API call
-		setTimeout(() => {
-			setLoading(false)
-			console.log('Login data:', { ...formData, rememberMe })
-		}, 1000)
+		// Dispatch login action
+		dispatch(loginUser({
+			email: formData.email,
+			password: formData.password
+		}))
+	}
+
+	const handleGoogleAuth = () => {
+		console.log('Google authentication')
+		// TODO: Implement Google OAuth
+	}
+
+	const handleFacebookAuth = () => {
+		console.log('Facebook authentication')
+		// TODO: Implement Facebook OAuth
+	}
+
+	const handleGitHubAuth = () => {
+		console.log('GitHub authentication')
+		// TODO: Implement GitHub OAuth
 	}
 
 	return (
@@ -60,12 +91,18 @@ export default function LoginPage({ onNavigate }: LoginPageProps): JSX.Element {
 			onSubmit={handleSubmit}
 			buttonText="Login"
 			loading={loading}
+			error={error}
+			afterButton={
+				<SocialAuthButtons
+					onGoogleAuth={handleGoogleAuth}
+					onGitHubAuth={handleGitHubAuth}
+				/>
+			}
 			footer={
 				<p style={{ margin: 0 }}>
 					Don't have an account?{' '}
-					<button
-						type="button"
-						onClick={() => onNavigate('register')}
+					<Link 
+						to="/auth/register"
 						style={{
 							background: 'none',
 							border: 'none',
@@ -77,7 +114,7 @@ export default function LoginPage({ onNavigate }: LoginPageProps): JSX.Element {
 						}}
 					>
 						Sign up
-					</button>
+					</Link>
 				</p>
 			}
 		>
@@ -101,8 +138,6 @@ export default function LoginPage({ onNavigate }: LoginPageProps): JSX.Element {
 				placeholder="Enter your password"
 				error={errors.password}
 				required
-				showPassword={showPassword}
-				onTogglePassword={() => setShowPassword(!showPassword)}
 			/>
 			
 			<div style={{
@@ -117,9 +152,8 @@ export default function LoginPage({ onNavigate }: LoginPageProps): JSX.Element {
 					checked={rememberMe}
 					onChange={setRememberMe}
 				/>
-				<button
-					type="button"
-					onClick={() => onNavigate('forgot')}
+				<Link 
+					to="/auth/forgot"
 					style={{
 						background: 'none',
 						border: 'none',
@@ -130,7 +164,7 @@ export default function LoginPage({ onNavigate }: LoginPageProps): JSX.Element {
 					}}
 				>
 					Forgot Password?
-				</button>
+				</Link>
 			</div>
 		</AuthForm>
 	)

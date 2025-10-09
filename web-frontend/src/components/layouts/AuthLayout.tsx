@@ -1,18 +1,11 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from '../../pages/LoginPage'
 import RegisterPage from '../../pages/RegisterPage'
 import ForgotPasswordPage from '../../pages/ForgotPasswordPage'
 import ThemeToggle from '../atoms/ThemeToggle'
 
-export type AuthPageType = 'login' | 'register' | 'forgot'
-
 export default function AuthLayout(): JSX.Element {
-	const [currentPage, setCurrentPage] = useState<AuthPageType>('login')
-
-	const showPage = (pageId: AuthPageType) => {
-		setCurrentPage(pageId)
-	}
-
 	return (
 		<div style={{
 			minHeight: '100vh',
@@ -36,30 +29,12 @@ export default function AuthLayout(): JSX.Element {
 				alignItems: 'center',
 				justifyContent: 'center'
 			}}>
-				{currentPage === 'login' && (
-					<div style={{
-						width: '100%',
-						animation: 'fadeInUp 0.3s ease-out forwards'
-					}}>
-						<LoginPage onNavigate={showPage} />
-					</div>
-				)}
-				{currentPage === 'register' && (
-					<div style={{
-						width: '100%',
-						animation: 'fadeInUp 0.3s ease-out forwards'
-					}}>
-						<RegisterPage onNavigate={showPage} />
-					</div>
-				)}
-				{currentPage === 'forgot' && (
-					<div style={{
-						width: '100%',
-						animation: 'fadeInUp 0.3s ease-out forwards'
-					}}>
-						<ForgotPasswordPage onNavigate={showPage} />
-					</div>
-				)}
+				<Routes>
+					<Route index element={<Navigate to="/auth/login" replace />} />
+					<Route path="login" element={<LoginPage />} />
+					<Route path="register" element={<RegisterPage />} />
+					<Route path="forgot" element={<ForgotPasswordPage />} />
+				</Routes>
 			</div>
 		</div>
 	)

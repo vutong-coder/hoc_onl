@@ -1,15 +1,11 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import AuthForm from '../components/molecules/AuthForm'
 import Input from '../components/atoms/Input'
 import SuccessMessage from '../components/atoms/SuccessMessage'
 import { validateEmail } from '../utils/authValidation'
-import { AuthPageType } from '../components/layouts/AuthLayout'
 
-interface ForgotPasswordPageProps {
-	onNavigate: (page: AuthPageType) => void
-}
-
-export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPageProps): JSX.Element {
+export default function ForgotPasswordPage(): JSX.Element {
 	const [formData, setFormData] = useState({
 		email: ''
 	})
@@ -57,9 +53,8 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
 			footer={
 				<p style={{ margin: 0 }}>
 					Remember your password?{' '}
-					<button
-						type="button"
-						onClick={() => onNavigate('login')}
+					<Link 
+						to="/auth/login"
 						style={{
 							background: 'none',
 							border: 'none',
@@ -71,7 +66,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
 						}}
 					>
 						Sign in
-					</button>
+					</Link>
 				</p>
 			}
 		>

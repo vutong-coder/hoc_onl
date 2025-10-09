@@ -1,11 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
 import DashboardLayout from '../components/layouts/DashboardLayout'
+import UserLayout from '../components/layouts/UserLayout'
 import AuthLayout from '../components/layouts/AuthLayout'
+import ProtectedRoute from '../components/ProtectedRoute'
 import DashboardPage from '../pages/DashboardPage'
+import UserHomePage from '../pages/UserHomePage'
+import LandingPage from '../pages/LandingPage'
 import ExamPage from '../pages/ExamPage'
 import MonitorPage from '../pages/MonitorPage'
 import RewardPage from '../pages/RewardPage'
+import { checkAuth } from '../store/slices/authSlice'
 
 // Tạo các trang placeholder cho các chức năng khác
 const UsersPage = () => <div><h2>User Management</h2><p>Quản lý người dùng</p></div>
@@ -19,13 +25,26 @@ const AnalyticsPage = () => <div><h2>Analytics & Reports</h2><p>Phân tích và 
 const CopyrightPage = () => <div><h2>Document Copyright</h2><p>Bản quyền tài liệu</p></div>
 
 export default function AppRoutes(): JSX.Element {
+	const dispatch = useAppDispatch()
+	const { loggedIn } = useAppSelector((state) => state.auth)
+
+	// Check authentication on app load
+	useEffect(() => {
+		dispatch(checkAuth())
+	}, [dispatch])
 	return (
 		<BrowserRouter>
 			<Routes>
 				<Route path="/auth/*" element={<AuthLayout />} />
 				<Route path="/login" element={<Navigate to="/auth" replace />} />
-				<Route path="/" element={<DashboardLayout />}>
-					<Route index element={<Navigate to="/dashboard" replace />} />
+				
+				{/* Admin Routes */}
+				<Route path="/admin/*" element={
+					<ProtectedRoute requiredRole="admin">
+						<DashboardLayout />
+					</ProtectedRoute>
+				}>
+					<Route index element={<Navigate to="/admin/dashboard" replace />} />
 					<Route path="dashboard" element={<DashboardPage />} />
 					<Route path="users" element={<UsersPage />} />
 					<Route path="exams" element={<ExamsPage />} />
@@ -39,6 +58,26 @@ export default function AppRoutes(): JSX.Element {
 					<Route path="analytics" element={<AnalyticsPage />} />
 					<Route path="copyright" element={<CopyrightPage />} />
 				</Route>
+				
+				{/* Landing Page */}
+				<Route path="/" element={<LandingPage />} />
+				
+				{/* User Routes */}
+				<Route path="/user/*" element={
+					<ProtectedRoute requiredRole="user">
+						<UserLayout />
+					</ProtectedRoute>
+				}>
+					<Route index element={<UserHomePage />} />
+					<Route path="home" element={<UserHomePage />} />
+					<Route path="prepare" element={<UserHomePage />} />
+					<Route path="certify" element={<div><h2>Certify</h2><p>Trang chứng nhận</p></div>} />
+					<Route path="compete" element={<div><h2>Compete</h2><p>Trang thi đấu</p></div>} />
+					<Route path="exam" element={<ExamPage />} />
+					<Route path="monitor" element={<MonitorPage />} />
+					<Route path="reward" element={<RewardPage />} />
+				</Route>
+				
 				<Route path="*" element={<div style={{ padding: 24 }}>Not Found</div>} />
 			</Routes>
 		</BrowserRouter>

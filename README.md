@@ -1,229 +1,345 @@
-# EduPlatform - Hệ Thống Học Tập Trực Tuyến
+# 🚀 NCKH Project - Modern Web Application
 
-## 📖 Giới Thiệu
+## 📋 Tổng quan dự án
 
-EduPlatform là một hệ thống học tập trực tuyến hiện đại được xây dựng với React và TypeScript. Hệ thống cung cấp các tính năng quản lý khóa học, thi trực tuyến, chống gian lận và phần thưởng token.
+Dự án NCKH là một ứng dụng web hiện đại được xây dựng với React + TypeScript, có giao diện đẹp mắt và chức năng đầy đủ cho cả admin và người dùng cuối.
 
-## ✨ Tính Năng Chính
+## 🏗️ Cấu trúc dự án
 
-### 🔐 Hệ Thống Xác Thực
-- **Đăng nhập/Đăng ký**: Giao diện thân thiện với validation đầy đủ
-- **Quên mật khẩu**: Khôi phục mật khẩu qua email
-- **Bảo mật mật khẩu**: 
-  - Không cho phép chữ có dấu tiếng Việt
-  - Không cho phép dấu cách
-  - Chỉ thị độ mạnh mật khẩu real-time
-  - Toggle hiển thị/ẩn mật khẩu
+```
+nckh/
+├── web-frontend/                 # Frontend React Application
+│   ├── src/
+│   │   ├── components/          # React Components
+│   │   │   ├── atoms/           # Basic UI components
+│   │   │   ├── molecules/       # Composite components
+│   │   │   └── layouts/         # Layout components
+│   │   ├── pages/               # Page components
+│   │   ├── hooks/               # Custom React hooks
+│   │   ├── services/            # API & external services
+│   │   ├── store/               # Redux store & slices
+│   │   ├── routes/              # React Router configuration
+│   │   ├── utils/                # Utility functions
+│   │   └── assets/              # Static assets
+│   │       ├── theme.css        # Main CSS file
+│   │       └── css/             # Modular CSS files
+│   │           ├── variables.css    # CSS Variables & Theme
+│   │           ├── base.css         # Base styles
+│   │           ├── typography.css   # Typography system
+│   │           ├── animations.css   # Animations & keyframes
+│   │           ├── components.css   # Component styles
+│   │           └── utilities.css    # Utility classes
+│   ├── public/                  # Public assets
+│   ├── dist/                    # Build output
+│   ├── package.json             # Dependencies
+│   └── vite.config.ts           # Vite configuration
+├── test.html                    # Design reference
+└── README.md                    # This file
+```
 
-### 🎨 Giao Diện & Theme
-- **Dark/Light Mode**: Tự động chuyển đổi theo cài đặt trình duyệt
-- **Responsive Design**: Tương thích mọi thiết bị
-- **Smooth Animations**: Hiệu ứng chuyển động mượt mà
-- **Theme Notification**: Thông báo theme tự động ẩn sau 5 giây
+## 🎨 Giao diện & Design System
 
-### 🏗️ Kiến Trúc Code
-- **Atomic Design**: Tổ chức components theo nguyên tắc atomic
-- **TypeScript**: Type safety và IntelliSense
-- **Reusable Components**: Components tái sử dụng cao
-- **Clean Architecture**: Cấu trúc code rõ ràng, dễ bảo trì
+### Theme System
+- **Dark Theme**: Mặc định, giống với test.html
+- **Light Theme**: Tự động chuyển theo browser preference
+- **Colors**: Sử dụng OKLCH color space cho độ chính xác cao
+- **Typography**: Inter, Poppins, JetBrains Mono, Space Grotesk
 
-## 🛠️ Công Nghệ Sử Dụng
+### CSS Architecture
+- **Modular Structure**: CSS được tách thành các file riêng biệt
+- **CSS Variables**: Dynamic theming với CSS custom properties
+- **Responsive Design**: Mobile-first approach
+- **Animations**: Smooth transitions và micro-interactions
 
-### Frontend
-- **React 18** - UI Framework
-- **TypeScript** - Type Safety
-- **Vite** - Build Tool
-- **CSS Variables** - Theme System
-- **React Router** - Navigation
+### Components
+- **Cards**: Glassmorphism effects với hover animations
+- **Buttons**: Gradient backgrounds và shimmer effects
+- **Icons**: Enhanced với glow effects
+- **Grids**: Responsive layout systems
+
+## 🔧 Công nghệ sử dụng
+
+### Frontend Stack
+- **React 18**: UI library với hooks
+- **TypeScript**: Type safety và better DX
+- **Vite**: Fast build tool và dev server
+- **React Router**: Client-side routing
+- **Redux Toolkit**: State management
+- **Lucide React**: Icon library
 
 ### Styling
-- **CSS Custom Properties** - Theme variables
-- **CSS Animations** - Smooth transitions
-- **Responsive Design** - Mobile-first approach
+- **CSS Modules**: Scoped styling
+- **CSS Variables**: Dynamic theming
+- **OKLCH Colors**: Modern color space
+- **Glassmorphism**: Modern UI effects
 
-## 📁 Cấu Trúc Dự Án
+### Development Tools
+- **ESLint**: Code linting
+- **Prettier**: Code formatting
+- **TypeScript**: Static type checking
 
-```
-web-frontend/
-├── src/
-│   ├── components/
-│   │   ├── atoms/           # Components cơ bản
-│   │   │   ├── Button.tsx
-│   │   │   ├── Input.tsx
-│   │   │   ├── Checkbox.tsx
-│   │   │   └── ...
-│   │   ├── molecules/       # Components phức tạp
-│   │   │   └── AuthForm.tsx
-│   │   └── layouts/         # Layout components
-│   │       ├── AuthLayout.tsx
-│   │       ├── DashboardLayout.tsx
-│   │       └── ...
-│   ├── pages/              # Trang chính
-│   │   ├── LoginPage.tsx
-│   │   ├── RegisterPage.tsx
-│   │   ├── ForgotPasswordPage.tsx
-│   │   └── ...
-│   ├── utils/              # Utilities
-│   │   └── authValidation.ts
-│   ├── assets/             # Static assets
-│   │   └── theme.css
-│   └── routes/             # Routing
-│       └── AppRoutes.tsx
-└── public/                 # Public assets
-```
+## 🚀 Cài đặt & Chạy dự án
 
-## 🚀 Cài Đặt & Chạy
-
-### Yêu Cầu Hệ Thống
+### Yêu cầu hệ thống
 - Node.js >= 16.0.0
 - npm >= 8.0.0
 
-### Cài Đặt Dependencies
+### Cài đặt
 ```bash
+# Clone repository
+git clone <repository-url>
+cd nckh
+
+# Cài đặt dependencies
 cd web-frontend
 npm install
 ```
 
-### Chạy Development Server
+### Chạy development server
 ```bash
 npm run dev
 ```
 
-### Build Production
+### Build production
 ```bash
 npm run build
 ```
 
-### Preview Production Build
+### Preview production build
 ```bash
 npm run preview
 ```
 
-## 🎯 Tính Năng Chi Tiết
+## 📱 Tính năng chính
 
-### 🔐 Authentication Pages
+### Admin Dashboard
+- **Dashboard**: Tổng quan hệ thống
+- **Exam Management**: Quản lý bài thi
+- **Monitor**: Giám sát hệ thống
+- **Reward**: Quản lý phần thưởng
 
-#### Login Page
-- Email và password validation
-- Checkbox "Remember me"
-- Link "Forgot Password?" cùng hàng với checkbox
-- Button "Login" màu xanh
-- Footer với link đăng ký
+### User Homepage
+- **Welcome Banner**: Chào mừng người dùng
+- **Continue Practice**: Tiếp tục luyện tập
+- **Prepare by Topic**: Luyện tập theo chủ đề
+- **Certification**: Chứng chỉ
+- **Daily Streak**: Chuỗi ngày học
 
-#### Register Page
-- Form đăng ký với validation đầy đủ
-- Password strength indicator
-- Confirm password validation
-- Real-time feedback
+### Authentication
+- **Login**: Đăng nhập
+- **Register**: Đăng ký
+- **Forgot Password**: Quên mật khẩu
+- **Password Strength**: Kiểm tra độ mạnh mật khẩu
 
-#### Forgot Password Page
-- Email validation
-- Success message với auto-hide
-- Clean interface
+## 🎯 Routing Structure
 
-### 🎨 Theme System
+```
+/ (User Routes)
+├── /home                    # User homepage
+├── /exam                    # Exam page
+├── /monitor                 # Monitor page
+├── /reward                  # Reward page
+└── /auth/*                  # Authentication pages
 
-#### Auto Theme Switching
-```css
-/* Light Theme (Default) */
-:root {
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.15 0 0);
-  /* ... */
+/admin (Admin Routes)
+├── /admin/dashboard         # Admin dashboard
+├── /admin/exam              # Exam management
+├── /admin/monitor           # System monitoring
+└── /admin/reward            # Reward management
+```
+
+## 🎨 CSS Architecture
+
+### Modular CSS Structure
+```
+assets/css/
+├── variables.css         # CSS Variables & Theme System
+├── base.css              # Base HTML elements & reset
+├── typography.css        # Typography system
+├── animations.css        # Keyframes & animation classes
+├── components.css        # Component styles
+└── utilities.css         # Utility classes
+```
+
+### CSS Variables System
+- **Colors**: Primary, secondary, accent, muted colors
+- **Spacing**: Consistent spacing scale (4px to 96px)
+- **Typography**: Font families, sizes, weights
+- **Shadows**: Layered shadow system
+- **Transitions**: Smooth animation timings
+- **Gradients**: Modern gradient backgrounds
+- **Glassmorphism**: Backdrop blur effects
+
+### Utility Classes
+- **Layout**: `.container`, `.flex`, `.grid`
+- **Spacing**: `.p-*`, `.m-*`, `.gap-*`
+- **Typography**: `.text-*`, `.font-*`
+- **Hover Effects**: `.hover-lift`, `.hover-glow`
+- **States**: `.loading`, `.success`, `.warning`
+
+## 🔄 State Management
+
+### Redux Store Structure
+```
+store/
+├── index.ts               # Store configuration
+├── hooks.ts               # Typed hooks
+└── slices/
+    ├── authSlice.ts       # Authentication state
+    ├── examSlice.ts       # Exam state
+    ├── monitorSlice.ts    # Monitor state
+    └── walletSlice.ts     # Wallet state
+```
+
+## 🎭 Custom Hooks
+
+### Available Hooks
+- **useCameraMonitor**: Camera monitoring functionality
+- **useExamTimer**: Exam timer management
+- **useMultisigWallet**: Multi-signature wallet
+- **usePlagiarismCheck**: Plagiarism detection
+- **useRewardToken**: Reward token management
+
+## 📊 Services
+
+### API Services
+- **examApi.ts**: Exam-related API calls
+- **walletService.ts**: Blockchain wallet operations
+- **monitorService.ts**: System monitoring
+
+### External Integrations
+- **Blockchain**: Wallet integration
+- **Camera**: Monitoring capabilities
+- **AI**: Plagiarism detection
+
+## 🎨 Design System
+
+### Color Palette
+- **Primary**: Orange gradient (#FF6B35)
+- **Secondary**: Light gray (#F5F5F5)
+- **Accent**: Green (#00D4AA)
+- **Success**: Green gradient
+- **Warning**: Yellow gradient
+- **Error**: Red gradient
+
+### Typography Scale
+- **Display**: Poppins (headings)
+- **Body**: Inter (text content)
+- **Mono**: JetBrains Mono (code)
+- **Serif**: Space Grotesk (special text)
+
+### Spacing System
+- **xs**: 4px
+- **sm**: 8px
+- **md**: 16px
+- **lg**: 24px
+- **xl**: 32px
+- **2xl**: 48px
+- **3xl**: 64px
+
+## 🚀 Performance Optimizations
+
+### Build Optimizations
+- **Vite**: Fast HMR và build
+- **Tree Shaking**: Loại bỏ code không sử dụng
+- **Code Splitting**: Lazy loading components
+- **Asset Optimization**: Image và font optimization
+
+### Runtime Optimizations
+- **CSS Variables**: Dynamic theming không cần re-render
+- **Hardware Acceleration**: GPU-accelerated animations
+- **Memoization**: React.memo cho components
+- **Lazy Loading**: Route-based code splitting
+
+## 🔧 Development Guidelines
+
+### Code Style
+- **TypeScript**: Strict mode enabled
+- **ESLint**: Airbnb config
+- **Prettier**: Consistent formatting
+- **Conventional Commits**: Standardized commit messages
+
+### Component Structure
+```tsx
+// Component template
+interface ComponentProps {
+  // Props interface
 }
 
-/* Dark Theme */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: oklch(0.1450 0 0);
-    --foreground: oklch(0.9850 0 0);
-    /* ... */
-  }
+export default function Component({ }: ComponentProps): JSX.Element {
+  // Component logic
+  return (
+    // JSX
+  )
 }
 ```
 
-#### Theme Notification
-- Hiển thị theme hiện tại (🌙 Dark / ☀️ Light)
-- Tự động ẩn sau 5 giây
-- Hiện lại khi theme thay đổi
+### CSS Guidelines
+- **CSS Variables**: Sử dụng cho dynamic values
+- **Utility Classes**: Cho layout và spacing
+- **Component Classes**: Cho component-specific styles
+- **Responsive**: Mobile-first approach
 
-### 🔒 Password Validation
+## 📱 Responsive Design
 
-#### Rules
-- Tối thiểu 6 ký tự
-- Không có chữ có dấu tiếng Việt
-- Không có dấu cách
-- Chỉ thị độ mạnh real-time
+### Breakpoints
+- **Mobile**: < 768px
+- **Tablet**: 768px - 1024px
+- **Desktop**: > 1024px
 
-#### Strength Levels
-- **Weak**: Score ≤ 2
-- **Fair**: Score 3-4  
-- **Good**: Score 5
-- **Strong**: Score 6+
+### Responsive Features
+- **Flexible Grids**: Auto-fit grid layouts
+- **Responsive Typography**: clamp() for font sizes
+- **Adaptive Spacing**: CSS variables for spacing
+- **Mobile Navigation**: Collapsible navigation
 
-## 🎨 UI/UX Features
+## 🎯 Future Enhancements
 
-### Animations
-- **fadeInUp**: Hiệu ứng xuất hiện từ dưới lên
-- **shake**: Hiệu ứng rung khi có lỗi
-- **fadeOut**: Hiệu ứng biến mất mượt mà
+### Planned Features
+- **PWA Support**: Progressive Web App capabilities
+- **Offline Mode**: Service worker implementation
+- **Real-time Updates**: WebSocket integration
+- **Advanced Analytics**: User behavior tracking
+- **Multi-language**: i18n support
 
-### Responsive Design
-- Mobile-first approach
-- Breakpoints tương thích
-- Touch-friendly interface
-
-### Accessibility
-- Keyboard navigation
-- Screen reader support
-- High contrast mode
-- Focus indicators
-
-## 🔧 Development
-
-### Code Style
-- ESLint configuration
-- Prettier formatting
-- TypeScript strict mode
-- Component documentation
-
-### Git Workflow
-- Feature branches
-- Conventional commits
-- Code review process
-- Automated testing
-
-## 📝 Commit History
-
-### Recent Updates
-- ✅ Complete authentication system
-- ✅ Theme switching implementation
-- ✅ Password validation system
-- ✅ Component refactoring
-- ✅ Responsive design improvements
+### Technical Improvements
+- **Testing**: Unit và integration tests
+- **Storybook**: Component documentation
+- **Performance Monitoring**: Real-time metrics
+- **Error Tracking**: Sentry integration
 
 ## 🤝 Contributing
 
+### Development Workflow
 1. Fork repository
-2. Tạo feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Tạo Pull Request
+2. Create feature branch
+3. Make changes
+4. Run tests
+5. Submit pull request
+
+### Code Review Process
+- **Automated Checks**: ESLint, TypeScript, tests
+- **Manual Review**: Code quality và architecture
+- **Design Review**: UI/UX consistency
 
 ## 📄 License
 
-Dự án này được phân phối dưới giấy phép MIT. Xem file `LICENSE` để biết thêm chi tiết.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👥 Contributors
+## 👥 Team
 
-- **@vutong-coder** - Project Lead
-- **@xuanquyett** - Developer
+- **Frontend Developer**: React + TypeScript expertise
+- **UI/UX Designer**: Modern design system
+- **Backend Developer**: API integration
+- **DevOps**: Deployment và monitoring
 
-## 📞 Liên Hệ
+## 📞 Support
 
-- **Repository**: [https://github.com/vutong-coder/hoc_onl](https://github.com/vutong-coder/hoc_onl)
-- **Issues**: [GitHub Issues](https://github.com/vutong-coder/hoc_onl/issues)
+For support and questions:
+- **Issues**: GitHub Issues
+- **Discussions**: GitHub Discussions
+- **Email**: support@example.com
 
 ---
 
-⭐ **Nếu dự án này hữu ích, hãy cho chúng tôi một star!** ⭐
+**Made with ❤️ using React + TypeScript + Modern CSS**

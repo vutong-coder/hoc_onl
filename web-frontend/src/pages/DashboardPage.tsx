@@ -1,15 +1,15 @@
 import React from 'react'
-import StatCard from '../components/molecules/StatCard'
-import ProgressCard from '../components/molecules/ProgressCard'
+import StatCard from '../components/atoms/StatCard'
+import ProgressCard from '../components/atoms/ProgressCard'
 
 export default function DashboardPage(): JSX.Element {
 	return (
 		<div style={{ padding: '24px' }}>
 			<h2 style={{ fontSize: 32, fontWeight: 700, margin: '0 0 24px' }}>Dashboard Overview</h2>
 			<div className="dashboard-grid">
-				<StatCard title="Quick Stats" value="1,234" subtitle="Active Users" delayMs={0} />
-				<StatCard title="Recent Exams" value="5" subtitle="Scheduled this week" delayMs={100} />
-				<StatCard title="Token Balance" value="10,500" subtitle="Total Tokens Distributed" delayMs={200} />
+				<StatCard title="Quick Stats" value="1,234" subtitle="Active Users" />
+				<StatCard title="Recent Exams" value="5" subtitle="Scheduled this week" />
+				<StatCard title="Token Balance" value="10,500" subtitle="Total Tokens Distributed" />
 
 				<ProgressCard title="Course Progress" percent={65} delayMs={300} />
 
