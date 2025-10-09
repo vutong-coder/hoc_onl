@@ -9,6 +9,10 @@ import DashboardPage from '../pages/DashboardPage'
 import UserHomePage from '../pages/UserHomePage'
 import LandingPage from '../pages/LandingPage'
 import ExamPage from '../pages/ExamPage'
+import { ExamPreCheckPage } from '../pages/ExamPreCheckPage'
+import { ExamTakingPage } from '../pages/ExamTakingPage'
+import { ExamResultPage } from '../pages/ExamResultPage'
+import { ExamDetailPage } from '../pages/ExamDetailPage'
 import MonitorPage from '../pages/MonitorPage'
 import RewardPage from '../pages/RewardPage'
 import { checkAuth } from '../store/slices/authSlice'
@@ -77,6 +81,28 @@ export default function AppRoutes(): JSX.Element {
 					<Route path="monitor" element={<MonitorPage />} />
 					<Route path="reward" element={<RewardPage />} />
 				</Route>
+				
+				{/* Exam Routes - Standalone pages without layout */}
+				<Route path="/exam/:examId/pre-check" element={
+					<ProtectedRoute requiredRole="user">
+						<ExamPreCheckPage />
+					</ProtectedRoute>
+				} />
+				<Route path="/exam/:examId/take" element={
+					<ProtectedRoute requiredRole="user">
+						<ExamTakingPage />
+					</ProtectedRoute>
+				} />
+				<Route path="/exam/:examId/result" element={
+					<ProtectedRoute requiredRole="user">
+						<ExamResultPage />
+					</ProtectedRoute>
+				} />
+				<Route path="/exam/:examId/detail" element={
+					<ProtectedRoute requiredRole="user">
+						<ExamDetailPage />
+					</ProtectedRoute>
+				} />
 				
 				<Route path="*" element={<div style={{ padding: 24 }}>Not Found</div>} />
 			</Routes>

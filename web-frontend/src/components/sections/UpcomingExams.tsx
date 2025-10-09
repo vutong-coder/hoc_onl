@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Calendar, Clock, AlertCircle, CheckCircle } from 'lucide-react'
 
 interface UpcomingExam {
@@ -22,7 +23,7 @@ interface UpcomingExamsProps {
 export default function UpcomingExams({ 
 	exams = [
 		{
-			id: '1',
+			id: 'javascript-advanced',
 			title: 'JavaScript Advanced Concepts',
 			date: 'Today',
 			time: '2:00 PM',
@@ -32,7 +33,7 @@ export default function UpcomingExams({
 			proctoring: true
 		},
 		{
-			id: '2',
+			id: 'react-fundamentals',
 			title: 'React Development Fundamentals',
 			date: 'Tomorrow',
 			time: '10:00 AM',
@@ -42,17 +43,7 @@ export default function UpcomingExams({
 			proctoring: true
 		},
 		{
-			id: '3',
-			title: 'JavaScript Advanced Concepts',
-			date: 'Today',
-			time: '2:00 PM',
-			duration: '90 min',
-			type: 'certification',
-			status: 'ready',
-			proctoring: true
-		},
-		{
-			id: '4',
+			id: 'data-structures',
 			title: 'Data Structures Practice Test',
 			date: 'Dec 15, 2024',
 			time: '3:30 PM',
@@ -66,6 +57,7 @@ export default function UpcomingExams({
 	onViewExam,
 	onStartExam
 }: UpcomingExamsProps): JSX.Element {
+	const navigate = useNavigate()
 	const getTypeColor = (type: string) => {
 		switch (type) {
 			case 'certification':
@@ -92,12 +84,39 @@ export default function UpcomingExams({
 		}
 	}
 
+	const handleStartExam = (examId: string) => {
+		if (onStartExam) {
+			onStartExam(examId)
+		} else {
+			// Navigate to pre-check page for proctored exams
+			navigate(`/exam/${examId}/pre-check`)
+		}
+	}
+
+	const handleViewExam = (examId: string) => {
+		if (onViewExam) {
+			onViewExam(examId)
+		} else {
+			// Navigate to exam details or pre-check
+			navigate(`/exam/${examId}/pre-check`)
+		}
+	}
+
+	const handleRegisterExam = (examId: string) => {
+		if (onRegisterExam) {
+			onRegisterExam(examId)
+		} else {
+			// Handle registration logic here
+			console.log('Register for exam:', examId)
+		}
+	}
+
 	const getActionButton = (exam: UpcomingExam) => {
 		switch (exam.status) {
 			case 'ready':
 				return (
 					<button 
-						onClick={() => onStartExam?.(exam.id)}
+						onClick={() => handleStartExam(exam.id)}
 						className="bg-[var(--primary)] text-[var(--primary-foreground)] px-3 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
 						style={{ 
 							background: 'var(--gradient-primary)', 
@@ -117,7 +136,7 @@ export default function UpcomingExams({
 			case 'registered':
 				return (
 					<button 
-						onClick={() => onViewExam?.(exam.id)}
+						onClick={() => handleViewExam(exam.id)}
 						className="px-3 py-2 border border-[var(--border)] text-[var(--foreground)] rounded-md text-sm font-medium hover:border-[var(--accent)] transition-colors"
 						style={{ 
 							padding: '8px 12px', 
@@ -137,7 +156,7 @@ export default function UpcomingExams({
 			case 'upcoming':
 				return (
 					<button 
-						onClick={() => onRegisterExam?.(exam.id)}
+						onClick={() => handleRegisterExam(exam.id)}
 						className="bg-[var(--accent)] text-[var(--accent-foreground)] px-3 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
 						style={{ 
 							background: 'var(--gradient-accent)', 

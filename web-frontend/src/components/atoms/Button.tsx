@@ -6,7 +6,9 @@ interface ButtonProps {
 	onClick?: () => void
 	disabled?: boolean
 	loading?: boolean
-	variant?: 'primary' | 'secondary'
+	variant?: 'primary' | 'secondary' | 'outline'
+	size?: 'sm' | 'md' | 'lg'
+	className?: string
 	style?: React.CSSProperties
 }
 
@@ -17,14 +19,25 @@ export default function Button({
 	disabled = false,
 	loading = false,
 	variant = 'primary',
+	size = 'md',
+	className,
 	style = {}
 }: ButtonProps): JSX.Element {
+	const sizeStyles = size === 'sm' ? {
+		padding: '0.5rem 0.75rem',
+		fontSize: '0.75rem'
+	} : size === 'lg' ? {
+		padding: '1rem 1.5rem',
+		fontSize: '1rem'
+	} : {
+		padding: '0.75rem 1rem',
+		fontSize: '0.875rem'
+	}
+
 	const baseStyles = {
 		width: '100%',
-		padding: '0.75rem 1rem',
 		border: 'none',
 		borderRadius: 'var(--radius-md)',
-		fontSize: '0.875rem',
 		fontWeight: '500',
 		cursor: disabled || loading ? 'not-allowed' : 'pointer',
 		transition: 'all 0.2s ease',
@@ -32,15 +45,20 @@ export default function Button({
 		alignItems: 'center',
 		justifyContent: 'center',
 		gap: '0.5rem',
-		opacity: disabled || loading ? 0.6 : 1
+		opacity: disabled || loading ? 0.6 : 1,
+		...sizeStyles
 	}
 
 	const variantStyles = variant === 'primary' ? {
 		background: 'var(--primary)',
 		color: 'var(--primary-foreground)'
-	} : {
+	} : variant === 'secondary' ? {
 		background: 'var(--secondary)',
 		color: 'var(--secondary-foreground)'
+	} : {
+		background: 'transparent',
+		color: 'var(--foreground)',
+		border: '1px solid var(--border)'
 	}
 
 	return (
@@ -48,6 +66,7 @@ export default function Button({
 			type={type}
 			onClick={onClick}
 			disabled={disabled || loading}
+			className={className}
 			style={{
 				...baseStyles,
 				...variantStyles,

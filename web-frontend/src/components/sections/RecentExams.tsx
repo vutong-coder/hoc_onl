@@ -67,7 +67,7 @@ export default function RecentExams({
 	return (
 		<div className="card stagger-load hover-lift interactive" style={{ animationDelay: '300ms', padding: '16px', height: '490px', display: 'flex', flexDirection: 'column', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
 			<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-				<h3 style={{ fontSize: '18px', fontWeight: 600, marginLeft: '8px' }}>
+				<h3 style={{ fontSize: '18px', fontWeight: 600, margin: 0 }}>
 					Recent Exams
 				</h3>
 				<button 
