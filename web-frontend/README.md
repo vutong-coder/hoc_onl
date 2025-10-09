@@ -1,630 +1,403 @@
-# 🚀 NCKH Project - Modern Web Application
+# 🎓 NCKH Online Examination System
 
-## 📋 Tổng quan dự án
+> Hệ thống thi trực tuyến hiện đại với giám sát camera và xác thực blockchain
 
-Dự án NCKH là một ứng dụng web hiện đại được xây dựng với React + TypeScript, có giao diện đẹp mắt và chức năng đầy đủ cho cả admin và người dùng cuối.
+[![React](https://img.shields.io/badge/React-18.3.1-61dafb?logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6.3-3178c6?logo=typescript)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-7.1.9-646cff?logo=vite)](https://vitejs.dev/)
+[![Redux Toolkit](https://img.shields.io/badge/Redux%20Toolkit-2.9.0-764abc?logo=redux)](https://redux-toolkit.js.org/)
 
-## 🏗️ Cấu trúc dự án
+## ✨ Tính năng nổi bật
 
-```
-nckh/
-├── web-frontend/                 # Frontend React Application
-│   ├── src/
-│   │   ├── components/          # React Components
-│   │   │   ├── atoms/           # Basic UI components
-│   │   │   ├── molecules/       # Composite components
-│   │   │   └── layouts/         # Layout components
-│   │   ├── pages/               # Page components
-│   │   ├── hooks/               # Custom React hooks
-│   │   ├── services/            # API & external services
-│   │   ├── store/               # Redux store & slices
-│   │   ├── routes/              # React Router configuration
-│   │   ├── utils/                # Utility functions
-│   │   └── assets/              # Static assets
-│   │       ├── theme.css        # Main CSS file
-│   │       └── css/             # Modular CSS files
-│   │           ├── variables.css    # CSS Variables & Theme
-│   │           ├── base.css         # Base styles
-│   │           ├── typography.css   # Typography system
-│   │           ├── animations.css   # Animations & keyframes
-│   │           ├── components.css   # Component styles
-│   │           └── utilities.css    # Utility classes
-│   ├── public/                  # Public assets
-│   ├── dist/                    # Build output
-│   ├── package.json             # Dependencies
-│   └── vite.config.ts           # Vite configuration
-├── test.html                    # Design reference
-└── README.md                    # This file
-```
+- 🎥 **Giám sát camera thời gian thực** - Đảm bảo tính công bằng trong thi cử
+- ⏱️ **Quản lý thời gian thông minh** - Đồng hồ đếm ngược và cảnh báo
+- 🔒 **Bảo mật cao** - Chống gian lận với nhiều lớp bảo mật
+- 📊 **Dashboard trực quan** - Theo dõi tiến độ và kết quả
+- 🎨 **Giao diện hiện đại** - Dark/Light theme với Glassmorphism
+- 🔗 **Blockchain integration** - Xác thực kết quả thi bằng smart contract
+- 📱 **Responsive design** - Hoạt động mượt mà trên mọi thiết bị
+- 💾 **Auto-save** - Tự động lưu câu trả lời mỗi 30 giây
 
-## 🎨 Giao diện & Design System
-
-### Theme System
-- **Dark Theme**: Mặc định, giống với test.html
-- **Light Theme**: Tự động chuyển theo browser preference
-- **Colors**: Sử dụng OKLCH color space cho độ chính xác cao
-- **Typography**: Inter, Poppins, JetBrains Mono, Space Grotesk
-
-### CSS Architecture
-- **Modular Structure**: CSS được tách thành các file riêng biệt
-- **CSS Variables**: Dynamic theming với CSS custom properties
-- **Responsive Design**: Mobile-first approach
-- **Animations**: Smooth transitions và micro-interactions
-
-### Components
-- **Cards**: Glassmorphism effects với hover animations
-- **Buttons**: Gradient backgrounds và shimmer effects
-- **Icons**: Enhanced với glow effects
-- **Grids**: Responsive layout systems
-
-## 🔧 Công nghệ sử dụng
-
-### Frontend Stack
-- **React 18**: UI library với hooks
-- **TypeScript**: Type safety và better DX
-- **Vite**: Fast build tool và dev server
-- **React Router**: Client-side routing
-- **Redux Toolkit**: State management
-- **Lucide React**: Icon library
-
-### Styling
-- **CSS Modules**: Scoped styling
-- **CSS Variables**: Dynamic theming
-- **OKLCH Colors**: Modern color space
-- **Glassmorphism**: Modern UI effects
-
-### Development Tools
-- **ESLint**: Code linting
-- **Prettier**: Code formatting
-- **TypeScript**: Static type checking
-
-## 🚀 Cài đặt & Chạy dự án
+## 🚀 Bắt đầu nhanh
 
 ### Yêu cầu hệ thống
-- Node.js >= 16.0.0
-- npm >= 8.0.0
+
+- **Node.js** >= 16.0.0
+- **npm** >= 8.0.0
+- **Camera** (để sử dụng tính năng giám sát)
+- **Browser**: Chrome 90+, Firefox 88+, Safari 14+
 
 ### Cài đặt
+
 ```bash
 # Clone repository
-git clone <repository-url>
-cd nckh
+git clone https://github.com/vutong-coder/hoc_onl.git
+cd hoc_onl/web-frontend
 
 # Cài đặt dependencies
-cd web-frontend
 npm install
-```
 
-### Chạy development server
-```bash
+# Chạy development server
 npm run dev
 ```
 
-### Build production
-```bash
-npm run build
-```
+Mở trình duyệt và truy cập: `http://localhost:5173`
 
-### Preview production build
+### Build cho production
+
 ```bash
+# Build project
+npm run build
+
+# Preview production build
 npm run preview
 ```
 
-## 📱 Tính năng chính
-
-### Admin Dashboard
-- **Dashboard**: Tổng quan hệ thống
-- **Exam Management**: Quản lý bài thi
-- **Monitor**: Giám sát hệ thống
-- **Reward**: Quản lý phần thưởng
-
-### User Homepage
-- **Welcome Banner**: Chào mừng người dùng
-- **Continue Practice**: Tiếp tục luyện tập
-- **Prepare by Topic**: Luyện tập theo chủ đề
-- **Certification**: Chứng chỉ
-- **Daily Streak**: Chuỗi ngày học
-
-### Authentication
-- **Login**: Đăng nhập
-- **Register**: Đăng ký
-- **Forgot Password**: Quên mật khẩu
-- **Password Strength**: Kiểm tra độ mạnh mật khẩu
-
-## 📹 Hệ thống Thi với Giám sát Camera
-
-### Tổng quan
-Hệ thống thi với giám sát camera được thiết kế để đảm bảo tính công bằng và minh bạch trong quá trình làm bài thi trực tuyến. Hệ thống sử dụng camera để giám sát người dùng trong suốt quá trình thi.
-
-### Luồng hoạt động (Exam Flow)
+## 📁 Cấu trúc dự án
 
 ```
-Người dùng nhấn "Start Exam" từ Dashboard
-    ↓
-ExamPreCheckPage (/exam/:examId/pre-check)
-    ↓ Kiểm tra camera và hướng dẫn
-ExamTakingPage (/exam/:examId/take)
-    ↓ Làm bài thi với giám sát
-ExamResultPage (/exam/:examId/result)
+web-frontend/
+├── src/
+│   ├── components/           # React Components
+│   │   ├── atoms/           # UI cơ bản (Button, Input, Card...)
+│   │   ├── molecules/       # Components kết hợp (ExamQuestion, Timer...)
+│   │   ├── sections/        # Các section lớn (Hero, Features...)
+│   │   └── layouts/         # Layout components (Header, Sidebar...)
+│   ├── pages/               # Pages
+│   │   ├── LandingPage.tsx
+│   │   ├── LoginPage.tsx
+│   │   ├── ExamPreCheckPage.tsx
+│   │   ├── ExamTakingPage.tsx
+│   │   └── ExamResultPage.tsx
+│   ├── hooks/               # Custom hooks
+│   │   ├── useCamera.ts
+│   │   ├── useExamTimer.ts
+│   │   └── usePlagiarismCheck.ts
+│   ├── store/               # Redux store
+│   │   └── slices/
+│   │       ├── authSlice.ts
+│   │       ├── examSlice.ts
+│   │       └── walletSlice.ts
+│   ├── services/            # API services
+│   │   ├── examService.ts
+│   │   ├── monitorService.ts
+│   │   └── blockchain/
+│   ├── routes/              # Routing configuration
+│   ├── utils/               # Utilities & helpers
+│   └── assets/              # CSS & static files
+├── public/                  # Public assets
+└── dist/                    # Build output
 ```
 
-### Các thành phần chi tiết
+## 🎯 Luồng hoạt động hệ thống thi
 
-#### 1. ExamPreCheckPage
-- Hiển thị hướng dẫn làm bài thi
-- Yêu cầu quyền truy cập camera/microphone
-- Kiểm tra camera hoạt động
-- Xác nhận người dùng sẵn sàng
-- **Components**: `CameraCheckSection`, `ExamInstructionsSection`, `ExamReadySection`
-
-#### 2. ExamTakingPage
-Giao diện chính gồm:
-- **Main Content**: Hiển thị câu hỏi và các lựa chọn
-- **Sidebar**:
-  - Đồng hồ đếm ngược (`CountdownTimer`)
-  - Navigation câu hỏi (`ExamProgressIndicator`)
-  - Camera giám sát (`ProctoringView`)
-
-**Tính năng tự động**:
-- Auto-save câu trả lời mỗi 30 giây
-- Chụp ảnh màn hình mỗi 10 giây
-- Tự động nộp bài khi hết giờ
-- Cảnh báo khi sắp hết giờ (5 phút, 1 phút)
-
-#### 3. ExamResultPage
-- Hiển thị điểm số với biểu đồ trực quan
-- Thống kê chi tiết (số câu đúng, thời gian làm bài)
-- Trạng thái đạt/không đạt
-- Các bước tiếp theo (xem chi tiết, về dashboard)
-
-### Components chi tiết
-
-#### ProctoringView Component
 ```
-┌─────────────────────────────────────┐
-│          ProctoringView             │
-├─────────────────────────────────────┤
-│ [●] Camera giám sát    [⚙][-]      │
-│                                     │
-│         Video Stream                │
-│      (User's Camera)                │
-│                                     │
-│ Camera đang được sử dụng để         │
-│ giám sát quá trình làm bài thi      │
-└─────────────────────────────────────┘
+┌─────────────────┐
+│   Dashboard     │  User xem danh sách bài thi
+└────────┬────────┘
+         │ Click "Start Exam"
+         ▼
+┌─────────────────┐
+│ Pre-Check Page  │  Kiểm tra camera & hướng dẫn
+└────────┬────────┘
+         │ Camera Ready
+         ▼
+┌─────────────────┐
+│ Exam Taking     │  Làm bài thi với giám sát
+│    Page         │  • Auto-save mỗi 30s
+│                 │  • Screenshot mỗi 10s
+│                 │  • Timer countdown
+└────────┬────────┘
+         │ Submit hoặc hết giờ
+         ▼
+┌─────────────────┐
+│ Result Page     │  Hiển thị kết quả và thống kê
+└─────────────────┘
 ```
-- Hiển thị video stream từ camera
-- Điều khiển camera (bật/tắt, thu nhỏ/mở rộng)
-- Hiển thị trạng thái camera (sẵn sàng/lỗi)
 
-#### CountdownTimer Component
+## 🔑 Tính năng chính
+
+### 1. 🎥 Hệ thống giám sát
+
+**Camera Monitoring**
+- Yêu cầu quyền camera/microphone
+- Video stream trực tiếp
+- Chụp ảnh giám sát định kỳ (10s)
+- Mã hóa và gửi lên server
+
+**Anti-Cheating**
+- Phát hiện rời khỏi tab
+- Theo dõi focus window
+- Phát hiện nhiều người
+- Ghi âm môi trường
+
+### 2. ⏰ Quản lý thời gian
+
 - Đồng hồ đếm ngược chính xác
-- Thanh tiến trình thời gian
-- Cảnh báo màu sắc khi sắp hết giờ
-- Hiển thị phút:giây
+- Thanh tiến trình trực quan
+- Cảnh báo trước khi hết giờ (5 phút, 1 phút)
+- Tự động nộp bài khi timeout
 
-#### ExamQuestion Component
-```
-┌─────────────────────────────────────┐
-│ [C3/25] [4 điểm] [Trắc nghiệm] [🚩] │
-│                                     │
-│ Câu hỏi: ...                        │
-│                                     │
-│ ○ A. Đáp án 1                       │
-│ ● B. Đáp án 2 (đã chọn)            │
-│ ○ C. Đáp án 3                       │
-│ ○ D. Đáp án 4                       │
-│                                     │
-│ [← Câu trước]  [Sau →]              │
-└─────────────────────────────────────┘
-```
-- Hỗ trợ nhiều loại câu hỏi (trắc nghiệm, code, tự luận)
-- Đánh dấu câu hỏi để xem lại
-- Theo dõi thời gian làm từng câu
-- Navigation giữa các câu
+### 3. 📝 Quản lý câu hỏi
 
-### Hooks & Services
+- Hỗ trợ nhiều loại: trắc nghiệm, code, tự luận
+- Navigation linh hoạt giữa câu hỏi
+- Đánh dấu để xem lại
+- Theo dõi trạng thái (đã làm/chưa làm)
 
-#### useCamera Hook
-Quản lý camera và microphone:
-- Yêu cầu quyền truy cập camera/microphone
-- Cung cấp stream video
-- Chụp ảnh màn hình để giám sát
-- Xử lý lỗi camera
-- Dọn dẹp tài nguyên khi kết thúc
+### 4. 💾 Lưu trữ thông minh
 
-**Cấu hình camera**:
+- Auto-save câu trả lời (30s)
+- Lưu khi chuyển câu hỏi
+- Sync với server real-time
+- Backup local storage
+
+### 5. 🔐 Bảo mật
+
+- HTTPS required cho camera
+- JWT authentication
+- Session management
+- Blockchain verification (Ethers.js)
+- Encryption for screenshots
+
+## 🛠️ Tech Stack
+
+### Frontend Core
+- **React 18** - UI library với hooks
+- **TypeScript** - Type safety
+- **Vite** - Build tool & dev server
+- **React Router v6** - Client-side routing
+
+### State Management
+- **Redux Toolkit** - Global state
+- **React Context** - Local state
+
+### Styling
+- **CSS Modules** - Scoped styling
+- **CSS Variables** - Dynamic theming
+- **OKLCH Color Space** - Modern color system
+
+### HTTP & API
+- **Axios** - HTTP client
+- **REST API** - Backend communication
+
+### Blockchain
+- **Ethers.js** - Web3 integration
+- **MetaMask** - Wallet connection
+
+### Icons & UI
+- **Lucide React** - Icon library
+- **Custom Components** - Design system
+
+## 📚 API Services
+
+### examService
 ```typescript
-const mediaStream = await navigator.mediaDevices.getUserMedia({
-  video: {
-    width: { ideal: 1280 },
-    height: { ideal: 720 },
-    facingMode: 'user'
-  },
-  audio: true
-})
+// Lấy thông tin bài thi
+fetchExamDetails(examId: string): Promise<ExamDetails>
+
+// Bắt đầu session thi
+startExamSession(examId: string): Promise<SessionData>
+
+// Lưu câu trả lời
+saveAnswer(questionId: number, answer: any): Promise<void>
+
+// Nộp bài thi
+submitExam(examId: string, answers: Answer[]): Promise<Result>
+
+// Gửi ảnh giám sát
+sendScreenshot(examId: string, image: Blob): Promise<void>
 ```
 
-#### examService
-Quản lý API liên quan đến bài thi:
-- `fetchExamDetails(examId)`: Lấy thông tin bài thi
-- `startExamSession(examId)`: Bắt đầu session thi
-- `saveAnswer(questionId, answer)`: Lưu câu trả lời tạm thời
-- `submitExam(examId, answers)`: Nộp bài thi
-- `sendScreenshot(examId, imageData)`: Gửi ảnh giám sát
-
-#### examSlice (Redux)
-State management cho bài thi:
+### monitorService
 ```typescript
-{
-  currentExam: ExamDetails
-  questions: ExamQuestion[]
-  currentQuestionIndex: number
-  answers: Record<number, ExamAnswer>
-  timeRemaining: number
-  status: 'idle' | 'loading' | 'taking' | 'completed'
-  isCameraReady: boolean
-  visitedQuestions: Set<number>
-  flaggedQuestions: Set<number>
-}
+// Ghi lại hành vi
+logBehavior(event: BehaviorEvent): Promise<void>
+
+// Phát hiện gian lận
+detectCheating(data: MonitorData): Promise<CheatingAlert>
 ```
-
-### Tính năng bảo mật
-
-#### 1. Giám sát camera
-- Yêu cầu quyền truy cập camera và microphone
-- Hiển thị video stream trực tiếp
-- Chụp ảnh màn hình định kỳ (mỗi 10 giây)
-- Gửi ảnh về server để phân tích
-
-#### 2. Bảo mật dữ liệu
-- Sử dụng HTTPS để truy cập camera
-- Không lưu video stream, chỉ chụp ảnh
-- Ảnh giám sát được mã hóa trước khi gửi
-- Session timeout handling
-
-#### 3. Chống gian lận
-- Không cho phép rời khỏi tab
-- Giám sát liên tục qua camera
-- Ghi lại âm thanh
-- Phát hiện hành vi bất thường
-- Tab focus monitoring
-
-### API Flow
-
-```
-┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │    Backend      │
-└─────────┬───────┘    └─────────┬───────┘
-          │                      │
-          │ fetchExamDetails     │
-          ├─────────────────────►│
-          │                      │
-          │ startExamSession     │
-          ├─────────────────────►│
-          │                      │
-          │ saveAnswer (30s)     │
-          ├─────────────────────►│
-          │                      │
-          │ sendScreenshot (10s) │
-          ├─────────────────────►│
-          │                      │
-          │ submitExam           │
-          ├─────────────────────►│
-          │                      │
-          │ ◄────────────────────┤
-          │    Result            │
-```
-
-### Xử lý lỗi (Error Handling)
-
-#### Camera Errors
-- **Permission denied**: Thông báo yêu cầu cấp quyền
-- **Camera not found**: Hướng dẫn kiểm tra thiết bị
-- **Stream failed**: Thử refresh trang
-
-#### Network Errors
-- **Save answer failed**: Retry mechanism
-- **Submit exam failed**: Lưu local và sync sau
-- **Screenshot upload failed**: Queue và retry
-
-#### UI Errors
-- **Timer sync issues**: Đồng bộ với server
-- **Navigation problems**: Fallback navigation
-- **State corruption**: Recovery mechanism
-
-### Cách sử dụng
-
-#### 1. Bắt đầu thi
-```typescript
-// Từ component UpcomingExams
-const handleStartExam = (examId: string) => {
-  navigate(`/exam/${examId}/pre-check`)
-}
-```
-
-#### 2. Kiểm tra camera
-```typescript
-// Trong ExamPreCheckPage
-const { startCamera, isCameraOn, error } = useCamera()
-
-useEffect(() => {
-  startCamera()
-}, [])
-```
-
-#### 3. Làm bài thi
-```typescript
-// Trong ExamTakingPage
-const handleAnswerChange = (answer: any) => {
-  dispatch(updateAnswer({ questionId: currentQuestion.id, answer }))
-}
-```
-
-#### 4. Nộp bài
-```typescript
-const handleSubmitExam = async () => {
-  await dispatch(submitExam())
-  navigate(`/exam/${examId}/result`)
-}
-```
-
-### Troubleshooting
-
-#### Camera không hoạt động
-1. Kiểm tra quyền truy cập camera trong browser settings
-2. Đảm bảo camera không bị ứng dụng khác sử dụng
-3. Kiểm tra kết nối internet
-4. Thử refresh trang hoặc restart browser
-
-#### Lỗi khi lưu câu trả lời
-1. Kiểm tra kết nối internet
-2. Câu trả lời sẽ được lưu tự động khi kết nối ổn định
-3. Liên hệ hỗ trợ nếu vấn đề tiếp tục
-
-#### Hết giờ đột ngột
-1. Kiểm tra đồng hồ hệ thống
-2. Đảm bảo không có ứng dụng khác làm chậm máy
-3. Liên hệ hỗ trợ để kiểm tra log
-
-### Yêu cầu hệ thống cho thi
-
-#### Browser hỗ trợ
-- Chrome/Edge (khuyến nghị): 90+
-- Firefox: 88+
-- Safari: 14+
-
-#### Thiết bị
-- Camera: Độ phân giải tối thiểu 720p
-- Microphone: Hoạt động tốt
-- Internet: Tốc độ ổn định >= 2Mbps
-- RAM: >= 4GB khuyến nghị
-
-### Phát triển tiếp
-
-#### Tính năng có thể thêm
-1. Phát hiện gian lận bằng AI
-2. Ghi âm toàn bộ quá trình thi
-3. Theo dõi chuyển động mắt (eye tracking)
-4. Phân tích hành vi bất thường
-5. Tích hợp blockchain để xác thực kết quả
-
-#### Cải tiến hiệu suất
-1. WebRTC cho video streaming
-2. Compression ảnh giám sát
-3. Batch upload ảnh
-4. Offline support với sync sau
-5. Service Worker cho PWA
-
-## 🎯 Routing Structure
-
-```
-/ (User Routes)
-├── /home                    # User homepage
-├── /exam                    # Exam page
-├── /monitor                 # Monitor page
-├── /reward                  # Reward page
-└── /auth/*                  # Authentication pages
-
-/admin (Admin Routes)
-├── /admin/dashboard         # Admin dashboard
-├── /admin/exam              # Exam management
-├── /admin/monitor           # System monitoring
-└── /admin/reward            # Reward management
-```
-
-## 🎨 CSS Architecture
-
-### Modular CSS Structure
-```
-assets/css/
-├── variables.css         # CSS Variables & Theme System
-├── base.css              # Base HTML elements & reset
-├── typography.css        # Typography system
-├── animations.css        # Keyframes & animation classes
-├── components.css        # Component styles
-└── utilities.css         # Utility classes
-```
-
-### CSS Variables System
-- **Colors**: Primary, secondary, accent, muted colors
-- **Spacing**: Consistent spacing scale (4px to 96px)
-- **Typography**: Font families, sizes, weights
-- **Shadows**: Layered shadow system
-- **Transitions**: Smooth animation timings
-- **Gradients**: Modern gradient backgrounds
-- **Glassmorphism**: Backdrop blur effects
-
-### Utility Classes
-- **Layout**: `.container`, `.flex`, `.grid`
-- **Spacing**: `.p-*`, `.m-*`, `.gap-*`
-- **Typography**: `.text-*`, `.font-*`
-- **Hover Effects**: `.hover-lift`, `.hover-glow`
-- **States**: `.loading`, `.success`, `.warning`
-
-## 🔄 State Management
-
-### Redux Store Structure
-```
-store/
-├── index.ts               # Store configuration
-├── hooks.ts               # Typed hooks
-└── slices/
-    ├── authSlice.ts       # Authentication state
-    ├── examSlice.ts       # Exam state
-    ├── monitorSlice.ts    # Monitor state
-    └── walletSlice.ts     # Wallet state
-```
-
-## 🎭 Custom Hooks
-
-### Available Hooks
-- **useCameraMonitor**: Camera monitoring functionality
-- **useExamTimer**: Exam timer management
-- **useMultisigWallet**: Multi-signature wallet
-- **usePlagiarismCheck**: Plagiarism detection
-- **useRewardToken**: Reward token management
-
-## 📊 Services
-
-### API Services
-- **examApi.ts**: Exam-related API calls
-- **walletService.ts**: Blockchain wallet operations
-- **monitorService.ts**: System monitoring
-
-### External Integrations
-- **Blockchain**: Wallet integration
-- **Camera**: Monitoring capabilities
-- **AI**: Plagiarism detection
 
 ## 🎨 Design System
 
-### Color Palette
-- **Primary**: Orange gradient (#FF6B35)
-- **Secondary**: Light gray (#F5F5F5)
-- **Accent**: Green (#00D4AA)
-- **Success**: Green gradient
-- **Warning**: Yellow gradient
-- **Error**: Red gradient
+### Colors
+- **Primary**: `oklch(0.65 0.25 30)` - Orange gradient
+- **Secondary**: `oklch(0.95 0.01 60)` - Light gray
+- **Accent**: `oklch(0.70 0.20 180)` - Cyan
+- **Success**: `oklch(0.70 0.20 140)` - Green
+- **Warning**: `oklch(0.75 0.20 80)` - Yellow
+- **Error**: `oklch(0.60 0.25 20)` - Red
 
-### Typography Scale
+### Typography
 - **Display**: Poppins (headings)
-- **Body**: Inter (text content)
+- **Body**: Inter (content)
 - **Mono**: JetBrains Mono (code)
-- **Serif**: Space Grotesk (special text)
+- **Accent**: Space Grotesk (special)
 
-### Spacing System
-- **xs**: 4px
-- **sm**: 8px
-- **md**: 16px
-- **lg**: 24px
-- **xl**: 32px
-- **2xl**: 48px
-- **3xl**: 64px
-
-## 🚀 Performance Optimizations
-
-### Build Optimizations
-- **Vite**: Fast HMR và build
-- **Tree Shaking**: Loại bỏ code không sử dụng
-- **Code Splitting**: Lazy loading components
-- **Asset Optimization**: Image và font optimization
-
-### Runtime Optimizations
-- **CSS Variables**: Dynamic theming không cần re-render
-- **Hardware Acceleration**: GPU-accelerated animations
-- **Memoization**: React.memo cho components
-- **Lazy Loading**: Route-based code splitting
-
-## 🔧 Development Guidelines
-
-### Code Style
-- **TypeScript**: Strict mode enabled
-- **ESLint**: Airbnb config
-- **Prettier**: Consistent formatting
-- **Conventional Commits**: Standardized commit messages
-
-### Component Structure
-```tsx
-// Component template
-interface ComponentProps {
-  // Props interface
-}
-
-export default function Component({ }: ComponentProps): JSX.Element {
-  // Component logic
-  return (
-    // JSX
-  )
-}
+### Spacing Scale
+```
+xs: 4px, sm: 8px, md: 16px, lg: 24px,
+xl: 32px, 2xl: 48px, 3xl: 64px, 4xl: 96px
 ```
 
-### CSS Guidelines
-- **CSS Variables**: Sử dụng cho dynamic values
-- **Utility Classes**: Cho layout và spacing
-- **Component Classes**: Cho component-specific styles
-- **Responsive**: Mobile-first approach
+## 🔧 Scripts
 
-## 📱 Responsive Design
+```bash
+npm run dev        # Start dev server (localhost:5173)
+npm run build      # Build cho production
+npm run preview    # Preview production build
+npm run lint       # Chạy ESLint
+```
 
-### Breakpoints
-- **Mobile**: < 768px
-- **Tablet**: 768px - 1024px
-- **Desktop**: > 1024px
+## 📖 Hướng dẫn sử dụng
 
-### Responsive Features
-- **Flexible Grids**: Auto-fit grid layouts
-- **Responsive Typography**: clamp() for font sizes
-- **Adaptive Spacing**: CSS variables for spacing
-- **Mobile Navigation**: Collapsible navigation
+### Cho học sinh
 
-## 🎯 Future Enhancements
+1. **Đăng ký/Đăng nhập**
+   - Tạo tài khoản mới hoặc đăng nhập
+   - Xác thực email (nếu cần)
 
-### Planned Features
-- **PWA Support**: Progressive Web App capabilities
-- **Offline Mode**: Service worker implementation
-- **Real-time Updates**: WebSocket integration
-- **Advanced Analytics**: User behavior tracking
-- **Multi-language**: i18n support
+2. **Xem danh sách bài thi**
+   - Truy cập Dashboard
+   - Chọn bài thi cần làm
 
-### Technical Improvements
-- **Testing**: Unit và integration tests
-- **Storybook**: Component documentation
-- **Performance Monitoring**: Real-time metrics
-- **Error Tracking**: Sentry integration
+3. **Chuẩn bị thi**
+   - Đọc kỹ hướng dẫn
+   - Cho phép quyền camera/microphone
+   - Kiểm tra camera hoạt động
+
+4. **Làm bài thi**
+   - Đọc và trả lời câu hỏi
+   - Sử dụng navigation để di chuyển
+   - Đánh dấu câu cần xem lại
+   - Nộp bài hoặc chờ hết giờ
+
+5. **Xem kết quả**
+   - Kiểm tra điểm số
+   - Xem phân tích chi tiết
+   - Lưu chứng chỉ (nếu đạt)
+
+### Cho giám thị
+
+1. **Giám sát real-time**
+   - Theo dõi camera của thí sinh
+   - Nhận cảnh báo gian lận
+   - Xem hành vi bất thường
+
+2. **Quản lý bài thi**
+   - Tạo bài thi mới
+   - Cấu hình thời gian
+   - Thêm câu hỏi
+
+3. **Xem báo cáo**
+   - Thống kê kết quả
+   - Phân tích dữ liệu
+   - Export reports
+
+## 🔍 Troubleshooting
+
+### Camera không hoạt động
+```
+✓ Kiểm tra quyền truy cập trong browser
+✓ Đảm bảo không có app khác dùng camera
+✓ Thử refresh hoặc restart browser
+✓ Kiểm tra HTTPS (camera chỉ hoạt động trên HTTPS)
+```
+
+### Lỗi kết nối
+```
+✓ Kiểm tra internet connection
+✓ Xem console log để debug
+✓ Clear cache và reload
+✓ Thử browser khác
+```
+
+### Bài thi không load
+```
+✓ Kiểm tra API endpoint
+✓ Xem network tab trong DevTools
+✓ Kiểm tra authentication token
+✓ Liên hệ support
+```
+
+## 🚦 Browser Support
+
+| Browser | Version | Status |
+|---------|---------|--------|
+| Chrome  | 90+     | ✅ Supported |
+| Firefox | 88+     | ✅ Supported |
+| Safari  | 14+     | ✅ Supported |
+| Edge    | 90+     | ✅ Supported |
+
+## 🎯 Roadmap
+
+### Phase 1 - Core Features ✅
+- [x] Authentication system
+- [x] Exam management
+- [x] Camera monitoring
+- [x] Timer & auto-submit
+
+### Phase 2 - Advanced Features 🚧
+- [ ] AI-powered cheat detection
+- [ ] Eye tracking
+- [ ] Facial recognition
+- [ ] Voice analysis
+
+### Phase 3 - Ecosystem 📋
+- [ ] Mobile app (React Native)
+- [ ] AI question generation
+- [ ] Analytics dashboard
+- [ ] Multi-language support
+
+### Phase 4 - Enterprise 🔮
+- [ ] SSO integration
+- [ ] Advanced reporting
+- [ ] API for third-party
+- [ ] White-label solution
 
 ## 🤝 Contributing
 
-### Development Workflow
-1. Fork repository
-2. Create feature branch
-3. Make changes
-4. Run tests
-5. Submit pull request
+Chúng tôi rất hoan nghênh mọi đóng góp! Vui lòng làm theo các bước:
 
-### Code Review Process
-- **Automated Checks**: ESLint, TypeScript, tests
-- **Manual Review**: Code quality và architecture
-- **Design Review**: UI/UX consistency
+1. Fork repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
+
+### Code Style
+- Sử dụng TypeScript strict mode
+- Follow ESLint rules
+- Write meaningful commit messages
+- Add comments cho logic phức tạp
+- Update documentation
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Dự án này được cấp phép theo giấy phép **MIT License** - xem file [LICENSE](LICENSE) để biết chi tiết.
 
 ## 👥 Team
 
-- **Frontend Developer**: React + TypeScript expertise
-- **UI/UX Designer**: Modern design system
-- **Backend Developer**: API integration
-- **DevOps**: Deployment và monitoring
+- **Vũ Tống** - *Lead Developer* - [@vutong-coder](https://github.com/vutong-coder)
 
-## 📞 Support
+## 📞 Liên hệ & Hỗ trợ
 
-For support and questions:
-- **Issues**: GitHub Issues
-- **Discussions**: GitHub Discussions
-- **Email**: support@example.com
+- **GitHub Issues**: [Create an issue](https://github.com/vutong-coder/hoc_onl/issues)
+- **Email**: support@nckh-exam.com
+- **Documentation**: [Wiki](https://github.com/vutong-coder/hoc_onl/wiki)
+
+## 🙏 Acknowledgments
+
+- [React](https://reactjs.org/) - UI framework tuyệt vời
+- [Vite](https://vitejs.dev/) - Build tool siêu nhanh
+- [Redux Toolkit](https://redux-toolkit.js.org/) - State management đơn giản
+- [Lucide](https://lucide.dev/) - Beautiful icons
+- [Ethers.js](https://docs.ethers.org/) - Web3 integration
 
 ---
 
-**Made with ❤️ using React + TypeScript + Modern CSS**
+<div align="center">
+  <strong>Made with ❤️ using React + TypeScript</strong>
+  <br>
+  <sub>© 2024 NCKH Online Examination System</sub>
+</div>
