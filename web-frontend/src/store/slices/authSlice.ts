@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import MockAuthService, { User, LoginCredentials } from '../../services/mockAuthService'
+import MockAuthService, { User, LoginCredentials } from '../../data/mockAuthService'
 
 export type UserRole = 'admin' | 'user' | null
 

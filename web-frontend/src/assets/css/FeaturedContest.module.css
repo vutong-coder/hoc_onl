@@ -1,0 +1,219 @@
+.featuredContest {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 16px;
+  margin-bottom: 48px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+}
+
+.container {
+  position: relative;
+  z-index: 2;
+  padding: 48px 32px;
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.textContent {
+  flex: 1;
+  max-width: 600px;
+}
+
+.username {
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 800;
+  color: white;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.description {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 32px 0;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.actionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.registerButton {
+  background: white;
+  color: #059669;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.registerButton:hover {
+  background: #f9fafb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.registerButton:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.registerButton:active {
+  transform: translateY(0);
+}
+
+.registrationInfo {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.dateInfo {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.calendarIcon {
+  font-size: 18px;
+}
+
+.backgroundPattern {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000'><defs><radialGradient id='bg' cx='50%' cy='50%'><stop offset='0%' stop-color='%23ffffff' stop-opacity='0.1'/><stop offset='100%' stop-color='%23ffffff' stop-opacity='0'/></radialGradient></defs><circle cx='200' cy='200' r='400' fill='url(%23bg)'/><circle cx='800' cy='300' r='300' fill='url(%23bg)'/><circle cx='400' cy='800' r='350' fill='url(%23bg)'/></svg>");
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .featuredContest {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
+  }
+  
+  .date {
+    background: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.dark .featuredContest {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
+}
+
+.dark .date {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .content {
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .dateInfo {
+    align-items: flex-start;
+  }
+  
+  .title {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 32px 24px;
+  }
+  
+  .title {
+    font-size: 28px;
+  }
+  
+  .description {
+    font-size: 16px;
+  }
+  
+  .registerButton {
+    font-size: 15px;
+    padding: 10px 20px;
+  }
+  
+  .date {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 24px 16px;
+  }
+  
+  .title {
+    font-size: 24px;
+  }
+  
+  .description {
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+  
+  .registerButton {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+  
+  .date {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+  
+  .calendarIcon {
+    font-size: 16px;
+  }
+}
