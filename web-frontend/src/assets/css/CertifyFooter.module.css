@@ -1,9 +1,12 @@
 .footer {
   background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-  padding: 24px 0;
-  margin-top: auto;
+  padding: 20px 8px; /* Match the padding from developer tools: 20px 8px */
+  margin: 24px auto 16px; /* Match the margin from developer tools: 24px auto 16px */
   border-top: 1px solid rgba(226, 232, 240, 0.8);
   position: relative;
+  max-width: 800px; /* Match compete page max-width */
+  border-radius: 6px; /* Match compete page border-radius */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Add subtle shadow like compete page */
 }
 
 .footer::before {
@@ -19,20 +22,14 @@
   z-index: 1;
 }
 
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 24px;
-  position: relative;
-  z-index: 2;
-}
+/* Container styling removed - footer handles its own layout */
 
 .links {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 20px; /* Increased gap to match compete page spacing */
 }
 
 .link {
@@ -43,8 +40,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 4px 8px; /* Keep same padding as compete page */
+  border-radius: 6px; /* Match compete page border-radius */
   text-decoration: none;
 }
 
@@ -125,11 +122,8 @@
 /* Responsive design */
 @media (max-width: 768px) {
   .footer {
-    padding: 20px 0;
-  }
-  
-  .container {
-    padding: 0 16px;
+    padding: 20px 8px; /* Keep consistent padding on mobile */
+    margin: 20px auto 16px; /* Slightly reduced margin on mobile */
   }
   
   .links {
@@ -149,11 +143,8 @@
 
 @media (max-width: 480px) {
   .footer {
-    padding: 16px 0;
-  }
-  
-  .container {
-    padding: 0 12px;
+    padding: 20px 8px; /* Keep consistent padding on small mobile */
+    margin: 16px auto 12px; /* Further reduced margin on small mobile */
   }
   
   .links {

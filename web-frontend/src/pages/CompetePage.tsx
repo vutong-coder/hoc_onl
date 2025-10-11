@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Contest, ContestSection as ContestSectionType } from '../types/contest';
 import { featuredContest, contestSections } from '../data/mockContests';
 import FeaturedContest from '../components/sections/FeaturedContest';
@@ -7,10 +8,17 @@ import Footer from '../components/layouts/Footer';
 import styles from '../assets/css/CompetePage.module.css';
 
 const CompetePage: React.FC = () => {
+  const navigate = useNavigate();
+
   const handleContestActionClick = (contest: Contest) => {
-    // In a real app, this would handle navigation to contest details
-    console.log(`Contest action clicked: ${contest.id}`);
-    // Example: navigate to contest detail page or open registration modal
+    // Only navigate to contest detail page for "View Challenges" button
+    if (contest.actionButtonText === 'View Challenges') {
+      navigate(`/user/compete/${contest.id}`);
+    } else {
+      // For other buttons (Register Now, View Details), show message that page is not designed yet
+      console.log(`Action "${contest.actionButtonText}" clicked for contest: ${contest.id}`);
+      alert(`Page for "${contest.actionButtonText}" is not designed yet.`);
+    }
   };
 
   const handleViewAllClick = (section: ContestSectionType) => {
@@ -28,26 +36,6 @@ const CompetePage: React.FC = () => {
   return (
     <div className={styles.page}>
       <div className={styles.container}>
-        {/* Page Header */}
-        <div className={styles.pageHeader}>
-          <div className={styles.headerTop}>
-            <div className={styles.headerLeft}>
-              <nav className={styles.breadcrumb}>
-                <span className={styles.breadcrumbText}>All Contests</span>
-              </nav>
-              <h1 className={styles.pageTitle}>Contests</h1>
-            </div>
-            
-            <div className={styles.pageActions}>
-              <button className={styles.manageButton} type="button">
-                Manage a Contest
-              </button>
-              <button className={styles.createButton} type="button">
-                Create a Contest
-              </button>
-            </div>
-          </div>
-        </div>
 
         {/* Featured Contest */}
         <FeaturedContest

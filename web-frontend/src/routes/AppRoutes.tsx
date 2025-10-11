@@ -18,6 +18,7 @@ import RewardPage from '../pages/RewardPage'
 import CertifyPage from '../pages/CertifyPage'
 import CertificationDetailPage from '../pages/CertificationDetailPage'
 import CompetePage from '../pages/CompetePage'
+import ContestDetailPage from '../pages/ContestDetailPage'
 import { checkAuth } from '../store/slices/authSlice'
 
 // Tạo các trang placeholder cho các chức năng khác
@@ -78,9 +79,10 @@ export default function AppRoutes(): JSX.Element {
 					<Route index element={<UserHomePage />} />
 					<Route path="home" element={<UserHomePage />} />
 					<Route path="prepare" element={<UserHomePage />} />
-					<Route path="certify" element={<CertifyPage />} />
-					<Route path="certify/:certificationId" element={<CertificationDetailPage />} />
-					<Route path="compete" element={<CompetePage />} />
+                <Route path="certify" element={<CertifyPage />} />
+                <Route path="certify/:certificationId" element={<CertificationDetailPage />} />
+                <Route path="compete" element={<CompetePage />} />
+                <Route path="compete/:contestId" element={<ContestDetailPage />} />
 					<Route path="exam" element={<ExamPage />} />
 					<Route path="monitor" element={<MonitorPage />} />
 					<Route path="reward" element={<RewardPage />} />

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Contest } from '../../types/contest';
 import styles from '../../assets/css/ContestCard.module.css';
 
@@ -11,12 +12,20 @@ const ContestCard: React.FC<ContestCardProps> = ({
   contest,
   onActionClick
 }) => {
+  const navigate = useNavigate();
+
   const handleActionClick = () => {
     if (onActionClick) {
       onActionClick(contest);
     } else {
-      // Default action - in a real app, this would navigate
-      console.log(`Action clicked for contest: ${contest.id}`);
+      // Default action - only navigate to contest detail page for "View Challenges"
+      if (contest.actionButtonText === 'View Challenges') {
+        navigate(`/user/compete/${contest.id}`);
+      } else {
+        // For other buttons, show message that page is not designed yet
+        console.log(`Action "${contest.actionButtonText}" clicked for contest: ${contest.id}`);
+        alert(`Page for "${contest.actionButtonText}" is not designed yet.`);
+      }
     }
   };
 

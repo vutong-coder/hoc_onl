@@ -21,23 +21,21 @@ const CertifyFooter: React.FC = () => {
 
   return (
     <footer className={styles.footer}>
-      <div className={styles.container}>
-        <div className={styles.links}>
-          {footerLinks.map((link, index) => (
-            <React.Fragment key={link}>
-              <button
-                className={styles.link}
-                onClick={() => handleLinkClick(link)}
-                type="button"
-              >
-                {link}
-              </button>
-              {index < footerLinks.length - 1 && (
-                <span className={styles.separator}>|</span>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
+      <div className={styles.links}>
+        {footerLinks.map((link, index) => (
+          <React.Fragment key={link}>
+            <button
+              className={styles.link}
+              onClick={() => handleLinkClick(link)}
+              type="button"
+            >
+              {link}
+            </button>
+            {index < footerLinks.length - 1 && (
+              <span className={styles.separator}>|</span>
+            )}
+          </React.Fragment>
+        ))}
       </div>
     </footer>
   );
