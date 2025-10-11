@@ -109,13 +109,26 @@ export default function MockInterviews({
                         New
                     </Badge>
                 </div>
-                <button style={{ 
-                    color: 'var(--foreground)', 
-                    background: 'none', 
-                    border: 'none', 
-                    cursor: 'pointer',
-                    transition: 'color var(--transition-normal)'
-                }}>
+                <button 
+                    style={{ 
+                        color: '#3b82f6', 
+                        background: 'none', 
+                        border: 'none', 
+                        cursor: 'pointer',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        fontWeight: 500
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'
+                        e.currentTarget.style.textDecoration = 'underline'
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'none'
+                        e.currentTarget.style.textDecoration = 'none'
+                    }}
+                >
                     Know More
                 </button>
             </div>

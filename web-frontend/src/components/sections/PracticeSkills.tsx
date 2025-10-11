@@ -113,15 +113,38 @@ export default function PracticeSkills({
 
 			{/* Load More Button */}
 			<div style={{ textAlign: 'center', marginTop: '20px' }}>
-				<button style={{ 
-					padding: '8px 24px', 
-					border: '1px solid var(--border)', 
-					color: 'var(--foreground)', 
-					borderRadius: 'var(--radius-md)', 
-					background: 'none', 
-					cursor: 'pointer',
-					transition: 'all var(--transition-normal)'
-				}}>
+				<button 
+					style={{ 
+						padding: '10px 24px', 
+						border: '1px solid rgba(226, 232, 240, 0.8)', 
+						color: '#3b82f6', 
+						borderRadius: '8px', 
+						background: 'transparent', 
+						cursor: 'pointer',
+						transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+						position: 'relative',
+						overflow: 'hidden',
+						fontWeight: 500
+					}}
+					onMouseEnter={(e) => {
+						e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'
+						e.currentTarget.style.borderColor = '#3b82f6'
+						e.currentTarget.style.transform = 'translateY(-2px)'
+						e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)'
+					}}
+					onMouseLeave={(e) => {
+						e.currentTarget.style.background = 'transparent'
+						e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 0.8)'
+						e.currentTarget.style.transform = 'translateY(0)'
+						e.currentTarget.style.boxShadow = 'none'
+					}}
+					onMouseDown={(e) => {
+						e.currentTarget.style.transform = 'translateY(0)'
+					}}
+					onMouseUp={(e) => {
+						e.currentTarget.style.transform = 'translateY(-2px)'
+					}}
+				>
 					Load More Skills
 				</button>
 			</div>

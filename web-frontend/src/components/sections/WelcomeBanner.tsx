@@ -22,14 +22,15 @@ export default function WelcomeBanner({
 }: WelcomeBannerProps): JSX.Element {
 	return (
 		<div style={{
-			background: 'var(--card)',
-			borderRadius: 'var(--radius-lg)',
+			background: 'linear-gradient(145deg, var(--card) 0%, rgba(255, 255, 255, 0.05) 100%)',
+			borderRadius: '20px',
 			padding: '32px',
-			border: '1px solid var(--border)',
-			boxShadow: 'var(--shadow-sm)',
+			border: '1px solid rgba(226, 232, 240, 0.8)',
+			boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
 			marginBottom: '24px',
 			position: 'relative',
-			overflow: 'hidden'
+			overflow: 'hidden',
+			transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
 		}}>
 			{/* Background Pattern */}
 			<div style={{

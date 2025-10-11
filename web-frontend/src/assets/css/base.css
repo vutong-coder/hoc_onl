@@ -1,4 +1,5 @@
 /* Base Styles */
+@import './effects.css';
 
 html, body, #root { 
 	height: 100%; 

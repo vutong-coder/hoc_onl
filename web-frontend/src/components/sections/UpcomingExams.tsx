@@ -187,7 +187,25 @@ export default function UpcomingExams({
 				</h3>
 				<button 
 					className="text-sm text-[var(--accent)] hover:underline"
-					style={{ fontSize: '14px', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+					style={{ 
+						fontSize: '14px', 
+						color: '#3b82f6', 
+						background: 'none', 
+						border: 'none', 
+						cursor: 'pointer',
+						transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+						padding: '4px 8px',
+						borderRadius: '6px',
+						fontWeight: 500
+					}}
+					onMouseEnter={(e) => {
+						e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'
+						e.currentTarget.style.textDecoration = 'underline'
+					}}
+					onMouseLeave={(e) => {
+						e.currentTarget.style.background = 'none'
+						e.currentTarget.style.textDecoration = 'none'
+					}}
 				>
 					View Calendar
 				</button>

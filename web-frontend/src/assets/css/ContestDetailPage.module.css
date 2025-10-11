@@ -1,5 +1,5 @@
 .page {
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   min-height: 100vh;
   position: relative;
 }

@@ -37,23 +37,31 @@ export default function SkillCard({ skill, onSkillClick }: SkillCardProps): JSX.
 		<div 
 			style={{ 
 				padding: '12px', 
-				borderRadius: 'var(--radius-md)', 
-				border: '1px solid var(--border)', 
-				background: 'var(--card)',
-				transition: 'all 0.3s ease',
+				borderRadius: '12px', 
+				border: '1px solid rgba(226, 232, 240, 0.8)', 
+				background: 'linear-gradient(145deg, var(--card) 0%, rgba(255, 255, 255, 0.05) 100%)',
+				transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
 				cursor: 'pointer',
-				position: 'relative'
+				position: 'relative',
+				boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+				overflow: 'hidden'
 			}}
 			onClick={() => onSkillClick?.(skill.id)}
 			onMouseEnter={(e) => {
-				e.currentTarget.style.borderColor = 'var(--accent)'
-				e.currentTarget.style.transform = 'translateY(-2px)'
-				e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
+				e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.2)'
+				e.currentTarget.style.transform = 'translateY(-6px) scale(1.02)'
+				e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(59, 130, 246, 0.1)'
 			}}
 			onMouseLeave={(e) => {
-				e.currentTarget.style.borderColor = 'var(--border)'
-				e.currentTarget.style.transform = 'translateY(0)'
-				e.currentTarget.style.boxShadow = 'none'
+				e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 0.8)'
+				e.currentTarget.style.transform = 'translateY(0) scale(1)'
+				e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
+			}}
+			onMouseDown={(e) => {
+				e.currentTarget.style.transform = 'translateY(-3px) scale(1.01)'
+			}}
+			onMouseUp={(e) => {
+				e.currentTarget.style.transform = 'translateY(-6px) scale(1.02)'
 			}}
 		>
 			{/* Icon */}
