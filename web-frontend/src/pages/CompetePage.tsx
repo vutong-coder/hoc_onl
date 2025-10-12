@@ -11,13 +11,13 @@ const CompetePage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleContestActionClick = (contest: Contest) => {
-    // Only navigate to contest detail page for "View Challenges" button
-    if (contest.actionButtonText === 'View Challenges') {
+    // Only navigate to contest detail page for "View Challenges" or "Xem thử thách" button
+    if (contest.actionButtonText === 'View Challenges' || contest.actionButtonText === 'Xem thử thách') {
       navigate(`/user/compete/${contest.id}`);
     } else {
       // For other buttons (Register Now, View Details), show message that page is not designed yet
       console.log(`Action "${contest.actionButtonText}" clicked for contest: ${contest.id}`);
-      alert(`Page for "${contest.actionButtonText}" is not designed yet.`);
+      alert(`Trang cho "${contest.actionButtonText}" chưa được thiết kế.`);
     }
   };
 

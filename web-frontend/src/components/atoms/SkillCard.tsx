@@ -97,7 +97,7 @@ export default function SkillCard({ skill, onSkillClick }: SkillCardProps): JSX.
 				<div style={{ width: '100%' }}>
 					<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
 						<span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
-							Progress
+							Tiến độ
 						</span>
 						<span 
 							style={{ 

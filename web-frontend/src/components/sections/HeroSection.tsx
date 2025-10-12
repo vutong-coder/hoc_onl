@@ -8,10 +8,10 @@ interface HeroSectionProps {
 
 export default function HeroSection({ 
 	stats = [
-		{ number: '2M+', label: 'Active Developers' },
-		{ number: '50K+', label: 'Coding Challenges' },
-		{ number: '100+', label: 'Programming Languages' },
-		{ number: '95%', label: 'Success Rate' }
+		{ number: '2M+', label: 'Lập trình viên hoạt động' },
+		{ number: '50K+', label: 'Bài tập lập trình' },
+		{ number: '100+', label: 'Ngôn ngữ lập trình' },
+		{ number: '95%', label: 'Tỷ lệ thành công' }
 	]
 }: HeroSectionProps): JSX.Element {
 	return (
@@ -40,9 +40,9 @@ export default function HeroSection({
 						WebkitTextFillColor: 'transparent',
 						fontFamily: 'var(--font-display)'
 					}}>
-						Master Coding Skills
+						Làm chủ kỹ năng lập trình
 						<br />
-						<span style={{ color: 'var(--accent)' }}>Build Your Future</span>
+						<span style={{ color: 'var(--accent)' }}>Xây dựng tương lai của bạn</span>
 					</h1>
 					
 					<p style={{
@@ -52,8 +52,8 @@ export default function HeroSection({
 						margin: '0 auto 40px',
 						lineHeight: 1.6
 					}}>
-						Join millions of developers worldwide. Practice coding, earn certifications, 
-						and prepare for your dream job with our comprehensive learning platform.
+						Tham gia cùng hàng triệu lập trình viên trên toàn thế giới. Luyện tập lập trình, nhận chứng chỉ 
+						và chuẩn bị cho công việc mơ ước với nền tảng học tập toàn diện của chúng tôi.
 					</p>
 
 					<div className="flex flex-col sm:flex-row gap-4 justify-center items-center" style={{
@@ -82,7 +82,7 @@ export default function HeroSection({
 								boxShadow: 'var(--shadow-lg)'
 							}}
 						>
-							Get Started Free
+							Bắt đầu miễn phí
 							<ArrowRight className="w-5 h-5" style={{ width: '20px', height: '20px' }} />
 						</Link>
 						
@@ -101,7 +101,7 @@ export default function HeroSection({
 							transition: 'all var(--transition-normal)'
 						}}>
 							<Play className="w-5 h-5" style={{ width: '20px', height: '20px' }} />
-							Watch Demo
+							Xem Demo
 						</button>
 					</div>
 

@@ -3,224 +3,224 @@ import { CertificationDetail } from '../types/certificationDetail';
 export const mockCertificationDetails: { [key: string]: CertificationDetail } = {
   'frontend-react': {
     id: 'frontend-react',
-    title: 'Frontend Developer',
+    title: 'Lập trình viên Frontend',
     subtitle: '(React)',
-    description: 'Demonstrate your expertise in building modern, responsive web applications using React, JavaScript, and CSS. This certification validates your ability to create interactive user interfaces and manage component state effectively.',
-    duration: '1 hour',
-    questions: '4 questions',
-    level: 'Intermediate',
+    description: 'Chứng minh chuyên môn của bạn trong việc xây dựng ứng dụng web hiện đại, responsive bằng React, JavaScript và CSS. Chứng chỉ này xác thực khả năng tạo giao diện người dùng tương tác và quản lý state component hiệu quả.',
+    duration: '1 giờ',
+    questions: '4 câu hỏi',
+    level: 'Trung cấp',
     category: 'role',
     icon: 'react',
     color: '#61dafb',
     benefits: [
-      'Stand out to employers with a verified React skills certification',
-      'Validate your frontend development expertise',
-      'Access to exclusive job opportunities',
-      'Boost your professional credibility',
-      'Join a community of certified developers'
+      'Nổi bật với nhà tuyển dụng bằng chứng chỉ kỹ năng React được xác minh',
+      'Xác thực chuyên môn phát triển frontend của bạn',
+      'Truy cập các cơ hội việc làm độc quyền',
+      'Tăng uy tín chuyên nghiệp',
+      'Tham gia cộng đồng lập trình viên được chứng chỉ'
     ],
     requirements: [
-      'Basic understanding of HTML, CSS, and JavaScript',
-      'Experience with React fundamentals',
-      'Knowledge of component lifecycle and state management',
-      'Familiarity with modern JavaScript (ES6+)'
+      'Hiểu biết cơ bản về HTML, CSS và JavaScript',
+      'Kinh nghiệm với các khái niệm React cơ bản',
+      'Kiến thức về vòng đời component và quản lý state',
+      'Quen thuộc với JavaScript hiện đại (ES6+)'
     ],
     topics: [
-      'React Components and JSX',
-      'State Management (useState, useEffect)',
-      'Props and Component Communication',
-      'Event Handling',
-      'Conditional Rendering',
-      'Lists and Keys',
-      'CSS Styling and Responsive Design',
-      'JavaScript Fundamentals'
+      'React Components và JSX',
+      'Quản lý State (useState, useEffect)',
+      'Props và giao tiếp giữa các Component',
+      'Xử lý sự kiện',
+      'Render có điều kiện',
+      'Lists và Keys',
+      'CSS Styling và Responsive Design',
+      'JavaScript cơ bản'
     ],
     faqs: [
       {
         id: 'what-is-test',
-        question: 'What is the HackerRank Certification Test?',
-        answer: 'The HackerRank Certification Test is a standardized assessment designed to evaluate your practical coding skills and knowledge in specific technologies. It consists of real-world coding problems that test your ability to solve challenges under time constraints.'
+        question: 'Bài kiểm tra chứng chỉ là gì?',
+        answer: 'Bài kiểm tra chứng chỉ là đánh giá tiêu chuẩn được thiết kế để đánh giá kỹ năng lập trình thực tế và kiến thức của bạn về các công nghệ cụ thể. Nó bao gồm các bài toán lập trình thực tế để kiểm tra khả năng giải quyết thử thách của bạn trong thời gian giới hạn.'
       },
       {
         id: 'types-of-tests',
-        question: 'What are the different types of certification tests?',
-        answer: 'We offer various certification tests including Role-based certifications (Frontend Developer, Backend Developer, Full Stack Developer) and Skill-based certifications (JavaScript, Python, SQL, React, etc.). Each test is tailored to validate specific competencies.'
+        question: 'Các loại bài kiểm tra chứng chỉ khác nhau là gì?',
+        answer: 'Chúng tôi cung cấp nhiều bài kiểm tra chứng chỉ bao gồm chứng chỉ dựa trên vai trò (Lập trình viên Frontend, Backend, Full Stack) và chứng chỉ dựa trên kỹ năng (JavaScript, Python, SQL, React, v.v.). Mỗi bài kiểm tra được thiết kế riêng để xác thực các năng lực cụ thể.'
       },
       {
         id: 'subject-matter',
-        question: 'What is the subject matter tested during the test?',
-        answer: 'For the Frontend Developer (React) certification, you will be tested on React fundamentals, component lifecycle, state management, event handling, JSX, props, CSS styling, and JavaScript concepts. The test focuses on practical application rather than theoretical knowledge.'
+        question: 'Nội dung kiểm tra trong bài thi là gì?',
+        answer: 'Đối với chứng chỉ Lập trình viên Frontend (React), bạn sẽ được kiểm tra về kiến thức React cơ bản, vòng đời component, quản lý state, xử lý sự kiện, JSX, props, CSS styling và các khái niệm JavaScript. Bài kiểm tra tập trung vào ứng dụng thực tế thay vì kiến thức lý thuyết.'
       },
       {
         id: 'if-fail',
-        question: 'What happens if I fail the test?',
-        answer: 'If you don\'t pass the test on your first attempt, you can retake it after a 7-day waiting period. We encourage you to review the topics and practice more before attempting again. There is no limit to the number of retakes.'
+        question: 'Điều gì xảy ra nếu tôi trượt bài kiểm tra?',
+        answer: 'Nếu bạn không vượt qua bài kiểm tra ở lần đầu tiên, bạn có thể thi lại sau thời gian chờ 7 ngày. Chúng tôi khuyến khích bạn ôn tập các chủ đề và luyện tập thêm trước khi thử lại. Không giới hạn số lần thi lại.'
       },
       {
         id: 'why-take',
-        question: 'Why should I take this test?',
-        answer: 'This certification helps you stand out in the competitive job market, validates your skills to employers, provides access to exclusive job opportunities, and demonstrates your commitment to professional development in frontend development.'
+        question: 'Tại sao tôi nên tham gia bài kiểm tra này?',
+        answer: 'Chứng chỉ này giúp bạn nổi bật trên thị trường việc làm cạnh tranh, xác thực kỹ năng của bạn với nhà tuyển dụng, cung cấp quyền truy cập vào các cơ hội việc làm độc quyền và thể hiện cam kết của bạn với phát triển chuyên nghiệp trong lĩnh vực phát triển frontend.'
       },
       {
         id: 'duration',
-        question: 'What\'s the duration of the test?',
-        answer: 'The Frontend Developer (React) certification test is 60 minutes long. This includes time for reading questions, coding solutions, and testing your implementations. We recommend managing your time effectively to complete all questions.'
+        question: 'Thời lượng của bài kiểm tra là bao lâu?',
+        answer: 'Bài kiểm tra chứng chỉ Lập trình viên Frontend (React) kéo dài 60 phút. Bao gồm thời gian đọc câu hỏi, viết code giải pháp và kiểm tra triển khai của bạn. Chúng tôi khuyến nghị quản lý thời gian hiệu quả để hoàn thành tất cả câu hỏi.'
       },
       {
         id: 'questions-count',
-        question: 'How many questions are in the test?',
-        answer: 'The test contains 4 carefully crafted questions that progressively increase in difficulty. These questions are designed to assess different aspects of React development, from basic component creation to complex state management scenarios.'
+        question: 'Có bao nhiêu câu hỏi trong bài kiểm tra?',
+        answer: 'Bài kiểm tra chứa 4 câu hỏi được thiết kế cẩn thận với độ khó tăng dần. Những câu hỏi này được thiết kế để đánh giá các khía cạnh khác nhau của phát triển React, từ tạo component cơ bản đến các tình huống quản lý state phức tạp.'
       }
     ],
     companyLogos: ['ORACLE', 'BANK OF AMERICA', 'Walmart', 'Uber', 'NUTANIX', 'Salesforce'],
-    testimonialCount: '3 million'
+    testimonialCount: '3 triệu'
   },
   'angular-basic': {
     id: 'angular-basic',
     title: 'Angular',
-    subtitle: '(Basic)',
-    description: 'Master the fundamentals of Angular development and learn to build robust single-page applications. This certification covers core Angular concepts, components, services, and routing.',
-    duration: '45 minutes',
-    questions: '3 questions',
-    level: 'Basic',
+    subtitle: '(Cơ bản)',
+    description: 'Nắm vững kiến thức cơ bản về phát triển Angular và học cách xây dựng ứng dụng đơn trang mạnh mẽ. Chứng chỉ này bao gồm các khái niệm Angular cốt lõi, components, services và routing.',
+    duration: '45 phút',
+    questions: '3 câu hỏi',
+    level: 'Cơ bản',
     category: 'skill',
     icon: 'angular',
     color: '#dd0031',
     benefits: [
-      'Validate your Angular fundamentals',
-      'Showcase your frontend framework skills',
-      'Access to Angular-specific job opportunities',
-      'Build confidence in Angular development',
-      'Join the Angular developer community'
+      'Xác thực kiến thức Angular cơ bản của bạn',
+      'Thể hiện kỹ năng frontend framework',
+      'Truy cập các cơ hội việc làm chuyên về Angular',
+      'Xây dựng tự tin trong phát triển Angular',
+      'Tham gia cộng đồng lập trình viên Angular'
     ],
     requirements: [
-      'Basic understanding of HTML, CSS, and JavaScript',
-      'Familiarity with TypeScript basics',
-      'Knowledge of web development concepts',
-      'Understanding of component-based architecture'
+      'Hiểu biết cơ bản về HTML, CSS và JavaScript',
+      'Quen thuộc với TypeScript cơ bản',
+      'Kiến thức về các khái niệm phát triển web',
+      'Hiểu về kiến trúc dựa trên component'
     ],
     topics: [
       'Angular Components',
-      'TypeScript Fundamentals',
+      'TypeScript cơ bản',
       'Data Binding',
       'Directives',
-      'Services and Dependency Injection',
-      'Routing and Navigation',
-      'Forms and Validation',
+      'Services và Dependency Injection',
+      'Routing và Navigation',
+      'Forms và Validation',
       'HTTP Client'
     ],
     faqs: [
       {
         id: 'what-is-test',
-        question: 'What is the HackerRank Certification Test?',
-        answer: 'The HackerRank Certification Test is a standardized assessment designed to evaluate your practical coding skills and knowledge in specific technologies. It consists of real-world coding problems that test your ability to solve challenges under time constraints.'
+        question: 'Bài kiểm tra chứng chỉ là gì?',
+        answer: 'Bài kiểm tra chứng chỉ là đánh giá tiêu chuẩn được thiết kế để đánh giá kỹ năng lập trình thực tế và kiến thức của bạn về các công nghệ cụ thể. Nó bao gồm các bài toán lập trình thực tế để kiểm tra khả năng giải quyết thử thách của bạn trong thời gian giới hạn.'
       },
       {
         id: 'types-of-tests',
-        question: 'What are the different types of certification tests?',
-        answer: 'We offer various certification tests including Role-based certifications (Frontend Developer, Backend Developer, Full Stack Developer) and Skill-based certifications (JavaScript, Python, SQL, Angular, etc.). Each test is tailored to validate specific competencies.'
+        question: 'Các loại bài kiểm tra chứng chỉ khác nhau là gì?',
+        answer: 'Chúng tôi cung cấp nhiều bài kiểm tra chứng chỉ bao gồm chứng chỉ dựa trên vai trò (Lập trình viên Frontend, Backend, Full Stack) và chứng chỉ dựa trên kỹ năng (JavaScript, Python, SQL, Angular, v.v.). Mỗi bài kiểm tra được thiết kế riêng để xác thực các năng lực cụ thể.'
       },
       {
         id: 'subject-matter',
-        question: 'What is the subject matter tested during the test?',
-        answer: 'For the Angular (Basic) certification, you will be tested on Angular components, TypeScript fundamentals, data binding, directives, services, routing, forms, and HTTP client. The test focuses on practical application of Angular concepts.'
+        question: 'Nội dung kiểm tra trong bài thi là gì?',
+        answer: 'Đối với chứng chỉ Angular (Cơ bản), bạn sẽ được kiểm tra về Angular components, TypeScript cơ bản, data binding, directives, services, routing, forms và HTTP client. Bài kiểm tra tập trung vào ứng dụng thực tế các khái niệm Angular.'
       },
       {
         id: 'if-fail',
-        question: 'What happens if I fail the test?',
-        answer: 'If you don\'t pass the test on your first attempt, you can retake it after a 7-day waiting period. We encourage you to review the topics and practice more before attempting again. There is no limit to the number of retakes.'
+        question: 'Điều gì xảy ra nếu tôi trượt bài kiểm tra?',
+        answer: 'Nếu bạn không vượt qua bài kiểm tra ở lần đầu tiên, bạn có thể thi lại sau thời gian chờ 7 ngày. Chúng tôi khuyến khích bạn ôn tập các chủ đề và luyện tập thêm trước khi thử lại. Không giới hạn số lần thi lại.'
       },
       {
         id: 'why-take',
-        question: 'Why should I take this test?',
-        answer: 'This certification helps you stand out in the competitive job market, validates your Angular skills to employers, provides access to Angular-specific job opportunities, and demonstrates your commitment to learning modern frontend frameworks.'
+        question: 'Tại sao tôi nên tham gia bài kiểm tra này?',
+        answer: 'Chứng chỉ này giúp bạn nổi bật trên thị trường việc làm cạnh tranh, xác thực kỹ năng Angular của bạn với nhà tuyển dụng, cung cấp quyền truy cập vào các cơ hội việc làm Angular và thể hiện cam kết của bạn trong việc học các framework frontend hiện đại.'
       },
       {
         id: 'duration',
-        question: 'What\'s the duration of the test?',
-        answer: 'The Angular (Basic) certification test is 45 minutes long. This includes time for reading questions, coding solutions, and testing your implementations. We recommend managing your time effectively to complete all questions.'
+        question: 'Thời lượng của bài kiểm tra là bao lâu?',
+        answer: 'Bài kiểm tra chứng chỉ Angular (Cơ bản) kéo dài 45 phút. Bao gồm thời gian đọc câu hỏi, viết code giải pháp và kiểm tra triển khai của bạn. Chúng tôi khuyến nghị quản lý thời gian hiệu quả để hoàn thành tất cả câu hỏi.'
       },
       {
         id: 'questions-count',
-        question: 'How many questions are in the test?',
-        answer: 'The test contains 3 carefully crafted questions that progressively increase in difficulty. These questions are designed to assess different aspects of Angular development, from basic component creation to service implementation.'
+        question: 'Có bao nhiêu câu hỏi trong bài kiểm tra?',
+        answer: 'Bài kiểm tra chứa 3 câu hỏi được thiết kế cẩn thận với độ khó tăng dần. Những câu hỏi này được thiết kế để đánh giá các khía cạnh khác nhau của phát triển Angular, từ tạo component cơ bản đến triển khai service.'
       }
     ],
     companyLogos: ['Microsoft', 'Google', 'Adobe', 'PayPal', 'IBM', 'Intel'],
-    testimonialCount: '2.5 million'
+    testimonialCount: '2,5 triệu'
   },
   'csharp-basic': {
     id: 'csharp-basic',
     title: 'C#',
-    subtitle: '(Basic)',
-    description: 'Learn the fundamentals of C# programming language and object-oriented programming concepts. This certification covers basic syntax, data types, control structures, and class design.',
-    duration: '50 minutes',
-    questions: '3 questions',
-    level: 'Basic',
+    subtitle: '(Cơ bản)',
+    description: 'Học các kiến thức cơ bản về ngôn ngữ lập trình C# và các khái niệm lập trình hướng đối tượng. Chứng chỉ này bao gồm cú pháp cơ bản, kiểu dữ liệu, cấu trúc điều khiển và thiết kế class.',
+    duration: '50 phút',
+    questions: '3 câu hỏi',
+    level: 'Cơ bản',
     category: 'skill',
     icon: 'csharp',
     color: '#239120',
     benefits: [
-      'Validate your C# programming fundamentals',
-      'Showcase your .NET development skills',
-      'Access to C# developer job opportunities',
-      'Build confidence in object-oriented programming',
-      'Join the .NET developer community'
+      'Xác thực kiến thức lập trình C# cơ bản',
+      'Thể hiện kỹ năng phát triển .NET',
+      'Truy cập các cơ hội việc làm lập trình viên C#',
+      'Xây dựng tự tin trong lập trình hướng đối tượng',
+      'Tham gia cộng đồng lập trình viên .NET'
     ],
     requirements: [
-      'Basic understanding of programming concepts',
-      'Familiarity with object-oriented programming',
-      'Knowledge of data types and variables',
-      'Understanding of control structures'
+      'Hiểu biết cơ bản về các khái niệm lập trình',
+      'Quen thuộc với lập trình hướng đối tượng',
+      'Kiến thức về kiểu dữ liệu và biến',
+      'Hiểu về cấu trúc điều khiển'
     ],
     topics: [
-      'C# Syntax and Data Types',
-      'Variables and Constants',
-      'Control Structures (if, for, while)',
-      'Methods and Functions',
-      'Classes and Objects',
-      'Inheritance and Polymorphism',
-      'Exception Handling',
-      'Collections and LINQ'
+      'Cú pháp C# và Kiểu dữ liệu',
+      'Biến và Constants',
+      'Cấu trúc điều khiển (if, for, while)',
+      'Methods và Functions',
+      'Classes và Objects',
+      'Kế thừa và Đa hình',
+      'Xử lý ngoại lệ',
+      'Collections và LINQ'
     ],
     faqs: [
       {
         id: 'what-is-test',
-        question: 'What is the HackerRank Certification Test?',
-        answer: 'The HackerRank Certification Test is a standardized assessment designed to evaluate your practical coding skills and knowledge in specific technologies. It consists of real-world coding problems that test your ability to solve challenges under time constraints.'
+        question: 'Bài kiểm tra chứng chỉ là gì?',
+        answer: 'Bài kiểm tra chứng chỉ là đánh giá tiêu chuẩn được thiết kế để đánh giá kỹ năng lập trình thực tế và kiến thức của bạn về các công nghệ cụ thể. Nó bao gồm các bài toán lập trình thực tế để kiểm tra khả năng giải quyết thử thách của bạn trong thời gian giới hạn.'
       },
       {
         id: 'types-of-tests',
-        question: 'What are the different types of certification tests?',
-        answer: 'We offer various certification tests including Role-based certifications (Software Engineer, Backend Developer, Full Stack Developer) and Skill-based certifications (C#, Java, Python, SQL, etc.). Each test is tailored to validate specific competencies.'
+        question: 'Các loại bài kiểm tra chứng chỉ khác nhau là gì?',
+        answer: 'Chúng tôi cung cấp nhiều bài kiểm tra chứng chỉ bao gồm chứng chỉ dựa trên vai trò (Kỹ sư phần mềm, Lập trình viên Backend, Full Stack) và chứng chỉ dựa trên kỹ năng (C#, Java, Python, SQL, v.v.). Mỗi bài kiểm tra được thiết kế riêng để xác thực các năng lực cụ thể.'
       },
       {
         id: 'subject-matter',
-        question: 'What is the subject matter tested during the test?',
-        answer: 'For the C# (Basic) certification, you will be tested on C# syntax, data types, control structures, methods, classes, inheritance, exception handling, and basic collections. The test focuses on practical application of C# fundamentals.'
+        question: 'Nội dung kiểm tra trong bài thi là gì?',
+        answer: 'Đối với chứng chỉ C# (Cơ bản), bạn sẽ được kiểm tra về cú pháp C#, kiểu dữ liệu, cấu trúc điều khiển, methods, classes, kế thừa, xử lý ngoại lệ và collections cơ bản. Bài kiểm tra tập trung vào ứng dụng thực tế các kiến thức C# cơ bản.'
       },
       {
         id: 'if-fail',
-        question: 'What happens if I fail the test?',
-        answer: 'If you don\'t pass the test on your first attempt, you can retake it after a 7-day waiting period. We encourage you to review the topics and practice more before attempting again. There is no limit to the number of retakes.'
+        question: 'Điều gì xảy ra nếu tôi trượt bài kiểm tra?',
+        answer: 'Nếu bạn không vượt qua bài kiểm tra ở lần đầu tiên, bạn có thể thi lại sau thời gian chờ 7 ngày. Chúng tôi khuyến khích bạn ôn tập các chủ đề và luyện tập thêm trước khi thử lại. Không giới hạn số lần thi lại.'
       },
       {
         id: 'why-take',
-        question: 'Why should I take this test?',
-        answer: 'This certification helps you stand out in the competitive job market, validates your C# skills to employers, provides access to .NET developer job opportunities, and demonstrates your commitment to learning modern programming languages.'
+        question: 'Tại sao tôi nên tham gia bài kiểm tra này?',
+        answer: 'Chứng chỉ này giúp bạn nổi bật trên thị trường việc làm cạnh tranh, xác thực kỹ năng C# của bạn với nhà tuyển dụng, cung cấp quyền truy cập vào các cơ hội việc làm lập trình viên .NET và thể hiện cam kết của bạn trong việc học các ngôn ngữ lập trình hiện đại.'
       },
       {
         id: 'duration',
-        question: 'What\'s the duration of the test?',
-        answer: 'The C# (Basic) certification test is 50 minutes long. This includes time for reading questions, coding solutions, and testing your implementations. We recommend managing your time effectively to complete all questions.'
+        question: 'Thời lượng của bài kiểm tra là bao lâu?',
+        answer: 'Bài kiểm tra chứng chỉ C# (Cơ bản) kéo dài 50 phút. Bao gồm thời gian đọc câu hỏi, viết code giải pháp và kiểm tra triển khai của bạn. Chúng tôi khuyến nghị quản lý thời gian hiệu quả để hoàn thành tất cả câu hỏi.'
       },
       {
         id: 'questions-count',
-        question: 'How many questions are in the test?',
-        answer: 'The test contains 3 carefully crafted questions that progressively increase in difficulty. These questions are designed to assess different aspects of C# development, from basic syntax to object-oriented programming concepts.'
+        question: 'Có bao nhiêu câu hỏi trong bài kiểm tra?',
+        answer: 'Bài kiểm tra chứa 3 câu hỏi được thiết kế cẩn thận với độ khó tăng dần. Những câu hỏi này được thiết kế để đánh giá các khía cạnh khác nhau của phát triển C#, từ cú pháp cơ bản đến các khái niệm lập trình hướng đối tượng.'
       }
     ],
     companyLogos: ['Microsoft', 'Stack Overflow', 'Unity', 'JetBrains', 'GitHub', 'Slack'],
-    testimonialCount: '2 million'
+    testimonialCount: '2 triệu'
   }
 };

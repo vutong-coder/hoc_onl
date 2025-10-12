@@ -41,10 +41,13 @@ const CertificationCard: React.FC<CertificationCardProps> = ({
 
   const getLevelBadgeClass = (level: string) => {
     switch (level) {
+      case 'Cơ bản':
       case 'Basic':
         return styles.levelBasic;
+      case 'Trung cấp':
       case 'Intermediate':
         return styles.levelIntermediate;
+      case 'Nâng cao':
       case 'Advanced':
         return styles.levelAdvanced;
       default:
@@ -89,7 +92,7 @@ const CertificationCard: React.FC<CertificationCardProps> = ({
           className={styles.getCertifiedButton}
           onClick={handleGetCertified}
         >
-          Get Certified
+          Nhận chứng chỉ
         </button>
       </div>
       

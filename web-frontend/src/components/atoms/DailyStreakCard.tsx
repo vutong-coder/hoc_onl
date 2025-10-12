@@ -9,7 +9,7 @@ export default function DailyStreakCard({
 	currentStreak, 
 	weeklyProgress = [true, true, true, true, true, true, true] // Default: all days completed
 }: DailyStreakCardProps): JSX.Element {
-	const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+	const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 
 	return (
 		<div style={{ 
@@ -27,7 +27,7 @@ export default function DailyStreakCard({
 				marginBottom: '16px', 
 				margin: 0 
 			}}>
-				Daily Streak
+				Chuỗi ngày
 			</h3>
 
 			{/* Days of Week */}
@@ -83,14 +83,14 @@ export default function DailyStreakCard({
 					fontWeight: 500, 
 					color: 'var(--foreground)' 
 				}}>
-					Current Streak:
+					Chuỗi hiện tại:
 				</span>
 				<span style={{ 
 					fontSize: '16px', 
 					fontWeight: 700, 
 					color: '#f59e0b' 
 				}}>
-					{currentStreak} Days
+					{currentStreak} ngày
 				</span>
 			</div>
 		</div>

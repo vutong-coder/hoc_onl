@@ -22,42 +22,42 @@ export default function RecentExams({
 	exams = [
 		{
 			id: '1',
-			title: 'Python Programming Fundamentals',
+			title: 'Lập trình Python cơ bản',
 			score: 85,
 			maxScore: 100,
 			status: 'completed',
-			date: '2 hours ago',
-			duration: '45 min',
+			date: '2 giờ trước',
+			duration: '45 phút',
 			certificate: true
 		},
 		{
 			id: '2',
-			title: 'Data Structures & Algorithms',
+			title: 'Cấu trúc dữ liệu & Thuật toán',
 			score: 72,
 			maxScore: 100,
 			status: 'completed',
-			date: '1 day ago',
-			duration: '60 min',
+			date: '1 ngày trước',
+			duration: '60 phút',
 			certificate: false
 		},
 		{
 			id: '3',
-			title: 'Web Development Basics',
+			title: 'Phát triển Web cơ bản',
 			score: undefined,
 			maxScore: 100,
 			status: 'in-progress',
-			date: 'Started 30 min ago',
-			duration: '90 min',
+			date: 'Bắt đầu 30 phút trước',
+			duration: '90 phút',
 			certificate: false
 		},
 		{
 			id: '4',
-			title: 'Python Programming Fundamentals',
+			title: 'Lập trình Python cơ bản',
 			score: 85,
 			maxScore: 100,
 			status: 'completed',
-			date: '2 hours ago',
-			duration: '45 min',
+			date: '2 giờ trước',
+			duration: '45 phút',
 			certificate: true
 		},
 	],
@@ -68,7 +68,7 @@ export default function RecentExams({
 		<div className="card stagger-load hover-lift interactive" style={{ animationDelay: '300ms', padding: '16px', height: '490px', display: 'flex', flexDirection: 'column', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
 			<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
 				<h3 style={{ fontSize: '18px', fontWeight: 600, margin: 0 }}>
-					Recent Exams
+					Bài thi gần đây
 				</h3>
 				<button 
 					style={{ 
@@ -91,7 +91,7 @@ export default function RecentExams({
 						e.currentTarget.style.textDecoration = 'none'
 					}}
 				>
-					View All
+					Xem tất cả
 				</button>
 			</div>
 

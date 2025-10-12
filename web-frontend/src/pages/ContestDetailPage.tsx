@@ -19,14 +19,14 @@ const ContestDetailPage: React.FC = () => {
     return (
       <div className={styles.errorPage}>
         <div className={styles.container}>
-          <h1>Contest not found</h1>
-          <p>The contest you're looking for doesn't exist.</p>
+          <h1>Không tìm thấy cuộc thi</h1>
+          <p>Cuộc thi bạn đang tìm kiếm không tồn tại.</p>
           <button 
             className={styles.backButton}
             onClick={() => navigate('/user/compete')}
             type="button"
           >
-            Back to Contests
+            Quay lại cuộc thi
           </button>
         </div>
       </div>
@@ -105,8 +105,8 @@ const ContestDetailPage: React.FC = () => {
                 ))
               ) : (
                 <div className={styles.emptyState}>
-                  <h3>No challenges available</h3>
-                  <p>This contest doesn't have any challenges yet.</p>
+                  <h3>Không có thử thách nào</h3>
+                  <p>Cuộc thi này chưa có thử thách nào.</p>
                 </div>
               )}
             </div>

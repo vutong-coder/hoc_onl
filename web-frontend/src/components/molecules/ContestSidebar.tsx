@@ -66,13 +66,13 @@ const ContestSidebar: React.FC<ContestSidebarProps> = ({
 
       {/* Current Rank */}
       <div className={styles.rankSection}>
-        <h3 className={styles.rankTitle}>Current Rank:</h3>
+        <h3 className={styles.rankTitle}>Xếp hạng hiện tại:</h3>
         <p className={styles.rankValue}>
-          {contest.currentRank ? `#${contest.currentRank}` : 'N/A'}
+          {contest.currentRank ? `#${contest.currentRank}` : 'Chưa có'}
         </p>
         {contest.totalParticipants && (
           <p className={styles.totalParticipants}>
-            of {contest.totalParticipants.toLocaleString()} participants
+            trên {contest.totalParticipants.toLocaleString()} người tham gia
           </p>
         )}
       </div>
@@ -92,7 +92,7 @@ const ContestSidebar: React.FC<ContestSidebarProps> = ({
           type="button"
         >
           <span className={styles.actionIcon}>🏆</span>
-          Current Leaderboard
+          Bảng xếp hạng
         </button>
         
         <button
@@ -101,7 +101,7 @@ const ContestSidebar: React.FC<ContestSidebarProps> = ({
           type="button"
         >
           <span className={styles.actionIcon}>📊</span>
-          Compare Progress
+          So sánh tiến độ
         </button>
         
         <button
@@ -110,19 +110,19 @@ const ContestSidebar: React.FC<ContestSidebarProps> = ({
           type="button"
         >
           <span className={styles.actionIcon}>📋</span>
-          Review Submissions
+          Xem bài nộp
         </button>
       </div>
 
       {/* Message Center */}
       <div className={styles.messageCenter}>
-        <h4 className={styles.messageTitle}>Message Center</h4>
+        <h4 className={styles.messageTitle}>Trung tâm tin nhắn</h4>
         <form onSubmit={handleMessageSubmit} className={styles.messageForm}>
           <input
             type="text"
             value={message}
             onChange={handleMessageChange}
-            placeholder="Type your message..."
+            placeholder="Nhập tin nhắn của bạn..."
             className={styles.messageInput}
           />
           <button
@@ -130,7 +130,7 @@ const ContestSidebar: React.FC<ContestSidebarProps> = ({
             className={styles.messageButton}
             disabled={!message.trim()}
           >
-            Send
+            Gửi
           </button>
         </form>
       </div>

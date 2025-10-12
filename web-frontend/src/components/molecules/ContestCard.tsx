@@ -18,8 +18,8 @@ const ContestCard: React.FC<ContestCardProps> = ({
     if (onActionClick) {
       onActionClick(contest);
     } else {
-      // Default action - only navigate to contest detail page for "View Challenges"
-      if (contest.actionButtonText === 'View Challenges') {
+      // Default action - only navigate to contest detail page for "View Challenges" or "Xem thử thách"
+      if (contest.actionButtonText === 'View Challenges' || contest.actionButtonText === 'Xem thử thách') {
         navigate(`/user/compete/${contest.id}`);
       } else {
         // For other buttons, show message that page is not designed yet
@@ -47,13 +47,13 @@ const ContestCard: React.FC<ContestCardProps> = ({
   const getTypeText = (type: Contest['type']) => {
     switch (type) {
       case 'global':
-        return 'Global';
+        return 'Toàn cầu';
       case 'college':
-        return 'College';
+        return 'Sinh viên';
       case 'hiring':
-        return 'Hiring';
+        return 'Tuyển dụng';
       case 'practice':
-        return 'Practice';
+        return 'Luyện tập';
       default:
         return type;
     }
@@ -67,7 +67,7 @@ const ContestCard: React.FC<ContestCardProps> = ({
         </div>
         {contest.difficulty && (
           <div className={styles.difficultyBadge}>
-            {contest.difficulty}
+            {contest.difficulty === 'easy' ? 'Dễ' : contest.difficulty === 'medium' ? 'Trung bình' : contest.difficulty === 'hard' ? 'Khó' : contest.difficulty}
           </div>
         )}
       </div>

@@ -12,7 +12,7 @@ export interface CertificationDetail {
   description: string;
   duration: string;
   questions: string;
-  level: 'Basic' | 'Intermediate' | 'Advanced';
+  level: 'Basic' | 'Intermediate' | 'Advanced' | 'Cơ bản' | 'Trung cấp' | 'Nâng cao';
   category: 'role' | 'skill';
   icon: string;
   color: string;

@@ -5,18 +5,18 @@ import { LayoutDashboard, Users, FileText, Monitor, Video, Lock, Award, BookOpen
 type Item = { icon: React.ReactNode; label: string; path: string }
 
 const items: Item[] = [
-	{ icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard', path: '/dashboard' },
-	{ icon: <Users className="w-5 h-5" />, label: 'User Management', path: '/users' },
-	{ icon: <FileText className="w-5 h-5" />, label: 'Exam Management', path: '/exams' },
-	{ icon: <Monitor className="w-5 h-5" />, label: 'Online Exam', path: '/exam' },
-	{ icon: <Video className="w-5 h-5" />, label: 'Proctoring & Anti-cheating', path: '/proctoring' },
-	{ icon: <Lock className="w-5 h-5" />, label: 'Security & Blockchain', path: '/security' },
-	{ icon: <Award className="w-5 h-5" />, label: 'Token Reward System', path: '/reward' },
-	{ icon: <BookOpen className="w-5 h-5" />, label: 'Course Management', path: '/courses' },
-	{ icon: <Building className="w-5 h-5" />, label: 'Organization Management', path: '/organizations' },
-	{ icon: <Server className="w-5 h-5" />, label: 'System Admin', path: '/admin' },
-	{ icon: <BarChart className="w-5 h-5" />, label: 'Analytics & Reports', path: '/analytics' },
-	{ icon: <Copyright className="w-5 h-5" />, label: 'Document Copyright', path: '/copyright' },
+	{ icon: <LayoutDashboard className="w-5 h-5" />, label: 'Tổng quan', path: '/dashboard' },
+	{ icon: <Users className="w-5 h-5" />, label: 'Quản lý người dùng', path: '/users' },
+	{ icon: <FileText className="w-5 h-5" />, label: 'Quản lý bài thi', path: '/exams' },
+	{ icon: <Monitor className="w-5 h-5" />, label: 'Thi trực tuyến', path: '/exam' },
+	{ icon: <Video className="w-5 h-5" />, label: 'Giám sát & Chống gian lận', path: '/proctoring' },
+	{ icon: <Lock className="w-5 h-5" />, label: 'Bảo mật & Blockchain', path: '/security' },
+	{ icon: <Award className="w-5 h-5" />, label: 'Hệ thống thưởng Token', path: '/reward' },
+	{ icon: <BookOpen className="w-5 h-5" />, label: 'Quản lý khóa học', path: '/courses' },
+	{ icon: <Building className="w-5 h-5" />, label: 'Quản lý tổ chức', path: '/organizations' },
+	{ icon: <Server className="w-5 h-5" />, label: 'Quản trị hệ thống', path: '/admin' },
+	{ icon: <BarChart className="w-5 h-5" />, label: 'Phân tích & Báo cáo', path: '/analytics' },
+	{ icon: <Copyright className="w-5 h-5" />, label: 'Bản quyền tài liệu', path: '/copyright' },
 ]
 
 export default function Sidebar(): JSX.Element {

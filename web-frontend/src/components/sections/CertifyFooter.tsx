@@ -4,14 +4,14 @@ import styles from '../../assets/css/CertifyFooter.module.css';
 const CertifyFooter: React.FC = () => {
   const footerLinks = [
     'Blog',
-    'Scoring',
-    'Environment',
-    'FAQ',
-    'About Us',
-    'Helpdesk',
-    'Careers',
-    'Terms Of Service',
-    'Privacy Policy'
+    'Chấm điểm',
+    'Môi trường',
+    'Câu hỏi thường gặp',
+    'Về chúng tôi',
+    'Trợ giúp',
+    'Tuyển dụng',
+    'Điều khoản dịch vụ',
+    'Chính sách bảo mật'
   ];
 
   const handleLinkClick = (link: string) => {

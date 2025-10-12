@@ -36,11 +36,11 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   const getStatusText = (status: Contest['status']) => {
     switch (status) {
       case 'active':
-        return 'Active';
+        return 'Đang diễn ra';
       case 'upcoming':
-        return 'Upcoming';
+        return 'Sắp tới';
       case 'archived':
-        return 'Ended';
+        return 'Đã kết thúc';
       default:
         return status;
     }

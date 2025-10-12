@@ -7,11 +7,11 @@ interface PasswordStrengthProps {
 export default function PasswordStrength({ strength }: PasswordStrengthProps): JSX.Element {
 	const getStrengthText = (strength: string) => {
 		switch (strength) {
-			case 'weak': return 'Weak password'
-			case 'fair': return 'Fair password'
-			case 'good': return 'Good password'
-			case 'strong': return 'Strong password'
-			default: return 'Enter password'
+			case 'weak': return 'Mật khẩu yếu'
+			case 'fair': return 'Mật khẩu trung bình'
+			case 'good': return 'Mật khẩu tốt'
+			case 'strong': return 'Mật khẩu mạnh'
+			default: return 'Nhập mật khẩu'
 		}
 	}
 

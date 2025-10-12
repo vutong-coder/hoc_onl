@@ -23,7 +23,7 @@ const FAQSection: React.FC<FAQSectionProps> = ({ faqs, onGetCertified }) => {
   return (
     <div className={styles.faqSection}>
       <div className={styles.container}>
-        <h2 className={styles.title}>Frequently asked questions</h2>
+        <h2 className={styles.title}>Câu hỏi thường gặp</h2>
         
         <div className={styles.faqList}>
           {faqsWithState.map((faq) => (
@@ -36,12 +36,12 @@ const FAQSection: React.FC<FAQSectionProps> = ({ faqs, onGetCertified }) => {
         </div>
         
         <div className={styles.callToAction}>
-          <h3 className={styles.ctaTitle}>What are you waiting for?</h3>
+          <h3 className={styles.ctaTitle}>Bạn còn chờ gì nữa?</h3>
           <button 
             className={styles.getCertifiedButton}
             onClick={onGetCertified}
           >
-            Get Certified
+            Nhận chứng chỉ
           </button>
         </div>
       </div>

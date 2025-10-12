@@ -40,7 +40,7 @@ const CertificationDetailPage: React.FC = () => {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.loadingSpinner}></div>
-        <p className={styles.loadingText}>Loading certification details...</p>
+        <p className={styles.loadingText}>Đang tải chi tiết chứng chỉ...</p>
       </div>
     );
   }
@@ -48,15 +48,15 @@ const CertificationDetailPage: React.FC = () => {
   if (!certification) {
     return (
       <div className={styles.errorContainer}>
-        <h1 className={styles.errorTitle}>Certification Not Found</h1>
+        <h1 className={styles.errorTitle}>Không tìm thấy chứng chỉ</h1>
         <p className={styles.errorText}>
-          The certification you're looking for doesn't exist or has been removed.
+          Chứng chỉ bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
         </p>
         <button 
           className={styles.backButton}
           onClick={handleBackToCertify}
         >
-          Back to Certifications
+          Quay lại chứng chỉ
         </button>
       </div>
     );
@@ -71,7 +71,7 @@ const CertificationDetailPage: React.FC = () => {
             className={styles.backButton}
             onClick={handleBackToCertify}
           >
-            ← Back to Certifications
+            ← Quay lại chứng chỉ
           </button>
         </nav>
 

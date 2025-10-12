@@ -15,33 +15,33 @@ export default function FeaturesSection({
 	features = [
 		{
 			icon: Code,
-			title: 'Practice Coding',
-			description: 'Master programming skills with thousands of challenges across multiple languages and difficulty levels.'
+			title: 'Luyện tập lập trình',
+			description: 'Nâng cao kỹ năng lập trình với hàng nghìn thử thách trên nhiều ngôn ngữ và cấp độ khó khác nhau.'
 		},
 		{
 			icon: Users,
-			title: 'Join Community',
-			description: 'Connect with millions of developers worldwide, share solutions, and learn from each other.'
+			title: 'Tham gia cộng đồng',
+			description: 'Kết nối với hàng triệu lập trình viên trên toàn thế giới, chia sẻ giải pháp và học hỏi lẫn nhau.'
 		},
 		{
 			icon: Award,
-			title: 'Earn Certifications',
-			description: 'Validate your skills with industry-recognized certifications that boost your career prospects.'
+			title: 'Nhận chứng chỉ',
+			description: 'Xác thực kỹ năng của bạn với chứng chỉ được công nhận trong ngành, giúp thúc đẩy sự nghiệp.'
 		},
 		{
 			icon: Shield,
-			title: 'Secure Platform',
-			description: 'Practice in a secure environment with plagiarism detection and fair assessment tools.'
+			title: 'Nền tảng an toàn',
+			description: 'Luyện tập trong môi trường an toàn với công cụ phát hiện đạo văn và đánh giá công bằng.'
 		},
 		{
 			icon: Zap,
-			title: 'Real-time Feedback',
-			description: 'Get instant feedback on your code with detailed explanations and optimization suggestions.'
+			title: 'Phản hồi thời gian thực',
+			description: 'Nhận phản hồi ngay lập tức về mã của bạn với giải thích chi tiết và gợi ý tối ưu hóa.'
 		},
 		{
 			icon: Target,
-			title: 'Career Preparation',
-			description: 'Prepare for technical interviews with mock tests and real-world problem-solving scenarios.'
+			title: 'Chuẩn bị nghề nghiệp',
+			description: 'Chuẩn bị cho phỏng vấn kỹ thuật với bài kiểm tra mô phỏng và các tình huống giải quyết vấn đề thực tế.'
 		}
 	]
 }: FeaturesSectionProps): JSX.Element {
@@ -59,7 +59,7 @@ export default function FeaturesSection({
 						marginBottom: '16px',
 						fontFamily: 'var(--font-display)'
 					}}>
-						Why Choose EduPlatform?
+						Tại sao chọn EduPlatform?
 					</h2>
 					<p style={{
 						fontSize: '1.125rem',
@@ -68,7 +68,7 @@ export default function FeaturesSection({
 						margin: '0 auto',
 						lineHeight: 1.6
 					}}>
-						Everything you need to become a better developer and advance your career
+						Mọi thứ bạn cần để trở thành một lập trình viên giỏi hơn và thăng tiến trong sự nghiệp
 					</p>
 				</div>
 

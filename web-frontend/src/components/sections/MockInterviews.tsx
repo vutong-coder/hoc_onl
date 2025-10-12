@@ -24,9 +24,9 @@ export default function MockInterviews({
     interviews = [
         {
             id: '1',
-            title: 'Software Engineer',
-            description: 'Problem Solving (Medium)',
-            duration: '60 mins',
+            title: 'Kỹ sư phần mềm',
+            description: 'Giải quyết vấn đề (Trung bình)',
+            duration: '60 phút',
             difficulty: 'Medium',
             isLocked: false,
             isFree: true,
@@ -34,36 +34,36 @@ export default function MockInterviews({
         },
         {
             id: '2',
-            title: 'Frontend Developer',
-            description: 'React (Medium)',
-            duration: '60 mins',
+            title: 'Lập trình viên Frontend',
+            description: 'React (Trung bình)',
+            duration: '60 phút',
             difficulty: 'Medium',
             isLocked: true,
             isFree: false
         },
         {
             id: '3',
-            title: 'Backend Developer',
-            description: 'Node (Medium)',
-            duration: '60 mins',
+            title: 'Lập trình viên Backend',
+            description: 'Node (Trung bình)',
+            duration: '60 phút',
             difficulty: 'Medium',
             isLocked: true,
             isFree: false
         },
         {
             id: '4',
-            title: 'System Design',
-            description: 'Architecture Design (Medium)',
-            duration: '60 mins',
+            title: 'Thiết kế hệ thống',
+            description: 'Thiết kế kiến trúc (Trung bình)',
+            duration: '60 phút',
             difficulty: 'Medium',
             isLocked: true,
             isFree: false
         },
         {
             id: '5',
-            title: 'Data Scientist',
-            description: 'Python & Pandas (Hard)',
-            duration: '90 mins',
+            title: 'Khoa học dữ liệu',
+            description: 'Python & Pandas (Khó)',
+            duration: '90 phút',
             difficulty: 'Hard',
             isLocked: true,
             isFree: false
@@ -103,10 +103,10 @@ export default function MockInterviews({
             }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <h2 style={{ fontSize: '24px', fontWeight: 700, marginRight: '8px' }}>
-                        AI-powered Mock Interviews
+                        Phỏng vấn mô phỏng AI
                     </h2>
                     <Badge variant="primary">
-                        New
+                        Mới
                     </Badge>
                 </div>
                 <button 
@@ -129,7 +129,7 @@ export default function MockInterviews({
                         e.currentTarget.style.textDecoration = 'none'
                     }}
                 >
-                    Know More
+                    Tìm hiểu thêm
                 </button>
             </div>
 

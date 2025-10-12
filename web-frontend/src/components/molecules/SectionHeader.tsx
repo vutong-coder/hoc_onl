@@ -32,7 +32,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
           onClick={handleViewAllClick}
           type="button"
         >
-          View All →
+          Xem tất cả →
         </button>
       )}
     </div>

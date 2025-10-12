@@ -19,7 +19,7 @@ const ContestDetailHero: React.FC<ContestDetailHeroProps> = ({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('vi-VN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -43,7 +43,7 @@ const ContestDetailHero: React.FC<ContestDetailHeroProps> = ({
         {/* Breadcrumbs */}
         <nav className={styles.breadcrumbs}>
           <a href="/user/compete" className={styles.breadcrumbLink}>
-            All Contests
+            Tất cả cuộc thi
           </a>
           <span className={styles.breadcrumbSeparator}>›</span>
           <span className={styles.breadcrumbCurrent}>{contest.title}</span>
@@ -61,9 +61,9 @@ const ContestDetailHero: React.FC<ContestDetailHeroProps> = ({
                 <p className={styles.description}>{contest.description}</p>
               )}
               <div className={styles.dateInfo}>
-                <span className={styles.dateLabel}>Start Date:</span>
+                <span className={styles.dateLabel}>Ngày bắt đầu:</span>
                 <span className={styles.dateValue}>{formatDate(contest.startDate)}</span>
-                <span className={styles.dateLabel}>End Date:</span>
+                <span className={styles.dateLabel}>Ngày kết thúc:</span>
                 <span className={styles.dateValue}>{formatDate(contest.endDate)}</span>
               </div>
             </div>
@@ -74,15 +74,15 @@ const ContestDetailHero: React.FC<ContestDetailHeroProps> = ({
             onClick={handleDetailsClick}
             type="button"
           >
-            Details →
+            Chi tiết →
           </button>
         </div>
 
         {/* Challenges Section Header */}
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Challenges</h2>
+          <h2 className={styles.sectionTitle}>Thử thách</h2>
           <div className={styles.challengesCount}>
-            {contest.challenges.length} challenge{contest.challenges.length !== 1 ? 's' : ''}
+            {contest.challenges.length} thử thách
           </div>
         </div>
       </div>

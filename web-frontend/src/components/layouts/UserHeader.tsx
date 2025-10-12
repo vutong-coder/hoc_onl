@@ -115,7 +115,7 @@ export default function UserHeader(): JSX.Element {
 							color: getActiveNavItem() === 'prepare' ? 'var(--foreground)' : 'var(--muted-foreground)'
 						}}
 					>
-						Prepare
+						Chuẩn bị
 						{/* Green underline for active item */}
 						{getActiveNavItem() === 'prepare' && (
 							<div 
@@ -143,7 +143,7 @@ export default function UserHeader(): JSX.Element {
 							color: getActiveNavItem() === 'certify' ? 'var(--foreground)' : 'var(--muted-foreground)'
 						}}
 					>
-						Certify
+						Chứng chỉ
 						{/* Green underline for active item */}
 						{getActiveNavItem() === 'certify' && (
 							<div 
@@ -171,7 +171,7 @@ export default function UserHeader(): JSX.Element {
 							color: getActiveNavItem() === 'compete' ? 'var(--foreground)' : 'var(--muted-foreground)'
 						}}
 					>
-						Compete
+						Thi đấu
 						{/* Green underline for active item */}
 						{getActiveNavItem() === 'compete' && (
 							<div 
@@ -215,7 +215,7 @@ export default function UserHeader(): JSX.Element {
 						<form onSubmit={handleSearch} style={{ display: 'block' }}>
 							<input 
 								type="text" 
-								placeholder="Search challenges..." 
+								placeholder="Tìm kiếm thử thách..." 
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
 								style={{
@@ -420,14 +420,14 @@ export default function UserHeader(): JSX.Element {
 										{/* Menu Items */}
 										<div style={{ padding: '8px 0' }}>
 											{[
-												{ icon: <User style={{ width: '16px', height: '16px' }} />, label: 'Profile' },
-												{ icon: <Trophy style={{ width: '16px', height: '16px' }} />, label: 'Leaderboard' },
-												{ icon: <Settings style={{ width: '16px', height: '16px' }} />, label: 'Settings' },
-												{ icon: <Bookmark style={{ width: '16px', height: '16px' }} />, label: 'Bookmarks' },
-												{ icon: <Users style={{ width: '16px', height: '16px' }} />, label: 'Network' },
-												{ icon: <FileText style={{ width: '16px', height: '16px' }} />, label: 'Submissions' },
-												{ icon: <Shield style={{ width: '16px', height: '16px' }} />, label: 'Administration' },
-												{ icon: <LogOut style={{ width: '16px', height: '16px' }} />, label: 'Logout', onClick: handleLogout }
+												{ icon: <User style={{ width: '16px', height: '16px' }} />, label: 'Hồ sơ' },
+												{ icon: <Trophy style={{ width: '16px', height: '16px' }} />, label: 'Bảng xếp hạng' },
+												{ icon: <Settings style={{ width: '16px', height: '16px' }} />, label: 'Cài đặt' },
+												{ icon: <Bookmark style={{ width: '16px', height: '16px' }} />, label: 'Đánh dấu' },
+												{ icon: <Users style={{ width: '16px', height: '16px' }} />, label: 'Mạng lưới' },
+												{ icon: <FileText style={{ width: '16px', height: '16px' }} />, label: 'Bài nộp' },
+												{ icon: <Shield style={{ width: '16px', height: '16px' }} />, label: 'Quản trị' },
+												{ icon: <LogOut style={{ width: '16px', height: '16px' }} />, label: 'Đăng xuất', onClick: handleLogout }
 											].map((item, index) => (
 												<button
 													key={index}

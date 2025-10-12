@@ -18,10 +18,10 @@ export default function TokenWallet({
     tokenBalance = 1250,
     totalEarned = 5000,
     recentTransactions = [
-        { type: 'earn', amount: 100, description: 'Completed Python Basic', date: '2 hours ago' },
-        { type: 'spend', amount: -50, description: 'Unlocked Advanced Course', date: '1 day ago' },
-        { type: 'reward', amount: 200, description: 'Daily Streak Bonus', date: '2 days ago' },
-        { type: 'earn', amount: 75, description: 'Quiz High Score', date: '3 days ago' }
+        { type: 'earn', amount: 100, description: 'Hoàn thành Python cơ bản', date: '2 giờ trước' },
+        { type: 'spend', amount: -50, description: 'Mở khóa khóa học nâng cao', date: '1 ngày trước' },
+        { type: 'reward', amount: 200, description: 'Thưởng chuỗi ngày', date: '2 ngày trước' },
+        { type: 'earn', amount: 75, description: 'Điểm cao bài kiểm tra', date: '3 ngày trước' }
     ],
     onViewTransactions,
     onBuyTokens
@@ -39,20 +39,20 @@ export default function TokenWallet({
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                     <h3 style={{ fontSize: '18px', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center' }}>
                         <Wallet style={{ width: '20px', height: '20px', marginRight: '8px', color: 'var(--accent)' }} />
-                        Token Wallet
+                        Ví Token
                     </h3>
                     <button 
                         onClick={onBuyTokens}
                         style={{ fontSize: '14px', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
                     >
-                        Buy Tokens
+                        Mua Token
                     </button>
                 </div>
 
                 <div style={{ marginBottom: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
-                            Current Balance
+                            Số dư hiện tại
                         </span>
                         <span style={{ fontSize: '24px', fontWeight: 700, color: 'var(--accent)', display: 'flex', alignItems: 'center' }}>
                             <Coins style={{ width: '24px', height: '24px', marginRight: '4px' }} />
@@ -61,7 +61,7 @@ export default function TokenWallet({
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: 'var(--muted-foreground)', marginTop: '4px' }}>
                         <TrendingUp style={{ width: '16px', height: '16px', marginRight: '4px' }} />
-                        Total Earned: {totalEarned.toLocaleString()} tokens
+                        Tổng đã kiếm: {totalEarned.toLocaleString()} token
                     </div>
                 </div>
             </div>
@@ -70,7 +70,7 @@ export default function TokenWallet({
             <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none', minHeight: 0 }}>
                 <div>
                     <h4 style={{ fontSize: '14px', fontWeight: 500, marginBottom: '12px' }}>
-                        Recent Transactions
+                        Giao dịch gần đây
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {recentTransactions.map((transaction, index) => (
@@ -126,7 +126,7 @@ export default function TokenWallet({
                             textDecoration: 'underline' 
                         }}
                     >
-                        View All Transactions
+                        Xem tất cả giao dịch
                     </button>
                 </div>
             </div>

@@ -41,10 +41,17 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
 
   const getDifficultyColor = (difficulty: Challenge['difficulty']) => {
     switch (difficulty) {
-      case 'Easy': return styles.difficultyEasy;
-      case 'Medium': return styles.difficultyMedium;
-      case 'Hard': return styles.difficultyHard;
-      default: return styles.difficultyEasy;
+      case 'Easy':
+      case 'Dễ': 
+        return styles.difficultyEasy;
+      case 'Medium':
+      case 'Trung bình': 
+        return styles.difficultyMedium;
+      case 'Hard':
+      case 'Khó': 
+        return styles.difficultyHard;
+      default: 
+        return styles.difficultyEasy;
     }
   };
 
@@ -57,6 +64,15 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
     }
   };
 
+  const getDifficultyText = (difficulty: Challenge['difficulty']) => {
+    switch (difficulty) {
+      case 'Easy': return 'Dễ';
+      case 'Medium': return 'Trung bình';
+      case 'Hard': return 'Khó';
+      default: return difficulty;
+    }
+  };
+
   return (
     <div className={styles.challengeCard}>
       <div className={styles.challengeHeader}>
@@ -66,13 +82,13 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
           </h3>
           <div className={styles.challengeStats}>
             <span className={styles.stat}>
-              Success Rate: <strong>{challenge.successRate.toFixed(2)}%</strong>
+              Tỷ lệ thành công: <strong>{challenge.successRate.toFixed(2)}%</strong>
             </span>
             <span className={styles.stat}>
-              Max Score: <strong>{challenge.maxScore}</strong>
+              Điểm tối đa: <strong>{challenge.maxScore}</strong>
             </span>
             <span className={`${styles.stat} ${styles.difficulty} ${getDifficultyColor(challenge.difficulty)}`}>
-              Difficulty: <strong>{challenge.difficulty}</strong>
+              Độ khó: <strong>{getDifficultyText(challenge.difficulty)}</strong>
             </span>
           </div>
         </div>
@@ -82,7 +98,7 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
             <button
               className={styles.actionIcon}
               onClick={handleDiscussionClick}
-              title="Discussion"
+              title="Thảo luận"
               type="button"
             >
               💬
@@ -90,7 +106,7 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
             <button
               className={styles.actionIcon}
               onClick={handleLeaderboardClick}
-              title="Leaderboard"
+              title="Bảng xếp hạng"
               type="button"
             >
               🏆
@@ -98,7 +114,7 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
             <button
               className={styles.actionIcon}
               onClick={handleSubmissionsClick}
-              title="Submissions"
+              title="Bài nộp"
               type="button"
             >
               📋
@@ -110,7 +126,7 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
             onClick={handleSolveClick}
             type="button"
           >
-            Solve Challenge
+            Giải thử thách
           </button>
         </div>
       </div>

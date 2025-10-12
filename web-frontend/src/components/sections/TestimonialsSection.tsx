@@ -16,24 +16,24 @@ interface TestimonialsSectionProps {
 export default function TestimonialsSection({ 
 	testimonials = [
 		{
-			name: 'Sarah Chen',
-			role: 'Software Engineer',
+			name: 'Nguyễn Văn A',
+			role: 'Kỹ sư phần mềm',
 			company: 'Google',
-			content: 'EduPlatform helped me land my dream job at Google. The practice problems and mock interviews were invaluable.',
+			content: 'EduPlatform đã giúp tôi có được công việc mơ ước tại Google. Các bài tập luyện tập và phỏng vấn mô phỏng rất hữu ích.',
 			rating: 5
 		},
 		{
-			name: 'Michael Rodriguez',
-			role: 'Full Stack Developer',
+			name: 'Trần Thị B',
+			role: 'Lập trình viên Full Stack',
 			company: 'Microsoft',
-			content: 'The community support and detailed explanations made learning complex algorithms much easier.',
+			content: 'Sự hỗ trợ từ cộng đồng và giải thích chi tiết giúp việc học các thuật toán phức tạp trở nên dễ dàng hơn nhiều.',
 			rating: 5
 		},
 		{
-			name: 'Emily Johnson',
-			role: 'Data Scientist',
+			name: 'Lê Văn C',
+			role: 'Chuyên gia khoa học dữ liệu',
 			company: 'Amazon',
-			content: 'The certification program gave me the confidence to apply for senior positions. Highly recommended!',
+			content: 'Chương trình chứng chỉ giúp tôi tự tin ứng tuyển vào các vị trí cao cấp. Rất đáng để thử!',
 			rating: 5
 		}
 	]
@@ -56,7 +56,7 @@ export default function TestimonialsSection({
 						marginBottom: '16px',
 						fontFamily: 'var(--font-display)'
 					}}>
-						Loved by Developers Worldwide
+						Được yêu thích bởi lập trình viên toàn cầu
 					</h2>
 					<p style={{
 						fontSize: '1.125rem',
@@ -65,7 +65,7 @@ export default function TestimonialsSection({
 						margin: '0 auto',
 						lineHeight: 1.6
 					}}>
-						See what our community members have to say about their success stories
+						Xem các thành viên cộng đồng chia sẻ về câu chuyện thành công của họ
 					</p>
 				</div>
 
@@ -124,12 +124,12 @@ export default function TestimonialsSection({
 								}}>
 									{testimonial.name}
 								</div>
-								<div style={{
-									fontSize: '0.875rem',
-									color: 'var(--muted-foreground)'
-								}}>
-									{testimonial.role} at {testimonial.company}
-								</div>
+							<div style={{
+								fontSize: '0.875rem',
+								color: 'var(--muted-foreground)'
+							}}>
+								{testimonial.role} tại {testimonial.company}
+							</div>
 							</div>
 						</div>
 					))}

@@ -12,11 +12,11 @@ interface CTASectionProps {
 }
 
 export default function CTASection({ 
-	title = 'Ready to Start Your Journey?',
-	subtitle = 'Join millions of developers who are already building their future with EduPlatform',
-	primaryButtonText = 'Create Free Account',
+	title = 'Sẵn sàng bắt đầu hành trình của bạn?',
+	subtitle = 'Tham gia cùng hàng triệu lập trình viên đang xây dựng tương lai của họ với EduPlatform',
+	primaryButtonText = 'Tạo tài khoản miễn phí',
 	primaryButtonLink = '/auth/register',
-	secondaryButtonText = 'Already have an account? Sign in',
+	secondaryButtonText = 'Đã có tài khoản? Đăng nhập',
 	secondaryButtonLink = '/auth/login'
 }: CTASectionProps): JSX.Element {
 	return (

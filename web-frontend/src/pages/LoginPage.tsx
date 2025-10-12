@@ -86,10 +86,10 @@ export default function LoginPage(): JSX.Element {
 
 	return (
 		<AuthForm
-			title="Welcome Back"
-			subtitle="Sign in to your account to continue"
+			title="Chào mừng trở lại"
+			subtitle="Đăng nhập vào tài khoản của bạn để tiếp tục"
 			onSubmit={handleSubmit}
-			buttonText="Login"
+			buttonText="Đăng nhập"
 			loading={loading}
 			error={error}
 			afterButton={
@@ -100,7 +100,7 @@ export default function LoginPage(): JSX.Element {
 			}
 			footer={
 				<p style={{ margin: 0 }}>
-					Don't have an account?{' '}
+					Chưa có tài khoản?{' '}
 					<Link 
 						to="/auth/register"
 						style={{
@@ -113,7 +113,7 @@ export default function LoginPage(): JSX.Element {
 							fontFamily: 'inherit'
 						}}
 					>
-						Sign up
+						Đăng ký
 					</Link>
 				</p>
 			}
@@ -124,7 +124,7 @@ export default function LoginPage(): JSX.Element {
 				type="email"
 				value={formData.email}
 				onChange={handleInputChange}
-				placeholder="Enter your email"
+				placeholder="Nhập email của bạn"
 				error={errors.email}
 				required
 			/>
@@ -135,7 +135,7 @@ export default function LoginPage(): JSX.Element {
 				type="password"
 				value={formData.password}
 				onChange={handleInputChange}
-				placeholder="Enter your password"
+				placeholder="Nhập mật khẩu của bạn"
 				error={errors.password}
 				required
 			/>
@@ -148,7 +148,7 @@ export default function LoginPage(): JSX.Element {
 			}}>
 				<Checkbox
 					id="remember"
-					label="Remember me"
+					label="Ghi nhớ đăng nhập"
 					checked={rememberMe}
 					onChange={setRememberMe}
 				/>
@@ -163,7 +163,7 @@ export default function LoginPage(): JSX.Element {
 						textDecoration: 'none'
 					}}
 				>
-					Forgot Password?
+					Quên mật khẩu?
 				</Link>
 			</div>
 		</AuthForm>

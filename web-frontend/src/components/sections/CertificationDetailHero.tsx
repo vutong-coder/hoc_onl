@@ -14,10 +14,13 @@ const CertificationDetailHero: React.FC<CertificationDetailHeroProps> = ({
 
   const getLevelColor = (level: string) => {
     switch (level) {
+      case 'Cơ bản':
       case 'Basic':
         return '#10b981';
+      case 'Trung cấp':
       case 'Intermediate':
         return '#f59e0b';
+      case 'Nâng cao':
       case 'Advanced':
         return '#ef4444';
       default:
@@ -31,7 +34,7 @@ const CertificationDetailHero: React.FC<CertificationDetailHeroProps> = ({
         <div className={styles.content}>
         <div className={styles.textContent}>
           <h1 className={styles.title}>
-              Get certified as a
+              Nhận chứng chỉ
               <br />
               <span className={styles.certificationTitle}>
                 {certification.title}
@@ -72,17 +75,17 @@ const CertificationDetailHero: React.FC<CertificationDetailHeroProps> = ({
               className={styles.getCertifiedButton}
               onClick={onGetCertified}
             >
-              Get Certified
+              Nhận chứng chỉ
             </button>
             
             <p className={styles.testimonial}>
-              Join {certification.testimonialCount} certified developers
+              Tham gia cùng {certification.testimonialCount} lập trình viên đã được chứng chỉ
             </p>
           </div>
           
           <div className={styles.companies}>
             <p className={styles.companiesTitle}>
-              {certification.title} certified developers work at
+              Các lập trình viên có chứng chỉ {certification.title} đang làm việc tại
             </p>
             <div className={styles.logos}>
               {certification.companyLogos.map((logo, index) => (

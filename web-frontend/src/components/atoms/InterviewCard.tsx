@@ -117,7 +117,7 @@ export default function InterviewCard({ interview, onStartInterview, onUnlockInt
 							e.currentTarget.style.background = 'var(--primary)'
 						}}
 					>
-						Try for Free
+						Dùng thử miễn phí
 					</button>
 				)}
 				
@@ -134,7 +134,7 @@ export default function InterviewCard({ interview, onStartInterview, onUnlockInt
 							transition: 'color var(--transition-normal)'
 						}}
 					>
-						Unlock
+						Mở khóa
 					</button>
 				)}
 			</div>

@@ -63,7 +63,7 @@ export default function WelcomeBanner({
 						WebkitTextFillColor: 'transparent',
 						backgroundClip: 'text'
 					}}>
-						Welcome back, {userName}! 👋
+						Chào mừng trở lại, {userName}! 👋
 					</h1>
 					<p style={{ 
 						fontSize: '18px', 
@@ -71,7 +71,7 @@ export default function WelcomeBanner({
 						margin: 0,
 						fontWeight: 500
 					}}>
-						Ready to continue your learning journey?
+						Sẵn sàng tiếp tục hành trình học tập của bạn chưa?
 					</p>
 				</div>
 
@@ -90,25 +90,25 @@ export default function WelcomeBanner({
 						gap: '20px'
 					}}>
 						<StatCard 
-							title="Level" 
+							title="Cấp độ" 
 							value={level} 
 							icon={<Star style={{ width: '28px', height: '28px' }} />} 
 							gradient="primary" 
 						/>
 						<StatCard 
-							title="Total XP" 
+							title="Tổng XP" 
 							value={xp.toLocaleString()} 
 							icon={<TrendingUp style={{ width: '28px', height: '28px' }} />} 
 							gradient="accent" 
 						/>
 						<StatCard 
-							title="Exams Taken" 
+							title="Bài thi đã làm" 
 							value={totalExams} 
 							icon={<Calendar style={{ width: '28px', height: '28px' }} />} 
 							gradient="primary" 
 						/>
 						<StatCard 
-							title="Certificates" 
+							title="Chứng chỉ" 
 							value={certificates} 
 							icon={<Award style={{ width: '28px', height: '28px' }} />} 
 							gradient="accent" 

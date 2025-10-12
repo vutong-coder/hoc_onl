@@ -1,37 +1,37 @@
 export const validateEmail = (email: string): string | null => {
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-	if (!email) return 'Email is required'
-	if (!emailRegex.test(email)) return 'Please enter a valid email address'
+	if (!email) return 'Email là bắt buộc'
+	if (!emailRegex.test(email)) return 'Vui lòng nhập địa chỉ email hợp lệ'
 	return null
 }
 
 export const validatePassword = (password: string): string | null => {
-	if (!password) return 'Password is required'
-	if (password.length < 6) return 'Password must be at least 6 characters'
+	if (!password) return 'Mật khẩu là bắt buộc'
+	if (password.length < 6) return 'Mật khẩu phải có ít nhất 6 ký tự'
 	
 	// Check for Vietnamese characters (có dấu)
 	const vietnameseRegex = /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđĐ]/
 	if (vietnameseRegex.test(password)) {
-		return 'Password cannot contain Vietnamese characters with diacritics'
+		return 'Mật khẩu không được chứa ký tự tiếng Việt có dấu'
 	}
 	
 	// Check for spaces
 	if (password.includes(' ')) {
-		return 'Password cannot contain spaces'
+		return 'Mật khẩu không được chứa khoảng trắng'
 	}
 	
 	return null
 }
 
 export const validateName = (name: string): string | null => {
-	if (!name) return 'Name is required'
-	if (name.length < 2) return 'Name must be at least 2 characters'
+	if (!name) return 'Tên là bắt buộc'
+	if (name.length < 2) return 'Tên phải có ít nhất 2 ký tự'
 	return null
 }
 
 export const validateConfirmPassword = (password: string, confirmPassword: string): string | null => {
-	if (!confirmPassword) return 'Please confirm your password'
-	if (password !== confirmPassword) return 'Passwords do not match'
+	if (!confirmPassword) return 'Vui lòng xác nhận mật khẩu'
+	if (password !== confirmPassword) return 'Mật khẩu không khớp'
 	return null
 }
 

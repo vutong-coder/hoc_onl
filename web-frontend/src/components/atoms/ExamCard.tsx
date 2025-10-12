@@ -72,7 +72,7 @@ export default function ExamCard({ exam, onViewExam, onRetakeExam }: ExamCardPro
 					{exam.score !== undefined && (
 						<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 							<span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
-								Score
+								Điểm
 							</span>
 							<span style={{ 
 								fontSize: '14px', 
@@ -93,7 +93,7 @@ export default function ExamCard({ exam, onViewExam, onRetakeExam }: ExamCardPro
 								padding: '2px 8px', 
 								borderRadius: '9999px' 
 							}}>
-								Certificate Available
+								Có chứng chỉ
 							</span>
 						</div>
 					)}
@@ -120,7 +120,7 @@ export default function ExamCard({ exam, onViewExam, onRetakeExam }: ExamCardPro
 							onClick={() => onRetakeExam?.(exam.id)}
 							style={{ fontSize: '12px', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
 						>
-							Retake
+							Thi lại
 						</button>
 					)}
 				</div>

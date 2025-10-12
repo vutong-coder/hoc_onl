@@ -2,13 +2,13 @@ import React from 'react'
 
 export default function Footer(): JSX.Element {
 	const footerLinks = [
-		'Environment',
-		'FAQ', 
-		'About Us',
-		'Helpdesk',
-		'Careers',
-		'Terms Of Service',
-		'Privacy Policy'
+		'Môi trường',
+		'Câu hỏi thường gặp', 
+		'Về chúng tôi',
+		'Trợ giúp',
+		'Tuyển dụng',
+		'Điều khoản dịch vụ',
+		'Chính sách bảo mật'
 	]
 
 	return (

@@ -63,7 +63,7 @@ const ContestSection: React.FC<ContestSectionProps> = ({
         renderContests()
       ) : (
         <div className={styles.emptyState}>
-          <p className={styles.emptyText}>No contests available</p>
+          <p className={styles.emptyText}>Không có cuộc thi nào</p>
         </div>
       )}
     </div>

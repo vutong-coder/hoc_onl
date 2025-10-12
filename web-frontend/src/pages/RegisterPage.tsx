@@ -79,10 +79,10 @@ export default function RegisterPage(): JSX.Element {
 
 	return (
 		<AuthForm
-			title="Create Account"
-			subtitle="Sign up to get started with EduPlatform"
+			title="Tạo tài khoản"
+			subtitle="Đăng ký để bắt đầu với EduPlatform"
 			onSubmit={handleSubmit}
-			buttonText="Create Account"
+			buttonText="Tạo tài khoản"
 			loading={loading}
 			afterButton={
 				<SocialAuthButtons
@@ -92,7 +92,7 @@ export default function RegisterPage(): JSX.Element {
 			}
 			footer={
 				<p style={{ margin: 0 }}>
-					Already have an account?{' '}
+					Đã có tài khoản?{' '}
 					<Link 
 						to="/auth/login"
 						style={{
@@ -105,7 +105,7 @@ export default function RegisterPage(): JSX.Element {
 							fontFamily: 'inherit'
 						}}
 					>
-						Sign in
+						Đăng nhập
 					</Link>
 				</p>
 			}
@@ -116,7 +116,7 @@ export default function RegisterPage(): JSX.Element {
 				type="text"
 				value={formData.name}
 				onChange={handleInputChange}
-				placeholder="Enter your full name"
+				placeholder="Nhập họ và tên của bạn"
 				error={errors.name}
 				required
 			/>
@@ -127,7 +127,7 @@ export default function RegisterPage(): JSX.Element {
 				type="email"
 				value={formData.email}
 				onChange={handleInputChange}
-				placeholder="Enter your email"
+				placeholder="Nhập email của bạn"
 				error={errors.email}
 				required
 			/>
@@ -139,7 +139,7 @@ export default function RegisterPage(): JSX.Element {
 					type="password"
 					value={formData.password}
 					onChange={handleInputChange}
-					placeholder="Create a password"
+					placeholder="Tạo mật khẩu"
 					error={errors.password}
 					required
 				/>
@@ -152,7 +152,7 @@ export default function RegisterPage(): JSX.Element {
 				type="password"
 				value={formData.confirmPassword}
 				onChange={handleInputChange}
-				placeholder="Confirm your password"
+				placeholder="Xác nhận mật khẩu"
 				error={errors.confirmPassword}
 				required
 			/>

@@ -173,10 +173,10 @@ export default function Header(): JSX.Element {
 							/>
 							<div>
 								<span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--foreground)' }}>
-									{user?.name || 'Admin User'}
+									{user?.name || 'Người quản trị'}
 								</span>
 								<div style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
-									{user?.role === 'admin' ? 'Administrator' : 'User'}
+									{user?.role === 'admin' ? 'Quản trị viên' : 'Người dùng'}
 								</div>
 							</div>
 						</div>
@@ -209,7 +209,7 @@ export default function Header(): JSX.Element {
 							}}
 						>
 							<LogOut className="w-4 h-4" style={{ width: '16px', height: '16px' }} />
-							Logout
+							Đăng xuất
 						</button>
 					</div>
 				</div>

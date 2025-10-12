@@ -52,14 +52,14 @@ export default function CourseCard({ course, onContinueCourse, onViewCourse }: C
 					
 					<div style={{ display: 'flex', alignItems: 'center', fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '8px' }}>
 						<Clock style={{ width: '12px', height: '12px', marginRight: '4px' }} />
-						{course.duration} • {course.completedLessons}/{course.totalLessons} lessons
+						{course.duration} • {course.completedLessons}/{course.totalLessons} bài học
 					</div>
 
 					{/* Progress Bar */}
 					<div style={{ marginBottom: '8px' }}>
 						<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
 							<span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
-								Progress
+								Tiến độ
 							</span>
 							<span style={{ fontSize: '12px', fontWeight: 600, color: getProgressColor(course.progress) }}>
 								{course.progress}%
@@ -84,7 +84,7 @@ export default function CourseCard({ course, onContinueCourse, onViewCourse }: C
 
 					{course.nextLesson && (
 						<div style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '8px' }}>
-							Next: {course.nextLesson}
+							Tiếp theo: {course.nextLesson}
 						</div>
 					)}
 
@@ -97,7 +97,7 @@ export default function CourseCard({ course, onContinueCourse, onViewCourse }: C
 								padding: '2px 8px', 
 								borderRadius: '9999px' 
 							}}>
-								Certificate Available
+								Có chứng chỉ
 							</span>
 						</div>
 					)}
@@ -128,7 +128,7 @@ export default function CourseCard({ course, onContinueCourse, onViewCourse }: C
 						}}
 					>
 						<Play style={{ width: '12px', height: '12px' }} />
-						Continue
+						Tiếp tục
 					</button>
 					
 					<button 
@@ -143,7 +143,7 @@ export default function CourseCard({ course, onContinueCourse, onViewCourse }: C
 							transition: 'color var(--transition-normal)'
 						}}
 					>
-						View Details
+						Xem chi tiết
 					</button>
 				</div>
 			</div>

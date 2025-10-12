@@ -24,30 +24,30 @@ export default function UpcomingExams({
 	exams = [
 		{
 			id: 'javascript-advanced',
-			title: 'JavaScript Advanced Concepts',
-			date: 'Today',
-			time: '2:00 PM',
-			duration: '90 min',
+			title: 'JavaScript nâng cao',
+			date: 'Hôm nay',
+			time: '2:00 chiều',
+			duration: '90 phút',
 			type: 'certification',
 			status: 'ready',
 			proctoring: true
 		},
 		{
 			id: 'react-fundamentals',
-			title: 'React Development Fundamentals',
-			date: 'Tomorrow',
-			time: '10:00 AM',
-			duration: '60 min',
+			title: 'Phát triển React cơ bản',
+			date: 'Ngày mai',
+			time: '10:00 sáng',
+			duration: '60 phút',
 			type: 'scheduled',
 			status: 'registered',
 			proctoring: true
 		},
 		{
 			id: 'data-structures',
-			title: 'Data Structures Practice Test',
-			date: 'Dec 15, 2024',
-			time: '3:30 PM',
-			duration: '45 min',
+			title: 'Bài kiểm tra Cấu trúc dữ liệu',
+			date: '15 tháng 12, 2024',
+			time: '3:30 chiều',
+			duration: '45 phút',
 			type: 'practice',
 			status: 'upcoming',
 			proctoring: false
@@ -130,7 +130,7 @@ export default function UpcomingExams({
 							transition: 'opacity var(--transition-normal)'
 						}}
 					>
-						Start Exam
+						Bắt đầu thi
 					</button>
 				)
 			case 'registered':
@@ -150,7 +150,7 @@ export default function UpcomingExams({
 							transition: 'border-color var(--transition-normal)'
 						}}
 					>
-						View Details
+						Xem chi tiết
 					</button>
 				)
 			case 'upcoming':
@@ -170,7 +170,7 @@ export default function UpcomingExams({
 							transition: 'opacity var(--transition-normal)'
 						}}
 					>
-						Register
+						Đăng ký
 					</button>
 				)
 			default:
@@ -183,7 +183,7 @@ export default function UpcomingExams({
 			<div className="flex items-center justify-between mb-4" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
 				<h3 className="text-lg font-semibold flex items-center" style={{ fontSize: '18px', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center' }}>
 					<Calendar className="w-5 h-5 mr-2" style={{ width: '20px', height: '20px', marginRight: '8px', color: 'var(--accent)' }} />
-					Upcoming Exams
+					Bài thi sắp tới
 				</h3>
 				<button 
 					className="text-sm text-[var(--accent)] hover:underline"
@@ -207,7 +207,7 @@ export default function UpcomingExams({
 						e.currentTarget.style.textDecoration = 'none'
 					}}
 				>
-					View Calendar
+					Xem lịch
 				</button>
 			</div>
 
@@ -238,7 +238,7 @@ export default function UpcomingExams({
                                         {exam.duration}
                                         {exam.proctoring && (
                                             <span style={{ marginLeft: '8px', padding: '2px 8px', background: '#fee2e2', color: '#991b1b', borderRadius: '9999px', fontSize: '12px' }}>
-                                                Proctored
+                                                Giám sát
                                             </span>
                                         )}
                                     </div>

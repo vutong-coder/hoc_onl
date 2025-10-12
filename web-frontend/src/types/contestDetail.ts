@@ -1,4 +1,4 @@
-export type ChallengeDifficulty = 'Easy' | 'Medium' | 'Hard';
+export type ChallengeDifficulty = 'Easy' | 'Medium' | 'Hard' | 'Dễ' | 'Trung bình' | 'Khó';
 export type ChallengeStatus = 'solved' | 'attempted' | 'not_attempted';
 
 export interface Challenge {

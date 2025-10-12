@@ -22,42 +22,42 @@ export default function CourseProgress({
     courses = [
         {
             id: '1',
-            title: 'Python Programming Complete',
+            title: 'Lập trình Python toàn diện',
             progress: 75,
             totalLessons: 20,
             completedLessons: 15,
-            duration: '8 hours',
-            nextLesson: 'Object-Oriented Programming',
+            duration: '8 giờ',
+            nextLesson: 'Lập trình hướng đối tượng',
             certificate: true
         },
         {
             id: '2',
-            title: 'Web Development Bootcamp',
+            title: 'Khóa học Phát triển Web',
             progress: 45,
             totalLessons: 30,
             completedLessons: 13,
-            duration: '12 hours',
-            nextLesson: 'React Components',
+            duration: '12 giờ',
+            nextLesson: 'Các thành phần React',
             certificate: false
         },
         {
             id: '3',
-            title: 'Data Science Fundamentals',
+            title: 'Khoa học dữ liệu cơ bản',
             progress: 20,
             totalLessons: 25,
             completedLessons: 5,
-            duration: '10 hours',
-            nextLesson: 'Pandas Basics',
+            duration: '10 giờ',
+            nextLesson: 'Cơ bản về Pandas',
             certificate: false
         },
         {
             id: '4',
-            title: 'Advanced JavaScript Concepts',
+            title: 'JavaScript nâng cao',
             progress: 90,
             totalLessons: 15,
             completedLessons: 14,
-            duration: '6 hours',
-            nextLesson: 'Asynchronous JavaScript',
+            duration: '6 giờ',
+            nextLesson: 'JavaScript bất đồng bộ',
             certificate: true
         }
     ],
@@ -77,10 +77,10 @@ export default function CourseProgress({
         >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <h3 style={{ fontSize: '18px', fontWeight: 600, margin: 0 }}>
-                    Course Progress
+                    Tiến độ khóa học
                 </h3>
                 <button style={{ fontSize: '14px', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
-                    Browse Courses
+                    Xem khóa học
                 </button>
             </div>
 

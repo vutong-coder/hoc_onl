@@ -15,7 +15,7 @@ export default function ProgressCard({ title, percent, delayMs = 0 }: Props): JS
 			<div style={{ width: '100%', background: 'var(--muted)', borderRadius: 9999, height: 10, marginBottom: 8 }}>
 				<div style={{ width: `${clamped}%`, background: 'var(--primary)', height: 10, borderRadius: 9999 }} />
 			</div>
-			<p style={{ fontSize: 14, color: 'var(--muted-foreground)', marginTop: 0 }}>{clamped}% Completion Rate</p>
+			<p style={{ fontSize: 14, color: 'var(--muted-foreground)', marginTop: 0 }}>{clamped}% Tỷ lệ hoàn thành</p>
 		</Card>
 	)
 }

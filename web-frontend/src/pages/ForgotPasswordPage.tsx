@@ -45,14 +45,14 @@ export default function ForgotPasswordPage(): JSX.Element {
 
 	return (
 		<AuthForm
-			title="Reset Password"
-			subtitle="Enter your email to receive reset instructions"
+			title="Đặt lại mật khẩu"
+			subtitle="Nhập email để nhận hướng dẫn đặt lại mật khẩu"
 			onSubmit={handleSubmit}
-			buttonText="Send Reset Link"
+			buttonText="Gửi liên kết đặt lại"
 			loading={loading}
 			footer={
 				<p style={{ margin: 0 }}>
-					Remember your password?{' '}
+					Nhớ mật khẩu?{' '}
 					<Link 
 						to="/auth/login"
 						style={{
@@ -65,14 +65,14 @@ export default function ForgotPasswordPage(): JSX.Element {
 							fontFamily: 'inherit'
 						}}
 					>
-						Sign in
+						Đăng nhập
 					</Link>
 				</p>
 			}
 		>
 			{showSuccess && (
 				<SuccessMessage
-					message="Password reset link sent to your email!"
+					message="Liên kết đặt lại mật khẩu đã được gửi đến email của bạn!"
 					onClose={() => setShowSuccess(false)}
 				/>
 			)}
@@ -83,7 +83,7 @@ export default function ForgotPasswordPage(): JSX.Element {
 				type="email"
 				value={formData.email}
 				onChange={handleInputChange}
-				placeholder="Enter your email"
+				placeholder="Nhập email của bạn"
 				error={errors.email}
 				required
 			/>
