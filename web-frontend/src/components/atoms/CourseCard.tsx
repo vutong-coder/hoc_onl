@@ -20,10 +20,10 @@ interface CourseCardProps {
 
 export default function CourseCard({ course, onContinueCourse, onViewCourse }: CourseCardProps): JSX.Element {
 	const getProgressColor = (progress: number) => {
-		if (progress >= 80) return '#10b981'
-		if (progress >= 60) return '#3b82f6'
-		if (progress >= 40) return '#f59e0b'
-		return '#ef4444'
+		if (progress >= 80) return 'var(--primary)'
+		if (progress >= 60) return 'var(--primary)'
+		if (progress >= 40) return 'var(--accent)'
+		return 'var(--destructive)'
 	}
 
 	return (

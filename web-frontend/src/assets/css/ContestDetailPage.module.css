@@ -1,5 +1,5 @@
 .page {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  background: var(--gradient-background);
   min-height: 100vh;
   position: relative;
 }
@@ -11,10 +11,23 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-  opacity: 0.6;
+  background-size: 1000px 1000px;
+  background-position: 0 0, 0 0, 0 0;
+  background-repeat: no-repeat;
+  opacity: 0.3;
   pointer-events: none;
   z-index: 1;
+}
+
+/* Light mode pattern */
+:global(.light) .page::before {
+  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
+}
+
+/* Dark mode pattern */
+:global(.dark) .page::before {
+  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
+  opacity: 0.4;
 }
 
 .container {
@@ -34,7 +47,7 @@
 
 .mainContent {
   flex: 1;
-  min-width: 0; /* Allow flex item to shrink */
+  min-width: 0;
 }
 
 .sidebar {
@@ -51,13 +64,13 @@
 .emptyState {
   text-align: center;
   padding: 60px 20px;
-  color: #6b7280;
+  color: var(--muted-foreground);
 }
 
 .emptyState h3 {
   font-size: 24px;
   font-weight: 600;
-  color: #374151;
+  color: var(--foreground);
   margin: 0 0 12px 0;
 }
 
@@ -67,7 +80,7 @@
 }
 
 .errorPage {
-  background: #ffffff;
+  background: var(--background);
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -82,19 +95,19 @@
 .errorPage h1 {
   font-size: 32px;
   font-weight: 700;
-  color: #111827;
+  color: var(--foreground);
   margin: 0 0 16px 0;
 }
 
 .errorPage p {
   font-size: 16px;
-  color: #6b7280;
+  color: var(--muted-foreground);
   margin: 0 0 24px 0;
 }
 
 .backButton {
-  background: #10b981;
-  color: white;
+  background: var(--primary);
+  color: var(--primary-foreground);
   border: none;
   padding: 12px 24px;
   border-radius: 8px;
@@ -105,69 +118,8 @@
 }
 
 .backButton:hover {
-  background: #059669;
+  background: var(--primary);
   transform: translateY(-1px);
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .page {
-    background: #0f172a;
-  }
-
-  .page::before {
-    background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-    opacity: 0.4;
-  }
-
-  .emptyState h3 {
-    color: #d1d5db;
-  }
-
-  .emptyState {
-    color: #9ca3af;
-  }
-
-  .errorPage {
-    background: #0f172a;
-  }
-
-  .errorPage h1 {
-    color: #f9fafb;
-  }
-
-  .errorPage p {
-    color: #9ca3af;
-  }
-}
-
-.dark .page {
-  background: #0f172a;
-}
-
-.dark .page::before {
-  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-  opacity: 0.4;
-}
-
-.dark .emptyState h3 {
-  color: #d1d5db;
-}
-
-.dark .emptyState {
-  color: #9ca3af;
-}
-
-.dark .errorPage {
-  background: #0f172a;
-}
-
-.dark .errorPage h1 {
-  color: #f9fafb;
-}
-
-.dark .errorPage p {
-  color: #9ca3af;
 }
 
 /* Responsive design */

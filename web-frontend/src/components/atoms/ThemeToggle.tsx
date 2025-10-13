@@ -1,96 +1,50 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
+import { useTheme } from '../../contexts/ThemeContext'
+import { Moon, Sun } from 'lucide-react'
 
 export default function ThemeToggle(): JSX.Element {
-	const [isVisible, setIsVisible] = useState(true)
-	const [isFadingOut, setIsFadingOut] = useState(false)
-	const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light')
-
-	// Detect current theme
-	const detectTheme = () => {
-		return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-	}
-
-	// Show notification for 5 seconds
-	const showNotification = () => {
-		setIsVisible(true)
-		setIsFadingOut(false)
-		setCurrentTheme(detectTheme())
-		
-		// Start fade out after 4.5 seconds
-		setTimeout(() => {
-			setIsFadingOut(true)
-		}, 4500)
-		
-		// Hide after 5 seconds
-		setTimeout(() => {
-			setIsVisible(false)
-		}, 5000)
-	}
-
-	// Listen for theme changes
-	useEffect(() => {
-		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-		
-		// Show notification on page load
-		showNotification()
-		
-		// Listen for theme changes
-		const handleThemeChange = () => {
-			showNotification()
-		}
-		
-		mediaQuery.addEventListener('change', handleThemeChange)
-		
-		// Cleanup
-		return () => {
-			mediaQuery.removeEventListener('change', handleThemeChange)
-		}
-	}, [])
-
-	if (!isVisible) return <></>
+	const { theme, toggleTheme } = useTheme()
 
 	return (
-		<div style={{
-			position: 'fixed',
-			top: '1rem',
-			right: '1rem',
-			zIndex: 1000,
-			background: 'var(--card)',
-			border: '1px solid var(--border)',
-			borderRadius: 'var(--radius-md)',
-			padding: '0.75rem 1rem',
-			boxShadow: 'var(--shadow-lg)',
-			animation: isFadingOut ? 'fadeOut 0.5s ease-out forwards' : 'fadeInUp 0.3s ease-out forwards'
-		}}>
-			<div style={{
-				fontSize: '0.75rem',
-				color: 'var(--muted-foreground)',
-				marginBottom: '0.25rem',
-				textAlign: 'center'
-			}}>
-				Theme Mode
-			</div>
-			<div style={{
-				fontSize: '0.875rem',
+		<button
+			onClick={toggleTheme}
+			style={{
+				position: 'fixed',
+				top: '1rem',
+				right: '1rem',
+				zIndex: 1000,
+				width: '48px',
+				height: '48px',
+				background: 'var(--card)',
+				border: '1px solid var(--border)',
+				borderRadius: '50%',
+				cursor: 'pointer',
 				color: 'var(--foreground)',
-				fontWeight: '500',
-				textAlign: 'center',
+				transition: 'all var(--transition-normal)',
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
-				gap: '0.5rem'
-			}}>
-				<span>{currentTheme === 'dark' ? '🌙' : '☀️'}</span>
-				<span style={{ textTransform: 'capitalize' }}>{currentTheme}</span>
-			</div>
-			<div style={{
-				fontSize: '0.75rem',
-				color: 'var(--muted-foreground)',
-				marginTop: '0.25rem',
-				textAlign: 'center'
-			}}>
-				Auto-detected
-			</div>
-		</div>
+				boxShadow: 'var(--shadow-lg)',
+				backdropFilter: 'blur(10px)',
+				WebkitBackdropFilter: 'blur(10px)'
+			}}
+			onMouseEnter={(e) => {
+				e.currentTarget.style.background = 'var(--accent)'
+				e.currentTarget.style.color = 'var(--accent-foreground)'
+				e.currentTarget.style.transform = 'scale(1.05)'
+			}}
+			onMouseLeave={(e) => {
+				e.currentTarget.style.background = 'var(--card)'
+				e.currentTarget.style.color = 'var(--foreground)'
+				e.currentTarget.style.transform = 'scale(1)'
+			}}
+			title={`Chuyển sang chế độ ${theme === 'light' ? 'tối' : 'sáng'}`}
+		>
+			{theme === 'dark' ? (
+				<Sun style={{ width: '20px', height: '20px' }} />
+			) : (
+				<Moon style={{ width: '20px', height: '20px' }} />
+			)}
+		</button>
 	)
 }

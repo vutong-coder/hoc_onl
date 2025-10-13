@@ -1,13 +1,12 @@
 .hero {
-  background: white;
-  /* Removed border-bottom to eliminate the horizontal line */
-  padding: 24px 0 40px 0; /* Increased bottom padding for better spacing */
+  background: var(--card);
+  padding: 24px 0 40px 0;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 24px 0 24px; /* Increased top padding to push content further down */
+  padding: 80px 24px 0 24px;
 }
 
 .breadcrumbs {
@@ -19,22 +18,22 @@
 }
 
 .breadcrumbLink {
-  color: #6b7280;
+  color: var(--muted-foreground);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .breadcrumbLink:hover {
-  color: #10b981;
+  color: var(--primary);
 }
 
 .breadcrumbSeparator {
-  color: #9ca3af;
+  color: var(--muted-foreground);
   font-weight: 600;
 }
 
 .breadcrumbCurrent {
-  color: #374151;
+  color: var(--foreground);
   font-weight: 500;
 }
 
@@ -53,7 +52,7 @@
 .title {
   font-size: 32px;
   font-weight: 700;
-  color: #111827;
+  color: var(--foreground);
   margin: 0 0 16px 0;
   line-height: 1.2;
 }
@@ -76,27 +75,27 @@
 }
 
 .statusActive {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
 .statusUpcoming {
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--accent-light);
+  color: var(--accent);
 }
 
 .statusArchived {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .statusDefault {
-  background: #e5e7eb;
-  color: #6b7280;
+  background: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .description {
-  color: #6b7280;
+  color: var(--muted-foreground);
   font-size: 16px;
   line-height: 1.5;
   margin: 0;
@@ -110,19 +109,19 @@
 }
 
 .dateLabel {
-  color: #6b7280;
+  color: var(--muted-foreground);
   font-weight: 500;
 }
 
 .dateValue {
-  color: #374151;
+  color: var(--foreground);
   font-weight: 600;
 }
 
 .detailsButton {
   background: none;
   border: none;
-  color: #10b981;
+  color: var(--primary);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -133,8 +132,8 @@
 }
 
 .detailsButton:hover {
-  background: #f0fdf4;
-  color: #059669;
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
 .detailsButton:active {
@@ -146,194 +145,33 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 16px;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid var(--border);
 }
 
 .sectionTitle {
   font-size: 24px;
   font-weight: 700;
-  color: #111827;
+  color: var(--foreground);
   margin: 0;
 }
 
 .challengesCount {
-  color: #6b7280;
+  color: var(--muted-foreground);
   font-size: 14px;
   font-weight: 500;
-  background: #f3f4f6;
+  background: var(--muted);
   padding: 4px 12px;
   border-radius: 12px;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .hero {
-    background: #111827;
-    /* Removed border-bottom-color for dark mode */
-  }
-
-  .breadcrumbLink {
-    color: #9ca3af;
-  }
-
-  .breadcrumbLink:hover {
-    color: #34d399;
-  }
-
-  .breadcrumbSeparator {
-    color: #6b7280;
-  }
-
-  .breadcrumbCurrent {
-    color: #d1d5db;
-  }
-
-  .title {
-    color: #f9fafb;
-  }
-
-  .statusActive {
-    background: #064e3b;
-    color: #6ee7b7;
-  }
-
-  .statusUpcoming {
-    background: #78350f;
-    color: #fbbf24;
-  }
-
-  .statusArchived {
-    background: #374151;
-    color: #d1d5db;
-  }
-
-  .statusDefault {
-    background: #4b5563;
-    color: #9ca3af;
-  }
-
-  .description {
-    color: #9ca3af;
-  }
-
-  .dateLabel {
-    color: #9ca3af;
-  }
-
-  .dateValue {
-    color: #d1d5db;
-  }
-
-  .detailsButton {
-    color: #34d399;
-  }
-
-  .detailsButton:hover {
-    background: #064e3b;
-    color: #6ee7b7;
-  }
-
-  .sectionTitle {
-    color: #f9fafb;
-  }
-
-  .challengesCount {
-    color: #9ca3af;
-    background: #374151;
-  }
-
-  .sectionHeader {
-    border-bottom-color: #374151;
-  }
-}
-
-.dark .hero {
-  background: #111827;
-  /* Removed border-bottom-color for dark mode */
-}
-
-.dark .breadcrumbLink {
-  color: #9ca3af;
-}
-
-.dark .breadcrumbLink:hover {
-  color: #34d399;
-}
-
-.dark .breadcrumbSeparator {
-  color: #6b7280;
-}
-
-.dark .breadcrumbCurrent {
-  color: #d1d5db;
-}
-
-.dark .title {
-  color: #f9fafb;
-}
-
-.dark .statusActive {
-  background: #064e3b;
-  color: #6ee7b7;
-}
-
-.dark .statusUpcoming {
-  background: #78350f;
-  color: #fbbf24;
-}
-
-.dark .statusArchived {
-  background: #374151;
-  color: #d1d5db;
-}
-
-.dark .statusDefault {
-  background: #4b5563;
-  color: #9ca3af;
-}
-
-.dark .description {
-  color: #9ca3af;
-}
-
-.dark .dateLabel {
-  color: #9ca3af;
-}
-
-.dark .dateValue {
-  color: #d1d5db;
-}
-
-.dark .detailsButton {
-  color: #34d399;
-}
-
-.dark .detailsButton:hover {
-  background: #064e3b;
-  color: #6ee7b7;
-}
-
-.dark .sectionTitle {
-  color: #f9fafb;
-}
-
-.dark .challengesCount {
-  color: #9ca3af;
-  background: #374151;
-}
-
-.dark .sectionHeader {
-  border-bottom-color: #374151;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
   .container {
-    padding: 60px 16px 0 16px; /* Reduced but still sufficient top padding on mobile */
+    padding: 60px 16px 0 16px;
   }
   
   .hero {
-    padding: 20px 0 32px 0; /* Reduced padding on mobile */
+    padding: 20px 0 32px 0;
   }
 
   .titleSection {
@@ -371,11 +209,11 @@
 
 @media (max-width: 480px) {
   .container {
-    padding: 40px 12px 0 12px; /* Reduced but still sufficient top padding on small mobile */
+    padding: 40px 12px 0 12px;
   }
   
   .hero {
-    padding: 16px 0 24px 0; /* Further reduced padding on small mobile */
+    padding: 16px 0 24px 0;
   }
 
   .breadcrumbs {

@@ -22,11 +22,11 @@ export default function ExamCard({ exam, onViewExam, onRetakeExam }: ExamCardPro
 	const getStatusIcon = (status: string) => {
 		switch (status) {
 			case 'completed':
-				return <CheckCircle style={{ width: '16px', height: '16px', color: '#10b981' }} />
+				return <CheckCircle style={{ width: '16px', height: '16px', color: 'var(--primary)' }} />
 			case 'in-progress':
-				return <Clock style={{ width: '16px', height: '16px', color: '#3b82f6' }} />
+				return <Clock style={{ width: '16px', height: '16px', color: 'var(--primary)' }} />
 			case 'failed':
-				return <AlertCircle style={{ width: '16px', height: '16px', color: '#ef4444' }} />
+				return <AlertCircle style={{ width: '16px', height: '16px', color: 'var(--destructive)' }} />
 			default:
 				return null
 		}
@@ -35,9 +35,9 @@ export default function ExamCard({ exam, onViewExam, onRetakeExam }: ExamCardPro
 	const getScoreColor = (score?: number, maxScore: number = 100) => {
 		if (!score) return 'var(--muted-foreground)'
 		const percentage = (score / maxScore) * 100
-		if (percentage >= 80) return '#10b981'
-		if (percentage >= 60) return '#f59e0b'
-		return '#ef4444'
+		if (percentage >= 80) return 'var(--primary)'
+		if (percentage >= 60) return 'var(--accent)'
+		return 'var(--destructive)'
 	}
 
 	return (

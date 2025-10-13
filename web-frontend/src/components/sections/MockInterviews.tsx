@@ -75,11 +75,11 @@ export default function MockInterviews({
     const getDifficultyColor = (difficulty: string) => {
         switch (difficulty) {
             case 'Easy':
-                return '#10b981'
+                return 'var(--primary)'
             case 'Medium':
-                return '#f59e0b'
+                return 'var(--accent)'
             case 'Hard':
-                return '#ef4444'
+                return 'var(--destructive)'
             default:
                 return 'var(--muted-foreground)'
         }
@@ -111,7 +111,7 @@ export default function MockInterviews({
                 </div>
                 <button 
                     style={{ 
-                        color: '#3b82f6', 
+                        color: 'var(--primary)', 
                         background: 'none', 
                         border: 'none', 
                         cursor: 'pointer',
@@ -121,7 +121,7 @@ export default function MockInterviews({
                         fontWeight: 500
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'
+                        e.currentTarget.style.background = 'var(--primary-light)'
                         e.currentTarget.style.textDecoration = 'underline'
                     }}
                     onMouseLeave={(e) => {

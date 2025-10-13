@@ -17,7 +17,7 @@ export default function Footer(): JSX.Element {
 			borderRadius: '6px',
 			padding: '20px 8px',
 			margin: '24px auto 16px',
-			maxWidth: '800px',
+			maxWidth: '1000px',
 			border: '1px solid var(--border)',
 			boxShadow: 'var(--shadow-sm)'
 		}}>

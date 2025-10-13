@@ -19,6 +19,9 @@ import CertifyPage from '../pages/CertifyPage'
 import CertificationDetailPage from '../pages/CertificationDetailPage'
 import CompetePage from '../pages/CompetePage'
 import ContestDetailPage from '../pages/ContestDetailPage'
+import ProfilePage from '../pages/ProfilePage'
+import SettingsPage from '../pages/SettingsPage'
+import LeaderboardPage from '../pages/LeaderboardPage'
 import { checkAuth } from '../store/slices/authSlice'
 
 // Tạo các trang placeholder cho các chức năng khác
@@ -86,6 +89,9 @@ export default function AppRoutes(): JSX.Element {
 					<Route path="exam" element={<ExamPage />} />
 					<Route path="monitor" element={<MonitorPage />} />
 					<Route path="reward" element={<RewardPage />} />
+					<Route path="profile" element={<ProfilePage />} />
+					<Route path="settings" element={<SettingsPage />} />
+					<Route path="leaderboard" element={<LeaderboardPage />} />
 				</Route>
 				
 				{/* Exam Routes - Standalone pages without layout */}

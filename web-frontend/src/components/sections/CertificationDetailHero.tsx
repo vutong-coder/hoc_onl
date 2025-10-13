@@ -16,15 +16,15 @@ const CertificationDetailHero: React.FC<CertificationDetailHeroProps> = ({
     switch (level) {
       case 'Cơ bản':
       case 'Basic':
-        return '#10b981';
+        return 'var(--primary)';
       case 'Trung cấp':
       case 'Intermediate':
-        return '#f59e0b';
+        return 'var(--accent)';
       case 'Nâng cao':
       case 'Advanced':
-        return '#ef4444';
+        return 'var(--destructive)';
       default:
-        return '#6b7280';
+        return 'var(--muted-foreground)';
     }
   };
 

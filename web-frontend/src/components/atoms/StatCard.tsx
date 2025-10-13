@@ -14,13 +14,13 @@ export default function StatCard({ title, value, icon, gradient = 'primary', sub
 		switch (gradient) {
 			case 'primary':
 				return {
-					background: '#10b981', // Green background
-					color: 'white'
+					background: 'var(--gradient-primary)',
+					color: 'var(--primary-foreground)'
 				}
 			case 'accent':
 				return {
-					background: '#f59e0b', // Orange background  
-					color: 'black'
+					background: 'var(--gradient-accent)',
+					color: 'var(--accent-foreground)'
 				}
 			default:
 				return {

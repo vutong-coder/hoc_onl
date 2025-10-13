@@ -91,7 +91,7 @@ export default function TokenWallet({
                                         borderRadius: '50%', 
                                         marginRight: '12px',
                                         flexShrink: 0,
-                                        background: transaction.type === 'earn' ? '#10b981' : transaction.type === 'spend' ? '#ef4444' : '#f59e0b'
+                                        background: transaction.type === 'earn' ? 'var(--primary)' : transaction.type === 'spend' ? 'var(--destructive)' : 'var(--accent)'
                                     }} />
                                     <div>
                                         <p style={{ fontSize: '14px', fontWeight: 500, margin: 0, color: 'var(--foreground)' }}>
@@ -105,7 +105,7 @@ export default function TokenWallet({
                                 <span style={{ 
                                     fontSize: '14px', 
                                     fontWeight: 600, 
-                                    color: transaction.amount > 0 ? '#059669' : '#dc2626',
+                                    color: transaction.amount > 0 ? 'var(--primary)' : 'var(--destructive)',
                                     marginLeft: '8px'
                                 }}>
                                     {transaction.amount > 0 ? '+' : ''}{transaction.amount}

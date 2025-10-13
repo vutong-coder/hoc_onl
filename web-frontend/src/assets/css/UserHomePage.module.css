@@ -1,33 +1,29 @@
 /* UserHomePage.module.css */
 
-/* Light mode (default) */
+/* Use CSS variables for theme-aware styling */
 .userHomePage {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  background: var(--gradient-background);
   min-height: 100vh;
   position: relative;
 }
 
 .userHomePattern {
-  background-image: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   opacity: 0.6;
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Dark mode */
-@media (prefers-color-scheme: dark) {
-  .userHomePage {
-    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-  }
-  
-  .userHomePattern {
-    background-image: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23334155\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23334155\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-  }
+/* Light mode pattern */
+:global(.light) .userHomePattern {
+  background-image: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
 }
 
-/* Class-based dark mode (when .dark class is applied to html/body) */
-.dark .userHomePage {
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-}
-
-.dark .userHomePattern {
+/* Dark mode pattern */
+:global(.dark) .userHomePattern {
   background-image: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23334155\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23334155\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
 }

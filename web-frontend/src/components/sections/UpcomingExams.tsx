@@ -61,11 +61,11 @@ export default function UpcomingExams({
 	const getTypeColor = (type: string) => {
 		switch (type) {
 			case 'certification':
-				return '#f59e0b'
+				return 'var(--accent)'
 			case 'scheduled':
-				return '#3b82f6'
+				return 'var(--primary)'
 			case 'practice':
-				return '#10b981'
+				return 'var(--primary)'
 			default:
 				return 'var(--muted-foreground)'
 		}
@@ -74,11 +74,11 @@ export default function UpcomingExams({
 	const getStatusIcon = (status: string) => {
 		switch (status) {
 			case 'ready':
-				return <CheckCircle className="w-4 h-4 text-green-500" style={{ width: '16px', height: '16px', color: '#10b981' }} />
+				return <CheckCircle className="w-4 h-4 text-green-500" style={{ width: '16px', height: '16px', color: 'var(--primary)' }} />
 			case 'registered':
-				return <Clock className="w-4 h-4 text-blue-500" style={{ width: '16px', height: '16px', color: '#3b82f6' }} />
+				return <Clock className="w-4 h-4 text-blue-500" style={{ width: '16px', height: '16px', color: 'var(--primary)' }} />
 			case 'upcoming':
-				return <AlertCircle className="w-4 h-4 text-yellow-500" style={{ width: '16px', height: '16px', color: '#f59e0b' }} />
+				return <AlertCircle className="w-4 h-4 text-yellow-500" style={{ width: '16px', height: '16px', color: 'var(--accent)' }} />
 			default:
 				return null
 		}
@@ -189,7 +189,7 @@ export default function UpcomingExams({
 					className="text-sm text-[var(--accent)] hover:underline"
 					style={{ 
 						fontSize: '14px', 
-						color: '#3b82f6', 
+						color: 'var(--primary)', 
 						background: 'none', 
 						border: 'none', 
 						cursor: 'pointer',
@@ -199,7 +199,7 @@ export default function UpcomingExams({
 						fontWeight: 500
 					}}
 					onMouseEnter={(e) => {
-						e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'
+						e.currentTarget.style.background = 'var(--primary-light)'
 						e.currentTarget.style.textDecoration = 'underline'
 					}}
 					onMouseLeave={(e) => {
@@ -237,7 +237,7 @@ export default function UpcomingExams({
                                         <Clock style={{ width: '12px', height: '12px', marginRight: '4px' }} />
                                         {exam.duration}
                                         {exam.proctoring && (
-                                            <span style={{ marginLeft: '8px', padding: '2px 8px', background: '#fee2e2', color: '#991b1b', borderRadius: '9999px', fontSize: '12px' }}>
+                                            <span style={{ marginLeft: '8px', padding: '2px 8px', background: 'var(--destructive)', color: 'var(--destructive-foreground)', borderRadius: '9999px', fontSize: '12px', opacity: 0.8 }}>
                                                 Giám sát
                                             </span>
                                         )}

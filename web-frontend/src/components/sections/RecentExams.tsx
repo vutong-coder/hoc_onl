@@ -73,7 +73,7 @@ export default function RecentExams({
 				<button 
 					style={{ 
 						fontSize: '14px', 
-						color: '#3b82f6', 
+						color: 'var(--primary)', 
 						background: 'none', 
 						border: 'none', 
 						cursor: 'pointer', 
@@ -83,7 +83,7 @@ export default function RecentExams({
 						fontWeight: 500
 					}}
 					onMouseEnter={(e) => {
-						e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'
+						e.currentTarget.style.background = 'var(--primary-light)'
 						e.currentTarget.style.textDecoration = 'underline'
 					}}
 					onMouseLeave={(e) => {

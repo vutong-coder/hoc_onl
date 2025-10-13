@@ -1,5 +1,5 @@
 .page {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  background: var(--gradient-background);
   min-height: 100vh;
   position: relative;
   padding-top: 80px; /* Add padding to avoid header overlap */
@@ -19,6 +19,17 @@
   z-index: 1;
 }
 
+/* Light mode pattern */
+:global(.light) .page::before {
+  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
+}
+
+/* Dark mode pattern */
+:global(.dark) .page::before {
+  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23334155\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23334155\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
+  opacity: 0.3;
+}
+
 .container {
   max-width: 1400px;
   margin: 0 auto;
@@ -29,144 +40,7 @@
 }
 
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .page {
-    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-    padding-top: 80px; /* Add padding to avoid header overlap */
-    padding-bottom: 60px; /* Reduced padding for less empty space */
-  }
-  
-  @media (max-width: 1024px) {
-    .page {
-      padding-top: 70px; /* Adjust for tablets */
-      padding-bottom: 80px; /* Reduced padding on tablets */
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .page {
-      padding-top: 60px; /* Adjust for mobile */
-      padding-bottom: 100px; /* Reduced padding on mobile */
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .page {
-      padding-top: 50px; /* Adjust for small mobile */
-      padding-bottom: 120px; /* Reduced padding on small mobile */
-    }
-  }
-  
-  .page::before {
-    background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-    opacity: 0.4;
-  }
-  
-  .breadcrumbText {
-    color: #9ca3af;
-  }
-  
-  .pageTitle {
-    color: #f1f5f9;
-  }
-  
-  .manageButton {
-    background: #1e293b;
-    border-color: #374151;
-    color: #d1d5db;
-  }
-  
-  .manageButton:hover {
-    background: #334155;
-    border-color: #4b5563;
-    color: #f1f5f9;
-  }
-  
-  .manageButton:focus {
-    outline-color: #60a5fa;
-  }
-  
-  .createButton {
-    background: #059669;
-  }
-  
-  .createButton:hover {
-    background: #047857;
-  }
-  
-  .createButton:focus {
-    outline-color: #059669;
-  }
-}
-
-.dark .page {
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-  padding-top: 80px; /* Add padding to avoid header overlap */
-  padding-bottom: 60px; /* Reduced padding for less empty space */
-}
-
-@media (max-width: 1024px) {
-  .dark .page {
-    padding-top: 70px; /* Adjust for tablets */
-    padding-bottom: 80px; /* Reduced padding on tablets */
-  }
-}
-
-@media (max-width: 768px) {
-  .dark .page {
-    padding-top: 60px; /* Adjust for mobile */
-    padding-bottom: 100px; /* Reduced padding on mobile */
-  }
-}
-
-@media (max-width: 480px) {
-  .dark .page {
-    padding-top: 50px; /* Adjust for small mobile */
-    padding-bottom: 120px; /* Reduced padding on small mobile */
-  }
-}
-
-.dark .page::before {
-  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-  opacity: 0.4;
-}
-
-.dark .breadcrumbText {
-  color: #9ca3af;
-}
-
-.dark .pageTitle {
-  color: #f1f5f9;
-}
-
-.dark .manageButton {
-  background: #1e293b;
-  border-color: #374151;
-  color: #d1d5db;
-}
-
-.dark .manageButton:hover {
-  background: #334155;
-  border-color: #4b5563;
-  color: #f1f5f9;
-}
-
-.dark .manageButton:focus {
-  outline-color: #60a5fa;
-}
-
-.dark .createButton {
-  background: #059669;
-}
-
-.dark .createButton:hover {
-  background: #047857;
-}
-
-.dark .createButton:focus {
-  outline-color: #059669;
-}
+/* Theme will be handled by CSS variables */
 
 /* Responsive design */
 @media (max-width: 1024px) {

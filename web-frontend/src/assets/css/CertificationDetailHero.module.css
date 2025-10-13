@@ -1,5 +1,5 @@
 .hero {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  background: var(--gradient-background);
   padding: 80px 0 120px;
   position: relative;
   overflow: hidden;
@@ -12,10 +12,24 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-  opacity: 0.6;
+  background-size: 1000px 1000px;
+  background-position: 0 0, 0 0, 0 0;
+  background-repeat: no-repeat;
+  opacity: 0.3;
   pointer-events: none;
   z-index: 1;
+}
+
+/* Light mode pattern */
+:global(.light) .hero::before {
+  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
+  opacity: 0.6;
+}
+
+/* Dark mode pattern */
+:global(.dark) .hero::before {
+  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
+  opacity: 0.4;
 }
 
 .container {
@@ -37,11 +51,10 @@
   max-width: 600px;
 }
 
-
 .title {
   font-size: 48px;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--foreground);
   line-height: 1.1;
   margin-bottom: 24px;
   letter-spacing: -0.02em;
@@ -55,13 +68,13 @@
 }
 
 .subtitle {
-  color: #6b7280;
+  color: var(--muted-foreground);
   font-weight: 600;
 }
 
 .description {
   font-size: 18px;
-  color: #64748b;
+  color: var(--muted-foreground);
   line-height: 1.6;
   margin-bottom: 32px;
 }
@@ -78,10 +91,10 @@
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  background: var(--card);
   border-radius: 12px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
 
 .statIcon {
@@ -91,7 +104,7 @@
 .statText {
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: var(--foreground);
 }
 
 .levelBadge {
@@ -104,8 +117,8 @@
 }
 
 .getCertifiedButton {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
+  background: var(--gradient-primary);
+  color: var(--primary-foreground);
   border: none;
   border-radius: 12px;
   padding: 16px 48px;
@@ -113,7 +126,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+  box-shadow: var(--shadow-md);
   position: relative;
   overflow: hidden;
   margin-bottom: 24px;
@@ -131,9 +144,9 @@
 }
 
 .getCertifiedButton:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  background: var(--gradient-primary);
   transform: translateY(-2px);
-  box-shadow: 0 8px 15px rgba(16, 185, 129, 0.3);
+  box-shadow: var(--shadow-lg);
 }
 
 .getCertifiedButton:hover::before {
@@ -146,7 +159,7 @@
 
 .testimonial {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--muted-foreground);
   margin: 0;
 }
 
@@ -156,7 +169,7 @@
 
 .companiesTitle {
   font-size: 16px;
-  color: #6b7280;
+  color: var(--muted-foreground);
   margin-bottom: 32px;
   font-weight: 500;
 }
@@ -174,111 +187,18 @@
   align-items: center;
   justify-content: center;
   height: 60px;
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  background: var(--card);
   border-radius: 12px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid var(--border);
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: var(--foreground);
   transition: all 0.2s ease;
 }
 
 .logo:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .hero {
-    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-  }
-  
-  .hero::before {
-    background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-  }
-  
-  
-  .title {
-    color: #f1f5f9;
-  }
-  
-  .subtitle {
-    color: #9ca3af;
-  }
-  
-  .description {
-    color: #d1d5db;
-  }
-  
-  .stat {
-    background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-    border: 1px solid rgba(71, 85, 105, 0.3);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .statText {
-    color: #f3f4f6;
-  }
-  
-  .testimonial {
-    color: #9ca3af;
-  }
-  
-  .companiesTitle {
-    color: #9ca3af;
-  }
-  
-  .logo {
-    background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-    border: 1px solid rgba(71, 85, 105, 0.3);
-    color: #f3f4f6;
-  }
-}
-
-.dark .hero {
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-}
-
-.dark .hero::before {
-  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-}
-
-
-.dark .title {
-  color: #f1f5f9;
-}
-
-.dark .subtitle {
-  color: #9ca3af;
-}
-
-.dark .description {
-  color: #d1d5db;
-}
-
-.dark .stat {
-  background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.dark .statText {
-  color: #f3f4f6;
-}
-
-.dark .testimonial {
-  color: #9ca3af;
-}
-
-.dark .companiesTitle {
-  color: #9ca3af;
-}
-
-.dark .logo {
-  background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  color: #f3f4f6;
+  box-shadow: var(--shadow-md);
 }
 
 /* Responsive design */
@@ -306,7 +226,6 @@
   .content {
     gap: 40px;
   }
-  
   
   .title {
     font-size: 36px;
