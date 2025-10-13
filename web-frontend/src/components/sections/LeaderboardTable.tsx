@@ -3,6 +3,7 @@ import LeaderboardRow from '../molecules/LeaderboardRow';
 import Pagination from '../molecules/Pagination';
 import { LeaderboardTableProps } from '../../types/leaderboard';
 import { ChevronUp, ChevronDown } from 'lucide-react';
+import styles from '../../assets/css/LeaderboardTable.module.css';
 
 export default function LeaderboardTable({
   entries,
@@ -60,22 +61,10 @@ export default function LeaderboardTable({
   };
 
   return (
-    <div style={{
-      background: 'var(--card)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--radius-lg)',
-      overflow: 'hidden',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-    }}>
+    <div className={styles.tableWrapper}>
       {/* Table */}
-      <div style={{
-        overflowX: 'auto'
-      }}>
-        <table style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          minWidth: '800px'
-        }}>
+      <div className={styles.tableScrollContainer}>
+        <table className={styles.table}>
           {/* Table Header */}
           <thead>
             <tr style={{

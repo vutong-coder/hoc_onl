@@ -1,37 +1,30 @@
 .faqSection {
-  background: var(--gradient-background);
-  padding: 80px 0;
+  background: linear-gradient(180deg, var(--gradient-background) 0%, var(--card) 100%);
+  padding: 100px 0;
   position: relative;
   width: 100%;
   display: block;
   z-index: 10;
+  overflow: hidden;
 }
 
 .faqSection::before {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-size: 1000px 1000px;
-  background-position: 0 0, 0 0, 0 0;
-  background-repeat: no-repeat;
-  opacity: 0.3;
+  left: 50%;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+  opacity: 0.05;
   pointer-events: none;
-  z-index: 1;
+  transform: translateX(-50%);
+  animation: pulse 15s ease-in-out infinite;
 }
 
-/* Light mode pattern */
-:global(.light) .faqSection::before {
-  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-  opacity: 0.6;
-}
-
-/* Dark mode pattern */
-:global(.dark) .faqSection::before {
-  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-  opacity: 0.4;
+@keyframes pulse {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.05; }
+  50% { transform: translateX(-50%) scale(1.1); opacity: 0.08; }
 }
 
 .container {
@@ -43,23 +36,27 @@
 }
 
 .title {
-  font-size: 32px;
-  font-weight: 800;
-  color: var(--foreground);
+  font-size: 40px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--foreground) 0%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   text-align: center;
-  margin-bottom: 48px;
-  letter-spacing: -0.02em;
+  margin-bottom: 56px;
+  letter-spacing: -0.03em;
 }
 
 .faqList {
-  background: var(--card);
-  border-radius: 16px;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border);
-  padding: 32px;
-  margin-bottom: 64px;
+  background: linear-gradient(135deg, var(--card) 0%, var(--muted) 100%);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 2px solid var(--border);
+  padding: 40px;
+  margin-bottom: 80px;
   position: relative;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .faqList::before {
@@ -68,9 +65,13 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  pointer-events: none;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+}
+
+.faqList:hover {
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18);
+  transform: translateY(-4px);
 }
 
 .callToAction {
@@ -79,26 +80,31 @@
 }
 
 .ctaTitle {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--foreground);
-  margin-bottom: 32px;
+  font-size: 32px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--foreground) 0%, var(--primary) 50%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 40px;
   letter-spacing: -0.02em;
 }
 
 .getCertifiedButton {
-  background: var(--gradient-primary);
-  color: var(--primary-foreground);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  color: white;
   border: none;
-  border-radius: 12px;
-  padding: 16px 48px;
-  font-size: 18px;
-  font-weight: 600;
+  border-radius: 14px;
+  padding: 18px 56px;
+  font-size: 19px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-md);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .getCertifiedButton::before {
@@ -108,22 +114,39 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s ease;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.getCertifiedButton::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
 }
 
 .getCertifiedButton:hover {
-  background: var(--gradient-primary);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
 }
 
 .getCertifiedButton:hover::before {
   left: 100%;
 }
 
+.getCertifiedButton:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
 .getCertifiedButton:active {
-  transform: translateY(0);
+  transform: translateY(-2px);
 }
 
 /* Responsive design */
