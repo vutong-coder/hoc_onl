@@ -417,7 +417,7 @@ export default function UserHeader(): JSX.Element {
 										top: '100%',
 										right: 0,
 										marginTop: '8px',
-										background: 'white',
+										background: 'var(--card)',
 										borderRadius: '8px',
 										boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
 										border: '1px solid var(--border)',

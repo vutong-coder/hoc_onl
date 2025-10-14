@@ -20,6 +20,8 @@ export const countries: CountryInfo[] = [
   { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
   { code: 'NL', name: 'Netherlands', flag: '🇳🇱' },
   { code: 'SE', name: 'Sweden', flag: '🇸🇪' },
+  { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
+  { code: 'IT', name: 'Italy', flag: '🇮🇹' },
   { code: 'UNKNOWN', name: 'Unknown', flag: '❓' }
 ];
 

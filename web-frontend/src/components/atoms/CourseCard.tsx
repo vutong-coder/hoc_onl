@@ -27,19 +27,26 @@ export default function CourseCard({ course, onContinueCourse, onViewCourse }: C
 	}
 
 	return (
-		<div style={{ 
-			padding: '16px', 
-			borderRadius: 'var(--radius-md)', 
-			border: '1px solid var(--border)', 
+		<div style={{
+			padding: '16px',
+			borderRadius: 'var(--radius-md)',
+			border: '1px solid var(--border)',
 			background: 'var(--card)',
-			transition: 'border-color var(--transition-normal)',
-			cursor: 'pointer'
+			transition: 'all 0.2s',
+			cursor: 'pointer',
+			boxShadow: 'var(--shadow-sm)',
+			position: 'relative',
+			overflow: 'hidden'
 		}}
 		onMouseEnter={(e) => {
-			e.currentTarget.style.borderColor = 'var(--accent)'
+			e.currentTarget.style.borderColor = 'var(--primary)'
+			e.currentTarget.style.transform = 'translateY(-2px)'
+			e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
 		}}
 		onMouseLeave={(e) => {
 			e.currentTarget.style.borderColor = 'var(--border)'
+			e.currentTarget.style.transform = 'translateY(0)'
+			e.currentTarget.style.boxShadow = 'var(--shadow-sm)'
 		}}>
 			<div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
 				<div style={{ flex: 1 }}>
@@ -65,19 +72,20 @@ export default function CourseCard({ course, onContinueCourse, onViewCourse }: C
 								{course.progress}%
 							</span>
 						</div>
-						<div style={{ 
-							width: '100%', 
-							height: '6px', 
-							background: 'var(--muted)', 
-							borderRadius: '3px', 
-							overflow: 'hidden' 
+						<div style={{
+							width: '100%',
+							height: '6px',
+							background: 'var(--muted)',
+							borderRadius: '3px',
+							overflow: 'hidden'
 						}}>
-							<div style={{ 
-								width: `${course.progress}%`, 
-								height: '100%', 
-								background: getProgressColor(course.progress), 
+							<div style={{
+								width: `${course.progress}%`,
+								height: '100%',
+								background: `linear-gradient(90deg, var(--primary), var(--accent))`,
 								borderRadius: '3px',
-								transition: 'width 0.3s ease'
+								transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+								position: 'relative'
 							}} />
 						</div>
 					</div>
@@ -104,43 +112,52 @@ export default function CourseCard({ course, onContinueCourse, onViewCourse }: C
 				</div>
 
 				<div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginLeft: '12px' }}>
-					<button 
+					<button
 						onClick={() => onContinueCourse?.(course.id)}
-						style={{ 
-							background: 'var(--primary)', 
-							color: 'var(--primary-foreground)', 
-							padding: '6px 12px', 
-							borderRadius: 'var(--radius-md)', 
-							fontSize: '12px', 
-							fontWeight: 500, 
-							border: 'none', 
+						style={{
+							background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+							color: 'white',
+							padding: '6px 12px',
+							borderRadius: 'var(--radius-md)',
+							fontSize: '12px',
+							fontWeight: 500,
+							border: 'none',
 							cursor: 'pointer',
-							transition: 'background-color var(--transition-normal)',
+							transition: 'transform 0.2s, box-shadow 0.2s',
 							display: 'flex',
 							alignItems: 'center',
-							gap: '4px'
+							gap: '4px',
+							boxShadow: 'none'
 						}}
 						onMouseEnter={(e) => {
-							e.currentTarget.style.background = 'var(--accent)'
+							e.currentTarget.style.transform = 'translateY(-2px)'
+							e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
 						}}
 						onMouseLeave={(e) => {
-							e.currentTarget.style.background = 'var(--primary)'
+							e.currentTarget.style.transform = 'translateY(0)'
+							e.currentTarget.style.boxShadow = 'none'
 						}}
 					>
 						<Play style={{ width: '12px', height: '12px' }} />
 						Tiếp tục
 					</button>
-					
-					<button 
+
+					<button
 						onClick={() => onViewCourse?.(course.id)}
-						style={{ 
-							fontSize: '12px', 
-							color: 'var(--muted-foreground)', 
-							background: 'none', 
-							border: 'none', 
+						style={{
+							fontSize: '12px',
+							color: 'var(--accent)',
+							background: 'none',
+							border: 'none',
 							cursor: 'pointer',
 							textDecoration: 'underline',
-							transition: 'color var(--transition-normal)'
+							transition: 'color 0.2s'
+						}}
+						onMouseEnter={(e) => {
+							e.currentTarget.style.color = 'var(--primary)'
+						}}
+						onMouseLeave={(e) => {
+							e.currentTarget.style.color = 'var(--accent)'
 						}}
 					>
 						Xem chi tiết

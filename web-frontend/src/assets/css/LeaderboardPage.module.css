@@ -2,22 +2,43 @@
 
 .leaderboardPage {
   min-height: 100vh;
-  background: var(--background);
+  background: var(--gradient-background);
   color: var(--foreground);
   font-family: var(--font-sans);
   padding-top: 100px;
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.6s ease-out;
   position: relative;
+}
+
+.leaderboardPage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="bg" cx="50%" cy="50%"><stop offset="0%" stop-color="%23f0f9ff" stop-opacity="0.3"/><stop offset="100%" stop-color="%23f0f9ff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="400" fill="url(%23bg)"/><circle cx="800" cy="300" r="300" fill="url(%23bg)"/><circle cx="400" cy="800" r="350" fill="url(%23bg)"/></svg>');
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
+  animation: patternFloat 20s ease-in-out infinite;
+}
+
+@keyframes patternFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+  }
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -27,6 +48,20 @@
   padding: 32px 24px;
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+  animation: slideInUp 0.8s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Header Section */
@@ -104,18 +139,25 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   margin-bottom: 24px;
-  animation: slideIn 0.4s ease-out;
+  animation: fadeInScale 0.8s ease-out;
   box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
 }
 
-@keyframes slideIn {
+.statsBanner:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+@keyframes fadeInScale {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: scale(1);
   }
 }
 
@@ -123,6 +165,11 @@
   flex: 1;
   text-align: center;
   padding: 8px;
+  transition: transform 0.2s ease;
+}
+
+.statItem:hover {
+  transform: scale(1.05);
 }
 
 .statValue {
@@ -131,6 +178,10 @@
   font-weight: 700;
   color: var(--foreground);
   margin-bottom: 4px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .statLabel {

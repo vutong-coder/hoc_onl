@@ -4,6 +4,9 @@
   border-bottom: 1px solid var(--border);
   position: relative;
   overflow: hidden;
+  border-radius: 0 0 24px 24px;
+  margin: 0 16px 24px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .hero::before {
@@ -148,7 +151,7 @@
   font-weight: 600;
   cursor: pointer;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 12px;
   transition: all 0.3s ease;
   white-space: nowrap;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -226,6 +229,8 @@
   
   .hero {
     padding: 20px 0 32px 0;
+    margin: 0 8px 16px 8px;
+    border-radius: 0 0 16px 16px;
   }
 
   .titleSection {
@@ -268,6 +273,8 @@
   
   .hero {
     padding: 16px 0 24px 0;
+    margin: 0 4px 12px 4px;
+    border-radius: 0 0 12px 12px;
   }
 
   .breadcrumbs {

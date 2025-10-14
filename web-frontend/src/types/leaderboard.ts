@@ -72,6 +72,7 @@ export type CountryCode =
   | 'LU' // Luxembourg
   | 'MT' // Malta
   | 'CY' // Cyprus
+  | 'VN' // Vietnam
   | 'UNKNOWN'; // Unknown/Unselected
 
 export interface CountryInfo {

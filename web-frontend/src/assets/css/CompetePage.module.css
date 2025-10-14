@@ -2,8 +2,18 @@
   background: var(--gradient-background);
   min-height: 100vh;
   position: relative;
-  padding-top: 80px; /* Add padding to avoid header overlap */
-  padding-bottom: 60px; /* Reduced padding for less empty space */
+  padding-top: 80px;
+  padding-bottom: 60px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .page::before {
@@ -17,6 +27,16 @@
   opacity: 0.6;
   pointer-events: none;
   z-index: 1;
+  animation: patternFloat 20s ease-in-out infinite;
+}
+
+@keyframes patternFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+  }
 }
 
 /* Light mode pattern */
@@ -36,7 +56,19 @@
   padding: 24px;
   position: relative;
   z-index: 2;
-  margin-top: 0; /* Remove margin-top since we have padding-top on page */
+  margin-top: 0;
+  animation: slideInUp 0.8s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 

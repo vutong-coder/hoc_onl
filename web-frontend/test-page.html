@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0f172a;
+            color: white;
+            font-family: sans-serif;
+        }
+        .test-box {
+            padding: 20px;
+            background: #1e293b;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Page - Nếu bạn thấy text này thì trình duyệt hoạt động tốt</h1>
+    <div class="test-box">
+        <h2>Thông tin kiểm tra:</h2>
+        <p>✅ HTML đang load</p>
+        <p>✅ CSS đang hoạt động</p>
+        <p>✅ Text màu trắng hiển thị trên nền tối</p>
+    </div>
+    <div class="test-box">
+        <h3>Các bước tiếp theo:</h3>
+        <ol>
+            <li>Mở Browser Developer Tools (F12)</li>
+            <li>Vào tab Console</li>
+            <li>Kiểm tra xem có lỗi JavaScript không</li>
+            <li>Truy cập <a href="http://localhost:4173" style="color: #10b981;">http://localhost:4173</a></li>
+        </ol>
+    </div>
+
+    <script>
+        console.log("✅ Test page loaded successfully!");
+        console.log("🔍 Now check the main app at http://localhost:4173");
+    </script>
+</body>
+</html>

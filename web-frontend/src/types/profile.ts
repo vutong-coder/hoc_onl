@@ -119,7 +119,7 @@ export interface UserPreferences {
 export interface InfoCardData {
   id: string;
   title: string;
-  icon: string;
+  icon: React.ReactNode;
   content: React.ReactNode;
   actionButton?: {
     text: string;

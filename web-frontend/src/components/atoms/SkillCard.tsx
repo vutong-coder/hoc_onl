@@ -34,16 +34,16 @@ export default function SkillCard({ skill, onSkillClick }: SkillCardProps): JSX.
 	}
 
 	return (
-		<div 
-			style={{ 
-				padding: '12px', 
-				borderRadius: '12px', 
-				border: '1px solid rgba(226, 232, 240, 0.8)', 
-				background: 'linear-gradient(145deg, var(--card) 0%, rgba(255, 255, 255, 0.05) 100%)',
+		<div
+			style={{
+				padding: '12px',
+				borderRadius: '12px',
+				border: '1px solid var(--border)',
+				background: 'var(--card)',
 				transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
 				cursor: 'pointer',
 				position: 'relative',
-				boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+				boxShadow: 'var(--shadow-sm)',
 				overflow: 'hidden'
 			}}
 			onClick={() => onSkillClick?.(skill.id)}

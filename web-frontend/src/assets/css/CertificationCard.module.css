@@ -1,11 +1,11 @@
 .card {
   background: var(--card);
   border-radius: 20px;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   padding: 28px;
   position: relative;
   overflow: visible;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   cursor: pointer;
   min-height: 200px;
   display: flex;
@@ -13,27 +13,10 @@
   border: 1px solid var(--border);
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
 .card:hover {
-  transform: translateY(-8px) scale(1.02);
+  transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
   border-color: var(--primary);
-}
-
-.card:hover::before {
-  opacity: 1;
 }
 
 .cardContent {
@@ -83,47 +66,31 @@
 }
 
 .infoButton:hover {
-  background: var(--accent);
-  color: var(--accent-foreground);
+  background: var(--primary);
+  color: white;
   transform: scale(1.1);
 }
 
 .getCertifiedButton {
-  background: var(--gradient-primary);
-  color: var(--primary-foreground);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
   border: none;
   border-radius: 12px;
   padding: 14px 28px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   margin-top: auto;
   align-self: flex-start;
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
   position: relative;
   overflow: hidden;
 }
 
-.getCertifiedButton::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s ease;
-}
-
 .getCertifiedButton:hover {
-  background: var(--primary);
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
-}
-
-.getCertifiedButton:hover::before {
-  left: 100%;
 }
 
 .getCertifiedButton:active {

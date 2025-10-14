@@ -41,19 +41,26 @@ export default function ExamCard({ exam, onViewExam, onRetakeExam }: ExamCardPro
 	}
 
 	return (
-		<div style={{ 
-			padding: '12px', 
-			borderRadius: 'var(--radius-md)', 
-			border: '1px solid var(--border)', 
+		<div style={{
+			padding: '12px',
+			borderRadius: 'var(--radius-md)',
+			border: '1px solid var(--border)',
 			background: 'var(--card)',
-			transition: 'border-color var(--transition-normal)',
-			cursor: 'pointer'
+			transition: 'all 0.2s',
+			cursor: 'pointer',
+			boxShadow: 'var(--shadow-sm)',
+			position: 'relative',
+			overflow: 'hidden'
 		}}
 		onMouseEnter={(e) => {
-			e.currentTarget.style.borderColor = 'var(--accent)'
+			e.currentTarget.style.borderColor = 'var(--primary)'
+			e.currentTarget.style.transform = 'translateX(4px)'
+			e.currentTarget.style.boxShadow = 'var(--shadow-md)'
 		}}
 		onMouseLeave={(e) => {
 			e.currentTarget.style.borderColor = 'var(--border)'
+			e.currentTarget.style.transform = 'translateX(0)'
+			e.currentTarget.style.boxShadow = 'var(--shadow-sm)'
 		}}>
 			<div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
 				<div style={{ flex: 1 }}>
@@ -100,25 +107,45 @@ export default function ExamCard({ exam, onViewExam, onRetakeExam }: ExamCardPro
 				</div>
 
 				<div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginLeft: '12px' }}>
-					<button 
+					<button
 						onClick={() => onViewExam?.(exam.id)}
-						style={{ 
-							padding: '4px', 
-							color: 'var(--muted-foreground)', 
-							background: 'none', 
-							border: 'none', 
+						style={{
+							padding: '4px',
+							color: 'var(--accent)',
+							background: 'none',
+							border: 'none',
 							cursor: 'pointer',
-							transition: 'color var(--transition-normal)'
+							transition: 'color 0.2s'
 						}}
-						title="View Details"
+						title="Xem chi tiết"
+						onMouseEnter={(e) => {
+							e.currentTarget.style.color = 'var(--primary)'
+						}}
+						onMouseLeave={(e) => {
+							e.currentTarget.style.color = 'var(--accent)'
+						}}
 					>
 						<Eye style={{ width: '16px', height: '16px' }} />
 					</button>
-					
+
 					{exam.status === 'completed' && exam.score && exam.score < 70 && (
-						<button 
+						<button
 							onClick={() => onRetakeExam?.(exam.id)}
-							style={{ fontSize: '12px', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+							style={{
+								fontSize: '12px',
+								color: 'var(--accent)',
+								background: 'none',
+								border: 'none',
+								cursor: 'pointer',
+								textDecoration: 'underline',
+								transition: 'color 0.2s'
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.color = 'var(--primary)'
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.color = 'var(--accent)'
+							}}
 						>
 							Thi lại
 						</button>

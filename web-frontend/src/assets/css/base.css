@@ -1,10 +1,22 @@
 /* Base Styles */
 @import './effects.css';
 
-html, body, #root {
+html {
 	height: 100%;
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+body {
+	min-height: 100%;
 	margin: 0;
 	padding: 0;
+}
+
+#root {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
 
 body {

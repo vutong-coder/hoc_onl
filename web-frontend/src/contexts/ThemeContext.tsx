@@ -18,19 +18,11 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(() => {
-    // Check localStorage first
-    const savedTheme = localStorage.getItem('theme') as Theme;
-    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
-      return savedTheme;
-    }
-    
-    // Fall back to system preference
+    // Always use system preference by default
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
-  const [isManualOverride, setIsManualOverride] = useState(() => {
-    return !!localStorage.getItem('theme');
-  });
+  const [isManualOverride, setIsManualOverride] = useState(false);
 
   const setTheme = (newTheme: Theme, isManual = true) => {
     setThemeState(newTheme);
@@ -65,30 +57,25 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     }
   }, [theme]);
 
-  // Listen for system theme changes
+  // Listen for system theme changes - always follow system preference
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
+
     const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-      // Only update if user hasn't manually set a theme preference
-      if (!isManualOverride) {
-        const systemTheme = e.matches ? 'dark' : 'light';
-        setTheme(systemTheme, false);
-      }
+      const systemTheme = e.matches ? 'dark' : 'light';
+      setThemeState(systemTheme);
     };
 
-    // Set initial theme based on system preference if no manual override
-    if (!isManualOverride) {
-      const systemTheme = mediaQuery.matches ? 'dark' : 'light';
-      setTheme(systemTheme, false);
-    }
+    // Set initial theme based on system preference
+    const systemTheme = mediaQuery.matches ? 'dark' : 'light';
+    setThemeState(systemTheme);
 
     mediaQuery.addEventListener('change', handleSystemThemeChange);
-    
+
     return () => {
       mediaQuery.removeEventListener('change', handleSystemThemeChange);
     };
-  }, [isManualOverride]);
+  }, []);
 
   // Reset to system theme function
   const resetToSystemTheme = () => {

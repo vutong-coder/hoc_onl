@@ -1,7 +1,7 @@
 .challengeCard {
   background: var(--card);
   border: 2px solid var(--border);
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 24px;
   margin-bottom: 20px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -126,7 +126,7 @@
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -185,7 +185,7 @@
   background: linear-gradient(135deg, var(--muted) 0%, var(--card) 100%);
   color: var(--foreground);
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   border: 1px solid var(--border);
