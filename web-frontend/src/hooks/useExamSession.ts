@@ -1,8 +1,8 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  fetchExamDetails, 
+import {
+  fetchExamDetails,
   startExamSession,
   setCurrentQuestion,
   updateAnswer,
@@ -22,13 +22,13 @@ export const useExamSession = () => {
   const { examId } = useParams<{ examId: string }>();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  
+
   const [isProctoringMinimized, setIsProctoringMinimized] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const { 
-    currentExam, 
+
+  const {
+    currentExam,
     questions,
     currentQuestionIndex,
     answers,
@@ -40,11 +40,26 @@ export const useExamSession = () => {
     session
   } = useSelector((state: RootState) => state.exam);
 
-  const currentQuestion = questions[currentQuestionIndex];
-  const totalQuestions = questions.length;
-  const answeredQuestions = Object.keys(answers).length;
-  const progress = totalQuestions > 0 ? (answeredQuestions / totalQuestions) * 100 : 0;
-  const timeWarning = timeRemaining < 300; // Less than 5 minutes
+  // Memoize current question to prevent recalculation
+  const currentQuestion = useMemo(
+    () => questions[currentQuestionIndex],
+    [questions, currentQuestionIndex]
+  );
+
+  // Memoize calculated values
+  const { totalQuestions, answeredQuestions, progress, timeWarning } = useMemo(() => {
+    const total = questions.length;
+    const answered = Object.keys(answers).length;
+    const prog = total > 0 ? (answered / total) * 100 : 0;
+    const warning = timeRemaining < 300; // Less than 5 minutes
+
+    return {
+      totalQuestions: total,
+      answeredQuestions: answered,
+      progress: prog,
+      timeWarning: warning
+    };
+  }, [questions.length, answers, timeRemaining]);
 
   // Initialize exam
   useEffect(() => {
@@ -108,23 +123,23 @@ export const useExamSession = () => {
     }
   }, [currentQuestion, dispatch]);
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = useCallback(() => {
     if (currentQuestionIndex < totalQuestions - 1) {
       dispatch(goToNextQuestion());
     }
-  };
+  }, [currentQuestionIndex, totalQuestions, dispatch]);
 
-  const handlePreviousQuestion = () => {
+  const handlePreviousQuestion = useCallback(() => {
     if (currentQuestionIndex > 0) {
       dispatch(goToPreviousQuestion());
     }
-  };
+  }, [currentQuestionIndex, dispatch]);
 
-  const handleGoToQuestion = (questionIndex: number) => {
+  const handleGoToQuestion = useCallback((questionIndex: number) => {
     dispatch(setCurrentQuestion(questionIndex));
-  };
+  }, [dispatch]);
 
-  const handleSubmitExam = async () => {
+  const handleSubmitExam = useCallback(async () => {
     setIsSubmitting(true);
     try {
       await dispatch(submitExam());
@@ -134,26 +149,26 @@ export const useExamSession = () => {
       setIsSubmitting(false);
       setShowSubmitModal(false);
     }
-  };
+  }, [dispatch, navigate, examId]);
 
-  const handleTimeUp = () => {
+  const handleTimeUp = useCallback(() => {
     setShowSubmitModal(true);
-  };
+  }, []);
 
-  const handleCameraReady = () => {
+  const handleCameraReady = useCallback(() => {
     dispatch(setCameraReady(true));
-  };
+  }, [dispatch]);
 
-  const handleCameraError = (error: string) => {
+  const handleCameraError = useCallback((error: string) => {
     dispatch(setCameraError(error));
-  };
+  }, [dispatch]);
 
-  const formatTime = (seconds: number) => {
+  const formatTime = useCallback((seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, []);
 
   return {
     // State

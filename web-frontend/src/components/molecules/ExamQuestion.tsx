@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { Flag, CheckCircle2, Code, FileText } from 'lucide-react';
 import { ExamQuestion as ExamQuestionType } from '../../utils/types';
 
@@ -14,7 +14,7 @@ interface ExamQuestionProps {
   className?: string;
 }
 
-export const ExamQuestion: React.FC<ExamQuestionProps> = ({
+const ExamQuestionComponent: React.FC<ExamQuestionProps> = ({
   question,
   questionNumber,
   totalQuestions,
@@ -38,10 +38,10 @@ export const ExamQuestion: React.FC<ExamQuestionProps> = ({
     };
   }, [startTime]);
 
-  const handleAnswerChange = (newAnswer: any) => {
+  const handleAnswerChange = useCallback((newAnswer: any) => {
     setAnswer(newAnswer);
     onAnswerChange(newAnswer);
-  };
+  }, [onAnswerChange]);
 
   const renderMultipleChoice = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
@@ -291,7 +291,7 @@ export const ExamQuestion: React.FC<ExamQuestionProps> = ({
     }
   };
 
-  const getTypeInfo = () => {
+  const typeInfo = useMemo(() => {
     switch (question.type) {
       case 'multiple-choice':
         return { label: 'Trắc nghiệm', color: '#10b981', bg: '#d1fae5', icon: CheckCircle2 };
@@ -302,9 +302,8 @@ export const ExamQuestion: React.FC<ExamQuestionProps> = ({
       default:
         return { label: 'Khác', color: '#6b7280', bg: '#f3f4f6', icon: FileText };
     }
-  };
+  }, [question.type]);
 
-  const typeInfo = getTypeInfo();
   const TypeIcon = typeInfo.icon;
 
   return (
@@ -474,3 +473,6 @@ export const ExamQuestion: React.FC<ExamQuestionProps> = ({
     </div>
   );
 };
+
+// Memoize component to prevent unnecessary re-renders
+export const ExamQuestion = memo(ExamQuestionComponent);

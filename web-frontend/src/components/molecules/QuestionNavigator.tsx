@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import { Flag } from 'lucide-react';
 import styles from '../../assets/css/QuestionNavigator.module.css';
 import { ExamQuestion } from '../../utils/types';
@@ -12,7 +12,7 @@ interface QuestionNavigatorProps {
   onGoToQuestion: (index: number) => void;
 }
 
-export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
+const QuestionNavigatorComponent: React.FC<QuestionNavigatorProps> = ({
   questions,
   currentQuestionIndex,
   answers,
@@ -39,10 +39,12 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
               } ${isAnswered ? styles.answered : ''} ${
                 isFlagged ? styles.flagged : ''
               }`}
+              aria-label={`Câu hỏi ${index + 1}${isCurrent ? ' (hiện tại)' : ''}${isAnswered ? ' (đã trả lời)' : ''}${isFlagged ? ' (đã đánh dấu)' : ''}`}
+              aria-current={isCurrent ? 'true' : 'false'}
             >
               {index + 1}
               {isFlagged && (
-                <Flag className={styles.flagIcon} />
+                <Flag className={styles.flagIcon} aria-hidden="true" />
               )}
             </button>
           );
@@ -50,20 +52,20 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
       </div>
 
       {/* Legend */}
-      <div className={styles.legend}>
-        <div className={styles.legendItem}>
+      <div className={styles.legend} role="list" aria-label="Chú thích">
+        <div className={styles.legendItem} role="listitem">
           <div className={`${styles.legendBox} ${styles.legendAnswered}`} />
           <span>Đã trả lời</span>
         </div>
-        <div className={styles.legendItem}>
+        <div className={styles.legendItem} role="listitem">
           <div className={`${styles.legendBox} ${styles.legendNotViewed}`} />
           <span>Chưa xem</span>
         </div>
-        <div className={styles.legendItem}>
+        <div className={styles.legendItem} role="listitem">
           <div className={`${styles.legendBox} ${styles.legendFlagged}`} />
           <span>Đã đánh dấu</span>
         </div>
-        <div className={styles.legendItem}>
+        <div className={styles.legendItem} role="listitem">
           <div className={`${styles.legendBox} ${styles.legendCurrent}`} />
           <span>Câu hiện tại</span>
         </div>
@@ -71,4 +73,7 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
     </div>
   );
 };
+
+// Memoize component to prevent unnecessary re-renders
+export const QuestionNavigator = memo(QuestionNavigatorComponent);
 

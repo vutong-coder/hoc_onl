@@ -2,124 +2,157 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { examService } from '../../services/examService';
 import { ExamDetails, ExamQuestion, ExamAnswer, ExamSubmission, ExamResult, ExamSession } from '../../utils/types';
 
-interface ExamState {
-  // Exam details
-  currentExam: ExamDetails | null;
-  questions: ExamQuestion[];
-  
-  // Session info
-  session: ExamSession | null;
-  
-  // Current state
-  currentQuestionIndex: number;
-  answers: Record<number, ExamAnswer>;
-  timeRemaining: number; // seconds
-  startTime: number | null;
-  
-  // UI state
-  status: 'idle' | 'loading' | 'pre-check' | 'active' | 'submitting' | 'finished' | 'error';
-  error: string | null;
-  
-  // Camera state
-  isCameraReady: boolean;
-  cameraError: string | null;
-  
-  // Navigation
-  visitedQuestions: number[];
-  flaggedQuestions: number[];
+// State types
+export type ExamStatus = 'idle' | 'loading' | 'pre-check' | 'active' | 'submitting' | 'finished' | 'error'
+
+export interface ExamState {
+	// Exam details
+	currentExam: ExamDetails | null
+	questions: ExamQuestion[]
+
+	// Session info
+	session: ExamSession | null
+
+	// Current state
+	currentQuestionIndex: number
+	answers: Record<number, ExamAnswer>
+	timeRemaining: number // seconds
+	startTime: number | null
+
+	// UI state
+	status: ExamStatus
+	error: string | null
+
+	// Camera state
+	isCameraReady: boolean
+	cameraError: string | null
+
+	// Navigation
+	visitedQuestions: number[]
+	flaggedQuestions: number[]
 }
 
 const initialState: ExamState = {
-  currentExam: null,
-  questions: [],
-  session: null,
-  currentQuestionIndex: 0,
-  answers: {},
-  timeRemaining: 0,
-  startTime: null,
-  status: 'idle',
-  error: null,
-  isCameraReady: false,
-  cameraError: null,
-  visitedQuestions: [],
-  flaggedQuestions: []
-};
+	currentExam: null,
+	questions: [],
+	session: null,
+	currentQuestionIndex: 0,
+	answers: {},
+	timeRemaining: 0,
+	startTime: null,
+	status: 'idle',
+	error: null,
+	isCameraReady: false,
+	cameraError: null,
+	visitedQuestions: [],
+	flaggedQuestions: []
+}
 
-// Async thunks
-export const fetchExamDetails = createAsyncThunk(
-  'exam/fetchExamDetails',
-  async (examId: string, { rejectWithValue }) => {
-    try {
-      const examDetails = await examService.getExamDetails(examId);
-      return examDetails;
-    } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : 'Lỗi không xác định');
-    }
-  }
+// Thunk argument types
+interface FetchExamDetailsArgs {
+	examId: string
+}
+
+interface StartExamSessionArgs {
+	examId: string
+}
+
+interface SaveAnswerArgs {
+	questionId: number
+	answer: number | string // Union type for different answer types
+}
+
+// Async thunks with strict typing
+export const fetchExamDetails = createAsyncThunk<
+	ExamDetails, // Return type
+	string, // Argument type (examId)
+	{ rejectValue: string } // ThunkAPI config
+>(
+	'exam/fetchExamDetails',
+	async (examId, { rejectWithValue }) => {
+		try {
+			const examDetails = await examService.getExamDetails(examId);
+			return examDetails;
+		} catch (error) {
+			return rejectWithValue(error instanceof Error ? error.message : 'Lỗi không xác định');
+		}
+	}
 );
 
-export const startExamSession = createAsyncThunk(
-  'exam/startExamSession',
-  async (examId: string, { rejectWithValue }) => {
-    try {
-      const sessionData = await examService.startExam(examId);
-      return sessionData;
-    } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : 'Không thể bắt đầu bài thi');
-    }
-  }
+export const startExamSession = createAsyncThunk<
+	{ sessionId: string; startTime: string }, // Return type
+	string, // Argument type (examId)
+	{ rejectValue: string }
+>(
+	'exam/startExamSession',
+	async (examId, { rejectWithValue }) => {
+		try {
+			const sessionData = await examService.startExam(examId);
+			return sessionData;
+		} catch (error) {
+			return rejectWithValue(error instanceof Error ? error.message : 'Không thể bắt đầu bài thi');
+		}
+	}
 );
 
-export const saveAnswer = createAsyncThunk(
-  'exam/saveAnswer',
-  async (params: { questionId: number; answer: any }, { getState, rejectWithValue }) => {
-    try {
-      const state = getState() as { exam: ExamState };
-      const { session, answers } = state.exam;
-      
-      if (!session) {
-        throw new Error('Không tìm thấy session');
-      }
+export const saveAnswer = createAsyncThunk<
+	{ questionId: number; answer: number | string; timeSpent: number }, // Return type
+	SaveAnswerArgs, // Argument type
+	{ rejectValue: string; state: { exam: ExamState } }
+>(
+	'exam/saveAnswer',
+	async (params, { getState, rejectWithValue }) => {
+		try {
+			const state = getState();
+			const { session, answers } = state.exam;
 
-      await examService.saveAnswer(session.id, params.questionId, params.answer);
-      
-      return {
-        questionId: params.questionId,
-        answer: params.answer,
-        timeSpent: answers[params.questionId]?.timeSpent || 0
-      };
-    } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : 'Không thể lưu câu trả lời');
-    }
-  }
+			if (!session) {
+				throw new Error('Không tìm thấy session');
+			}
+
+			await examService.saveAnswer(session.id, params.questionId, params.answer);
+
+			return {
+				questionId: params.questionId,
+				answer: params.answer,
+				timeSpent: answers[params.questionId]?.timeSpent || 0
+			};
+		} catch (error) {
+			return rejectWithValue(error instanceof Error ? error.message : 'Không thể lưu câu trả lời');
+		}
+	}
 );
 
-export const submitExam = createAsyncThunk(
-  'exam/submitExam',
-  async (_, { getState, rejectWithValue }) => {
-    try {
-      const state = getState() as { exam: ExamState };
-      const { currentExam, session, answers, startTime } = state.exam;
-      
-      if (!currentExam || !session || !startTime) {
-        throw new Error('Thiếu thông tin cần thiết để nộp bài');
-      }
+export const submitExam = createAsyncThunk<
+	ExamResult, // Return type
+	void, // No argument
+	{ rejectValue: string; state: { exam: ExamState } }
+>(
+	'exam/submitExam',
+	async (_, { getState, rejectWithValue }) => {
+		try {
+			const state = getState();
+			const { currentExam, session, answers, startTime } = state.exam;
 
-      const timeSpent = Math.round((Date.now() - startTime) / 60000); // minutes
-      const submission: ExamSubmission = {
-        examId: currentExam.id,
-        sessionId: session.id,
-        answers: Object.values(answers),
-        timeSpent,
-        submittedAt: new Date().toISOString()
-      };
+			if (!currentExam || !session || !startTime) {
+				throw new Error('Thiếu thông tin cần thiết để nộp bài');
+			}
 
-      const result = await examService.submitExam(submission);
-      return result;
-    } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : 'Không thể nộp bài thi');
-    }
-  }
+			const timeSpent = Math.round((Date.now() - startTime) / 60000); // minutes
+			const submission: ExamSubmission = {
+				examId: currentExam.id,
+				sessionId: session.id,
+				answers: Object.values(answers),
+				timeSpent,
+				submittedAt: new Date().toISOString()
+			};
+
+			const result = await examService.submitExam(submission);
+			return result;
+		} catch (error) {
+			return rejectWithValue(error instanceof Error ? error.message : 'Không thể nộp bài thi');
+		}
+	}
 );
 
 const examSlice = createSlice({

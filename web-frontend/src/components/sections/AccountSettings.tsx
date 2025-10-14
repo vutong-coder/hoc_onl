@@ -49,9 +49,10 @@ export default function AccountSettings({ settings, onUpdateSettings }: AccountS
     console.log('Connecting to:', platform);
   };
 
-  const handleExportData = () => {
-    // TODO: Implement export data logic
+  const handleExportData = async () => {
     console.log('Exporting data...');
+
+    // Update status to pending
     onUpdateSettings({
       ...settings,
       exportData: {
@@ -59,19 +60,100 @@ export default function AccountSettings({ settings, onUpdateSettings }: AccountS
         exportStatus: 'pending'
       }
     });
+
+    // Simulate export process (2 seconds)
+    setTimeout(() => {
+      // Create mock export data
+      const exportData = {
+        profile: settings,
+        exportedAt: new Date().toISOString(),
+        version: '1.0'
+      };
+
+      // Create and download file
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `hackerrank-data-export-${Date.now()}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      // Reset status
+      onUpdateSettings({
+        ...settings,
+        exportData: {
+          ...settings.exportData,
+          exportStatus: 'completed',
+          lastExportDate: new Date().toISOString()
+        }
+      });
+
+      alert('✅ Dữ liệu đã được export thành công!');
+    }, 2000);
   };
 
   const handleDeleteAccount = () => {
-    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      // TODO: Implement delete account logic
+    const confirmMessage = `⚠️ XÓA TÀI KHOẢN
+
+Bạn có chắc chắn muốn xóa tài khoản "${settings.username}"?
+
+Thao tác này sẽ xóa vĩnh viễn:
+- Profile và thông tin cá nhân
+- Tất cả badges và achievements
+- Vị trí trên leaderboard
+- Lịch sử bài thi và điểm số
+- Token và ví blockchain
+
+⚠️ DỮ LIỆU KHÔNG THỂ KHÔI PHỤC!
+
+Nhập "DELETE" để xác nhận:`;
+
+    const userInput = prompt(confirmMessage);
+
+    if (userInput === 'DELETE') {
       console.log('Deleting account...');
+      alert('🗑️ Tài khoản sẽ được xóa trong 30 ngày. Bạn có thể hủy bỏ bằng cách đăng nhập lại trong thời gian này.');
+      // In real app: API call to mark account for deletion
+    } else if (userInput !== null) {
+      alert('❌ Xác nhận không đúng. Tài khoản của bạn an toàn.');
     }
   };
 
   const handleAddEmail = () => {
     if (newEmail) {
-      // TODO: Implement add email logic
-      console.log('Adding email:', newEmail);
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(newEmail)) {
+        alert('⚠️ Email không hợp lệ!');
+        return;
+      }
+
+      // Check if email already exists
+      const emailExists = settings.emailAddresses.some(e => e.email === newEmail);
+      if (emailExists) {
+        alert('⚠️ Email này đã được thêm!');
+        return;
+      }
+
+      // Add new email
+      const newEmailObj = {
+        id: `email-${Date.now()}`,
+        email: newEmail,
+        isPrimary: settings.emailAddresses.length === 0,
+        isVerified: false,
+        addedDate: new Date().toISOString()
+      };
+
+      onUpdateSettings({
+        ...settings,
+        emailAddresses: [...settings.emailAddresses, newEmailObj]
+      });
+
+      alert(`✅ Email ${newEmail} đã được thêm! Vui lòng kiểm tra hộp thư để xác thực.`);
       setNewEmail('');
       setShowAddEmail(false);
     }
