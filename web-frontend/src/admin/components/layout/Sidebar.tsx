@@ -1,22 +1,21 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Users, FileText, Monitor, Video, Lock, Award, BookOpen, Building, Server, BarChart, Copyright } from 'lucide-react'
+import { LayoutDashboard, Users, FileText, Video, Lock, Award, BookOpen, Building, Server, BarChart, Copyright } from 'lucide-react'
 
 type Item = { icon: React.ReactNode; label: string; path: string }
 
 const items: Item[] = [
-	{ icon: <LayoutDashboard className="w-5 h-5" />, label: 'Tổng quan', path: '/dashboard' },
-	{ icon: <Users className="w-5 h-5" />, label: 'Quản lý người dùng', path: '/users' },
-	{ icon: <FileText className="w-5 h-5" />, label: 'Quản lý bài thi', path: '/exams' },
-	{ icon: <Monitor className="w-5 h-5" />, label: 'Thi trực tuyến', path: '/exam' },
-	{ icon: <Video className="w-5 h-5" />, label: 'Giám sát & Chống gian lận', path: '/proctoring' },
-	{ icon: <Lock className="w-5 h-5" />, label: 'Bảo mật & Blockchain', path: '/security' },
-	{ icon: <Award className="w-5 h-5" />, label: 'Hệ thống thưởng Token', path: '/reward' },
-	{ icon: <BookOpen className="w-5 h-5" />, label: 'Quản lý khóa học', path: '/courses' },
-	{ icon: <Building className="w-5 h-5" />, label: 'Quản lý tổ chức', path: '/organizations' },
-	{ icon: <Server className="w-5 h-5" />, label: 'Quản trị hệ thống', path: '/admin' },
-	{ icon: <BarChart className="w-5 h-5" />, label: 'Phân tích & Báo cáo', path: '/analytics' },
-	{ icon: <Copyright className="w-5 h-5" />, label: 'Bản quyền tài liệu', path: '/copyright' },
+	{ icon: <LayoutDashboard className="w-5 h-5" />, label: 'Tổng quan', path: '/admin/dashboard' },
+	{ icon: <Users className="w-5 h-5" />, label: 'Quản lý người dùng', path: '/admin/users' },
+	{ icon: <FileText className="w-5 h-5" />, label: 'Quản lý bài thi', path: '/admin/exams' },
+	{ icon: <Video className="w-5 h-5" />, label: 'Giám sát & Chống gian lận', path: '/admin/proctoring' },
+	{ icon: <Lock className="w-5 h-5" />, label: 'Bảo mật & Blockchain', path: '/admin/security' },
+	{ icon: <Award className="w-5 h-5" />, label: 'Hệ thống thưởng Token', path: '/admin/reward' },
+	{ icon: <BookOpen className="w-5 h-5" />, label: 'Quản lý khóa học', path: '/admin/courses' },
+	{ icon: <Building className="w-5 h-5" />, label: 'Quản lý tổ chức', path: '/admin/organizations' },
+	{ icon: <Server className="w-5 h-5" />, label: 'Quản trị hệ thống', path: '/admin/admin' },
+	{ icon: <BarChart className="w-5 h-5" />, label: 'Phân tích & Báo cáo', path: '/admin/analytics' },
+	{ icon: <Copyright className="w-5 h-5" />, label: 'Bản quyền tài liệu', path: '/admin/copyright' },
 ]
 
 export default function Sidebar(): JSX.Element {
@@ -79,3 +78,4 @@ export default function Sidebar(): JSX.Element {
 		</aside>
 	)
 }
+

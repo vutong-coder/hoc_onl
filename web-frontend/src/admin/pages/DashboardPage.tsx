@@ -1,6 +1,6 @@
 import React from 'react'
-import StatCard from '../components/atoms/StatCard'
-import ProgressCard from '../components/atoms/ProgressCard'
+import StatCard from '../components/common/StatCard'
+import ProgressCard from '../components/common/ProgressCard'
 
 export default function DashboardPage(): JSX.Element {
 	return (

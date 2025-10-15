@@ -13,12 +13,13 @@ export default function DashboardLayout(): JSX.Element {
 
 				<main style={{ flex: 1, overflowY: 'auto', minWidth: 0 }}>
 					<Outlet />
+					
+					<footer style={{ background: 'var(--card)', borderTop: '1px solid var(--border)', color: 'var(--muted-foreground)', padding: '16px 24px', textAlign: 'center', fontSize: 14, marginTop: '32px' }}>
+						<p>EduPlatform © 2023 | Version 1.0.0 | <a href="#" style={{ color: 'inherit' }}>Help & Support</a></p>
+					</footer>
 				</main>
 			</div>
-
-			<footer style={{ background: 'var(--card)', borderTop: '1px solid var(--border)', color: 'var(--muted-foreground)', padding: '16px 24px', textAlign: 'center', fontSize: 14 }}>
-				<p>EduPlatform © 2023 | Version 1.0.0 | <a href="#" style={{ color: 'inherit' }}>Help & Support</a></p>
-			</footer>
 		</div>
 	)
 }
+

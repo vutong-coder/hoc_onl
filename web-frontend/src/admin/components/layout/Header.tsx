@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { Bell, Settings, LogOut, ChevronDown } from 'lucide-react'
-import { logoutUser } from '../../store/slices/authSlice'
+import { useAppDispatch, useAppSelector } from '../../../store/hooks'
+import { Bell, Settings, LogOut } from 'lucide-react'
+import { logoutUser } from '../../../store/slices/authSlice'
 import { useNavigate } from 'react-router-dom'
-import Logo from '../atoms/Logo'
+import Logo from '../../../components/atoms/Logo'
 
 export default function Header(): JSX.Element {
 	const dispatch = useAppDispatch()
@@ -18,10 +18,6 @@ export default function Header(): JSX.Element {
 
 	const handleDropdownToggle = (dropdown: string) => {
 		setActiveDropdown(activeDropdown === dropdown ? null : dropdown)
-	}
-
-	const handleDropdownClose = () => {
-		setActiveDropdown(null)
 	}
 
 	// Close dropdown when clicking outside
@@ -217,3 +213,4 @@ export default function Header(): JSX.Element {
 		</header>
 	)
 }
+

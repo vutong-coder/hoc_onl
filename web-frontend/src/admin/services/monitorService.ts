@@ -5,4 +5,3 @@ export function createMonitorSocket(url: string): WebSocket {
 	return ws
 }
 
-
