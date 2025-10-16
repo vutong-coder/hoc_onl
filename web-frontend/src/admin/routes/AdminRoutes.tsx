@@ -13,6 +13,7 @@ import AdminPage from '../pages/AdminPage'
 import AnalyticsPage from '../pages/AnalyticsPage'
 import CopyrightPage from '../pages/CopyrightPage'
 import AdminExamPage from '../pages/AdminExamPage'
+import CertifyPage from '../pages/CertifyPage'
 
 export default function AdminRoutes(): JSX.Element {
 	return (
@@ -28,6 +29,7 @@ export default function AdminRoutes(): JSX.Element {
 				<Route path="reward" element={<RewardPage />} />
 				<Route path="courses" element={<CoursesPage />} />
 				<Route path="organizations" element={<OrganizationsPage />} />
+				<Route path="certify" element={<CertifyPage />} />
 				<Route path="admin" element={<AdminPage />} />
 				<Route path="analytics" element={<AnalyticsPage />} />
 				<Route path="copyright" element={<CopyrightPage />} />

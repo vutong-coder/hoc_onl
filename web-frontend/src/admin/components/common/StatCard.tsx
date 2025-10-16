@@ -7,9 +7,10 @@ interface StatCardProps {
 	gradient?: 'primary' | 'accent'
 	subtitle?: string
 	delayMs?: number
+	trend?: { value: number; isPositive: boolean }
 }
 
-export default function StatCard({ title, value, icon, gradient = 'primary', subtitle }: StatCardProps): JSX.Element {
+export default function StatCard({ title, value, icon, gradient = 'primary', subtitle, trend }: StatCardProps): JSX.Element {
 	const getGradientStyles = () => {
 		switch (gradient) {
 			case 'primary':
@@ -70,6 +71,20 @@ export default function StatCard({ title, value, icon, gradient = 'primary', sub
 						<p style={{ fontSize: '12px', fontWeight: 400, color: gradientStyles.color, margin: '4px 0 0', opacity: 0.8 }}>
 							{subtitle}
 						</p>
+					)}
+					{trend && (
+						<div style={{ 
+							display: 'flex', 
+							alignItems: 'center', 
+							gap: '4px', 
+							marginTop: '4px',
+							fontSize: '12px',
+							fontWeight: 500,
+							color: trend.isPositive ? '#10b981' : '#ef4444'
+						}}>
+							<span>{trend.isPositive ? '↗' : '↘'}</span>
+							<span>{trend.value.toFixed(1)}%</span>
+						</div>
 					)}
 				</div>
 				{icon && (
