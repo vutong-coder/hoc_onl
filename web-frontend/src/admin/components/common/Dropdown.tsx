@@ -3,19 +3,20 @@ import { ChevronDown, Check } from 'lucide-react'
 import '../../styles/common.css'
 
 interface DropdownOption {
-	value: string
+	value: string | boolean
 	label: string
 	disabled?: boolean
 }
 
 interface DropdownProps {
 	options: DropdownOption[]
-	value: string
-	onChange: (value: string) => void
+	value: string | boolean
+	onChange: (value: string | boolean) => void
 	placeholder?: string
 	disabled?: boolean
 	className?: string
 	style?: React.CSSProperties
+	icon?: React.ReactNode
 }
 
 export default function Dropdown({ 
@@ -25,7 +26,8 @@ export default function Dropdown({
 	placeholder = "Chọn...", 
 	disabled = false,
 	className = '',
-	style
+	style,
+	icon
 }: DropdownProps): JSX.Element {
 	const [isOpen, setIsOpen] = useState(false)
 	const dropdownRef = useRef<HTMLDivElement>(null)
@@ -45,7 +47,7 @@ export default function Dropdown({
 		}
 	}, [])
 
-	const handleOptionClick = (optionValue: string) => {
+	const handleOptionClick = (optionValue: string | boolean) => {
 		if (!disabled) {
 			onChange(optionValue)
 			setIsOpen(false)
@@ -76,6 +78,7 @@ export default function Dropdown({
 				aria-haspopup="listbox"
 				aria-expanded={isOpen}
 			>
+				{icon && <span className="dropdown-icon-left">{icon}</span>}
 				<span className="dropdown-value">
 					{selectedOption ? selectedOption.label : placeholder}
 				</span>
@@ -90,7 +93,7 @@ export default function Dropdown({
 					<div className="dropdown-list" role="listbox">
 						{options.map((option) => (
 							<div
-								key={option.value}
+								key={String(option.value)}
 								className={`dropdown-option ${option.value === value ? 'selected' : ''} ${option.disabled ? 'disabled' : ''}`}
 								onClick={() => handleOptionClick(option.value)}
 								role="option"

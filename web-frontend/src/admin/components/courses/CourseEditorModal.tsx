@@ -290,7 +290,7 @@ export default function CourseEditorModal({
 							<Dropdown
 								options={categoryOptions}
 								value={form.categoryId}
-								onChange={(value) => setForm(prev => ({ ...prev, categoryId: value }))}
+								onChange={(value) => setForm(prev => ({ ...prev, categoryId: String(value) }))}
 								placeholder="Chọn danh mục"
 							/>
 							{errors.categoryId && <span className="error-message">{errors.categoryId}</span>}
@@ -301,7 +301,7 @@ export default function CourseEditorModal({
 							<Dropdown
 								options={instructorOptions}
 								value={form.instructorId}
-								onChange={(value) => setForm(prev => ({ ...prev, instructorId: value }))}
+								onChange={(value) => setForm(prev => ({ ...prev, instructorId: String(value) }))}
 								placeholder="Chọn giảng viên"
 							/>
 							{errors.instructorId && <span className="error-message">{errors.instructorId}</span>}
@@ -355,7 +355,7 @@ export default function CourseEditorModal({
 									{ value: 'SKILL', label: 'SKILL Token' }
 								]}
 								value={form.tokenSymbol}
-								onChange={(value) => setForm(prev => ({ ...prev, tokenSymbol: value }))}
+								onChange={(value) => setForm(prev => ({ ...prev, tokenSymbol: String(value) }))}
 							/>
 						</div>
 					</div>
