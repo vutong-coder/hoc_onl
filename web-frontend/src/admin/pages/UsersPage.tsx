@@ -2,8 +2,11 @@ import React, { useState, useRef } from 'react'
 import { Plus, Download, Upload, FileDown } from 'lucide-react'
 import SearchBar from '../components/common/SearchBar'
 import Pagination from '../components/common/Pagination'
-import Modal from '../components/common/Modal'
 import UserTable from '../components/users/UserTable'
+import DeleteUserModal from '../modal/Users/DeleteUserModal'
+import AddUserModal from '../modal/Users/AddUserModal'
+import ImportUserModal from '../modal/Users/ImportUserModal'
+import EditUserModal from '../modal/Users/EditUserModal'
 import useUsers from '../hooks/useUsers'
 import { User } from '../types/user'
 import { exportUsersToExcel, importUsersFromExcel, downloadExcelTemplate } from '../utils/excelHelpers'
@@ -70,6 +73,19 @@ export default function UsersPage(): JSX.Element {
 	const handleAddUser = (userData: Partial<User>) => {
 		addUser(userData as Omit<User, 'id' | 'createdAt'>)
 		setIsAddModalOpen(false)
+	}
+
+	// Xử lý cập nhật user
+	const handleUpdateUser = (userData: Partial<User>) => {
+		if (userToEdit) {
+			const updatedUser: User = {
+				...userToEdit,
+				...userData
+			}
+			updateUser(updatedUser)
+			setIsEditModalOpen(false)
+			setUserToEdit(null)
+		}
 	}
 
 	// Xử lý export Excel
@@ -246,303 +262,41 @@ export default function UsersPage(): JSX.Element {
 			)}
 
 			{/* Delete Modal */}
-			<Modal
+			<DeleteUserModal
 				isOpen={isDeleteModalOpen}
 				onClose={() => setIsDeleteModalOpen(false)}
-				title="Xác nhận xóa người dùng"
-				footer={
-					<>
-						<button 
-							className="btn btn-secondary"
-							onClick={() => setIsDeleteModalOpen(false)}
-						>
-							Hủy
-						</button>
-						<button 
-							className="btn btn-danger"
-							onClick={confirmDelete}
-						>
-							Xóa
-						</button>
-					</>
-				}
-			>
-				<p style={{ margin: 0 }}>
-					Bạn có chắc chắn muốn xóa người dùng <strong>{userToDelete?.name}</strong>?
-					<br />
-					Hành động này không thể hoàn tác.
-				</p>
-			</Modal>
+				onConfirm={confirmDelete}
+				user={userToDelete}
+			/>
 
 			{/* Add User Modal */}
-			<Modal
+			<AddUserModal
 				isOpen={isAddModalOpen}
 				onClose={() => setIsAddModalOpen(false)}
-				title="Thêm người dùng mới"
-				maxWidth="550px"
-				footer={
-					<>
-						<button 
-							className="btn btn-secondary"
-							onClick={() => setIsAddModalOpen(false)}
-						>
-							Hủy
-						</button>
-						<button 
-							className="btn btn-primary"
-							onClick={(e) => {
-								const form = (e.target as HTMLButtonElement).closest('.modal-content')?.querySelector('form')
-								if (form) {
-									const formData = new FormData(form)
-									const userData = {
-										name: formData.get('name') as string,
-										email: formData.get('email') as string,
-										phone: formData.get('phone') as string,
-										role: formData.get('role') as any,
-										department: formData.get('department') as string,
-										status: 'active' as const
-									}
-									if (userData.name && userData.email) {
-										handleAddUser(userData)
-									} else {
-										alert('Vui lòng điền đầy đủ họ tên và email')
-									}
-								}
-							}}
-						>
-							Thêm người dùng
-						</button>
-					</>
-				}
-			>
-				<form>
-					<div className="form-group">
-						<label className="form-label">Họ và tên *</label>
-						<input
-							type="text"
-							name="name"
-							className="form-input"
-							placeholder="Nhập họ và tên"
-							required
-						/>
-					</div>
-
-					<div className="form-group">
-						<label className="form-label">Email *</label>
-						<input
-							type="email"
-							name="email"
-							className="form-input"
-							placeholder="Nhập địa chỉ email"
-							required
-						/>
-					</div>
-
-					<div className="form-row">
-						<div className="form-group">
-							<label className="form-label">Số điện thoại</label>
-							<input
-								type="tel"
-								name="phone"
-								className="form-input"
-								placeholder="Nhập số điện thoại"
-							/>
-						</div>
-
-						<div className="form-group">
-							<label className="form-label">Vai trò</label>
-							<select
-								name="role"
-								className="form-select"
-								defaultValue="student"
-							>
-								<option value="admin">Quản trị viên</option>
-								<option value="teacher">Giảng viên</option>
-								<option value="student">Học viên</option>
-								<option value="user">Người dùng</option>
-							</select>
-						</div>
-					</div>
-
-					<div className="form-group">
-						<label className="form-label">Phòng ban</label>
-						<input
-							type="text"
-							name="department"
-							className="form-input"
-							placeholder="Nhập tên phòng ban"
-						/>
-					</div>
-				</form>
-			</Modal>
+				onSave={handleAddUser}
+			/>
 
 			{/* Import Preview Modal */}
-			<Modal
+			<ImportUserModal
 				isOpen={isImportModalOpen}
 				onClose={() => {
 					setIsImportModalOpen(false)
 					setImportPreview([])
 					setImportFile(null)
 				}}
-				title="Xem trước dữ liệu nhập"
-				maxWidth="800px"
-				footer={
-					<>
-						<button 
-							className="btn btn-secondary"
-							onClick={handleDownloadTemplate}
-						>
-							<FileDown size={18} />
-							Tải mẫu Excel
-						</button>
-						<button 
-							className="btn btn-secondary"
-							onClick={() => {
-								setIsImportModalOpen(false)
-								setImportPreview([])
-								setImportFile(null)
-							}}
-						>
-							Hủy
-						</button>
-						<button 
-							className="btn btn-primary"
-							onClick={confirmImport}
-							disabled={importPreview.length === 0}
-						>
-							Nhập {importPreview.length} người dùng
-						</button>
-					</>
-				}
-			>
-				<div>
-					<p style={{ marginBottom: '16px', color: 'var(--muted-foreground)' }}>
-						Đã tìm thấy <strong>{importPreview.length}</strong> người dùng hợp lệ từ file <strong>{importFile?.name}</strong>
-					</p>
-
-					{importPreview.length > 0 ? (
-						<div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-							<table className="admin-table">
-								<thead>
-									<tr>
-										<th>Họ và tên</th>
-										<th>Email</th>
-										<th>Vai trò</th>
-										<th>Phòng ban</th>
-									</tr>
-								</thead>
-								<tbody>
-									{importPreview.map((user, index) => (
-										<tr key={index}>
-											<td>{user.name}</td>
-											<td>{user.email}</td>
-											<td>
-												<span className="badge badge-info">
-													{user.role === 'admin' ? 'Quản trị viên' :
-													 user.role === 'teacher' ? 'Giảng viên' :
-													 user.role === 'student' ? 'Học viên' : 'Người dùng'}
-												</span>
-											</td>
-											<td>{user.department || '-'}</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
-					) : (
-						<div className="admin-table-empty">
-							<div className="admin-table-empty-icon">⚠️</div>
-							<div className="admin-table-empty-text">
-								Không tìm thấy dữ liệu hợp lệ trong file
-							</div>
-						</div>
-					)}
-				</div>
-			</Modal>
+				onConfirm={confirmImport}
+				onDownloadTemplate={handleDownloadTemplate}
+				importFile={importFile}
+				importPreview={importPreview}
+			/>
 
 			{/* Edit Modal */}
-			<Modal
+			<EditUserModal
 				isOpen={isEditModalOpen}
 				onClose={() => setIsEditModalOpen(false)}
-				title="Chỉnh sửa thông tin người dùng"
-				maxWidth="550px"
-				footer={
-					<>
-						<button 
-							className="btn btn-secondary"
-							onClick={() => setIsEditModalOpen(false)}
-						>
-							Hủy
-						</button>
-						<button 
-							className="btn btn-primary"
-							onClick={() => {
-								// TODO: Implement save logic
-								setIsEditModalOpen(false)
-							}}
-						>
-							Lưu thay đổi
-						</button>
-					</>
-				}
-			>
-				<div>
-					<div className="form-group">
-						<label className="form-label">Họ và tên</label>
-						<input
-							type="text"
-							className="form-input"
-							defaultValue={userToEdit?.name}
-							placeholder="Nhập họ và tên"
-						/>
-					</div>
-
-					<div className="form-group">
-						<label className="form-label">Email</label>
-						<input
-							type="email"
-							className="form-input"
-							defaultValue={userToEdit?.email}
-							placeholder="Nhập địa chỉ email"
-						/>
-					</div>
-
-					<div className="form-row">
-						<div className="form-group">
-							<label className="form-label">Số điện thoại</label>
-							<input
-								type="tel"
-								className="form-input"
-								defaultValue={userToEdit?.phone}
-								placeholder="Nhập số điện thoại"
-							/>
-						</div>
-
-						<div className="form-group">
-							<label className="form-label">Vai trò</label>
-							<select
-								className="form-select"
-								defaultValue={userToEdit?.role}
-							>
-								<option value="admin">Quản trị viên</option>
-								<option value="teacher">Giảng viên</option>
-								<option value="student">Học viên</option>
-								<option value="user">Người dùng</option>
-							</select>
-						</div>
-					</div>
-
-					<div className="form-group">
-						<label className="form-label">Phòng ban</label>
-						<input
-							type="text"
-							className="form-input"
-							defaultValue={userToEdit?.department}
-							placeholder="Nhập tên phòng ban"
-						/>
-					</div>
-				</div>
-			</Modal>
+				onSave={handleUpdateUser}
+				user={userToEdit}
+			/>
 		</div>
 	)
 }

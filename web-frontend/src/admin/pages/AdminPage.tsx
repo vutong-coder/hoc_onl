@@ -34,8 +34,9 @@ import SystemHealthWidget from '../components/admin/SystemHealthWidget'
 import AdminUsersTable from '../components/admin/AdminUsersTable'
 import GlobalSettings from '../components/admin/GlobalSettings'
 import AuditLog from '../components/admin/AuditLog'
-import Modal from '../components/common/Modal'
 import Badge from '../components/common/Badge'
+import AdminDetailModal from '../modal/Admin/AdminDetailModal'
+import AddAdminModal from '../modal/Admin/AddAdminModal'
 import StatCard from '../components/common/StatCard'
 import { 
 	exportAdminsToExcel,
@@ -194,29 +195,6 @@ export default function AdminPage(): JSX.Element {
 		return `${value.toFixed(1)}%`
 	}
 
-	const getRoleLabel = (role: string) => {
-		const labels: Record<string, string> = {
-			super_admin: 'Super Admin',
-			system_admin: 'System Admin',
-			content_admin: 'Content Admin',
-			user_admin: 'User Admin',
-			security_admin: 'Security Admin',
-			audit_admin: 'Audit Admin',
-			support_admin: 'Support Admin'
-		}
-		return labels[role] || role
-	}
-
-	const getStatusLabel = (status: string) => {
-		const labels: Record<string, string> = {
-			active: 'Hoạt động',
-			inactive: 'Không hoạt động',
-			suspended: 'Tạm dừng',
-			pending: 'Chờ duyệt',
-			locked: 'Khóa'
-		}
-		return labels[status] || status
-	}
 
 	return (
 		<div className="admin-page">
@@ -277,60 +255,299 @@ export default function AdminPage(): JSX.Element {
 
 				{/* Stats Overview */}
 				{showStats && (
-					<div className="admin-stats-grid">
-						<StatCard
-							title="Tổng Admin"
-							value={dashboard.stats.totalAdmins}
-							subtitle={`${dashboard.stats.activeAdmins} đang hoạt động`}
-							icon={<Users size={24} />}
-							gradient="primary"
-							trend={{ value: dashboard.stats.totalAdmins > 0 ? 5.2 : 0, isPositive: true }}
-						/>
-						
-						<StatCard
-							title="Đăng nhập gần đây"
-							value={dashboard.stats.recentLogins}
-							subtitle={`${dashboard.stats.failedLogins} thất bại`}
-							icon={<Activity size={24} />}
-							gradient="accent"
-							trend={{ value: dashboard.stats.recentLogins > 0 ? 12.8 : 0, isPositive: true }}
-						/>
-						
-						<StatCard
-							title="2FA Enabled"
-							value={dashboard.stats.twoFactorEnabled}
-							subtitle={`${dashboard.stats.totalAdmins - dashboard.stats.twoFactorEnabled} chưa bật`}
-							icon={<Shield size={24} />}
-							gradient="primary"
-							trend={{ value: dashboard.stats.twoFactorEnabled > 0 ? 8.4 : 0, isPositive: true }}
-						/>
-						
-						<StatCard
-							title="Suspended"
-							value={dashboard.stats.suspendedAdmins}
-							subtitle={`${dashboard.stats.pendingAdmins} chờ duyệt`}
-							icon={<AlertTriangle size={24} />}
-							gradient="accent"
-							trend={{ value: dashboard.stats.suspendedAdmins > 0 ? -2.1 : 0, isPositive: false }}
-						/>
-						
-						<StatCard
-							title="System Health"
-							value={systemHealth.overall === 'healthy' ? 'Khỏe mạnh' : 'Cảnh báo'}
-							subtitle={`Uptime: ${formatPercentage(systemHealth.uptime.current)}`}
-							icon={<Server size={24} />}
-							gradient="primary"
-							trend={{ value: systemHealth.uptime.current, isPositive: true }}
-						/>
-						
-						<StatCard
-							title="Storage Usage"
-							value={formatPercentage((systemHealth.storage.used / systemHealth.storage.total) * 100)}
-							subtitle={`${formatBytes(systemHealth.storage.used)} / ${formatBytes(systemHealth.storage.total)}`}
-							icon={<HardDrive size={24} />}
-							gradient="accent"
-							trend={{ value: (systemHealth.storage.used / systemHealth.storage.total) * 100, isPositive: false }}
-						/>
+					<div style={{ 
+						display: 'grid', 
+						gridTemplateColumns: 'repeat(3, 1fr)', 
+						gap: '16px',
+						marginBottom: '24px'
+					}}>
+						{/* Card 1 - Tổng Admin */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<Users size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Tổng Admin
+									</div>
+									<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{dashboard.stats.totalAdmins}
+									</div>
+									<div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 600, marginTop: '4px' }}>
+										{dashboard.stats.activeAdmins} đang hoạt động
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 2 - Đăng nhập gần đây */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<Activity size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Đăng nhập gần đây
+									</div>
+									<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{dashboard.stats.recentLogins}
+									</div>
+									<div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>
+										{dashboard.stats.failedLogins} thất bại
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 3 - 2FA Enabled */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<Shield size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										2FA Enabled
+									</div>
+									<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{dashboard.stats.twoFactorEnabled}
+									</div>
+									<div style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600, marginTop: '4px' }}>
+										{dashboard.stats.totalAdmins - dashboard.stats.twoFactorEnabled} chưa bật
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 4 - Suspended */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<AlertTriangle size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Suspended
+									</div>
+									<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{dashboard.stats.suspendedAdmins}
+									</div>
+									<div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginTop: '4px' }}>
+										{dashboard.stats.pendingAdmins} chờ duyệt
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 5 - System Health */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<Server size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										System Health
+									</div>
+									<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{systemHealth.overall === 'healthy' ? 'Khỏe mạnh' : 'Cảnh báo'}
+									</div>
+									<div style={{ fontSize: '11px', color: '#8b5cf6', fontWeight: 600, marginTop: '4px' }}>
+										Uptime: {formatPercentage(systemHealth.uptime.current)}
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 6 - Storage Usage */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<HardDrive size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Storage Usage
+									</div>
+									<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{formatPercentage((systemHealth.storage.used / systemHealth.storage.total) * 100)}
+									</div>
+									<div style={{ fontSize: '11px', color: '#22c55e', fontWeight: 600, marginTop: '4px' }}>
+										{formatBytes(systemHealth.storage.used)} / {formatBytes(systemHealth.storage.total)}
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				)}
 			</div>
@@ -471,127 +688,22 @@ export default function AdminPage(): JSX.Element {
 			</div>
 
 			{/* Admin Details Modal */}
-			<Modal
+			<AdminDetailModal
 				isOpen={!!selectedAdmin}
 				onClose={() => setSelectedAdmin(null)}
-				title={selectedAdmin?.fullName || 'Chi tiết Admin'}
-				maxWidth="800px"
-			>
-				{selectedAdmin && (
-					<div className="admin-detail-modal-content">
-						<div className="admin-detail-header">
-							<div className="admin-detail-avatar">
-								{selectedAdmin.avatar ? (
-									<img src={selectedAdmin.avatar} alt={selectedAdmin.fullName} />
-								) : (
-									<Users size={40} />
-								)}
-							</div>
-							<div className="admin-detail-info">
-								<h2 className="admin-detail-title">{selectedAdmin.fullName}</h2>
-								<p className="admin-detail-username">@{selectedAdmin.username}</p>
-								<div className="admin-detail-meta">
-									<div className="meta-item">
-										<Badge variant="secondary">
-											{getRoleLabel(selectedAdmin.role)}
-										</Badge>
-									</div>
-									<div className="meta-item">
-										<Badge variant="secondary">
-											{getStatusLabel(selectedAdmin.status)}
-										</Badge>
-									</div>
-									<div className="meta-item">
-										<Shield size={16} />
-										<span>{selectedAdmin.isTwoFactorEnabled ? '2FA Enabled' : '2FA Disabled'}</span>
-									</div>
-								</div>
-							</div>
-						</div>
+				admin={selectedAdmin}
+			/>
 
-						<div className="admin-detail-sections">
-							<div className="detail-section">
-								<h3>Thông tin liên hệ</h3>
-								<div className="contact-info">
-									<div className="contact-item">
-										<span className="contact-label">Email:</span>
-										<span className="contact-value">{selectedAdmin.email}</span>
-									</div>
-									{selectedAdmin.metadata.phone && (
-										<div className="contact-item">
-											<span className="contact-label">Phone:</span>
-											<span className="contact-value">{selectedAdmin.metadata.phone}</span>
-										</div>
-									)}
-									{selectedAdmin.metadata.address && (
-										<div className="contact-item">
-											<span className="contact-label">Address:</span>
-											<span className="contact-value">{selectedAdmin.metadata.address}</span>
-										</div>
-									)}
-								</div>
-							</div>
-
-							<div className="detail-section">
-								<h3>Quyền hạn</h3>
-								<div className="permissions-list">
-									{selectedAdmin.permissions.map((permission: string) => (
-										<Badge key={permission} variant="info">
-											{permission.replace(/_/g, ' ')}
-										</Badge>
-									))}
-								</div>
-							</div>
-
-							<div className="detail-section">
-								<h3>Thông tin hoạt động</h3>
-								<div className="activity-info">
-									<div className="activity-item">
-										<span className="activity-label">Đăng nhập cuối:</span>
-										<span className="activity-value">
-											{new Date(selectedAdmin.lastLoginAt).toLocaleString('vi-VN')}
-										</span>
-									</div>
-									<div className="activity-item">
-										<span className="activity-label">Tạo bởi:</span>
-										<span className="activity-value">{selectedAdmin.createdBy}</span>
-									</div>
-									<div className="activity-item">
-										<span className="activity-label">Ngày tạo:</span>
-										<span className="activity-value">
-											{new Date(selectedAdmin.createdAt).toLocaleString('vi-VN')}
-										</span>
-									</div>
-									<div className="activity-item">
-										<span className="activity-label">Cập nhật cuối:</span>
-										<span className="activity-value">
-											{new Date(selectedAdmin.updatedAt).toLocaleString('vi-VN')}
-										</span>
-									</div>
-								</div>
-							</div>
-
-							{selectedAdmin.metadata.bio && (
-								<div className="detail-section">
-									<h3>Giới thiệu</h3>
-									<p className="bio-content">{selectedAdmin.metadata.bio}</p>
-								</div>
-							)}
-
-							{selectedAdmin.metadata.skills && selectedAdmin.metadata.skills.length > 0 && (
-								<div className="detail-section">
-									<h3>Kỹ năng</h3>
-									<div className="skills-list">
-										{selectedAdmin.metadata.skills.map((skill: string) => (
-											<Badge key={skill} variant="success">{skill}</Badge>
-										))}
-									</div>
-								</div>
-							)}
-						</div>
-					</div>
-				)}
-			</Modal>
+			{/* Add/Edit Admin Modal */}
+			<AddAdminModal
+				isOpen={showAddModal}
+				onClose={() => {
+					setShowAddModal(false)
+					setEditingAdmin(null)
+				}}
+				onSave={handleSaveAdmin}
+				editingAdmin={editingAdmin}
+			/>
 
 			{/* Hidden file input for import */}
 			<input

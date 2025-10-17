@@ -145,32 +145,144 @@ const UserGrowthChart: React.FC<UserGrowthChartProps> = ({ data, chartData, load
 				</div>
 
 				{/* Chart stats */}
-				<div className="chart-stats">
-					<div className="stat-item">
-						<div className="stat-icon">
-							<Users size={16} />
-						</div>
-						<div className="stat-content">
-							<div className="stat-value">{formatNumber(maxUsers)}</div>
-							<div className="stat-label">Người dùng cao nhất</div>
+				<div style={{ 
+					display: 'grid', 
+					gridTemplateColumns: 'repeat(3, 1fr)', 
+					gap: '16px',
+					marginTop: '20px'
+				}}>
+					{/* Card 1 - Người dùng cao nhất */}
+					<div style={{ 
+						background: 'var(--card)',
+						borderRadius: 'var(--radius-lg)',
+						padding: '16px',
+						boxShadow: 'var(--shadow-sm)',
+						border: '1px solid var(--border)',
+						position: 'relative',
+						overflow: 'hidden'
+					}}>
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '60px',
+							height: '60px',
+							background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(15px, -15px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '32px', 
+								height: '32px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<Users size={16} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1, marginBottom: '2px' }}>
+									{formatNumber(maxUsers)}
+								</div>
+								<div style={{ fontSize: '11px', color: 'var(--muted-foreground)', fontWeight: 500 }}>
+									Người dùng cao nhất
+								</div>
+							</div>
 						</div>
 					</div>
-					<div className="stat-item">
-						<div className="stat-icon">
-							<UserPlus size={16} />
-						</div>
-						<div className="stat-content">
-							<div className="stat-value">{formatNumber(Math.floor(avgDailyGrowth))}</div>
-							<div className="stat-label">Tăng trưởng TB/ngày</div>
+
+					{/* Card 2 - Tăng trưởng TB/ngày */}
+					<div style={{ 
+						background: 'var(--card)',
+						borderRadius: 'var(--radius-lg)',
+						padding: '16px',
+						boxShadow: 'var(--shadow-sm)',
+						border: '1px solid var(--border)',
+						position: 'relative',
+						overflow: 'hidden'
+					}}>
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '60px',
+							height: '60px',
+							background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(15px, -15px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '32px', 
+								height: '32px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<UserPlus size={16} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1, marginBottom: '2px' }}>
+									{formatNumber(Math.floor(avgDailyGrowth))}
+								</div>
+								<div style={{ fontSize: '11px', color: 'var(--muted-foreground)', fontWeight: 500 }}>
+									Tăng trưởng TB/ngày
+								</div>
+							</div>
 						</div>
 					</div>
-					<div className="stat-item">
-						<div className="stat-icon">
-							<Activity size={16} />
-						</div>
-						<div className="stat-content">
-							<div className="stat-value">{formatNumber(totalGrowth)}</div>
-							<div className="stat-label">Tăng trưởng tổng</div>
+
+					{/* Card 3 - Tổng tăng trưởng */}
+					<div style={{ 
+						background: 'var(--card)',
+						borderRadius: 'var(--radius-lg)',
+						padding: '16px',
+						boxShadow: 'var(--shadow-sm)',
+						border: '1px solid var(--border)',
+						position: 'relative',
+						overflow: 'hidden'
+					}}>
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '60px',
+							height: '60px',
+							background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(15px, -15px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '32px', 
+								height: '32px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<Activity size={16} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1, marginBottom: '2px' }}>
+									{formatNumber(totalGrowth)}
+								</div>
+								<div style={{ fontSize: '11px', color: 'var(--muted-foreground)', fontWeight: 500 }}>
+									Tổng tăng trưởng
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

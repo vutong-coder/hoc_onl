@@ -27,8 +27,9 @@ import useCertifications from '../hooks/useCertifications'
 import CatalogTable from '../components/certify/CatalogTable'
 import IssuedTable from '../components/certify/IssuedTable'
 import CertificateFormModal from '../components/certify/CertificateFormModal'
-import Modal from '../components/common/Modal'
 import Badge from '../components/common/Badge'
+import TemplateDetailModal from '../modal/Certify/TemplateDetailModal'
+import CertificateDetailModal from '../modal/Certify/CertificateDetailModal'
 import StatCard from '../components/common/StatCard'
 import { CertificateForm, IssuedCertificate } from '../types/certification'
 import { 
@@ -206,6 +207,7 @@ export default function CertifyPage(): JSX.Element {
 		return num.toString()
 	}
 
+	// Helper functions moved to modal components
 	const getCategoryLabel = (category: string) => {
 		const labels: Record<string, string> = {
 			course_completion: 'Hoàn thành khóa học',
@@ -292,60 +294,299 @@ export default function CertifyPage(): JSX.Element {
 
 				{/* Stats Overview */}
 				{showStats && (
-					<div className="certify-stats-grid">
-						<StatCard
-							title="Tổng mẫu chứng chỉ"
-							value={dashboard.stats.totalTemplates}
-							subtitle={`${dashboard.stats.activeTemplates} đang hoạt động`}
-							icon={<Award size={24} />}
-							gradient="primary"
-							trend={{ value: dashboard.stats.totalTemplates > 0 ? 5.2 : 0, isPositive: true }}
-						/>
-						
-						<StatCard
-							title="Chứng chỉ đã cấp"
-							value={dashboard.stats.totalIssued}
-							subtitle={`${dashboard.stats.activeCertificates} đang hoạt động`}
-							icon={<CheckCircle size={24} />}
-							gradient="accent"
-							trend={{ value: dashboard.stats.totalIssued > 0 ? 12.8 : 0, isPositive: true }}
-						/>
-						
-						<StatCard
-							title="Người nhận"
-							value={formatNumber(dashboard.stats.totalRecipients)}
-							subtitle={`${dashboard.stats.totalOrganizations} tổ chức`}
-							icon={<Users size={24} />}
-							gradient="primary"
-							trend={{ value: dashboard.stats.totalRecipients > 0 ? 8.4 : 0, isPositive: true }}
-						/>
-						
-						<StatCard
-							title="Chứng chỉ hết hạn"
-							value={dashboard.stats.expiredCertificates}
-							subtitle={`${dashboard.stats.pendingCertificates} chờ duyệt`}
-							icon={<AlertTriangle size={24} />}
-							gradient="accent"
-							trend={{ value: dashboard.stats.expiredCertificates > 0 ? -2.1 : 0, isPositive: false }}
-						/>
-						
-						<StatCard
-							title="Danh mục phổ biến"
-							value={getCategoryLabel(dashboard.stats.mostPopularCategory)}
-							subtitle={`Cấp độ: ${getLevelLabel(dashboard.stats.mostPopularLevel)}`}
-							icon={<TrendingUp size={24} />}
-							gradient="primary"
-							trend={{ value: 15.6, isPositive: true }}
-						/>
-						
-						<StatCard
-							title="Thời hạn TB"
-							value={`${dashboard.stats.averageValidityPeriod.toFixed(0)} tháng`}
-							subtitle="Thời hạn trung bình"
-							icon={<Clock size={24} />}
-							gradient="accent"
-							trend={{ value: 3.2, isPositive: true }}
-						/>
+					<div style={{ 
+						display: 'grid', 
+						gridTemplateColumns: 'repeat(3, 1fr)', 
+						gap: '16px',
+						marginBottom: '24px'
+					}}>
+						{/* Card 1 - Tổng mẫu chứng chỉ */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<Award size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Tổng mẫu chứng chỉ
+									</div>
+									<div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{dashboard.stats.totalTemplates}
+									</div>
+									<div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 600, marginTop: '4px' }}>
+										{dashboard.stats.activeTemplates} đang hoạt động
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 2 - Chứng chỉ đã cấp */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<CheckCircle size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Chứng chỉ đã cấp
+									</div>
+									<div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{dashboard.stats.totalIssued}
+									</div>
+									<div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>
+										{dashboard.stats.activeCertificates} đang hoạt động
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 3 - Người nhận */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<Users size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Người nhận
+									</div>
+									<div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{formatNumber(dashboard.stats.totalRecipients)}
+									</div>
+									<div style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600, marginTop: '4px' }}>
+										{dashboard.stats.totalOrganizations} tổ chức
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 4 - Chứng chỉ hết hạn */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<AlertTriangle size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Chứng chỉ hết hạn
+									</div>
+									<div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{dashboard.stats.expiredCertificates}
+									</div>
+									<div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginTop: '4px' }}>
+										{dashboard.stats.pendingCertificates} chờ duyệt
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 5 - Danh mục phổ biến */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<TrendingUp size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Danh mục phổ biến
+									</div>
+									<div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{getCategoryLabel(dashboard.stats.mostPopularCategory)}
+									</div>
+									<div style={{ fontSize: '11px', color: '#8b5cf6', fontWeight: 600, marginTop: '4px' }}>
+										Cấp độ: {getLevelLabel(dashboard.stats.mostPopularLevel)}
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 6 - Thời hạn TB */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<Clock size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Thời hạn TB
+									</div>
+									<div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{dashboard.stats.averageValidityPeriod.toFixed(0)} tháng
+									</div>
+									<div style={{ fontSize: '11px', color: '#22c55e', fontWeight: 600, marginTop: '4px' }}>
+										Thời hạn trung bình
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				)}
 			</div>
@@ -408,187 +649,18 @@ export default function CertifyPage(): JSX.Element {
 			/>
 
 			{/* Template Details Modal */}
-			<Modal
+			<TemplateDetailModal
 				isOpen={!!selectedTemplate}
 				onClose={() => setSelectedTemplate(null)}
-				title={selectedTemplate?.name || 'Chi tiết mẫu chứng chỉ'}
-				maxWidth="800px"
-			>
-				{selectedTemplate && (
-					<div className="template-detail-modal-content">
-						<div className="template-detail-header">
-							<div className="template-detail-info">
-								<h2 className="template-detail-title">{selectedTemplate.name}</h2>
-								<p className="template-detail-description">{selectedTemplate.description}</p>
-								<div className="template-detail-meta">
-									<div className="meta-item">
-										<Award size={16} />
-										<span>{selectedTemplate.issuer}</span>
-									</div>
-									<div className="meta-item">
-										<Badge variant="secondary">
-											{getCategoryLabel(selectedTemplate.category)}
-										</Badge>
-									</div>
-									<div className="meta-item">
-										<Badge variant="secondary">
-											{getLevelLabel(selectedTemplate.level)}
-										</Badge>
-									</div>
-									<div className="meta-item">
-										<Clock size={16} />
-										<span>{selectedTemplate.validityPeriod} tháng</span>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div className="template-detail-sections">
-							<div className="detail-section">
-								<h3>Yêu cầu</h3>
-								<div className="requirements-list">
-									{selectedTemplate.requirements.map((req: any) => (
-										<div key={req.id} className="requirement-item">
-											<div className="requirement-info">
-												<div className="requirement-type">{req.type}</div>
-												<div className="requirement-description">{req.description}</div>
-												<div className="requirement-details">
-													<span className="requirement-value">
-														{req.value} {req.unit}
-													</span>
-													{req.isMandatory && (
-														<Badge variant="warning">Bắt buộc</Badge>
-													)}
-												</div>
-											</div>
-										</div>
-									))}
-								</div>
-							</div>
-
-							<div className="detail-section">
-								<h3>Thiết kế</h3>
-								<div className="design-info">
-									<div className="design-item">
-										<strong>Layout:</strong> {selectedTemplate.templateDesign.layout}
-									</div>
-									<div className="design-item">
-										<strong>Kích thước:</strong> {selectedTemplate.templateDesign.dimensions.width}x{selectedTemplate.templateDesign.dimensions.height} {selectedTemplate.templateDesign.dimensions.unit}
-									</div>
-									<div className="design-item">
-										<strong>Màu chính:</strong> 
-										<span 
-											className="color-preview" 
-											style={{ backgroundColor: selectedTemplate.templateDesign.colors.primary }}
-										></span>
-										{selectedTemplate.templateDesign.colors.primary}
-									</div>
-								</div>
-							</div>
-
-							{selectedTemplate.metadata.tags.length > 0 && (
-								<div className="detail-section">
-									<h3>Tags</h3>
-									<div className="tags-container">
-										{selectedTemplate.metadata.tags.map((tag: string) => (
-											<Badge key={tag} variant="secondary">{tag}</Badge>
-										))}
-									</div>
-								</div>
-							)}
-						</div>
-					</div>
-				)}
-			</Modal>
+				template={selectedTemplate}
+			/>
 
 			{/* Certificate Details Modal */}
-			<Modal
+			<CertificateDetailModal
 				isOpen={!!selectedCertificate}
 				onClose={() => setSelectedCertificate(null)}
-				title={selectedCertificate?.certificateName || 'Chi tiết chứng chỉ'}
-				maxWidth="800px"
-			>
-				{selectedCertificate && (
-					<div className="certificate-detail-modal-content">
-						<div className="certificate-detail-header">
-							<div className="certificate-detail-info">
-								<h2 className="certificate-detail-title">{selectedCertificate.certificateName}</h2>
-								<div className="certificate-detail-meta">
-									<div className="meta-item">
-										<Users size={16} />
-										<span>{selectedCertificate.recipientName}</span>
-									</div>
-									<div className="meta-item">
-										<Building2 size={16} />
-										<span>{selectedCertificate.organizationName}</span>
-									</div>
-									<div className="meta-item">
-										<Calendar size={16} />
-										<span>Cấp ngày: {new Date(selectedCertificate.issuedAt).toLocaleDateString('vi-VN')}</span>
-									</div>
-									<div className="meta-item">
-										<Clock size={16} />
-										<span>Hết hạn: {new Date(selectedCertificate.expiresAt).toLocaleDateString('vi-VN')}</span>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div className="certificate-detail-sections">
-							<div className="detail-section">
-								<h3>Thông tin xác minh</h3>
-								<div className="verification-info">
-									<div className="verification-item">
-										<strong>Mã xác minh:</strong> {selectedCertificate.verificationCode}
-									</div>
-									<div className="verification-item">
-										<strong>URL xác minh:</strong> 
-										<a href={selectedCertificate.metadata.verificationUrl} target="_blank" rel="noopener noreferrer">
-											{selectedCertificate.metadata.verificationUrl}
-										</a>
-									</div>
-									{selectedCertificate.blockchainHash && (
-										<div className="verification-item">
-											<strong>Blockchain Hash:</strong> 
-											<span className="blockchain-hash">{selectedCertificate.blockchainHash}</span>
-										</div>
-									)}
-								</div>
-							</div>
-
-							<div className="detail-section">
-								<h3>Kết quả học tập</h3>
-								<div className="score-info">
-									<div className="score-item">
-										<strong>Điểm số:</strong> {selectedCertificate.metadata.score}/100
-									</div>
-									<div className="score-item">
-										<strong>Xếp loại:</strong> {selectedCertificate.metadata.grade}
-									</div>
-									<div className="score-item">
-										<strong>Người cấp:</strong> {selectedCertificate.metadata.issuedBy}
-									</div>
-									<div className="score-item">
-										<strong>Chức vụ:</strong> {selectedCertificate.metadata.issuedByTitle}
-									</div>
-								</div>
-							</div>
-
-							{selectedCertificate.courseName && (
-								<div className="detail-section">
-									<h3>Khóa học</h3>
-									<div className="course-info">
-										<div className="course-item">
-											<BookOpen size={16} />
-											<span>{selectedCertificate.courseName}</span>
-										</div>
-									</div>
-								</div>
-							)}
-						</div>
-					</div>
-				)}
-			</Modal>
+				certificate={selectedCertificate}
+			/>
 
 			{/* Hidden file input for import */}
 			<input

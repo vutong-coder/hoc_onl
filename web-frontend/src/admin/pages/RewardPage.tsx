@@ -16,7 +16,7 @@ import RewardRulesTable from '../components/rewards/RewardRulesTable'
 import TransactionLog from '../components/rewards/TransactionLog'
 import RuleEditorModal from '../components/rewards/RuleEditorModal'
 import SearchBar from '../components/common/SearchBar'
-import Modal from '../components/common/Modal'
+import TransactionDetailModal from '../modal/Rewards/TransactionDetailModal'
 import '../styles/common.css'
 import '../styles/rewards.css'
 
@@ -362,102 +362,11 @@ export default function RewardPage(): JSX.Element {
 			/>
 
 			{/* Transaction Details Modal */}
-			<Modal
+			<TransactionDetailModal
 				isOpen={!!selectedTransaction}
 				onClose={() => setSelectedTransaction(null)}
-				title="Chi tiết giao dịch"
-				maxWidth="600px"
-			>
-				{selectedTransaction && (
-					<div style={{ padding: '20px' }}>
-						<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
-							<div>
-								<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
-									Người dùng
-								</label>
-								<div style={{ fontSize: '16px', fontWeight: 600 }}>
-									{selectedTransaction.userName}
-								</div>
-								<div style={{ fontSize: '12px', color: 'var(--muted-foreground)', fontFamily: 'monospace' }}>
-									{selectedTransaction.userId}
-								</div>
-							</div>
-							
-							<div>
-								<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
-									Luật thưởng
-								</label>
-								<div style={{ fontSize: '16px', fontWeight: 600 }}>
-									{selectedTransaction.ruleName}
-								</div>
-								<div style={{ fontSize: '12px', color: 'var(--muted-foreground)', fontFamily: 'monospace' }}>
-									{selectedTransaction.ruleId}
-								</div>
-							</div>
-						</div>
-
-						<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
-							<div>
-								<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
-									Số token
-								</label>
-								<div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--primary)' }}>
-									{selectedTransaction.tokenAmount} {selectedTransaction.tokenSymbol}
-								</div>
-							</div>
-							
-							<div>
-								<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
-									Trạng thái
-								</label>
-								<div style={{ fontSize: '14px', fontWeight: 600 }}>
-									{selectedTransaction.status}
-								</div>
-							</div>
-						</div>
-
-						{selectedTransaction.transactionHash && (
-							<div style={{ marginBottom: '20px' }}>
-								<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
-									Thông tin Blockchain
-								</label>
-								<div style={{ 
-									padding: '12px', 
-									background: 'var(--muted)', 
-									borderRadius: 'var(--radius-md)',
-									fontFamily: 'monospace',
-									fontSize: '12px'
-								}}>
-									<div>Hash: {selectedTransaction.transactionHash}</div>
-									{selectedTransaction.blockNumber && (
-										<div>Block: #{selectedTransaction.blockNumber}</div>
-									)}
-									{selectedTransaction.gasUsed && (
-										<div>Gas: {selectedTransaction.gasUsed.toLocaleString()}</div>
-									)}
-								</div>
-							</div>
-						)}
-
-						{selectedTransaction.metadata && (
-							<div>
-								<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
-									Metadata
-								</label>
-								<div style={{ 
-									padding: '12px', 
-									background: 'var(--muted)', 
-									borderRadius: 'var(--radius-md)',
-									fontSize: '12px',
-									fontFamily: 'monospace'
-								}}>
-									<pre>{JSON.stringify(selectedTransaction.metadata, null, 2)}</pre>
-								</div>
-							</div>
-						)}
-					</div>
-				)}
-			</Modal>
+				transaction={selectedTransaction}
+			/>
 		</div>
 	)
 }

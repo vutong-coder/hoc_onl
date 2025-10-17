@@ -50,38 +50,203 @@ export default function RewardDashboard({
 	return (
 		<div className="reward-dashboard">
 			{/* Stats Overview */}
-			<div className="stats-grid">
-				<StatCard
-					title="Tổng luật thưởng"
-					value={stats.totalRules}
-					subtitle={`${stats.activeRules} đang hoạt động`}
-					icon={<Target size={24} />}
-					gradient="primary"
-				/>
-				
-				<StatCard
-					title="Giao dịch hôm nay"
-					value={stats.todayTransactions}
-					subtitle={`${stats.totalTransactions.toLocaleString()} tổng cộng`}
-					icon={<TrendingUp size={24} />}
-					gradient="accent"
-				/>
-				
-				<StatCard
-					title="Token đã phân phối"
-					value={`${formatNumber(stats.totalTokensDistributed)}`}
-					subtitle={`${formatNumber(stats.todayTokensDistributed)} hôm nay`}
-					icon={<Gift size={24} />}
-					gradient="primary"
-				/>
-				
-				<StatCard
-					title="Tỷ lệ thành công"
-					value={`${stats.successRate}%`}
-					subtitle={`${stats.pendingTransactions} đang chờ`}
-					icon={<CheckCircle size={24} />}
-					gradient="accent"
-				/>
+			<div style={{ 
+				display: 'grid', 
+				gridTemplateColumns: 'repeat(4, 1fr)', 
+				gap: '16px',
+				marginBottom: '24px'
+			}}>
+				{/* Card 1 - Tổng luật thưởng */}
+				<div style={{ 
+					background: 'var(--card)',
+					borderRadius: 'var(--radius-lg)',
+					padding: '20px',
+					boxShadow: 'var(--shadow-sm)',
+					border: '1px solid var(--border)',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
+					<div style={{ 
+						position: 'absolute',
+						top: '0',
+						right: '0',
+						width: '80px',
+						height: '80px',
+						background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
+						borderRadius: '50%',
+						transform: 'translate(20px, -20px)'
+					}} />
+					<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+						<div style={{ 
+							width: '40px', 
+							height: '40px', 
+							borderRadius: 'var(--radius-md)', 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center',
+							background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+							color: 'white',
+							flexShrink: 0
+						}}>
+							<Target size={20} />
+						</div>
+						<div style={{ flex: 1 }}>
+							<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+								Tổng luật thưởng
+							</div>
+							<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+								{stats.totalRules}
+							</div>
+							<div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 600, marginTop: '4px' }}>
+								{stats.activeRules} đang hoạt động
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{/* Card 2 - Giao dịch hôm nay */}
+				<div style={{ 
+					background: 'var(--card)',
+					borderRadius: 'var(--radius-lg)',
+					padding: '20px',
+					boxShadow: 'var(--shadow-sm)',
+					border: '1px solid var(--border)',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
+					<div style={{ 
+						position: 'absolute',
+						top: '0',
+						right: '0',
+						width: '80px',
+						height: '80px',
+						background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
+						borderRadius: '50%',
+						transform: 'translate(20px, -20px)'
+					}} />
+					<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+						<div style={{ 
+							width: '40px', 
+							height: '40px', 
+							borderRadius: 'var(--radius-md)', 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center',
+							background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+							color: 'white',
+							flexShrink: 0
+						}}>
+							<TrendingUp size={20} />
+						</div>
+						<div style={{ flex: 1 }}>
+							<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+								Giao dịch hôm nay
+							</div>
+							<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+								{stats.todayTransactions}
+							</div>
+							<div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>
+								{stats.totalTransactions.toLocaleString()} tổng cộng
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{/* Card 3 - Token đã phân phối */}
+				<div style={{ 
+					background: 'var(--card)',
+					borderRadius: 'var(--radius-lg)',
+					padding: '20px',
+					boxShadow: 'var(--shadow-sm)',
+					border: '1px solid var(--border)',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
+					<div style={{ 
+						position: 'absolute',
+						top: '0',
+						right: '0',
+						width: '80px',
+						height: '80px',
+						background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
+						borderRadius: '50%',
+						transform: 'translate(20px, -20px)'
+					}} />
+					<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+						<div style={{ 
+							width: '40px', 
+							height: '40px', 
+							borderRadius: 'var(--radius-md)', 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center',
+							background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+							color: 'white',
+							flexShrink: 0
+						}}>
+							<Gift size={20} />
+						</div>
+						<div style={{ flex: 1 }}>
+							<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+								Token đã phân phối
+							</div>
+							<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+								{formatNumber(stats.totalTokensDistributed)}
+							</div>
+							<div style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600, marginTop: '4px' }}>
+								{formatNumber(stats.todayTokensDistributed)} hôm nay
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{/* Card 4 - Tỷ lệ thành công */}
+				<div style={{ 
+					background: 'var(--card)',
+					borderRadius: 'var(--radius-lg)',
+					padding: '20px',
+					boxShadow: 'var(--shadow-sm)',
+					border: '1px solid var(--border)',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
+					<div style={{ 
+						position: 'absolute',
+						top: '0',
+						right: '0',
+						width: '80px',
+						height: '80px',
+						background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
+						borderRadius: '50%',
+						transform: 'translate(20px, -20px)'
+					}} />
+					<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+						<div style={{ 
+							width: '40px', 
+							height: '40px', 
+							borderRadius: 'var(--radius-md)', 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center',
+							background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+							color: 'white',
+							flexShrink: 0
+						}}>
+							<CheckCircle size={20} />
+						</div>
+						<div style={{ flex: 1 }}>
+							<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+								Tỷ lệ thành công
+							</div>
+							<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+								{stats.successRate}%
+							</div>
+							<div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginTop: '4px' }}>
+								{stats.pendingTransactions} đang chờ
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 
 			{/* Token Info & Performance */}

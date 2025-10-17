@@ -2,9 +2,8 @@ import React, { useState } from 'react'
 import { Activity, AlertTriangle, Eye, Users, LayoutGrid, List, Search } from 'lucide-react'
 import useProctoring from '../hooks/useProctoring'
 import SessionGrid from '../components/proctoring/SessionGrid'
-import SessionDetailView from '../components/proctoring/SessionDetailView'
-import Modal from '../components/common/Modal'
 import SearchBar from '../components/common/SearchBar'
+import SessionDetailModal from '../modal/Proctoring/SessionDetailModal'
 import Badge from '../components/common/Badge'
 import '../styles/common.css'
 import '../styles/proctoring.css'
@@ -87,54 +86,199 @@ export default function ProctoringPage(): JSX.Element {
 			</div>
 
 			{/* Stats Overview */}
-			<div className="stats-grid">
-				<div className="stat-card">
-					<div className="stat-card-icon" style={{ background: '#dbeafe', color: '#3b82f6' }}>
-						<Users size={24} />
-					</div>
-					<div className="stat-card-content">
-						<div className="stat-card-label">Phiên thi đang diễn ra</div>
-						<div className="stat-card-value">{stats.totalActive}</div>
-					</div>
-				</div>
-
-				<div className="stat-card">
-					<div className="stat-card-icon" style={{ background: '#fee2e2', color: '#ef4444' }}>
-						<AlertTriangle size={24} />
-					</div>
-					<div className="stat-card-content">
-						<div className="stat-card-label">Phiên có nguy cơ cao</div>
-						<div className="stat-card-value">{stats.highRiskSessions}</div>
-						{stats.highRiskSessions > 0 && (
-							<div className="stat-card-change negative">
-								Cần chú ý!
+			<div style={{ 
+				display: 'grid', 
+				gridTemplateColumns: 'repeat(4, 1fr)', 
+				gap: '16px',
+				marginBottom: '24px'
+			}}>
+				{/* Card 1 - Phiên thi đang diễn ra */}
+				<div style={{ 
+					background: 'var(--card)',
+					borderRadius: 'var(--radius-lg)',
+					padding: '20px',
+					boxShadow: 'var(--shadow-sm)',
+					border: '1px solid var(--border)',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
+					<div style={{ 
+						position: 'absolute',
+						top: '0',
+						right: '0',
+						width: '80px',
+						height: '80px',
+						background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
+						borderRadius: '50%',
+						transform: 'translate(20px, -20px)'
+					}} />
+					<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+						<div style={{ 
+							width: '40px', 
+							height: '40px', 
+							borderRadius: 'var(--radius-md)', 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center',
+							background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+							color: 'white',
+							flexShrink: 0
+						}}>
+							<Users size={20} />
+						</div>
+						<div style={{ flex: 1 }}>
+							<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+								Phiên thi đang diễn ra
 							</div>
-						)}
-					</div>
-				</div>
-
-				<div className="stat-card">
-					<div className="stat-card-icon" style={{ background: '#fef3c7', color: '#f59e0b' }}>
-						<Eye size={24} />
-					</div>
-					<div className="stat-card-content">
-						<div className="stat-card-label">Tổng vi phạm</div>
-						<div className="stat-card-value">{stats.totalViolations}</div>
-					</div>
-				</div>
-
-				<div className="stat-card">
-					<div className="stat-card-icon" style={{ background: '#d1fae5', color: '#10b981' }}>
-						<Activity size={24} />
-					</div>
-					<div className="stat-card-content">
-						<div className="stat-card-label">Mức rủi ro trung bình</div>
-						<div className="stat-card-value">{stats.avgRiskLevel.toFixed(1)}/4</div>
-						{stats.avgRiskLevel < 2 && (
-							<div className="stat-card-change positive">
-								Tình hình ổn định
+							<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+								{stats.totalActive}
 							</div>
-						)}
+						</div>
+					</div>
+				</div>
+
+				{/* Card 2 - Phiên có nguy cơ cao */}
+				<div style={{ 
+					background: 'var(--card)',
+					borderRadius: 'var(--radius-lg)',
+					padding: '20px',
+					boxShadow: 'var(--shadow-sm)',
+					border: '1px solid var(--border)',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
+					<div style={{ 
+						position: 'absolute',
+						top: '0',
+						right: '0',
+						width: '80px',
+						height: '80px',
+						background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
+						borderRadius: '50%',
+						transform: 'translate(20px, -20px)'
+					}} />
+					<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+						<div style={{ 
+							width: '40px', 
+							height: '40px', 
+							borderRadius: 'var(--radius-md)', 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center',
+							background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+							color: 'white',
+							flexShrink: 0
+						}}>
+							<AlertTriangle size={20} />
+						</div>
+						<div style={{ flex: 1 }}>
+							<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+								Phiên có nguy cơ cao
+							</div>
+							<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+								{stats.highRiskSessions}
+							</div>
+							{stats.highRiskSessions > 0 && (
+								<div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginTop: '4px' }}>
+									Cần chú ý!
+								</div>
+							)}
+						</div>
+					</div>
+				</div>
+
+				{/* Card 3 - Tổng vi phạm */}
+				<div style={{ 
+					background: 'var(--card)',
+					borderRadius: 'var(--radius-lg)',
+					padding: '20px',
+					boxShadow: 'var(--shadow-sm)',
+					border: '1px solid var(--border)',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
+					<div style={{ 
+						position: 'absolute',
+						top: '0',
+						right: '0',
+						width: '80px',
+						height: '80px',
+						background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
+						borderRadius: '50%',
+						transform: 'translate(20px, -20px)'
+					}} />
+					<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+						<div style={{ 
+							width: '40px', 
+							height: '40px', 
+							borderRadius: 'var(--radius-md)', 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center',
+							background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+							color: 'white',
+							flexShrink: 0
+						}}>
+							<Eye size={20} />
+						</div>
+						<div style={{ flex: 1 }}>
+							<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+								Tổng vi phạm
+							</div>
+							<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+								{stats.totalViolations}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{/* Card 4 - Mức rủi ro trung bình */}
+				<div style={{ 
+					background: 'var(--card)',
+					borderRadius: 'var(--radius-lg)',
+					padding: '20px',
+					boxShadow: 'var(--shadow-sm)',
+					border: '1px solid var(--border)',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
+					<div style={{ 
+						position: 'absolute',
+						top: '0',
+						right: '0',
+						width: '80px',
+						height: '80px',
+						background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
+						borderRadius: '50%',
+						transform: 'translate(20px, -20px)'
+					}} />
+					<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+						<div style={{ 
+							width: '40px', 
+							height: '40px', 
+							borderRadius: 'var(--radius-md)', 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center',
+							background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+							color: 'white',
+							flexShrink: 0
+						}}>
+							<Activity size={20} />
+						</div>
+						<div style={{ flex: 1 }}>
+							<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+								Mức rủi ro trung bình
+							</div>
+							<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+								{stats.avgRiskLevel.toFixed(1)}/4
+							</div>
+							{stats.avgRiskLevel < 2 && (
+								<div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>
+									Tình hình ổn định
+								</div>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>
@@ -248,24 +392,17 @@ export default function ProctoringPage(): JSX.Element {
 			</div>
 
 			{/* Detail Modal */}
-			{selectedSession && (
-				<Modal
-					isOpen={isDetailModalOpen}
-					onClose={() => {
-						setIsDetailModalOpen(false)
-						setSelectedSession(null)
-					}}
-					title="Chi tiết phiên giám sát"
-					maxWidth="1000px"
-				>
-					<SessionDetailView
-						session={selectedSession}
-						onResolveViolation={handleResolveViolation}
-						onTerminate={handleTerminate}
-						onSendWarning={handleSendWarning}
-					/>
-				</Modal>
-			)}
+			<SessionDetailModal
+				isOpen={isDetailModalOpen}
+				onClose={() => {
+					setIsDetailModalOpen(false)
+					setSelectedSession(null)
+				}}
+				session={selectedSession}
+				onResolveViolation={handleResolveViolation}
+				onTerminate={handleTerminate}
+				onSendWarning={handleSendWarning}
+			/>
 		</div>
 	)
 }

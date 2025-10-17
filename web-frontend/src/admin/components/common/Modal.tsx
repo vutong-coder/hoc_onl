@@ -65,10 +65,13 @@ export default function Modal({
 						style={{ 
 							position: 'absolute', 
 							top: '16px', 
-							right: '16px' 
+							right: '16px',
+							fontSize: '18px',
+							fontWeight: 'bold'
 						}}
+						title="Đóng"
 					>
-						<X size={18} />
+						×
 					</button>
 				</div>
 				

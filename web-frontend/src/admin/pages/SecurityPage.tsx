@@ -15,6 +15,7 @@ import ModuleStatusGrid from '../components/security/ModuleStatusGrid'
 import ActivityLog from '../components/security/ActivityLog'
 import SearchBar from '../components/common/SearchBar'
 import Badge from '../components/common/Badge'
+import ModuleDetailModal from '../modal/Security/ModuleDetailModal'
 import '../styles/common.css'
 import '../styles/security.css'
 
@@ -34,6 +35,7 @@ export default function SecurityPage(): JSX.Element {
 	} = useSecurityDashboard()
 
 	const [selectedModule, setSelectedModule] = useState<any>(null)
+	const [isModuleDetailOpen, setIsModuleDetailOpen] = useState(false)
 	const [activeTab, setActiveTab] = useState<'modules' | 'activities' | 'alerts'>('modules')
 
 	const unresolvedAlerts = getUnresolvedAlerts()
@@ -41,7 +43,7 @@ export default function SecurityPage(): JSX.Element {
 
 	const handleModuleClick = (module: any) => {
 		setSelectedModule(module)
-		// Could open a detail modal here
+		setIsModuleDetailOpen(true)
 	}
 
 	const handleResolveAlert = (alertId: string) => {
@@ -82,57 +84,202 @@ export default function SecurityPage(): JSX.Element {
 			</div>
 
 			{/* Stats Overview */}
-			<div className="stats-grid">
-				<div className="stat-card">
-					<div className="stat-card-icon" style={{ background: '#dbeafe', color: '#3b82f6' }}>
-						<Shield size={24} />
-					</div>
-					<div className="stat-card-content">
-						<div className="stat-card-label">Module đang hoạt động</div>
-						<div className="stat-card-value">{dashboard.overview.activeModules}/{dashboard.overview.totalModules}</div>
-						<div className="stat-card-change neutral">
-							{Math.round((dashboard.overview.activeModules / dashboard.overview.totalModules) * 100)}% uptime
+			<div style={{ 
+				display: 'grid', 
+				gridTemplateColumns: 'repeat(4, 1fr)', 
+				gap: '16px',
+				marginBottom: '24px'
+			}}>
+				{/* Card 1 - Module đang hoạt động */}
+				<div style={{ 
+					background: 'var(--card)',
+					borderRadius: 'var(--radius-lg)',
+					padding: '20px',
+					boxShadow: 'var(--shadow-sm)',
+					border: '1px solid var(--border)',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
+					<div style={{ 
+						position: 'absolute',
+						top: '0',
+						right: '0',
+						width: '80px',
+						height: '80px',
+						background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
+						borderRadius: '50%',
+						transform: 'translate(20px, -20px)'
+					}} />
+					<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+						<div style={{ 
+							width: '40px', 
+							height: '40px', 
+							borderRadius: 'var(--radius-md)', 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center',
+							background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+							color: 'white',
+							flexShrink: 0
+						}}>
+							<Shield size={20} />
 						</div>
-					</div>
-				</div>
-
-				<div className="stat-card">
-					<div className="stat-card-icon" style={{ background: '#fee2e2', color: '#ef4444' }}>
-						<AlertTriangle size={24} />
-					</div>
-					<div className="stat-card-content">
-						<div className="stat-card-label">Cảnh báo chưa xử lý</div>
-						<div className="stat-card-value">{unresolvedAlerts.length}</div>
-						{unresolvedAlerts.length > 0 && (
-							<div className="stat-card-change negative">
-								Cần chú ý!
+						<div style={{ flex: 1 }}>
+							<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+								Module đang hoạt động
 							</div>
-						)}
-					</div>
-				</div>
-
-				<div className="stat-card">
-					<div className="stat-card-icon" style={{ background: '#d1fae5', color: '#10b981' }}>
-						<Activity size={24} />
-					</div>
-					<div className="stat-card-content">
-						<div className="stat-card-label">Tổng giao dịch</div>
-						<div className="stat-card-value">{dashboard.overview.totalTransactions.toLocaleString()}</div>
-						<div className="stat-card-change positive">
-							+{modules.reduce((sum, m) => sum + m.todayTransactions, 0)} hôm nay
+							<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+								{dashboard.overview.activeModules}/{dashboard.overview.totalModules}
+							</div>
+							<div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 600, marginTop: '4px' }}>
+								{Math.round((dashboard.overview.activeModules / dashboard.overview.totalModules) * 100)}% uptime
+							</div>
 						</div>
 					</div>
 				</div>
 
-				<div className="stat-card">
-					<div className="stat-card-icon" style={{ background: '#fef3c7', color: '#f59e0b' }}>
-						<TrendingUp size={24} />
+				{/* Card 2 - Cảnh báo chưa xử lý */}
+				<div style={{ 
+					background: 'var(--card)',
+					borderRadius: 'var(--radius-lg)',
+					padding: '20px',
+					boxShadow: 'var(--shadow-sm)',
+					border: '1px solid var(--border)',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
+					<div style={{ 
+						position: 'absolute',
+						top: '0',
+						right: '0',
+						width: '80px',
+						height: '80px',
+						background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
+						borderRadius: '50%',
+						transform: 'translate(20px, -20px)'
+					}} />
+					<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+						<div style={{ 
+							width: '40px', 
+							height: '40px', 
+							borderRadius: 'var(--radius-md)', 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center',
+							background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+							color: 'white',
+							flexShrink: 0
+						}}>
+							<AlertTriangle size={20} />
+						</div>
+						<div style={{ flex: 1 }}>
+							<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+								Cảnh báo chưa xử lý
+							</div>
+							<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+								{unresolvedAlerts.length}
+							</div>
+							{unresolvedAlerts.length > 0 && (
+								<div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginTop: '4px' }}>
+									Cần chú ý!
+								</div>
+							)}
+						</div>
 					</div>
-					<div className="stat-card-content">
-						<div className="stat-card-label">Điểm bảo mật TB</div>
-						<div className="stat-card-value">{dashboard.overview.averageSecurityScore}</div>
-						<div className="stat-card-change neutral">
-							/ 100
+				</div>
+
+				{/* Card 3 - Tổng giao dịch */}
+				<div style={{ 
+					background: 'var(--card)',
+					borderRadius: 'var(--radius-lg)',
+					padding: '20px',
+					boxShadow: 'var(--shadow-sm)',
+					border: '1px solid var(--border)',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
+					<div style={{ 
+						position: 'absolute',
+						top: '0',
+						right: '0',
+						width: '80px',
+						height: '80px',
+						background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
+						borderRadius: '50%',
+						transform: 'translate(20px, -20px)'
+					}} />
+					<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+						<div style={{ 
+							width: '40px', 
+							height: '40px', 
+							borderRadius: 'var(--radius-md)', 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center',
+							background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+							color: 'white',
+							flexShrink: 0
+						}}>
+							<Activity size={20} />
+						</div>
+						<div style={{ flex: 1 }}>
+							<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+								Tổng giao dịch
+							</div>
+							<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+								{dashboard.overview.totalTransactions.toLocaleString()}
+							</div>
+							<div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>
+								+{modules.reduce((sum, m) => sum + m.todayTransactions, 0)} hôm nay
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{/* Card 4 - Điểm bảo mật TB */}
+				<div style={{ 
+					background: 'var(--card)',
+					borderRadius: 'var(--radius-lg)',
+					padding: '20px',
+					boxShadow: 'var(--shadow-sm)',
+					border: '1px solid var(--border)',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
+					<div style={{ 
+						position: 'absolute',
+						top: '0',
+						right: '0',
+						width: '80px',
+						height: '80px',
+						background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
+						borderRadius: '50%',
+						transform: 'translate(20px, -20px)'
+					}} />
+					<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+						<div style={{ 
+							width: '40px', 
+							height: '40px', 
+							borderRadius: 'var(--radius-md)', 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center',
+							background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+							color: 'white',
+							flexShrink: 0
+						}}>
+							<TrendingUp size={20} />
+						</div>
+						<div style={{ flex: 1 }}>
+							<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+								Điểm bảo mật TB
+							</div>
+							<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+								{dashboard.overview.averageSecurityScore}
+							</div>
+							<div style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600, marginTop: '4px' }}>
+								/ 100
+							</div>
 						</div>
 					</div>
 				</div>
@@ -393,6 +540,16 @@ export default function SecurityPage(): JSX.Element {
 					</div>
 				)}
 			</div>
+
+			{/* Module Detail Modal */}
+			<ModuleDetailModal
+				isOpen={isModuleDetailOpen}
+				onClose={() => {
+					setIsModuleDetailOpen(false)
+					setSelectedModule(null)
+				}}
+				module={selectedModule}
+			/>
 		</div>
 	)
 }

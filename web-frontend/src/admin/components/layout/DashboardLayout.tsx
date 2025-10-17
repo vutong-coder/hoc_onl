@@ -11,7 +11,13 @@ export default function DashboardLayout(): JSX.Element {
 			<div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 				<Sidebar />
 
-				<main style={{ flex: 1, overflowY: 'auto', minWidth: 0 }}>
+				<main style={{ 
+					flex: 1, 
+					overflowY: 'auto', 
+					minWidth: 0,
+					marginLeft: 260,
+					height: 'calc(100vh - 60px)'
+				}}>
 					<Outlet />
 					
 					<footer style={{ background: 'var(--card)', borderTop: '1px solid var(--border)', color: 'var(--muted-foreground)', padding: '16px 24px', textAlign: 'center', fontSize: 14, marginTop: '32px' }}>

@@ -3,6 +3,7 @@ import { CourseFilters, CourseCategory, Instructor } from '../../types/course'
 import SearchBar from '../common/SearchBar'
 import Dropdown from '../common/Dropdown'
 import { Filter, SortAsc, SortDesc } from 'lucide-react'
+import '../../styles/courses.css'
 
 interface CourseFilterBarProps {
 	filters: CourseFilters
@@ -176,7 +177,7 @@ export default function CourseFilterBar({
 					</div>
 					
 					<button
-						className={`btn btn-icon ${filters.sortOrder === 'asc' ? 'btn-primary' : 'btn-secondary'}`}
+						className={`btn btn-icon btn-sm ${filters.sortOrder === 'asc' ? 'btn-primary' : 'btn-secondary'}`}
 						onClick={() => onFilterChange('sortOrder', filters.sortOrder === 'asc' ? 'desc' : 'asc')}
 						title={`Sắp xếp ${filters.sortOrder === 'asc' ? 'tăng dần' : 'giảm dần'}`}
 					>

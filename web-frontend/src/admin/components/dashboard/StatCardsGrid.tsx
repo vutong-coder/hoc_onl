@@ -38,86 +38,395 @@ const StatCardsGrid: React.FC<StatCardsGridProps> = ({ stats, loading = false })
 	}
 
 	return (
-		<div className="stat-cards-grid">
-			{/* Tổng người dùng */}
-			<StatCard
-				title="Tổng người dùng"
-				value={formatNumber(stats.totalUsers)}
-				subtitle={`${formatNumber(stats.activeUsers)} đang hoạt động`}
-				icon={<Users size={24} />}
-				gradient="primary"
-				trend={{ value: stats.userGrowthRate, isPositive: stats.userGrowthRate > 0 }}
-			/>
+		<div style={{ 
+			display: 'grid', 
+			gridTemplateColumns: 'repeat(4, 1fr)', 
+			gap: '16px',
+			marginBottom: '32px'
+		}}>
+			{/* Card 1 - Tổng người dùng */}
+			<div style={{ 
+				background: 'var(--card)',
+				borderRadius: 'var(--radius-lg)',
+				padding: '20px',
+				boxShadow: 'var(--shadow-sm)',
+				border: '1px solid var(--border)',
+				position: 'relative',
+				overflow: 'hidden'
+			}}>
+				<div style={{ 
+					position: 'absolute',
+					top: '0',
+					right: '0',
+					width: '80px',
+					height: '80px',
+					background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
+					borderRadius: '50%',
+					transform: 'translate(20px, -20px)'
+				}} />
+				<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+					<div style={{ 
+						width: '40px', 
+						height: '40px', 
+						borderRadius: 'var(--radius-md)', 
+						display: 'flex', 
+						alignItems: 'center', 
+						justifyContent: 'center',
+						background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+						color: 'white',
+						flexShrink: 0
+					}}>
+						<Users size={20} />
+					</div>
+					<div style={{ flex: 1 }}>
+						<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+							Tổng người dùng
+						</div>
+						<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+							{formatNumber(stats.totalUsers)}
+						</div>
+						<div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 600, marginTop: '4px' }}>
+							{formatNumber(stats.activeUsers)} đang hoạt động
+						</div>
+					</div>
+				</div>
+			</div>
 
-			{/* Tổng khóa học */}
-			<StatCard
-				title="Tổng khóa học"
-				value={stats.totalCourses.toString()}
-				subtitle={`${stats.publishedCourses} đã xuất bản`}
-				icon={<BookOpen size={24} />}
-				gradient="accent"
-				trend={{ value: stats.courseGrowthRate, isPositive: stats.courseGrowthRate > 0 }}
-			/>
+			{/* Card 2 - Tổng khóa học */}
+			<div style={{ 
+				background: 'var(--card)',
+				borderRadius: 'var(--radius-lg)',
+				padding: '20px',
+				boxShadow: 'var(--shadow-sm)',
+				border: '1px solid var(--border)',
+				position: 'relative',
+				overflow: 'hidden'
+			}}>
+				<div style={{ 
+					position: 'absolute',
+					top: '0',
+					right: '0',
+					width: '80px',
+					height: '80px',
+					background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
+					borderRadius: '50%',
+					transform: 'translate(20px, -20px)'
+				}} />
+				<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+					<div style={{ 
+						width: '40px', 
+						height: '40px', 
+						borderRadius: 'var(--radius-md)', 
+						display: 'flex', 
+						alignItems: 'center', 
+						justifyContent: 'center',
+						background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+						color: 'white',
+						flexShrink: 0
+					}}>
+						<BookOpen size={20} />
+					</div>
+					<div style={{ flex: 1 }}>
+						<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+							Tổng khóa học
+						</div>
+						<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+							{stats.totalCourses}
+						</div>
+						<div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>
+							{stats.publishedCourses} đã xuất bản
+						</div>
+					</div>
+				</div>
+			</div>
 
-			{/* Tổng đăng ký */}
-			<StatCard
-				title="Tổng đăng ký"
-				value={formatNumber(stats.totalEnrollments)}
-				subtitle={`${stats.todayEnrollments} hôm nay`}
-				icon={<TrendingUp size={24} />}
-				gradient="primary"
-				trend={{ value: stats.enrollmentGrowthRate, isPositive: stats.enrollmentGrowthRate > 0 }}
-			/>
+			{/* Card 3 - Tổng đăng ký */}
+			<div style={{ 
+				background: 'var(--card)',
+				borderRadius: 'var(--radius-lg)',
+				padding: '20px',
+				boxShadow: 'var(--shadow-sm)',
+				border: '1px solid var(--border)',
+				position: 'relative',
+				overflow: 'hidden'
+			}}>
+				<div style={{ 
+					position: 'absolute',
+					top: '0',
+					right: '0',
+					width: '80px',
+					height: '80px',
+					background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
+					borderRadius: '50%',
+					transform: 'translate(20px, -20px)'
+				}} />
+				<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+					<div style={{ 
+						width: '40px', 
+						height: '40px', 
+						borderRadius: 'var(--radius-md)', 
+						display: 'flex', 
+						alignItems: 'center', 
+						justifyContent: 'center',
+						background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+						color: 'white',
+						flexShrink: 0
+					}}>
+						<TrendingUp size={20} />
+					</div>
+					<div style={{ flex: 1 }}>
+						<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+							Tổng đăng ký
+						</div>
+						<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+							{formatNumber(stats.totalEnrollments)}
+						</div>
+						<div style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600, marginTop: '4px' }}>
+							{stats.todayEnrollments} hôm nay
+						</div>
+					</div>
+				</div>
+			</div>
 
-			{/* Tổng doanh thu */}
-			<StatCard
-				title="Tổng doanh thu"
-				value={formatCurrency(stats.totalRevenue)}
-				subtitle={`${formatCurrency(stats.todayRevenue)} hôm nay`}
-				icon={<DollarSign size={24} />}
-				gradient="accent"
-				trend={{ value: stats.revenueGrowthRate, isPositive: stats.revenueGrowthRate > 0 }}
-			/>
+			{/* Card 4 - Tổng doanh thu */}
+			<div style={{ 
+				background: 'var(--card)',
+				borderRadius: 'var(--radius-lg)',
+				padding: '20px',
+				boxShadow: 'var(--shadow-sm)',
+				border: '1px solid var(--border)',
+				position: 'relative',
+				overflow: 'hidden'
+			}}>
+				<div style={{ 
+					position: 'absolute',
+					top: '0',
+					right: '0',
+					width: '80px',
+					height: '80px',
+					background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
+					borderRadius: '50%',
+					transform: 'translate(20px, -20px)'
+				}} />
+				<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+					<div style={{ 
+						width: '40px', 
+						height: '40px', 
+						borderRadius: 'var(--radius-md)', 
+						display: 'flex', 
+						alignItems: 'center', 
+						justifyContent: 'center',
+						background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+						color: 'white',
+						flexShrink: 0
+					}}>
+						<DollarSign size={20} />
+					</div>
+					<div style={{ flex: 1 }}>
+						<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+							Tổng doanh thu
+						</div>
+						<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+							{formatCurrency(stats.totalRevenue)}
+						</div>
+						<div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginTop: '4px' }}>
+							{formatCurrency(stats.todayRevenue)} hôm nay
+						</div>
+					</div>
+				</div>
+			</div>
 
-			{/* Người dùng hoạt động */}
-			<StatCard
-				title="Người dùng hoạt động"
-				value={formatNumber(stats.activeUsers)}
-				subtitle={`${((stats.activeUsers / stats.totalUsers) * 100).toFixed(1)}% tổng số`}
-				icon={<Activity size={24} />}
-				gradient="primary"
-				trend={{ value: stats.userGrowthRate, isPositive: stats.userGrowthRate > 0 }}
-			/>
+			{/* Card 5 - Người dùng hoạt động */}
+			<div style={{ 
+				background: 'var(--card)',
+				borderRadius: 'var(--radius-lg)',
+				padding: '20px',
+				boxShadow: 'var(--shadow-sm)',
+				border: '1px solid var(--border)',
+				position: 'relative',
+				overflow: 'hidden'
+			}}>
+				<div style={{ 
+					position: 'absolute',
+					top: '0',
+					right: '0',
+					width: '80px',
+					height: '80px',
+					background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%)',
+					borderRadius: '50%',
+					transform: 'translate(20px, -20px)'
+				}} />
+				<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+					<div style={{ 
+						width: '40px', 
+						height: '40px', 
+						borderRadius: 'var(--radius-md)', 
+						display: 'flex', 
+						alignItems: 'center', 
+						justifyContent: 'center',
+						background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+						color: 'white',
+						flexShrink: 0
+					}}>
+						<Activity size={20} />
+					</div>
+					<div style={{ flex: 1 }}>
+						<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+							Người dùng hoạt động
+						</div>
+						<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+							{formatNumber(stats.activeUsers)}
+						</div>
+						<div style={{ fontSize: '11px', color: '#8b5cf6', fontWeight: 600, marginTop: '4px' }}>
+							{((stats.activeUsers / stats.totalUsers) * 100).toFixed(1)}% tổng số
+						</div>
+					</div>
+				</div>
+			</div>
 
-			{/* Khóa học xuất bản */}
-			<StatCard
-				title="Khóa học xuất bản"
-				value={stats.publishedCourses.toString()}
-				subtitle={`${((stats.publishedCourses / stats.totalCourses) * 100).toFixed(1)}% tổng số`}
-				icon={<Award size={24} />}
-				gradient="accent"
-				trend={{ value: stats.courseGrowthRate, isPositive: stats.courseGrowthRate > 0 }}
-			/>
+			{/* Card 6 - Khóa học xuất bản */}
+			<div style={{ 
+				background: 'var(--card)',
+				borderRadius: 'var(--radius-lg)',
+				padding: '20px',
+				boxShadow: 'var(--shadow-sm)',
+				border: '1px solid var(--border)',
+				position: 'relative',
+				overflow: 'hidden'
+			}}>
+				<div style={{ 
+					position: 'absolute',
+					top: '0',
+					right: '0',
+					width: '80px',
+					height: '80px',
+					background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.05) 100%)',
+					borderRadius: '50%',
+					transform: 'translate(20px, -20px)'
+				}} />
+				<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+					<div style={{ 
+						width: '40px', 
+						height: '40px', 
+						borderRadius: 'var(--radius-md)', 
+						display: 'flex', 
+						alignItems: 'center', 
+						justifyContent: 'center',
+						background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+						color: 'white',
+						flexShrink: 0
+					}}>
+						<Award size={20} />
+					</div>
+					<div style={{ flex: 1 }}>
+						<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+							Khóa học xuất bản
+						</div>
+						<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+							{stats.publishedCourses}
+						</div>
+						<div style={{ fontSize: '11px', color: '#22c55e', fontWeight: 600, marginTop: '4px' }}>
+							{((stats.publishedCourses / stats.totalCourses) * 100).toFixed(1)}% tổng số
+						</div>
+					</div>
+				</div>
+			</div>
 
-			{/* Đăng ký hôm nay */}
-			<StatCard
-				title="Đăng ký hôm nay"
-				value={stats.todayEnrollments.toString()}
-				subtitle={`${((stats.todayEnrollments / stats.totalEnrollments) * 100).toFixed(2)}% tổng số`}
-				icon={<Calendar size={24} />}
-				gradient="primary"
-				trend={{ value: stats.enrollmentGrowthRate, isPositive: stats.enrollmentGrowthRate > 0 }}
-			/>
+			{/* Card 7 - Đăng ký hôm nay */}
+			<div style={{ 
+				background: 'var(--card)',
+				borderRadius: 'var(--radius-lg)',
+				padding: '20px',
+				boxShadow: 'var(--shadow-sm)',
+				border: '1px solid var(--border)',
+				position: 'relative',
+				overflow: 'hidden'
+			}}>
+				<div style={{ 
+					position: 'absolute',
+					top: '0',
+					right: '0',
+					width: '80px',
+					height: '80px',
+					background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(219, 39, 119, 0.05) 100%)',
+					borderRadius: '50%',
+					transform: 'translate(20px, -20px)'
+				}} />
+				<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+					<div style={{ 
+						width: '40px', 
+						height: '40px', 
+						borderRadius: 'var(--radius-md)', 
+						display: 'flex', 
+						alignItems: 'center', 
+						justifyContent: 'center',
+						background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+						color: 'white',
+						flexShrink: 0
+					}}>
+						<Calendar size={20} />
+					</div>
+					<div style={{ flex: 1 }}>
+						<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+							Đăng ký hôm nay
+						</div>
+						<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+							{stats.todayEnrollments}
+						</div>
+						<div style={{ fontSize: '11px', color: '#ec4899', fontWeight: 600, marginTop: '4px' }}>
+							{((stats.todayEnrollments / stats.totalEnrollments) * 100).toFixed(2)}% tổng số
+						</div>
+					</div>
+				</div>
+			</div>
 
-			{/* Doanh thu hôm nay */}
-			<StatCard
-				title="Doanh thu hôm nay"
-				value={formatCurrency(stats.todayRevenue)}
-				subtitle={`${((stats.todayRevenue / stats.totalRevenue) * 100).toFixed(2)}% tổng số`}
-				icon={<CreditCard size={24} />}
-				gradient="accent"
-				trend={{ value: stats.revenueGrowthRate, isPositive: stats.revenueGrowthRate > 0 }}
-			/>
+			{/* Card 8 - Doanh thu hôm nay */}
+			<div style={{ 
+				background: 'var(--card)',
+				borderRadius: 'var(--radius-lg)',
+				padding: '20px',
+				boxShadow: 'var(--shadow-sm)',
+				border: '1px solid var(--border)',
+				position: 'relative',
+				overflow: 'hidden'
+			}}>
+				<div style={{ 
+					position: 'absolute',
+					top: '0',
+					right: '0',
+					width: '80px',
+					height: '80px',
+					background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(147, 51, 234, 0.05) 100%)',
+					borderRadius: '50%',
+					transform: 'translate(20px, -20px)'
+				}} />
+				<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+					<div style={{ 
+						width: '40px', 
+						height: '40px', 
+						borderRadius: 'var(--radius-md)', 
+						display: 'flex', 
+						alignItems: 'center', 
+						justifyContent: 'center',
+						background: 'linear-gradient(135deg, #a855f7 0%, #9333ea 100%)',
+						color: 'white',
+						flexShrink: 0
+					}}>
+						<CreditCard size={20} />
+					</div>
+					<div style={{ flex: 1 }}>
+						<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+							Doanh thu hôm nay
+						</div>
+						<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+							{formatCurrency(stats.todayRevenue)}
+						</div>
+						<div style={{ fontSize: '11px', color: '#a855f7', fontWeight: 600, marginTop: '4px' }}>
+							{((stats.todayRevenue / stats.totalRevenue) * 100).toFixed(2)}% tổng số
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	)
 }

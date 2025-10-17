@@ -20,7 +20,7 @@ import CourseListTable from '../components/courses/CourseListTable'
 import CourseFilterBar from '../components/courses/CourseFilterBar'
 import CourseEditorModal from '../components/courses/CourseEditorModal'
 import StatCard from '../components/common/StatCard'
-import Modal from '../components/common/Modal'
+import CourseDetailModal from '../modal/Courses/CourseDetailModal'
 import { exportCoursesToExcel, importCoursesFromExcel, generateExcelTemplate } from '../utils/courseExcelHelpers'
 import '../styles/common.css'
 import '../styles/courses.css'
@@ -206,40 +206,200 @@ export default function CoursesPage(): JSX.Element {
 					
 					<div style={{ 
 						display: 'grid', 
-						gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+						gridTemplateColumns: 'repeat(4, 1fr)', 
 						gap: '16px' 
 					}}>
-						<StatCard
-							title="Tổng khóa học"
-							value={dashboard.stats.totalCourses}
-							subtitle={`${dashboard.stats.publishedCourses} đã xuất bản`}
-							icon={<BookOpen size={24} />}
-							gradient="primary"
-						/>
-						
-						<StatCard
-							title="Tổng học viên"
-							value={formatNumber(dashboard.stats.totalEnrollments)}
-							subtitle={`${dashboard.stats.activeInstructors} giảng viên`}
-							icon={<Users size={24} />}
-							gradient="accent"
-						/>
-						
-						<StatCard
-							title="Đánh giá TB"
-							value={`${dashboard.stats.averageRating.toFixed(1)}`}
-							subtitle={`${dashboard.stats.featuredCourses} khóa nổi bật`}
-							icon={<Star size={24} />}
-							gradient="primary"
-						/>
-						
-						<StatCard
-							title="Doanh thu"
-							value={formatCurrency(dashboard.stats.totalRevenue)}
-							subtitle="Tổng doanh thu"
-							icon={<TrendingUp size={24} />}
-							gradient="accent"
-						/>
+						{/* Card 1 - Tổng khóa học */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<BookOpen size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Tổng khóa học
+									</div>
+									<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{dashboard.stats.totalCourses}
+									</div>
+									<div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 600, marginTop: '4px' }}>
+										{dashboard.stats.publishedCourses} đã xuất bản
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 2 - Tổng học viên */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<Users size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Tổng học viên
+									</div>
+									<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{formatNumber(dashboard.stats.totalEnrollments)}
+									</div>
+									<div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>
+										{dashboard.stats.activeInstructors} giảng viên
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 3 - Đánh giá TB */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<Star size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Đánh giá TB
+									</div>
+									<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{dashboard.stats.averageRating.toFixed(1)}
+									</div>
+									<div style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600, marginTop: '4px' }}>
+										{dashboard.stats.featuredCourses} khóa nổi bật
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Card 4 - Doanh thu */}
+						<div style={{ 
+							background: 'var(--card)',
+							borderRadius: 'var(--radius-lg)',
+							padding: '20px',
+							boxShadow: 'var(--shadow-sm)',
+							border: '1px solid var(--border)',
+							position: 'relative',
+							overflow: 'hidden'
+						}}>
+							<div style={{ 
+								position: 'absolute',
+								top: '0',
+								right: '0',
+								width: '80px',
+								height: '80px',
+								background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
+								borderRadius: '50%',
+								transform: 'translate(20px, -20px)'
+							}} />
+							<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+								<div style={{ 
+									width: '40px', 
+									height: '40px', 
+									borderRadius: 'var(--radius-md)', 
+									display: 'flex', 
+									alignItems: 'center', 
+									justifyContent: 'center',
+									background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+									color: 'white',
+									flexShrink: 0
+								}}>
+									<TrendingUp size={20} />
+								</div>
+								<div style={{ flex: 1 }}>
+									<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+										Doanh thu
+									</div>
+									<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+										{formatCurrency(dashboard.stats.totalRevenue)}
+									</div>
+									<div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginTop: '4px' }}>
+										Tổng doanh thu
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			)}
@@ -262,14 +422,14 @@ export default function CoursesPage(): JSX.Element {
 						borderRadius: 'var(--radius-md)'
 					}}>
 						<button
-							className={`btn btn-sm ${viewMode === 'grid' ? 'btn-primary' : 'btn-secondary'}`}
+							className={`btn btn-icon btn-sm ${viewMode === 'grid' ? 'btn-primary' : 'btn-secondary'}`}
 							onClick={() => setViewMode('grid')}
 							title="Xem dạng lưới"
 						>
 							<Grid3X3 size={16} />
 						</button>
 						<button
-							className={`btn btn-sm ${viewMode === 'list' ? 'btn-primary' : 'btn-secondary'}`}
+							className={`btn btn-icon btn-sm ${viewMode === 'list' ? 'btn-primary' : 'btn-secondary'}`}
 							onClick={() => setViewMode('list')}
 							title="Xem dạng danh sách"
 						>
@@ -359,184 +519,11 @@ export default function CoursesPage(): JSX.Element {
 			/>
 
 			{/* Course Details Modal */}
-			<Modal
+			<CourseDetailModal
 				isOpen={!!selectedCourse}
 				onClose={() => setSelectedCourse(null)}
-				title="Chi tiết khóa học"
-				maxWidth="800px"
-			>
-				{selectedCourse && (
-					<div style={{ padding: '20px' }}>
-						{/* Course Header */}
-						<div style={{ display: 'flex', gap: '20px', marginBottom: '24px' }}>
-							<img 
-								src={selectedCourse.thumbnail} 
-								alt={selectedCourse.title}
-								style={{ 
-									width: '200px', 
-									height: '120px', 
-									objectFit: 'cover', 
-									borderRadius: 'var(--radius-md)' 
-								}}
-							/>
-							<div style={{ flex: 1 }}>
-								<h3 style={{ fontSize: '24px', fontWeight: 600, margin: '0 0 8px 0' }}>
-									{selectedCourse.title}
-								</h3>
-								<p style={{ color: 'var(--muted-foreground)', margin: '0 0 12px 0' }}>
-									{selectedCourse.shortDescription}
-								</p>
-								<div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-									<span style={{ 
-										padding: '4px 8px', 
-										background: 'var(--muted)', 
-										borderRadius: 'var(--radius-sm)',
-										fontSize: '12px'
-									}}>
-										{selectedCourse.category.icon} {selectedCourse.category.name}
-									</span>
-									<span style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
-										bởi {selectedCourse.instructor.name}
-									</span>
-								</div>
-							</div>
-						</div>
-
-						{/* Course Details */}
-						<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-							<div>
-								<h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>
-									Thông tin khóa học
-								</h4>
-								<div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-									<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-										<span style={{ color: 'var(--muted-foreground)' }}>Cấp độ:</span>
-										<span>{selectedCourse.level}</span>
-									</div>
-									<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-										<span style={{ color: 'var(--muted-foreground)' }}>Thời lượng:</span>
-										<span>{selectedCourse.duration} giờ</span>
-									</div>
-									<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-										<span style={{ color: 'var(--muted-foreground)' }}>Giá:</span>
-										<span style={{ fontWeight: 600, color: 'var(--primary)' }}>
-											{selectedCourse.price === 0 ? 'Miễn phí' : 
-												`${selectedCourse.price.toLocaleString()} ${selectedCourse.tokenSymbol}`}
-										</span>
-									</div>
-									<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-										<span style={{ color: 'var(--muted-foreground)' }}>Học viên:</span>
-										<span>{selectedCourse.enrollmentCount.toLocaleString()}</span>
-									</div>
-									<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-										<span style={{ color: 'var(--muted-foreground)' }}>Đánh giá:</span>
-										<span>{selectedCourse.rating} ⭐ ({selectedCourse.reviewCount})</span>
-									</div>
-								</div>
-							</div>
-
-							<div>
-								<h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>
-									Trạng thái
-								</h4>
-								<div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-									<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-										<span style={{ color: 'var(--muted-foreground)' }}>Trạng thái:</span>
-										<span style={{ 
-											padding: '2px 8px', 
-											borderRadius: 'var(--radius-sm)',
-											fontSize: '12px',
-											background: selectedCourse.isPublished ? '#10b981' : '#f59e0b',
-											color: 'white'
-										}}>
-											{selectedCourse.isPublished ? 'Đã xuất bản' : 'Bản nháp'}
-										</span>
-									</div>
-									<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-										<span style={{ color: 'var(--muted-foreground)' }}>Nổi bật:</span>
-										<span>{selectedCourse.isFeatured ? 'Có' : 'Không'}</span>
-									</div>
-									<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-										<span style={{ color: 'var(--muted-foreground)' }}>Chứng chỉ:</span>
-										<span>{selectedCourse.certificateAvailable ? 'Có' : 'Không'}</span>
-									</div>
-									<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-										<span style={{ color: 'var(--muted-foreground)' }}>Tạo lúc:</span>
-										<span>{new Date(selectedCourse.createdAt).toLocaleDateString('vi-VN')}</span>
-									</div>
-									<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-										<span style={{ color: 'var(--muted-foreground)' }}>Cập nhật:</span>
-										<span>{new Date(selectedCourse.updatedAt).toLocaleDateString('vi-VN')}</span>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						{/* Description */}
-						<div style={{ marginBottom: '24px' }}>
-							<h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>
-								Mô tả chi tiết
-							</h4>
-							<p style={{ lineHeight: 1.6, color: 'var(--foreground)' }}>
-								{selectedCourse.description}
-							</p>
-						</div>
-
-						{/* Tags */}
-						{selectedCourse.tags.length > 0 && (
-							<div style={{ marginBottom: '24px' }}>
-								<h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>
-									Tags
-								</h4>
-								<div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-									{selectedCourse.tags.map(tag => (
-										<span key={tag} style={{ 
-											padding: '4px 8px', 
-											background: 'var(--muted)', 
-											borderRadius: 'var(--radius-sm)',
-											fontSize: '12px'
-										}}>
-											{tag}
-										</span>
-									))}
-								</div>
-							</div>
-						)}
-
-						{/* Prerequisites */}
-						{selectedCourse.prerequisites.length > 0 && (
-							<div style={{ marginBottom: '24px' }}>
-								<h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>
-									Điều kiện tiên quyết
-								</h4>
-								<ul style={{ paddingLeft: '20px', margin: 0 }}>
-									{selectedCourse.prerequisites.map((prereq, index) => (
-										<li key={index} style={{ marginBottom: '4px' }}>
-											{prereq}
-										</li>
-									))}
-								</ul>
-							</div>
-						)}
-
-						{/* Learning Outcomes */}
-						{selectedCourse.learningOutcomes.length > 0 && (
-							<div>
-								<h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>
-									Kết quả học tập
-								</h4>
-								<ul style={{ paddingLeft: '20px', margin: 0 }}>
-									{selectedCourse.learningOutcomes.map((outcome, index) => (
-										<li key={index} style={{ marginBottom: '4px' }}>
-											{outcome}
-										</li>
-									))}
-								</ul>
-							</div>
-						)}
-					</div>
-				)}
-			</Modal>
+				course={selectedCourse}
+			/>
 
 			{/* Hidden file input for import */}
 			<input

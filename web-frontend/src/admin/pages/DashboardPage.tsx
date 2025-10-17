@@ -23,8 +23,11 @@ import StatCardsGrid from '../components/dashboard/StatCardsGrid'
 import UserGrowthChart from '../components/dashboard/UserGrowthChart'
 import CourseCategoryChart from '../components/dashboard/CourseCategoryChart'
 import RecentActivityFeed from '../components/dashboard/RecentActivityFeed'
-import Modal from '../components/common/Modal'
 import Badge from '../components/common/Badge'
+import DashboardSettingsModal from '../modal/Dashboard/DashboardSettingsModal'
+import DashboardFiltersModal from '../modal/Dashboard/DashboardFiltersModal'
+import DashboardExportModal from '../modal/Dashboard/DashboardExportModal'
+import ActivityDetailModal from '../modal/Dashboard/ActivityDetailModal'
 import { 
 	exportCompleteDashboardToExcel,
 	exportDashboardStatsToExcel,
@@ -249,64 +252,199 @@ export default function DashboardPage(): JSX.Element {
 				{/* Quick Stats */}
 				<div style={{ 
 					display: 'grid', 
-					gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+					gridTemplateColumns: 'repeat(4, 1fr)', 
 					gap: '16px',
 					marginBottom: '24px'
 				}}>
+					{/* Card 1 - Hoạt động hôm nay */}
 					<div style={{ 
-						padding: '16px', 
-						background: 'var(--card)', 
+						background: 'var(--card)',
 						borderRadius: 'var(--radius-lg)',
+						padding: '20px',
+						boxShadow: 'var(--shadow-sm)',
 						border: '1px solid var(--border)',
-						textAlign: 'center'
+						position: 'relative',
+						overflow: 'hidden'
 					}}>
-						<div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--primary)', marginBottom: '4px' }}>
-							{activitySummary.total}
-						</div>
-						<div style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
-							Hoạt động hôm nay
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '80px',
+							height: '80px',
+							background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(20px, -20px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '40px', 
+								height: '40px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<Activity size={20} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+									Hoạt động hôm nay
+								</div>
+								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+									{activitySummary.total}
+								</div>
+								<div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 600, marginTop: '4px' }}>
+									Tổng hoạt động
+								</div>
+							</div>
 						</div>
 					</div>
+
+					{/* Card 2 - Uptime hệ thống */}
 					<div style={{ 
-						padding: '16px', 
-						background: 'var(--card)', 
+						background: 'var(--card)',
 						borderRadius: 'var(--radius-lg)',
+						padding: '20px',
+						boxShadow: 'var(--shadow-sm)',
 						border: '1px solid var(--border)',
-						textAlign: 'center'
+						position: 'relative',
+						overflow: 'hidden'
 					}}>
-						<div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--success)', marginBottom: '4px' }}>
-							{systemHealth.uptime}%
-						</div>
-						<div style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
-							Uptime hệ thống
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '80px',
+							height: '80px',
+							background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(20px, -20px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '40px', 
+								height: '40px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<CheckCircle size={20} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+									Uptime hệ thống
+								</div>
+								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+									{systemHealth.uptime}%
+								</div>
+								<div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>
+									Thời gian hoạt động
+								</div>
+							</div>
 						</div>
 					</div>
+
+					{/* Card 3 - Thời gian phản hồi */}
 					<div style={{ 
-						padding: '16px', 
-						background: 'var(--card)', 
+						background: 'var(--card)',
 						borderRadius: 'var(--radius-lg)',
+						padding: '20px',
+						boxShadow: 'var(--shadow-sm)',
 						border: '1px solid var(--border)',
-						textAlign: 'center'
+						position: 'relative',
+						overflow: 'hidden'
 					}}>
-						<div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--warning)', marginBottom: '4px' }}>
-							{systemHealth.responseTime}s
-						</div>
-						<div style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
-							Thời gian phản hồi
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '80px',
+							height: '80px',
+							background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(20px, -20px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '40px', 
+								height: '40px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<Clock size={20} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+									Thời gian phản hồi
+								</div>
+								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+									{systemHealth.responseTime}s
+								</div>
+								<div style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600, marginTop: '4px' }}>
+									Trung bình phản hồi
+								</div>
+							</div>
 						</div>
 					</div>
+
+					{/* Card 4 - Tỷ lệ lỗi */}
 					<div style={{ 
-						padding: '16px', 
-						background: 'var(--card)', 
+						background: 'var(--card)',
 						borderRadius: 'var(--radius-lg)',
+						padding: '20px',
+						boxShadow: 'var(--shadow-sm)',
 						border: '1px solid var(--border)',
-						textAlign: 'center'
+						position: 'relative',
+						overflow: 'hidden'
 					}}>
-						<div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--danger)', marginBottom: '4px' }}>
-							{systemHealth.errorRate}%
-						</div>
-						<div style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
-							Tỷ lệ lỗi
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '80px',
+							height: '80px',
+							background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(20px, -20px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '40px', 
+								height: '40px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<AlertTriangle size={20} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+									Tỷ lệ lỗi
+								</div>
+								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+									{systemHealth.errorRate}%
+								</div>
+								<div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginTop: '4px' }}>
+									Tỷ lệ lỗi hệ thống
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -433,326 +571,41 @@ export default function DashboardPage(): JSX.Element {
 			</div>
 
 			{/* Settings Modal */}
-			<Modal
+			<DashboardSettingsModal
 				isOpen={showSettings}
 				onClose={() => setShowSettings(false)}
-				title="Cài đặt Dashboard"
-				maxWidth="500px"
-			>
-				<div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-					<div>
-						<label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-							Khoảng thời gian làm mới (giây)
-						</label>
-						<input
-							type="number"
-							value={settings.refreshInterval}
-							onChange={(e) => updateSettings('refreshInterval', parseInt(e.target.value))}
-							min="10"
-							max="300"
-							className="form-input"
-						/>
-					</div>
-
-					<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-						<input
-							type="checkbox"
-							id="autoRefresh"
-							checked={settings.autoRefresh}
-							onChange={(e) => updateSettings('autoRefresh', e.target.checked)}
-						/>
-						<label htmlFor="autoRefresh">Tự động làm mới</label>
-					</div>
-
-					<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-						<input
-							type="checkbox"
-							id="showCharts"
-							checked={settings.showCharts}
-							onChange={(e) => updateSettings('showCharts', e.target.checked)}
-						/>
-						<label htmlFor="showCharts">Hiển thị biểu đồ</label>
-					</div>
-
-					<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-						<input
-							type="checkbox"
-							id="showActivities"
-							checked={settings.showActivities}
-							onChange={(e) => updateSettings('showActivities', e.target.checked)}
-						/>
-						<label htmlFor="showActivities">Hiển thị hoạt động</label>
-					</div>
-
-					<div>
-						<label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-							Loại biểu đồ
-						</label>
-						<select
-							value={settings.chartType}
-							onChange={(e) => updateSettings('chartType', e.target.value)}
-							className="form-select"
-						>
-							<option value="line">Đường</option>
-							<option value="bar">Cột</option>
-							<option value="pie">Tròn</option>
-							<option value="doughnut">Vòng tròn</option>
-						</select>
-					</div>
-				</div>
-			</Modal>
+				settings={settings}
+				onUpdateSettings={updateSettings as (key: string, value: any) => void}
+			/>
 
 			{/* Filters Modal */}
-			<Modal
+			<DashboardFiltersModal
 				isOpen={showFilters}
 				onClose={() => setShowFilters(false)}
-				title="Bộ lọc Dashboard"
-				maxWidth="400px"
-			>
-				<div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-					<div>
-						<label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-							Khoảng thời gian
-						</label>
-						<select
-							value={filters.timeRange}
-							onChange={(e) => updateFilter('timeRange', e.target.value)}
-							className="form-select"
-						>
-							<option value="7d">7 ngày qua</option>
-							<option value="30d">30 ngày qua</option>
-							<option value="90d">90 ngày qua</option>
-							<option value="1y">1 năm qua</option>
-							<option value="all">Tất cả</option>
-						</select>
-					</div>
-
-					<div>
-						<label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-							Loại hoạt động
-						</label>
-						<select
-							value={filters.activityType}
-							onChange={(e) => updateFilter('activityType', e.target.value)}
-							className="form-select"
-						>
-							<option value="all">Tất cả</option>
-							<option value="user_registration">Đăng ký người dùng</option>
-							<option value="course_enrollment">Đăng ký khóa học</option>
-							<option value="course_completion">Hoàn thành khóa học</option>
-							<option value="payment_received">Thanh toán</option>
-							<option value="system_alert">Cảnh báo hệ thống</option>
-						</select>
-					</div>
-
-					<div>
-						<label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-							Trạng thái
-						</label>
-						<select
-							value={filters.status}
-							onChange={(e) => updateFilter('status', e.target.value)}
-							className="form-select"
-						>
-							<option value="all">Tất cả</option>
-							<option value="success">Thành công</option>
-							<option value="warning">Cảnh báo</option>
-							<option value="error">Lỗi</option>
-							<option value="info">Thông tin</option>
-						</select>
-					</div>
-
-					<div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-						<button className="btn btn-secondary" onClick={clearFilters}>
-							Xóa bộ lọc
-						</button>
-						<button className="btn btn-primary" onClick={() => setShowFilters(false)}>
-							Áp dụng
-						</button>
-					</div>
-				</div>
-			</Modal>
+				filters={filters}
+				onUpdateFilter={updateFilter as (key: string, value: any) => void}
+				onClearFilters={clearFilters}
+			/>
 
 			{/* Export Options Modal */}
-			<Modal
+			<DashboardExportModal
 				isOpen={showExportOptions}
 				onClose={() => setShowExportOptions(false)}
-				title="Xuất dữ liệu Excel"
-				maxWidth="600px"
-			>
-				<div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-					<div style={{ marginBottom: '16px' }}>
-						<p style={{ color: 'var(--muted-foreground)', margin: 0 }}>
-							Chọn loại dữ liệu bạn muốn xuất ra file Excel:
-						</p>
-					</div>
-
-					<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '12px' }}>
-						<button
-							className="btn btn-primary"
-							onClick={handleExportComplete}
-							style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-						>
-							<FileSpreadsheet size={18} />
-							<div style={{ textAlign: 'left' }}>
-								<div style={{ fontWeight: 600 }}>Dashboard hoàn chỉnh</div>
-								<div style={{ fontSize: '12px', opacity: 0.8 }}>Tất cả dữ liệu trong 1 file</div>
-							</div>
-						</button>
-
-						<button
-							className="btn btn-outline"
-							onClick={handleExportStats}
-							style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-						>
-							<BarChart3 size={18} />
-							<div style={{ textAlign: 'left' }}>
-								<div style={{ fontWeight: 600 }}>Thống kê tổng quan</div>
-								<div style={{ fontSize: '12px', opacity: 0.8 }}>8 chỉ số chính</div>
-							</div>
-						</button>
-
-						<button
-							className="btn btn-outline"
-							onClick={handleExportUserGrowth}
-							style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-						>
-							<TrendingUp size={18} />
-							<div style={{ textAlign: 'left' }}>
-								<div style={{ fontWeight: 600 }}>Tăng trưởng người dùng</div>
-								<div style={{ fontSize: '12px', opacity: 0.8 }}>30 ngày gần nhất</div>
-							</div>
-						</button>
-
-						<button
-							className="btn btn-outline"
-							onClick={handleExportCategories}
-							style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-						>
-							<BookOpen size={18} />
-							<div style={{ textAlign: 'left' }}>
-								<div style={{ fontWeight: 600 }}>Danh mục khóa học</div>
-								<div style={{ fontSize: '12px', opacity: 0.8 }}>8 danh mục</div>
-							</div>
-						</button>
-
-						<button
-							className="btn btn-outline"
-							onClick={handleExportActivities}
-							style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-						>
-							<Activity size={18} />
-							<div style={{ textAlign: 'left' }}>
-								<div style={{ fontWeight: 600 }}>Hoạt động gần đây</div>
-								<div style={{ fontSize: '12px', opacity: 0.8 }}>10 hoạt động mới nhất</div>
-							</div>
-						</button>
-
-						<button
-							className="btn btn-outline"
-							onClick={handleExportPerformers}
-							style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-						>
-							<Users size={18} />
-							<div style={{ textAlign: 'left' }}>
-								<div style={{ fontWeight: 600 }}>Top Performers</div>
-								<div style={{ fontSize: '12px', opacity: 0.8 }}>5 người xuất sắc nhất</div>
-							</div>
-						</button>
-
-						<button
-							className="btn btn-outline"
-							onClick={handleExportSystemHealth}
-							style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-						>
-							<CheckCircle size={18} />
-							<div style={{ textAlign: 'left' }}>
-								<div style={{ fontWeight: 600 }}>Tình trạng hệ thống</div>
-								<div style={{ fontSize: '12px', opacity: 0.8 }}>Health & Alerts</div>
-							</div>
-						</button>
-					</div>
-
-					<div style={{ 
-						marginTop: '20px', 
-						padding: '16px', 
-						background: 'var(--muted)', 
-						borderRadius: 'var(--radius-md)',
-						border: '1px solid var(--border)'
-					}}>
-						<div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-							<Table size={16} />
-							<span style={{ fontWeight: 600, fontSize: '14px' }}>Thông tin xuất file</span>
-						</div>
-						<ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', color: 'var(--muted-foreground)' }}>
-							<li>File Excel (.xlsx) với nhiều sheet</li>
-							<li>Tên file tự động với ngày xuất</li>
-							<li>Dữ liệu được format theo tiếng Việt</li>
-							<li>Hỗ trợ mở bằng Excel, Google Sheets</li>
-						</ul>
-					</div>
-				</div>
-			</Modal>
+				onExportComplete={handleExportComplete}
+				onExportStats={handleExportStats}
+				onExportUserGrowth={handleExportUserGrowth}
+				onExportCategories={handleExportCategories}
+				onExportActivities={handleExportActivities}
+				onExportPerformers={handleExportPerformers}
+				onExportSystemHealth={handleExportSystemHealth}
+			/>
 
 			{/* Activity Detail Modal */}
-			<Modal
+			<ActivityDetailModal
 				isOpen={!!selectedActivity}
 				onClose={() => setSelectedActivity(null)}
-				title="Chi tiết hoạt động"
-				maxWidth="600px"
-			>
-				{selectedActivity && (
-					<div>
-						<div style={{ marginBottom: '20px' }}>
-							<h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>
-								{selectedActivity.title}
-							</h3>
-							<p style={{ color: 'var(--muted-foreground)', marginBottom: '16px' }}>
-								{selectedActivity.description}
-							</p>
-						</div>
-
-						<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
-							<div>
-								<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
-									Thời gian
-								</label>
-								<div style={{ fontSize: '14px', fontWeight: 500 }}>
-									{new Date(selectedActivity.timestamp).toLocaleString('vi-VN')}
-								</div>
-							</div>
-							<div>
-								<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
-									Trạng thái
-								</label>
-								<Badge variant={selectedActivity.status === 'success' ? 'success' : 
-													selectedActivity.status === 'warning' ? 'warning' : 
-													selectedActivity.status === 'error' ? 'danger' : 'info'}>
-									{selectedActivity.status}
-								</Badge>
-							</div>
-						</div>
-
-						{selectedActivity.metadata && Object.keys(selectedActivity.metadata).length > 0 && (
-							<div>
-								<h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>
-									Thông tin bổ sung
-								</h4>
-								<div style={{ 
-									background: 'var(--muted)', 
-									padding: '16px', 
-									borderRadius: 'var(--radius-md)',
-									fontSize: '14px'
-								}}>
-									<pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
-										{JSON.stringify(selectedActivity.metadata, null, 2)}
-									</pre>
-								</div>
-							</div>
-						)}
-					</div>
-				)}
-			</Modal>
+				activity={selectedActivity}
+			/>
 		</div>
 	)
 }

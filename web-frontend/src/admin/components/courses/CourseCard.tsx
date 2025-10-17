@@ -1,6 +1,7 @@
 import React from 'react'
 import { Course } from '../../types/course'
 import Badge from '../common/Badge'
+import '../../styles/courses.css'
 import { 
 	Edit, 
 	Trash2, 

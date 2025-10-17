@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { LayoutDashboard, Users, FileText, Video, Lock, Award, BookOpen, Building, Server, BarChart, Copyright, Badge } from 'lucide-react'
+import '../../styles/sidebar.css'
 
 type Item = { icon: React.ReactNode; label: string; path: string }
 
@@ -28,9 +29,13 @@ export default function Sidebar(): JSX.Element {
 			borderRight: '1px solid var(--sidebar-border)', 
 			width: 260, 
 			overflowY: 'auto',
-			minHeight: '100vh',
-			position: 'sticky',
-			top: 0
+			overflowX: 'hidden',
+			height: 'calc(100vh - 60px)',
+			maxHeight: 'calc(100vh - 60px)',
+			position: 'fixed',
+			top: 60,
+			left: 0,
+			zIndex: 1000
 		}}>
 			<nav style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 24, paddingBottom: 24 }}>
 				{items.map((item) => {

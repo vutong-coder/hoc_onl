@@ -24,8 +24,8 @@ import useOrganizations from '../hooks/useOrganizations'
 import OrganizationTable from '../components/organizations/OrganizationTable'
 import OrganizationFilterBar from '../components/organizations/OrganizationFilterBar'
 import OrganizationEditorModal from '../components/organizations/OrganizationEditorModal'
-import Modal from '../components/common/Modal'
 import Badge from '../components/common/Badge'
+import OrganizationDetailModal from '../modal/Organizations/OrganizationDetailModal'
 import StatCard from '../components/common/StatCard'
 import { 
 	exportOrganizationsToExcel,
@@ -138,6 +138,7 @@ export default function OrganizationsPage(): JSX.Element {
 		alert('Đã tải template Excel thành công!')
 	}
 
+	// Helper functions moved to modal components
 	const formatNumber = (num: number) => {
 		if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
 		if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
@@ -226,63 +227,297 @@ export default function OrganizationsPage(): JSX.Element {
 				{/* Stats Overview */}
 				<div style={{ 
 					display: 'grid', 
-					gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+					gridTemplateColumns: 'repeat(3, 1fr)', 
 					gap: '16px',
 					marginBottom: '24px'
 				}}>
-					<StatCard
-						title="Tổng tổ chức"
-						value={dashboard.stats.totalOrganizations}
-						subtitle={`${dashboard.stats.activeOrganizations} đang hoạt động`}
-						icon={<Building2 size={24} />}
-						gradient="primary"
-						trend={{ value: dashboard.stats.monthlyGrowth[dashboard.stats.monthlyGrowth.length - 1]?.count || 0, isPositive: true }}
-					/>
-					
-					<StatCard
-						title="Tổng nhân viên"
-						value={formatNumber(dashboard.stats.totalEmployees)}
-						subtitle={`TB: ${formatNumber(dashboard.stats.averageEmployees)}/tổ chức`}
-						icon={<Users size={24} />}
-						gradient="accent"
-						trend={{ value: 5.2, isPositive: true }}
-					/>
-					
-					<StatCard
-						title="Tổng học viên"
-						value={formatNumber(dashboard.stats.totalStudents)}
-						subtitle={`TB: ${formatNumber(dashboard.stats.averageStudents)}/tổ chức`}
-						icon={<GraduationCap size={24} />}
-						gradient="primary"
-						trend={{ value: 12.8, isPositive: true }}
-					/>
-					
-					<StatCard
-						title="Tổng khóa học"
-						value={dashboard.stats.totalCourses}
-						subtitle={`TB: ${dashboard.stats.averageCourses}/tổ chức`}
-						icon={<BookOpen size={24} />}
-						gradient="accent"
-						trend={{ value: 8.4, isPositive: true }}
-					/>
-					
-					<StatCard
-						title="Tổng doanh thu"
-						value={formatCurrency(dashboard.stats.totalRevenue, 'VND')}
-						subtitle={`${dashboard.stats.premiumOrganizations} tổ chức premium`}
-						icon={<DollarSign size={24} />}
-						gradient="primary"
-						trend={{ value: 15.6, isPositive: true }}
-					/>
-					
-					<StatCard
-						title="Đã xác minh"
-						value={dashboard.stats.verifiedOrganizations}
-						subtitle={`${dashboard.stats.pendingOrganizations} chờ xác minh`}
-						icon={<CheckCircle size={24} />}
-						gradient="accent"
-						trend={{ value: parseFloat(((dashboard.stats.verifiedOrganizations / dashboard.stats.totalOrganizations) * 100).toFixed(1)), isPositive: true }}
-					/>
+					{/* Card 1 - Tổng tổ chức */}
+					<div style={{ 
+						background: 'var(--card)',
+						borderRadius: 'var(--radius-lg)',
+						padding: '20px',
+						boxShadow: 'var(--shadow-sm)',
+						border: '1px solid var(--border)',
+						position: 'relative',
+						overflow: 'hidden'
+					}}>
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '80px',
+							height: '80px',
+							background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(20px, -20px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '40px', 
+								height: '40px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<Building2 size={20} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+									Tổng tổ chức
+								</div>
+								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+									{dashboard.stats.totalOrganizations}
+								</div>
+								<div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 600, marginTop: '4px' }}>
+									{dashboard.stats.activeOrganizations} đang hoạt động
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* Card 2 - Tổng nhân viên */}
+					<div style={{ 
+						background: 'var(--card)',
+						borderRadius: 'var(--radius-lg)',
+						padding: '20px',
+						boxShadow: 'var(--shadow-sm)',
+						border: '1px solid var(--border)',
+						position: 'relative',
+						overflow: 'hidden'
+					}}>
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '80px',
+							height: '80px',
+							background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(20px, -20px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '40px', 
+								height: '40px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<Users size={20} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+									Tổng nhân viên
+								</div>
+								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+									{formatNumber(dashboard.stats.totalEmployees)}
+								</div>
+								<div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>
+									TB: {formatNumber(dashboard.stats.averageEmployees)}/tổ chức
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* Card 3 - Tổng học viên */}
+					<div style={{ 
+						background: 'var(--card)',
+						borderRadius: 'var(--radius-lg)',
+						padding: '20px',
+						boxShadow: 'var(--shadow-sm)',
+						border: '1px solid var(--border)',
+						position: 'relative',
+						overflow: 'hidden'
+					}}>
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '80px',
+							height: '80px',
+							background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(20px, -20px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '40px', 
+								height: '40px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<GraduationCap size={20} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+									Tổng học viên
+								</div>
+								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+									{formatNumber(dashboard.stats.totalStudents)}
+								</div>
+								<div style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600, marginTop: '4px' }}>
+									TB: {formatNumber(dashboard.stats.averageStudents)}/tổ chức
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* Card 4 - Tổng khóa học */}
+					<div style={{ 
+						background: 'var(--card)',
+						borderRadius: 'var(--radius-lg)',
+						padding: '20px',
+						boxShadow: 'var(--shadow-sm)',
+						border: '1px solid var(--border)',
+						position: 'relative',
+						overflow: 'hidden'
+					}}>
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '80px',
+							height: '80px',
+							background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(20px, -20px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '40px', 
+								height: '40px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<BookOpen size={20} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+									Tổng khóa học
+								</div>
+								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+									{dashboard.stats.totalCourses}
+								</div>
+								<div style={{ fontSize: '11px', color: '#8b5cf6', fontWeight: 600, marginTop: '4px' }}>
+									TB: {dashboard.stats.averageCourses}/tổ chức
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* Card 5 - Tổng doanh thu */}
+					<div style={{ 
+						background: 'var(--card)',
+						borderRadius: 'var(--radius-lg)',
+						padding: '20px',
+						boxShadow: 'var(--shadow-sm)',
+						border: '1px solid var(--border)',
+						position: 'relative',
+						overflow: 'hidden'
+					}}>
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '80px',
+							height: '80px',
+							background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(20px, -20px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '40px', 
+								height: '40px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<DollarSign size={20} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+									Tổng doanh thu
+								</div>
+								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+									{formatCurrency(dashboard.stats.totalRevenue, 'VND')}
+								</div>
+								<div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginTop: '4px' }}>
+									{dashboard.stats.premiumOrganizations} tổ chức premium
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* Card 6 - Đã xác minh */}
+					<div style={{ 
+						background: 'var(--card)',
+						borderRadius: 'var(--radius-lg)',
+						padding: '20px',
+						boxShadow: 'var(--shadow-sm)',
+						border: '1px solid var(--border)',
+						position: 'relative',
+						overflow: 'hidden'
+					}}>
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '80px',
+							height: '80px',
+							background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(20px, -20px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '40px', 
+								height: '40px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<CheckCircle size={20} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
+									Đã xác minh
+								</div>
+								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
+									{dashboard.stats.verifiedOrganizations}
+								</div>
+								<div style={{ fontSize: '11px', color: '#22c55e', fontWeight: 600, marginTop: '4px' }}>
+									{dashboard.stats.pendingOrganizations} chờ xác minh
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -358,127 +593,11 @@ export default function OrganizationsPage(): JSX.Element {
 			/>
 
 			{/* Organization Details Modal */}
-			<Modal
+			<OrganizationDetailModal
 				isOpen={!!selectedOrganization}
 				onClose={() => setSelectedOrganization(null)}
-				title={selectedOrganization?.name || 'Chi tiết tổ chức'}
-				maxWidth="800px"
-			>
-				{selectedOrganization && (
-					<div className="organization-detail-modal-content">
-						<div className="organization-detail-header">
-							<img src={selectedOrganization.logo} alt={selectedOrganization.name} className="organization-detail-logo" />
-							<div className="organization-detail-info">
-								<h2 className="organization-detail-title">{selectedOrganization.name}</h2>
-								<p className="organization-detail-description">{selectedOrganization.description}</p>
-								<div className="organization-detail-meta">
-									<div className="meta-item">
-										<Building2 size={16} />
-										<span>{selectedOrganization.type}</span>
-									</div>
-									<div className="meta-item">
-										<Globe size={16} />
-										<span>{selectedOrganization.city}, {selectedOrganization.country}</span>
-									</div>
-									<div className="meta-item">
-										<Calendar size={16} />
-										<span>Thành lập: {selectedOrganization.foundedYear}</span>
-									</div>
-									<div className="meta-item">
-										<Users size={16} />
-										<span>{selectedOrganization.employees} nhân viên</span>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div className="organization-detail-stats">
-							<div className="stat-item">
-								<div className="stat-label">Học viên</div>
-								<div className="stat-value">{formatNumber(selectedOrganization.students)}</div>
-							</div>
-							<div className="stat-item">
-								<div className="stat-label">Khóa học</div>
-								<div className="stat-value">{selectedOrganization.courses}</div>
-							</div>
-							<div className="stat-item">
-								<div className="stat-label">Giảng viên</div>
-								<div className="stat-value">{selectedOrganization.instructors}</div>
-							</div>
-							<div className="stat-item">
-								<div className="stat-label">Doanh thu</div>
-								<div className="stat-value">{formatCurrency(selectedOrganization.revenue, selectedOrganization.currency)}</div>
-							</div>
-						</div>
-
-						<div className="organization-detail-sections">
-							<div className="detail-section">
-								<h3>Thông tin liên hệ</h3>
-								<div className="contact-info">
-									<div className="contact-item">
-										<Mail size={16} />
-										<span>{selectedOrganization.email}</span>
-									</div>
-									<div className="contact-item">
-										<Phone size={16} />
-										<span>{selectedOrganization.phone}</span>
-									</div>
-									<div className="contact-item">
-										<Globe size={16} />
-										<span>{selectedOrganization.website}</span>
-									</div>
-								</div>
-							</div>
-
-							<div className="detail-section">
-								<h3>Người liên hệ</h3>
-								<div className="contact-person">
-									<div className="person-name">{selectedOrganization.contactPerson.name}</div>
-									<div className="person-title">{selectedOrganization.contactPerson.title}</div>
-									<div className="person-department">{selectedOrganization.contactPerson.department}</div>
-									<div className="person-contact">
-										<span>{selectedOrganization.contactPerson.email}</span>
-										<span>{selectedOrganization.contactPerson.phone}</span>
-									</div>
-								</div>
-							</div>
-
-							<div className="detail-section">
-								<h3>Gói đăng ký</h3>
-								<div className="subscription-info">
-									<div className="subscription-plan">{selectedOrganization.subscriptionPlan}</div>
-									<div className="subscription-status">
-										<Badge variant={selectedOrganization.subscriptionStatus === 'active' ? 'success' : 'danger'}>
-											{selectedOrganization.subscriptionStatus}
-										</Badge>
-									</div>
-									<div className="subscription-expiry">
-										Hết hạn: {new Date(selectedOrganization.subscriptionExpiry).toLocaleDateString('vi-VN')}
-									</div>
-								</div>
-							</div>
-
-							{selectedOrganization.tags.length > 0 && (
-								<div className="detail-section">
-									<h3>Tags</h3>
-									<div className="tags-container">
-										{selectedOrganization.tags.map((tag: string) => (
-											<Badge key={tag} variant="secondary">{tag}</Badge>
-										))}
-									</div>
-								</div>
-							)}
-
-							{selectedOrganization.notes && (
-								<div className="detail-section">
-									<h3>Ghi chú</h3>
-									<p className="notes-content">{selectedOrganization.notes}</p>
-								</div>
-							)}
-						</div>
-					</div>
-				)}
-			</Modal>
+				organization={selectedOrganization}
+			/>
 
 			{/* Hidden file input for import */}
 			<input

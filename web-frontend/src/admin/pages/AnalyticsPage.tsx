@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import Card from '../components/common/Card'
 import Badge from '../components/common/Badge'
-import Modal from '../components/common/Modal'
 import { KpiGrid } from '../components/analytics/KpiGrid'
 import { AnalyticsChartComponent } from '../components/analytics/AnalyticsChart'
 import { TopListsWidgetComponent } from '../components/analytics/TopListsWidget'
+import KpiDetailModal from '../modal/Analytics/KpiDetailModal'
+import ChartFullscreenModal from '../modal/Analytics/ChartFullscreenModal'
+import TopListModal from '../modal/Analytics/TopListModal'
+import ExportModal from '../modal/Analytics/ExportModal'
+import SettingsModal from '../modal/Analytics/SettingsModal'
+import ShareModal from '../modal/Analytics/ShareModal'
+import PrintModal from '../modal/Analytics/PrintModal'
+import DatabaseModal from '../modal/Analytics/DatabaseModal'
+import CloudModal from '../modal/Analytics/CloudModal'
 import { DateRangePicker } from '../components/analytics/DateRangePicker'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { 
@@ -830,413 +838,72 @@ export const AnalyticsPage: React.FC = () => {
 			)}
 
 			{/* KPI Detail Modal */}
-			<Modal
+			<KpiDetailModal
 				isOpen={showKpiModal}
 				onClose={() => setShowKpiModal(false)}
-				title={`Chi tiết ${selectedKpi?.name}`}
-			>
-				{selectedKpi && (
-					<div className="kpi-detail">
-						<div className="kpi-detail-header">
-							<h3>{selectedKpi.name}</h3>
-							<p>{selectedKpi.description}</p>
-						</div>
-						<div className="kpi-detail-content">
-							<div className="detail-item">
-								<label>Giá trị hiện tại:</label>
-								<span className="detail-value">
-									{selectedKpi.value.toLocaleString('vi-VN')} {selectedKpi.unit}
-								</span>
-							</div>
-							<div className="detail-item">
-								<label>Thay đổi:</label>
-								<span className={`detail-change change-${selectedKpi.changeType}`}>
-									{selectedKpi.change > 0 ? '+' : ''}{selectedKpi.change.toFixed(1)}%
-								</span>
-							</div>
-							<div className="detail-item">
-								<label>Khoảng thời gian:</label>
-								<span className="detail-period">{selectedKpi.period}</span>
-							</div>
-						</div>
-					</div>
-				)}
-			</Modal>
+				kpi={selectedKpi}
+			/>
 
 			{/* Chart Fullscreen Modal */}
-			<Modal
+			<ChartFullscreenModal
 				isOpen={showChartModal}
 				onClose={() => setShowChartModal(false)}
-				title={selectedChart?.title}
-				maxWidth="90vw"
-			>
-				{selectedChart && (
-					<AnalyticsChartComponent
-						chart={selectedChart}
-						onRefresh={refreshChart}
-						onExport={exportChart}
-						onConfigure={configureChart}
-						onFullscreen={handleChartFullscreen}
-						height={500}
-					/>
-				)}
-			</Modal>
+				chart={selectedChart}
+				onRefresh={refreshChart}
+				onExport={exportChart}
+				onConfigure={configureChart}
+				onFullscreen={handleChartFullscreen}
+			/>
 
 			{/* Top List Detail Modal */}
-			<Modal
+			<TopListModal
 				isOpen={showTopListModal}
 				onClose={() => setShowTopListModal(false)}
-				title={selectedTopList?.title}
-				maxWidth="80vw"
-			>
-				{selectedTopList && (
-					<TopListsWidgetComponent
-						widget={selectedTopList}
-						onItemClick={handleItemClick}
-						onViewAll={handleViewAllItems}
-						onRefresh={handleTopListRefresh}
-					/>
-				)}
-			</Modal>
+				topList={selectedTopList}
+				onItemClick={handleItemClick}
+				onViewAll={handleViewAllItems}
+				onRefresh={handleTopListRefresh}
+			/>
 
 			{/* Export Modal */}
-			<Modal
+			<ExportModal
 				isOpen={showExportModal}
 				onClose={() => setShowExportModal(false)}
-				title="Xuất dữ liệu"
-			>
-				<div className="export-options">
-					<div className="export-section">
-						<h4>Định dạng xuất</h4>
-						<div className="export-buttons">
-							<button 
-								className="btn btn-secondary"
-								onClick={() => handleExportData('excel')}
-								disabled={isExporting}
-							>
-								<FileText className="w-4 h-4" />
-								Excel (.xlsx)
-							</button>
-							<button 
-								className="btn btn-secondary"
-								onClick={() => handleExportData('pdf')}
-								disabled={isExporting}
-							>
-								<FileText className="w-4 h-4" />
-								PDF (.pdf)
-							</button>
-							<button 
-								className="btn btn-secondary"
-								onClick={() => handleExportData('csv')}
-								disabled={isExporting}
-							>
-								<FileText className="w-4 h-4" />
-								CSV (.csv)
-							</button>
-							<button 
-								className="btn btn-secondary"
-								onClick={() => handleExportData('json')}
-								disabled={isExporting}
-							>
-								<FileText className="w-4 h-4" />
-								JSON (.json)
-							</button>
-						</div>
-					</div>
-					<div className="export-section">
-						<h4>Tùy chọn xuất</h4>
-						<div className="export-options-list">
-							<label className="export-option">
-								<input type="checkbox" defaultChecked />
-								<span>Bao gồm biểu đồ</span>
-							</label>
-							<label className="export-option">
-								<input type="checkbox" defaultChecked />
-								<span>Bao gồm KPI</span>
-							</label>
-							<label className="export-option">
-								<input type="checkbox" defaultChecked />
-								<span>Bao gồm bảng xếp hạng</span>
-							</label>
-							<label className="export-option">
-								<input type="checkbox" />
-								<span>Bao gồm dữ liệu thô</span>
-							</label>
-						</div>
-					</div>
-				</div>
-			</Modal>
+				onExport={handleExportData}
+				isExporting={isExporting}
+			/>
 
 			{/* Settings Modal */}
-			<Modal
+			<SettingsModal
 				isOpen={showSettingsModal}
 				onClose={() => setShowSettingsModal(false)}
-				title="Cài đặt Analytics"
-			>
-				<div className="settings-content">
-					<div className="settings-section">
-						<h4>Cài đặt hiển thị</h4>
-						<div className="settings-options">
-							<label className="setting-option">
-								<span>Tự động làm mới dữ liệu</span>
-								<input type="checkbox" checked={isRealTimeEnabled} onChange={handleRealTimeToggle} />
-							</label>
-							<label className="setting-option">
-								<span>Hiển thị cảnh báo</span>
-								<input type="checkbox" defaultChecked />
-							</label>
-							<label className="setting-option">
-								<span>Hiển thị insights</span>
-								<input type="checkbox" defaultChecked />
-							</label>
-						</div>
-					</div>
-					<div className="settings-section">
-						<h4>Cài đặt biểu đồ</h4>
-						<div className="settings-options">
-							<label className="setting-option">
-								<span>Hiệu ứng animation</span>
-								<input type="checkbox" defaultChecked />
-							</label>
-							<label className="setting-option">
-								<span>Hiển thị grid</span>
-								<input type="checkbox" defaultChecked />
-							</label>
-							<label className="setting-option">
-								<span>Hiển thị legend</span>
-								<input type="checkbox" defaultChecked />
-							</label>
-						</div>
-					</div>
-					<div className="settings-actions">
-						<button className="btn btn-primary">
-							<Save className="w-4 h-4" />
-							Lưu cài đặt
-						</button>
-						<button className="btn btn-secondary">
-							<RefreshCw className="w-4 h-4" />
-							Đặt lại mặc định
-						</button>
-					</div>
-				</div>
-			</Modal>
+				isRealTimeEnabled={isRealTimeEnabled}
+				onRealTimeToggle={handleRealTimeToggle}
+			/>
 
 			{/* Share Modal */}
-			<Modal
+			<ShareModal
 				isOpen={showShareModal}
 				onClose={() => setShowShareModal(false)}
-				title="Chia sẻ báo cáo"
-			>
-				<div className="share-content">
-					<div className="share-section">
-						<h4>Chia sẻ qua liên kết</h4>
-						<div className="share-link">
-							<input 
-								type="text" 
-								value="https://analytics.example.com/report/12345" 
-								readOnly 
-								className="share-input"
-							/>
-							<button className="btn btn-secondary">
-								<Share2 className="w-4 h-4" />
-								Copy
-							</button>
-						</div>
-					</div>
-					<div className="share-section">
-						<h4>Chia sẻ qua email</h4>
-						<div className="share-email">
-							<input 
-								type="email" 
-								placeholder="Nhập email người nhận..." 
-								className="share-input"
-							/>
-							<button className="btn btn-primary">
-								Gửi email
-							</button>
-						</div>
-					</div>
-					<div className="share-section">
-						<h4>Tùy chọn chia sẻ</h4>
-						<div className="share-options">
-							<label className="share-option">
-								<input type="checkbox" defaultChecked />
-								<span>Cho phép xem công khai</span>
-							</label>
-							<label className="share-option">
-								<input type="checkbox" />
-								<span>Yêu cầu đăng nhập</span>
-							</label>
-							<label className="share-option">
-								<input type="checkbox" />
-								<span>Hết hạn sau 7 ngày</span>
-							</label>
-						</div>
-					</div>
-				</div>
-			</Modal>
+			/>
 
 			{/* Print Modal */}
-			<Modal
+			<PrintModal
 				isOpen={showPrintModal}
 				onClose={() => setShowPrintModal(false)}
-				title="In báo cáo"
-			>
-				<div className="print-content">
-					<div className="print-section">
-						<h4>Tùy chọn in</h4>
-						<div className="print-options">
-							<label className="print-option">
-								<span>Trang hiện tại</span>
-								<input type="radio" name="print-range" defaultChecked />
-							</label>
-							<label className="print-option">
-								<span>Tất cả các tab</span>
-								<input type="radio" name="print-range" />
-							</label>
-							<label className="print-option">
-								<span>Chỉ KPI và biểu đồ</span>
-								<input type="radio" name="print-range" />
-							</label>
-						</div>
-					</div>
-					<div className="print-section">
-						<h4>Định dạng</h4>
-						<div className="print-format">
-							<label className="print-option">
-								<span>Khổ A4</span>
-								<input type="radio" name="print-format" defaultChecked />
-							</label>
-							<label className="print-option">
-								<span>Khổ A3</span>
-								<input type="radio" name="print-format" />
-							</label>
-							<label className="print-option">
-								<span>Khổ Letter</span>
-								<input type="radio" name="print-format" />
-							</label>
-						</div>
-					</div>
-					<div className="print-actions">
-						<button className="btn btn-primary">
-							<Printer className="w-4 h-4" />
-							In ngay
-						</button>
-						<button className="btn btn-secondary">
-							<FileText className="w-4 h-4" />
-							Xuất PDF để in
-						</button>
-					</div>
-				</div>
-			</Modal>
+			/>
 
 			{/* Database Sync Modal */}
-			<Modal
+			<DatabaseModal
 				isOpen={showDatabaseModal}
 				onClose={() => setShowDatabaseModal(false)}
-				title="Đồng bộ cơ sở dữ liệu"
-			>
-				<div className="database-content">
-					<div className="database-section">
-						<h4>Trạng thái đồng bộ</h4>
-						<div className="sync-status">
-							<div className="status-item">
-								<span>Lần đồng bộ cuối:</span>
-								<span>2 phút trước</span>
-							</div>
-							<div className="status-item">
-								<span>Trạng thái:</span>
-								<span className="status-connected">Đã kết nối</span>
-							</div>
-							<div className="status-item">
-								<span>Dữ liệu chưa đồng bộ:</span>
-								<span>0 bản ghi</span>
-							</div>
-						</div>
-					</div>
-					<div className="database-section">
-						<h4>Tùy chọn đồng bộ</h4>
-						<div className="sync-options">
-							<label className="sync-option">
-								<input type="checkbox" defaultChecked />
-								<span>Đồng bộ tự động mỗi 5 phút</span>
-							</label>
-							<label className="sync-option">
-								<input type="checkbox" defaultChecked />
-								<span>Đồng bộ khi có thay đổi</span>
-							</label>
-							<label className="sync-option">
-								<input type="checkbox" />
-								<span>Đồng bộ dữ liệu lịch sử</span>
-							</label>
-						</div>
-					</div>
-					<div className="database-actions">
-						<button className="btn btn-primary">
-							<Database className="w-4 h-4" />
-							Đồng bộ ngay
-						</button>
-						<button className="btn btn-secondary">
-							<Settings className="w-4 h-4" />
-							Cài đặt nâng cao
-						</button>
-					</div>
-				</div>
-			</Modal>
+			/>
 
 			{/* Cloud Sync Modal */}
-			<Modal
+			<CloudModal
 				isOpen={showCloudModal}
 				onClose={() => setShowCloudModal(false)}
-				title="Đồng bộ đám mây"
-			>
-				<div className="cloud-content">
-					<div className="cloud-section">
-						<h4>Dịch vụ đám mây</h4>
-						<div className="cloud-services">
-							<label className="cloud-service">
-								<input type="radio" name="cloud-service" defaultChecked />
-								<span>Google Drive</span>
-							</label>
-							<label className="cloud-service">
-								<input type="radio" name="cloud-service" />
-								<span>Dropbox</span>
-							</label>
-							<label className="cloud-service">
-								<input type="radio" name="cloud-service" />
-								<span>OneDrive</span>
-							</label>
-						</div>
-					</div>
-					<div className="cloud-section">
-						<h4>Tùy chọn đồng bộ</h4>
-						<div className="cloud-options">
-							<label className="cloud-option">
-								<input type="checkbox" defaultChecked />
-								<span>Đồng bộ báo cáo hàng ngày</span>
-							</label>
-							<label className="cloud-option">
-								<input type="checkbox" defaultChecked />
-								<span>Đồng bộ dữ liệu thô</span>
-							</label>
-							<label className="cloud-option">
-								<input type="checkbox" />
-								<span>Nén dữ liệu trước khi tải lên</span>
-							</label>
-						</div>
-					</div>
-					<div className="cloud-actions">
-						<button className="btn btn-primary">
-							<Cloud className="w-4 h-4" />
-							Đồng bộ ngay
-						</button>
-						<button className="btn btn-secondary">
-							<Settings className="w-4 h-4" />
-							Cài đặt tài khoản
-						</button>
-					</div>
-				</div>
-			</Modal>
+			/>
 		</div>
 	)
 }

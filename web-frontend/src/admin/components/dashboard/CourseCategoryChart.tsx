@@ -180,32 +180,144 @@ const CourseCategoryChart: React.FC<CourseCategoryChartProps> = ({ data, chartDa
 				</div>
 
 				{/* Summary stats */}
-				<div className="chart-stats">
-					<div className="stat-item">
-						<div className="stat-icon">
-							<BookOpen size={16} />
-						</div>
-						<div className="stat-content">
-							<div className="stat-value">{totalCourses}</div>
-							<div className="stat-label">Tổng khóa học</div>
+				<div style={{ 
+					display: 'grid', 
+					gridTemplateColumns: 'repeat(3, 1fr)', 
+					gap: '16px',
+					marginTop: '20px'
+				}}>
+					{/* Card 1 - Tổng khóa học */}
+					<div style={{ 
+						background: 'var(--card)',
+						borderRadius: 'var(--radius-lg)',
+						padding: '16px',
+						boxShadow: 'var(--shadow-sm)',
+						border: '1px solid var(--border)',
+						position: 'relative',
+						overflow: 'hidden'
+					}}>
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '60px',
+							height: '60px',
+							background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(15px, -15px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '32px', 
+								height: '32px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<BookOpen size={16} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1, marginBottom: '2px' }}>
+									{totalCourses}
+								</div>
+								<div style={{ fontSize: '11px', color: 'var(--muted-foreground)', fontWeight: 500 }}>
+									Tổng khóa học
+								</div>
+							</div>
 						</div>
 					</div>
-					<div className="stat-item">
-						<div className="stat-icon">
-							<Users size={16} />
-						</div>
-						<div className="stat-content">
-							<div className="stat-value">{formatNumber(totalEnrollments)}</div>
-							<div className="stat-label">Tổng đăng ký</div>
+
+					{/* Card 2 - Tổng đăng ký */}
+					<div style={{ 
+						background: 'var(--card)',
+						borderRadius: 'var(--radius-lg)',
+						padding: '16px',
+						boxShadow: 'var(--shadow-sm)',
+						border: '1px solid var(--border)',
+						position: 'relative',
+						overflow: 'hidden'
+					}}>
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '60px',
+							height: '60px',
+							background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(15px, -15px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '32px', 
+								height: '32px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<Users size={16} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1, marginBottom: '2px' }}>
+									{formatNumber(totalEnrollments)}
+								</div>
+								<div style={{ fontSize: '11px', color: 'var(--muted-foreground)', fontWeight: 500 }}>
+									Tổng đăng ký
+								</div>
+							</div>
 						</div>
 					</div>
-					<div className="stat-item">
-						<div className="stat-icon">
-							<TrendingUp size={16} />
-						</div>
-						<div className="stat-content">
-							<div className="stat-value">{formatCurrency(totalRevenue)}</div>
-							<div className="stat-label">Tổng doanh thu</div>
+
+					{/* Card 3 - Tổng doanh thu */}
+					<div style={{ 
+						background: 'var(--card)',
+						borderRadius: 'var(--radius-lg)',
+						padding: '16px',
+						boxShadow: 'var(--shadow-sm)',
+						border: '1px solid var(--border)',
+						position: 'relative',
+						overflow: 'hidden'
+					}}>
+						<div style={{ 
+							position: 'absolute',
+							top: '0',
+							right: '0',
+							width: '60px',
+							height: '60px',
+							background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
+							borderRadius: '50%',
+							transform: 'translate(15px, -15px)'
+						}} />
+						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', position: 'relative', zIndex: 1 }}>
+							<div style={{ 
+								width: '32px', 
+								height: '32px', 
+								borderRadius: 'var(--radius-md)', 
+								display: 'flex', 
+								alignItems: 'center', 
+								justifyContent: 'center',
+								background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+								color: 'white',
+								flexShrink: 0
+							}}>
+								<TrendingUp size={16} />
+							</div>
+							<div style={{ flex: 1 }}>
+								<div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1, marginBottom: '2px' }}>
+									{formatCurrency(totalRevenue)}
+								</div>
+								<div style={{ fontSize: '11px', color: 'var(--muted-foreground)', fontWeight: 500 }}>
+									Tổng doanh thu
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
