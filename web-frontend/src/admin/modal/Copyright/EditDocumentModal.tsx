@@ -140,11 +140,11 @@ export const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
 	if (!isOpen || !document) return null
 
 	return (
-		<div className="modal-overlay">
-			<div className="modal-container edit-document-modal">
-				<div className="modal-header">
-					<div className="modal-title">
-						<FileText size={24} />
+		<div className="modal-overlay-modern">
+			<div className="modal-container-modern edit-document-modal">
+				<div className="modal-header-modern">
+					<div className="modal-title-modern">
+						<FileText size={36} />
 						<h2>Chỉnh sửa tài liệu</h2>
 					</div>
 					<button 
@@ -156,177 +156,190 @@ export const EditDocumentModal: React.FC<EditDocumentModalProps> = ({
 					</button>
 				</div>
 
-				<form onSubmit={handleSubmit} className="modal-content">
-					<div className="form-section">
-						<h3>Thông tin cơ bản</h3>
-						
-						<div className="form-group">
-							<label htmlFor="title">
-								<Tag size={16} />
-								Tiêu đề tài liệu *
-							</label>
-							<input
-								id="title"
-								type="text"
-								value={form.title}
-								onChange={(e) => handleInputChange('title', e.target.value)}
-								placeholder="Nhập tiêu đề tài liệu"
-								className={errors.title ? 'error' : ''}
-								disabled={isSubmitting}
-							/>
-							{errors.title && <span className="error-message">{errors.title}</span>}
-						</div>
-
-						<div className="form-group">
-							<label htmlFor="description">
-								<FileText size={16} />
-								Mô tả tài liệu *
-							</label>
-							<textarea
-								id="description"
-								value={form.description}
-								onChange={(e) => handleInputChange('description', e.target.value)}
-								placeholder="Nhập mô tả chi tiết về tài liệu"
-								rows={4}
-								className={errors.description ? 'error' : ''}
-								disabled={isSubmitting}
-							/>
-							{errors.description && <span className="error-message">{errors.description}</span>}
-						</div>
-
-						<div className="form-row">
-							<div className="form-group">
-								<label htmlFor="author">
-									<User size={16} />
-									Tác giả *
+				<div className="modal-content-modern">
+					<div className="modal-content-wrapper">
+					<form onSubmit={handleSubmit}>
+						<div className="modal-form-section">
+							<div className="section-title">
+								<FileText />
+								<h4>Thông tin cơ bản</h4>
+							</div>
+							
+							<div className="modal-form-group">
+								<label htmlFor="title">
+									<Tag />
+									Tiêu đề tài liệu <span className="required">*</span>
 								</label>
 								<input
-									id="author"
+									id="title"
 									type="text"
-									value={form.author}
-									onChange={(e) => handleInputChange('author', e.target.value)}
-									placeholder="Tên tác giả"
-									className={errors.author ? 'error' : ''}
+									value={form.title}
+									onChange={(e) => handleInputChange('title', e.target.value)}
+									placeholder="Nhập tiêu đề tài liệu"
+									className={errors.title ? 'error' : ''}
 									disabled={isSubmitting}
 								/>
-								{errors.author && <span className="error-message">{errors.author}</span>}
+								{errors.title && <span className="error-message">{errors.title}</span>}
 							</div>
 
-							<div className="form-group">
-								<label htmlFor="category">
-									<Hash size={16} />
-									Danh mục *
+							<div className="modal-form-group">
+								<label htmlFor="description">
+									<FileText />
+									Mô tả tài liệu <span className="required">*</span>
 								</label>
-								<select
-									id="category"
-									value={form.category}
-									onChange={(e) => handleInputChange('category', e.target.value)}
-									className={errors.category ? 'error' : ''}
+								<textarea
+									id="description"
+									value={form.description}
+									onChange={(e) => handleInputChange('description', e.target.value)}
+									placeholder="Nhập mô tả chi tiết về tài liệu"
+									rows={4}
+									className={errors.description ? 'error' : ''}
 									disabled={isSubmitting}
-								>
-									<option value="">Chọn danh mục</option>
-									<option value="academic">Học thuật</option>
-									<option value="research">Nghiên cứu</option>
-									<option value="textbook">Sách giáo khoa</option>
-									<option value="thesis">Luận văn</option>
-									<option value="article">Bài báo</option>
-									<option value="presentation">Thuyết trình</option>
-								</select>
-								{errors.category && <span className="error-message">{errors.category}</span>}
+								/>
+								{errors.description && <span className="error-message">{errors.description}</span>}
+							</div>
+
+							<div className="modal-form-row">
+								<div className="modal-form-group">
+									<label htmlFor="author">
+										<User />
+										Tác giả *
+									</label>
+									<input
+										id="author"
+										type="text"
+										value={form.author}
+										onChange={(e) => handleInputChange('author', e.target.value)}
+										placeholder="Tên tác giả"
+										className={errors.author ? 'error' : ''}
+										disabled={isSubmitting}
+									/>
+									{errors.author && <span className="error-message">{errors.author}</span>}
+								</div>
+
+								<div className="modal-form-group">
+									<label htmlFor="category">
+										<Hash />
+										Danh mục *
+									</label>
+									<select
+										id="category"
+										value={form.category}
+										onChange={(e) => handleInputChange('category', e.target.value)}
+										className={errors.category ? 'error' : ''}
+										disabled={isSubmitting}
+									>
+										<option value="">Chọn danh mục</option>
+										<option value="academic">Học thuật</option>
+										<option value="research">Nghiên cứu</option>
+										<option value="textbook">Sách giáo khoa</option>
+										<option value="thesis">Luận văn</option>
+										<option value="article">Bài báo</option>
+										<option value="presentation">Thuyết trình</option>
+									</select>
+									{errors.category && <span className="error-message">{errors.category}</span>}
+								</div>
 							</div>
 						</div>
-					</div>
 
-					<div className="form-section">
-						<h3>Từ khóa và tham chiếu</h3>
-						
-						<div className="form-group">
-							<label htmlFor="keywords">
-								<Tag size={16} />
-								Từ khóa
-							</label>
-							<input
-								id="keywords"
-								type="text"
-								value={form.keywords.join(', ')}
-								onChange={(e) => handleKeywordsChange(e.target.value)}
-								placeholder="Nhập từ khóa, phân cách bằng dấu phẩy"
+						<div className="modal-form-section">
+							<div className="section-title">
+								<Tag />
+								<h4>Từ khóa và tham chiếu</h4>
+							</div>
+							
+							<div className="modal-form-group">
+								<label htmlFor="keywords">
+									<Tag />
+									Từ khóa
+								</label>
+								<input
+									id="keywords"
+									type="text"
+									value={form.keywords.join(', ')}
+									onChange={(e) => handleKeywordsChange(e.target.value)}
+									placeholder="Nhập từ khóa, phân cách bằng dấu phẩy"
+									disabled={isSubmitting}
+								/>
+								<small>Phân cách các từ khóa bằng dấu phẩy (,)</small>
+							</div>
+
+							<div className="modal-form-group">
+								<label htmlFor="references">
+									<Link />
+									Tham chiếu
+								</label>
+								<textarea
+									id="references"
+									value={form.references?.join('\n') || ''}
+									onChange={(e) => handleReferencesChange(e.target.value)}
+									placeholder="Nhập các tham chiếu, mỗi tham chiếu một dòng"
+									rows={3}
+									disabled={isSubmitting}
+								/>
+								<small>Mỗi tham chiếu trên một dòng riêng</small>
+							</div>
+						</div>
+
+						<div className="modal-form-section">
+							<div className="section-title">
+								<Upload />
+								<h4>Cập nhật tệp tin</h4>
+							</div>
+							
+							<div className="modal-form-group">
+								<label htmlFor="file">
+									<Upload />
+									Tệp tin mới (tùy chọn)
+								</label>
+								<input
+									id="file"
+									type="file"
+									onChange={handleFileChange}
+									accept=".pdf,.doc,.docx,.txt,.rtf"
+									disabled={isSubmitting}
+								/>
+								<small>Để trống nếu không muốn thay đổi tệp tin hiện tại</small>
+							</div>
+						</div>
+
+						{errors.submit && (
+							<div className="error-banner">
+								<AlertCircle />
+								<span>{errors.submit}</span>
+							</div>
+						)}
+
+						<div className="modal-actions">
+							<button
+								type="button"
+								className="btn btn-secondary"
+								onClick={handleClose}
 								disabled={isSubmitting}
-							/>
-							<small>Phân cách các từ khóa bằng dấu phẩy (,)</small>
-						</div>
-
-						<div className="form-group">
-							<label htmlFor="references">
-								<Link size={16} />
-								Tham chiếu
-							</label>
-							<textarea
-								id="references"
-								value={form.references?.join('\n') || ''}
-								onChange={(e) => handleReferencesChange(e.target.value)}
-								placeholder="Nhập các tham chiếu, mỗi tham chiếu một dòng"
-								rows={3}
+							>
+								Hủy
+							</button>
+							<button
+								type="submit"
+								className="btn btn-primary"
 								disabled={isSubmitting}
-							/>
-							<small>Mỗi tham chiếu trên một dòng riêng</small>
+							>
+								{isSubmitting ? (
+									<>
+										<Loader2 className="animate-spin" />
+										Đang cập nhật...
+									</>
+								) : (
+									<>
+										<Save />
+										Cập nhật tài liệu
+									</>
+								)}
+							</button>
 						</div>
+					</form>
 					</div>
-
-					<div className="form-section">
-						<h3>Cập nhật tệp tin</h3>
-						
-						<div className="form-group">
-							<label htmlFor="file">
-								<Upload size={16} />
-								Tệp tin mới (tùy chọn)
-							</label>
-							<input
-								id="file"
-								type="file"
-								onChange={handleFileChange}
-								accept=".pdf,.doc,.docx,.txt,.rtf"
-								disabled={isSubmitting}
-							/>
-							<small>Để trống nếu không muốn thay đổi tệp tin hiện tại</small>
-						</div>
-					</div>
-
-					{errors.submit && (
-						<div className="error-banner">
-							<AlertCircle size={16} />
-							<span>{errors.submit}</span>
-						</div>
-					)}
-
-					<div className="modal-actions">
-						<button
-							type="button"
-							className="btn btn-secondary"
-							onClick={handleClose}
-							disabled={isSubmitting}
-						>
-							Hủy
-						</button>
-						<button
-							type="submit"
-							className="btn btn-primary"
-							disabled={isSubmitting}
-						>
-							{isSubmitting ? (
-								<>
-									<Loader2 size={16} className="animate-spin" />
-									Đang cập nhật...
-								</>
-							) : (
-								<>
-									<Save size={16} />
-									Cập nhật tài liệu
-								</>
-							)}
-						</button>
-					</div>
-				</form>
+				</div>
 			</div>
 		</div>
 	)

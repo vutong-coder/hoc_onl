@@ -74,71 +74,39 @@ export default function EventLog({ violations, onResolve }: EventLogProps): JSX.
 	}
 
 	return (
-		<div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-			<table className="admin-table">
-				<thead>
-					<tr>
-						<th>Thời gian</th>
-						<th>Loại vi phạm</th>
-						<th>Mô tả</th>
-						<th>Mức độ</th>
-						<th>Trạng thái</th>
-						{onResolve && <th>Hành động</th>}
-					</tr>
-				</thead>
-				<tbody>
-					{violations.map(violation => (
-						<tr key={violation.id}>
-							<td style={{ fontSize: '13px', color: 'var(--muted-foreground)' }}>
-								{formatTime(violation.timestamp)}
-							</td>
-							<td>
-								<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-									<AlertTriangle size={16} color={
-										violation.severity === 'critical' ? '#dc2626' :
-										violation.severity === 'high' ? '#f59e0b' : '#6b7280'
-									} />
-									{getViolationTypeLabel(violation.type)}
-								</div>
-							</td>
-							<td style={{ fontSize: '13px' }}>
-								{violation.description}
-							</td>
-							<td>
-								<Badge variant={getSeverityBadgeVariant(violation.severity)}>
-									{getSeverityLabel(violation.severity)}
-								</Badge>
-							</td>
-							<td>
-								{violation.resolved ? (
-									<div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#10b981' }}>
-										<CheckCircle size={16} />
-										<span style={{ fontSize: '13px' }}>Đã xử lý</span>
-									</div>
-								) : (
-									<div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#ef4444' }}>
-										<XCircle size={16} />
-										<span style={{ fontSize: '13px' }}>Chưa xử lý</span>
-									</div>
-								)}
-							</td>
-							{onResolve && (
-								<td>
-									{!violation.resolved && (
-										<button
-											className="btn btn-sm btn-secondary"
-											onClick={() => onResolve(violation.id)}
-										>
-											Đánh dấu đã xử lý
-										</button>
-									)}
-								</td>
-							)}
-						</tr>
-					))}
-				</tbody>
-			</table>
-		</div>
+		<ul className="modal-list">
+			{violations.map((violation) => (
+				<li key={violation.id} className="list-item">
+					<div className="item-icon">
+						<AlertTriangle />
+					</div>
+					<div className="item-content">
+						<div className="item-title">{getViolationTypeLabel(violation.type)}</div>
+						<div className="item-description">{violation.description}</div>
+					</div>
+					<div className="item-meta">
+						<div className="item-time">{formatTime(violation.timestamp)}</div>
+						<div className={`item-status ${getSeverityBadgeVariant(violation.severity)}`}>
+							{getSeverityLabel(violation.severity)}
+						</div>
+						{violation.resolved ? (
+							<div className="item-status success">Đã xử lý</div>
+						) : (
+							<div className="item-status danger">Chưa xử lý</div>
+						)}
+						{!violation.resolved && onResolve && (
+							<button 
+								className="modal-action-button"
+								onClick={() => onResolve(violation.id)}
+							>
+								<CheckCircle />
+								Xử lý
+							</button>
+						)}
+					</div>
+				</li>
+			))}
+		</ul>
 	)
 }
 

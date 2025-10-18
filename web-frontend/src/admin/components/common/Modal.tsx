@@ -51,36 +51,31 @@ export default function Modal({
 	if (!isOpen) return null
 
 	return (
-		<div className="modal-overlay" onClick={onClose}>
+		<div className="modal-overlay-modern" onClick={onClose}>
 			<div 
-				className="modal-content" 
+				className="modal-container-modern" 
 				style={{ maxWidth }}
 				onClick={(e) => e.stopPropagation()}
 			>
-				<div className="modal-header">
-					<h3 className="modal-title">{title}</h3>
+				<div className="modal-header-modern">
+					<div className="modal-title-modern">
+						<h2>{title}</h2>
+					</div>
 					<button
 						onClick={onClose}
-						className="btn btn-icon btn-secondary"
-						style={{ 
-							position: 'absolute', 
-							top: '16px', 
-							right: '16px',
-							fontSize: '18px',
-							fontWeight: 'bold'
-						}}
+						className="modal-close"
 						title="Đóng"
 					>
-						×
+						<X size={22} />
 					</button>
 				</div>
 				
-				<div className="modal-body">
+				<div className="modal-content-modern">
 					{children}
 				</div>
 				
 				{footer && (
-					<div className="modal-footer">
+					<div className="form-actions-modern">
 						{footer}
 					</div>
 				)}

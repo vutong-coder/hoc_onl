@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Modal from '../../components/common/Modal'
-import { User } from '../../types/user'
+import { User, User as UserIcon, Mail, Phone, Shield, Building } from 'lucide-react'
+import { User as UserType } from '../../types/user'
 
 interface EditUserModalProps {
 	isOpen: boolean
@@ -74,70 +75,99 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 				</>
 			}
 		>
-			<div>
-				<div className="form-group">
-					<label className="form-label">Họ và tên</label>
-					<input
-						type="text"
-						name="name"
-						className="form-input"
-						value={formData.name}
-						onChange={handleInputChange}
-						placeholder="Nhập họ và tên"
-					/>
-				</div>
-
-				<div className="form-group">
-					<label className="form-label">Email</label>
-					<input
-						type="email"
-						name="email"
-						className="form-input"
-						value={formData.email}
-						onChange={handleInputChange}
-						placeholder="Nhập địa chỉ email"
-					/>
-				</div>
-
-				<div className="form-row">
-					<div className="form-group">
-						<label className="form-label">Số điện thoại</label>
+			<div className="modal-content-wrapper">
+				<div className="modal-form-section">
+					<div className="section-title">
+						<UserIcon />
+						<h4>Thông tin cơ bản</h4>
+					</div>
+					
+					<div className="modal-form-group">
+						<label className="form-label">
+							<UserIcon />
+							Họ và tên <span className="required">*</span>
+						</label>
 						<input
-							type="tel"
-							name="phone"
+							type="text"
+							name="name"
 							className="form-input"
-							value={formData.phone}
+							value={formData.name}
 							onChange={handleInputChange}
-							placeholder="Nhập số điện thoại"
+							placeholder="Nhập họ và tên"
 						/>
 					</div>
 
-					<div className="form-group">
-						<label className="form-label">Vai trò</label>
-						<select
-							name="role"
-							className="form-select"
-							value={formData.role}
+					<div className="modal-form-group">
+						<label className="form-label">
+							<Mail />
+							Email <span className="required">*</span>
+						</label>
+						<input
+							type="email"
+							name="email"
+							className="form-input"
+							value={formData.email}
 							onChange={handleInputChange}
-						>
-							<option value="admin">Quản trị viên</option>
-							<option value="teacher">Giảng viên</option>
-							<option value="student">Học viên</option>
-							<option value="user">Người dùng</option>
-						</select>
+							placeholder="Nhập địa chỉ email"
+						/>
 					</div>
 				</div>
 
-				<div className="form-group">
-					<label className="form-label">Phòng ban</label>
-					<input
-						type="text"
-						name="department"
-						className="form-input"
-						value={formData.department}
-						onChange={handleInputChange}
-						placeholder="Nhập tên phòng ban"
-					/>
+				<div className="modal-form-section">
+					<div className="section-title">
+						<Phone />
+						<h4>Thông tin liên hệ</h4>
+					</div>
+					
+					<div className="modal-form-row">
+						<div className="modal-form-group">
+							<label className="form-label">
+								<Phone />
+								Số điện thoại
+							</label>
+							<input
+								type="tel"
+								name="phone"
+								className="form-input"
+								value={formData.phone}
+								onChange={handleInputChange}
+								placeholder="Nhập số điện thoại"
+							/>
+						</div>
+
+						<div className="modal-form-group">
+							<label className="form-label">
+								<Shield />
+								Vai trò
+							</label>
+							<select
+								name="role"
+								className="form-select"
+								value={formData.role}
+								onChange={handleInputChange}
+							>
+								<option value="admin">Quản trị viên</option>
+								<option value="teacher">Giảng viên</option>
+								<option value="student">Học viên</option>
+								<option value="user">Người dùng</option>
+							</select>
+						</div>
+					</div>
+
+					<div className="modal-form-group">
+						<label className="form-label">
+							<Building />
+							Phòng ban
+						</label>
+						<input
+							type="text"
+							name="department"
+							className="form-input"
+							value={formData.department}
+							onChange={handleInputChange}
+							placeholder="Nhập tên phòng ban"
+						/>
+					</div>
 				</div>
 			</div>
 		</Modal>

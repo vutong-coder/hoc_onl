@@ -1,11 +1,12 @@
 import React from 'react'
 import Modal from '../../components/common/Modal'
-import { User } from '../../types/user'
+import { User } from 'lucide-react'
+import { User as UserType } from '../../types/user'
 
 interface AddUserModalProps {
 	isOpen: boolean
 	onClose: () => void
-	onSave: (userData: Partial<User>) => void
+	onSave: (userData: Partial<UserType>) => void
 }
 
 const AddUserModal: React.FC<AddUserModalProps> = ({
@@ -14,7 +15,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
 	onSave
 }) => {
 	const handleSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
-		const form = (e.target as HTMLButtonElement).closest('.modal-content')?.querySelector('form')
+		const form = (e.target as HTMLButtonElement).closest('.modal-content-modern')?.querySelector('form')
 		if (form) {
 			const formData = new FormData(form)
 			const userData = {
@@ -56,65 +57,89 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
 				</>
 			}
 		>
-			<form>
-				<div className="form-group">
-					<label className="form-label">Họ và tên *</label>
-					<input
-						type="text"
-						name="name"
-						className="form-input"
-						placeholder="Nhập họ và tên"
-						required
-					/>
-				</div>
+			<div className="modal-content-wrapper">
+				<form>
+					<div className="modal-form-section">
+						<div className="section-title">
+							<User />
+							<h4>Thông tin cơ bản</h4>
+						</div>
+						
+						<div className="modal-form-group">
+							<label className="form-label">
+								<User />
+								Họ và tên <span className="required">*</span>
+							</label>
+							<input
+								type="text"
+								name="name"
+								className="form-input"
+								placeholder="Nhập họ và tên"
+								required
+							/>
+						</div>
 
-				<div className="form-group">
-					<label className="form-label">Email *</label>
-					<input
-						type="email"
-						name="email"
-						className="form-input"
-						placeholder="Nhập địa chỉ email"
-						required
-					/>
-				</div>
+						<div className="modal-form-group">
+							<label className="form-label">
+								<User />
+								Email <span className="required">*</span>
+							</label>
+							<input
+								type="email"
+								name="email"
+								className="form-input"
+								placeholder="Nhập địa chỉ email"
+								required
+							/>
+						</div>
 
-				<div className="form-row">
-					<div className="form-group">
-						<label className="form-label">Số điện thoại</label>
-						<input
-							type="tel"
-							name="phone"
-							className="form-input"
-							placeholder="Nhập số điện thoại"
-						/>
+						<div className="modal-form-row">
+							<div className="modal-form-group">
+								<label className="form-label">
+									<User />
+									Số điện thoại
+								</label>
+								<input
+									type="tel"
+									name="phone"
+									className="form-input"
+									placeholder="Nhập số điện thoại"
+								/>
+							</div>
+
+							<div className="modal-form-group">
+								<label className="form-label">
+									<User />
+									Vai trò
+								</label>
+								<select
+									name="role"
+									className="form-select"
+									defaultValue="student"
+								>
+									<option value="admin">Quản trị viên</option>
+									<option value="teacher">Giảng viên</option>
+									<option value="student">Học viên</option>
+									<option value="user">Người dùng</option>
+								</select>
+							</div>
+						</div>
+
+						<div className="modal-form-group">
+							<label className="form-label">
+								<User />
+								Phòng ban
+							</label>
+							<input
+								type="text"
+								name="department"
+								className="form-input"
+								placeholder="Nhập tên phòng ban"
+							/>
+						</div>
 					</div>
-
-					<div className="form-group">
-						<label className="form-label">Vai trò</label>
-						<select
-							name="role"
-							className="form-select"
-							defaultValue="student"
-						>
-							<option value="admin">Quản trị viên</option>
-							<option value="teacher">Giảng viên</option>
-							<option value="student">Học viên</option>
-							<option value="user">Người dùng</option>
-						</select>
-					</div>
-				</div>
-
-				<div className="form-group">
-					<label className="form-label">Phòng ban</label>
-					<input
-						type="text"
-						name="department"
-						className="form-input"
-						placeholder="Nhập tên phòng ban"
-					/>
-				</div>
-			</form>
+				</form>
+			</div>
 		</Modal>
 	)
 }

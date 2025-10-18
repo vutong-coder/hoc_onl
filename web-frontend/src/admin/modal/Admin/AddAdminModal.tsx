@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { X, Save, User, Mail, Lock, Shield, Settings } from 'lucide-react'
+import { X, Save, User, Mail, Lock, Shield, Settings, UserCheck, Phone, Building2 } from 'lucide-react'
 import Modal from '../../components/common/Modal'
 import { AdminForm, AdminRole, AdminStatus, AdminPermission, AdminPreferences, AdminMetadata } from '../../types/admin'
 
@@ -285,173 +285,216 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
 			onClose={onClose}
 			title={editingAdmin ? 'Chỉnh sửa Admin' : 'Thêm Admin mới'}
 			maxWidth="900px"
+			footer={
+				<>
+					<button
+						type="button"
+						className="btn btn-secondary"
+						onClick={onClose}
+					>
+						<X size={18} />
+						Hủy
+					</button>
+					<button
+						type="submit"
+						form="admin-form"
+						className="btn btn-primary"
+					>
+						<Save size={18} />
+						{editingAdmin ? 'Cập nhật' : 'Tạo mới'}
+					</button>
+				</>
+			}
 		>
-			<form onSubmit={handleSubmit} className="add-admin-form">
-				{/* Basic Information */}
-				<div className="form-section">
-					<h3 className="section-title">
-						<User size={20} />
-						Thông tin cơ bản
-					</h3>
-					<div className="form-row">
-						<div className="form-group">
-							<label htmlFor="username">Tên đăng nhập *</label>
-							<input
-								type="text"
-								id="username"
-								value={formData.username}
-								onChange={(e) => handleInputChange('username', e.target.value)}
-								className={errors.username ? 'error' : ''}
-								placeholder="Nhập tên đăng nhập"
-							/>
-							{errors.username && <span className="error-message">{errors.username}</span>}
+			<div className="modal-content-wrapper">
+				<form id="admin-form" onSubmit={handleSubmit}>
+					{/* Basic Information */}
+					<div className="modal-form-section">
+						<div className="section-title">
+							<User />
+							<h4>Thông tin cơ bản</h4>
 						</div>
-						<div className="form-group">
-							<label htmlFor="email">Email *</label>
-							<input
-								type="email"
-								id="email"
-								value={formData.email}
-								onChange={(e) => handleInputChange('email', e.target.value)}
-								className={errors.email ? 'error' : ''}
-								placeholder="Nhập email"
-							/>
-							{errors.email && <span className="error-message">{errors.email}</span>}
+						
+						<div className="modal-form-row">
+							<div className="modal-form-group">
+								<label className="form-label">
+									<UserCheck />
+									Tên đăng nhập *
+								</label>
+								<input
+									type="text"
+									value={formData.username}
+									onChange={(e) => handleInputChange('username', e.target.value)}
+									className={`form-input ${errors.username ? 'error' : ''}`}
+									placeholder="Nhập tên đăng nhập"
+								/>
+								{errors.username && <span className="error-message">{errors.username}</span>}
+							</div>
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Mail />
+									Email *
+								</label>
+								<input
+									type="email"
+									value={formData.email}
+									onChange={(e) => handleInputChange('email', e.target.value)}
+									className={`form-input ${errors.email ? 'error' : ''}`}
+									placeholder="Nhập email"
+								/>
+								{errors.email && <span className="error-message">{errors.email}</span>}
+							</div>
+						</div>
+						
+						<div className="modal-form-row">
+							<div className="modal-form-group">
+								<label className="form-label">
+									<User />
+									Họ và tên *
+								</label>
+								<input
+									type="text"
+									value={formData.fullName}
+									onChange={(e) => handleInputChange('fullName', e.target.value)}
+									className={`form-input ${errors.fullName ? 'error' : ''}`}
+									placeholder="Nhập họ và tên"
+								/>
+								{errors.fullName && <span className="error-message">{errors.fullName}</span>}
+							</div>
+							<div className="modal-form-group">
+								<label className="form-label">
+									<UserCheck />
+									Trạng thái
+								</label>
+								<select
+									value={formData.status}
+									onChange={(e) => handleInputChange('status', e.target.value as AdminStatus)}
+									className="form-select"
+								>
+									{statusOptions.map(option => (
+										<option key={option.value} value={option.value}>
+											{option.label}
+										</option>
+									))}
+								</select>
+							</div>
 						</div>
 					</div>
-					<div className="form-row">
-						<div className="form-group">
-							<label htmlFor="fullName">Họ và tên *</label>
-							<input
-								type="text"
-								id="fullName"
-								value={formData.fullName}
-								onChange={(e) => handleInputChange('fullName', e.target.value)}
-								className={errors.fullName ? 'error' : ''}
-								placeholder="Nhập họ và tên"
-							/>
-							{errors.fullName && <span className="error-message">{errors.fullName}</span>}
+
+					{/* Role and Permissions */}
+					<div className="modal-form-section">
+						<div className="section-title">
+							<Shield />
+							<h4>Vai trò và quyền hạn</h4>
 						</div>
-						<div className="form-group">
-							<label htmlFor="status">Trạng thái</label>
+						
+						<div className="modal-form-group">
+							<label className="form-label">
+								<Shield />
+								Vai trò
+							</label>
 							<select
-								id="status"
-								value={formData.status}
-								onChange={(e) => handleInputChange('status', e.target.value as AdminStatus)}
+								value={formData.role}
+								onChange={(e) => handleRoleChange(e.target.value as AdminRole)}
+								className="form-select"
 							>
-								{statusOptions.map(option => (
+								{roleOptions.map(option => (
 									<option key={option.value} value={option.value}>
 										{option.label}
 									</option>
 								))}
 							</select>
 						</div>
-					</div>
-				</div>
 
-				{/* Role and Permissions */}
-				<div className="form-section">
-					<h3 className="section-title">
-						<Shield size={20} />
-						Vai trò và quyền hạn
-					</h3>
-					<div className="form-group">
-						<label htmlFor="role">Vai trò</label>
-						<select
-							id="role"
-							value={formData.role}
-							onChange={(e) => handleRoleChange(e.target.value as AdminRole)}
-						>
-							{roleOptions.map(option => (
-								<option key={option.value} value={option.value}>
-									{option.label}
-								</option>
-							))}
-						</select>
-					</div>
-
-					<div className="permissions-section">
-						<label>Quyền hạn</label>
-						{errors.permissions && <span className="error-message">{errors.permissions}</span>}
-						<div className="permissions-grid">
-							{selectedRole?.permissions.map(permission => (
-								<div key={permission} className="permission-item">
-									<label className="checkbox-label">
-										<input
-											type="checkbox"
-											checked={formData.permissions.includes(permission)}
-											onChange={() => handlePermissionToggle(permission)}
-										/>
-										<span>{permission.replace(/_/g, ' ')}</span>
-									</label>
-								</div>
-							))}
+						<div className="modal-form-group">
+							<label className="form-label">
+								<Settings />
+								Quyền hạn
+							</label>
+							{errors.permissions && <span className="error-message">{errors.permissions}</span>}
+							<div className="modal-checkbox-group">
+								{selectedRole?.permissions.map(permission => (
+									<div key={permission} className="checkbox-item">
+										<label className="checkbox-label">
+											<input
+												type="checkbox"
+												checked={formData.permissions.includes(permission)}
+												onChange={() => handlePermissionToggle(permission)}
+											/>
+											<span>{permission.replace(/_/g, ' ')}</span>
+										</label>
+									</div>
+								))}
+							</div>
 						</div>
 					</div>
-				</div>
 
-				{/* Additional Information */}
-				<div className="form-section">
-					<h3 className="section-title">
-						<Settings size={20} />
-						Thông tin bổ sung
-					</h3>
-					<div className="form-row">
-						<div className="form-group">
-							<label htmlFor="department">Phòng ban</label>
+					{/* Additional Information */}
+					<div className="modal-form-section">
+						<div className="section-title">
+							<Settings />
+							<h4>Thông tin bổ sung</h4>
+						</div>
+						
+						<div className="modal-form-row">
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Building2 />
+									Phòng ban
+								</label>
+								<input
+									type="text"
+									value={formData.metadata.department || ''}
+									onChange={(e) => handleMetadataChange('department', e.target.value)}
+									className="form-input"
+									placeholder="Nhập phòng ban"
+								/>
+							</div>
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Phone />
+									Số điện thoại
+								</label>
+								<input
+									type="tel"
+									value={formData.metadata.phone || ''}
+									onChange={(e) => handleMetadataChange('phone', e.target.value)}
+									className="form-input"
+									placeholder="Nhập số điện thoại"
+								/>
+							</div>
+						</div>
+						
+						<div className="modal-form-group">
+							<label className="form-label">
+								<Building2 />
+								Địa chỉ
+							</label>
 							<input
 								type="text"
-								id="department"
-								value={formData.metadata.department || ''}
-								onChange={(e) => handleMetadataChange('department', e.target.value)}
-								placeholder="Nhập phòng ban"
+								value={formData.metadata.address || ''}
+								onChange={(e) => handleMetadataChange('address', e.target.value)}
+								className="form-input"
+								placeholder="Nhập địa chỉ"
 							/>
 						</div>
-						<div className="form-group">
-							<label htmlFor="phone">Số điện thoại</label>
-							<input
-								type="tel"
-								id="phone"
-								value={formData.metadata.phone || ''}
-								onChange={(e) => handleMetadataChange('phone', e.target.value)}
-								placeholder="Nhập số điện thoại"
+						
+						<div className="modal-form-group">
+							<label className="form-label">
+								<User />
+								Giới thiệu
+							</label>
+							<textarea
+								value={formData.metadata.bio || ''}
+								onChange={(e) => handleMetadataChange('bio', e.target.value)}
+								className="form-textarea"
+								placeholder="Nhập giới thiệu"
+								rows={3}
 							/>
 						</div>
 					</div>
-					<div className="form-group">
-						<label htmlFor="address">Địa chỉ</label>
-						<input
-							type="text"
-							id="address"
-							value={formData.metadata.address || ''}
-							onChange={(e) => handleMetadataChange('address', e.target.value)}
-							placeholder="Nhập địa chỉ"
-						/>
-					</div>
-					<div className="form-group">
-						<label htmlFor="bio">Giới thiệu</label>
-						<textarea
-							id="bio"
-							value={formData.metadata.bio || ''}
-							onChange={(e) => handleMetadataChange('bio', e.target.value)}
-							placeholder="Nhập giới thiệu"
-							rows={3}
-						/>
-					</div>
-				</div>
-
-				{/* Form Actions */}
-				<div className="form-actions">
-					<button type="button" className="btn btn-secondary" onClick={onClose}>
-						<X size={16} />
-						Hủy
-					</button>
-					<button type="submit" className="btn btn-primary">
-						<Save size={16} />
-						{editingAdmin ? 'Cập nhật' : 'Thêm mới'}
-					</button>
-				</div>
-			</form>
+				</form>
+			</div>
 		</Modal>
 	)
 }

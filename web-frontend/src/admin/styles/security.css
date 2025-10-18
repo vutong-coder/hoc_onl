@@ -1,5 +1,8 @@
 /* Security & Blockchain specific styles */
 
+/* Import common modal & form styles */
+@import './_modal-common.scss';
+
 .module-status-card {
 	padding: 20px;
 	background: var(--card);

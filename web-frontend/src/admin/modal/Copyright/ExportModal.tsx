@@ -28,52 +28,42 @@ const ExportModal: React.FC<ExportModalProps> = ({
 			onClose={onClose}
 			title="Xuất dữ liệu"
 		>
-			<div className="export-options">
-				<div className="export-section">
-					<h4>Định dạng xuất</h4>
-					<div className="export-buttons">
-						<button 
-							className="btn btn-secondary"
-							onClick={() => handleExport('excel')}
-							disabled={isExporting}
-						>
-							<Download className="w-4 h-4" />
-							Excel (.xlsx)
-						</button>
-						<button 
-							className="btn btn-secondary"
-							onClick={() => handleExport('csv')}
-							disabled={isExporting}
-						>
-							<Download className="w-4 h-4" />
-							CSV (.csv)
-						</button>
-						<button 
-							className="btn btn-secondary"
-							onClick={() => handleExport('json')}
-							disabled={isExporting}
-						>
-							<Download className="w-4 h-4" />
-							JSON (.json)
-						</button>
+			<div className="modal-content-wrapper">
+				<div className="modal-selection-grid">
+					<div className="modal-selection-card" onClick={() => handleExport('excel')}>
+						<div className="card-icon">
+							<Download />
+						</div>
+						<div className="card-title">Excel (.xlsx)</div>
+						<div className="card-description">Xuất dữ liệu dạng bảng tính Excel</div>
+					</div>
+					<div className="modal-selection-card" onClick={() => handleExport('csv')}>
+						<div className="card-icon">
+							<Download />
+						</div>
+						<div className="card-title">CSV (.csv)</div>
+						<div className="card-description">Xuất dữ liệu dạng CSV</div>
+					</div>
+					<div className="modal-selection-card" onClick={() => handleExport('json')}>
+						<div className="card-icon">
+							<Download />
+						</div>
+						<div className="card-title">JSON (.json)</div>
+						<div className="card-description">Xuất dữ liệu dạng JSON</div>
 					</div>
 				</div>
-				<div className="export-section">
-					<h4>Tùy chọn xuất</h4>
-					<div className="export-options-list">
-						<label className="export-option">
-							<input type="checkbox" defaultChecked />
-							<span>Bao gồm metadata</span>
-						</label>
-						<label className="export-option">
-							<input type="checkbox" defaultChecked />
-							<span>Bao gồm lịch sử xác minh</span>
-						</label>
-						<label className="export-option">
-							<input type="checkbox" defaultChecked />
-							<span>Bao gồm tranh chấp</span>
-						</label>
+
+				<div className="modal-export-info">
+					<div className="export-title">
+						<Download />
+						<h4>Tùy chọn xuất</h4>
 					</div>
+					<ul className="export-list">
+						<li>Bao gồm metadata</li>
+						<li>Bao gồm lịch sử xác minh</li>
+						<li>Bao gồm tranh chấp</li>
+						<li>Tên file tự động với ngày xuất</li>
+					</ul>
 				</div>
 			</div>
 		</Modal>

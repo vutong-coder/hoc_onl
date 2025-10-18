@@ -66,87 +66,83 @@ export default function SessionDetailView({
 	}
 
 	return (
-		<div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+		<div className="modal-content-wrapper">
 			{/* Header */}
-			<div style={{ 
-				display: 'flex', 
-				justifyContent: 'space-between', 
-				alignItems: 'flex-start'
-			}}>
-				<div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+			<div className="modal-info-card">
+				<div className="card-icon">
 					{session.userAvatar ? (
 						<img 
 							src={session.userAvatar} 
 							alt={session.userName}
 							style={{ 
-								width: '80px', 
-								height: '80px', 
+								width: '40px', 
+								height: '40px', 
 								borderRadius: '50%',
-								objectFit: 'cover',
-								border: '3px solid var(--border)'
+								objectFit: 'cover'
 							}}
 						/>
 					) : (
 						<div style={{ 
-							width: '80px', 
-							height: '80px', 
+							width: '40px', 
+							height: '40px', 
 							borderRadius: '50%',
 							background: 'var(--accent)',
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
 							color: 'var(--accent-foreground)',
-							fontSize: '32px',
+							fontSize: '18px',
 							fontWeight: 700
 						}}>
 							{session.userName.charAt(0)}
 						</div>
 					)}
-					
-					<div>
-						<h2 style={{ fontSize: '24px', fontWeight: 700, margin: '0 0 8px 0' }}>
-							{session.userName}
-						</h2>
-						<div style={{ fontSize: '14px', color: 'var(--muted-foreground)', marginBottom: '8px' }}>
-							{session.examTitle}
-						</div>
-						<div style={{ display: 'flex', gap: '8px' }}>
-							<Badge variant={getRiskBadgeVariant(session.riskLevel)}>
-								{getRiskLabel(session.riskLevel)}
-							</Badge>
-							<Badge variant="info">ID: {session.id}</Badge>
-						</div>
-					</div>
 				</div>
-
-				{session.status === 'active' && (
-					<div style={{ display: 'flex', gap: '12px' }}>
-						{onSendWarning && (
-							<button className="btn btn-warning" onClick={() => onSendWarning(session.id)}>
-								<AlertTriangle size={18} />
-								Gửi cảnh báo
-							</button>
-						)}
-						{onTerminate && (
-							<button className="btn btn-danger" onClick={() => onTerminate(session.id)}>
-								Dừng phiên thi
-							</button>
-						)}
-					</div>
-				)}
+				<div className="card-title">{session.userName}</div>
+				<div className="card-description">{session.examTitle}</div>
+				<div className="card-value">
+					<span className={`modal-status-badge ${getRiskBadgeVariant(session.riskLevel)}`}>
+						{getRiskLabel(session.riskLevel)}
+					</span>
+					<span className="modal-status-badge secondary" style={{ marginLeft: '8px' }}>
+						ID: {session.id}
+					</span>
+				</div>
 			</div>
 
+			{/* Action Buttons */}
+			{session.status === 'active' && (
+				<div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+					{onSendWarning && (
+						<button className="btn btn-warning" onClick={() => onSendWarning(session.id)}>
+							<AlertTriangle size={18} />
+							Gửi cảnh báo
+						</button>
+					)}
+					{onTerminate && (
+						<button className="btn btn-danger" onClick={() => onTerminate(session.id)}>
+							Dừng phiên thi
+						</button>
+					)}
+				</div>
+			)}
+
 			{/* Video Stream Placeholder */}
-			<div style={{ 
-				background: '#000',
-				borderRadius: 'var(--radius-lg)',
-				aspectRatio: '16/9',
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-				position: 'relative',
-				overflow: 'hidden'
-			}}>
+			<div className="modal-detail-section">
+				<div className="section-title">
+					<Video />
+					<h4>Video Stream</h4>
+				</div>
+				<div style={{ 
+					background: '#000',
+					borderRadius: '16px',
+					aspectRatio: '16/9',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					position: 'relative',
+					overflow: 'hidden'
+				}}>
 				{session.cameraEnabled && session.faceDetected ? (
 					<>
 						<div style={{
@@ -219,13 +215,10 @@ export default function SessionDetailView({
 					}} />
 				</div>
 			</div>
+			</div>
 
 			{/* Stats Grid */}
-			<div style={{ 
-				display: 'grid',
-				gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-				gap: '16px'
-			}}>
+			<div className="modal-info-grid">
 				<StatCard
 					icon={<Video size={20} />}
 					label="Camera"
@@ -267,10 +260,11 @@ export default function SessionDetailView({
 			</div>
 
 			{/* Event Log */}
-			<div>
-				<h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '16px' }}>
-					Nhật ký sự kiện ({session.violations.length})
-				</h3>
+			<div className="modal-detail-section">
+				<div className="section-title">
+					<AlertTriangle />
+					<h4>Nhật ký sự kiện ({session.violations.length})</h4>
+				</div>
 				<EventLog 
 					violations={session.violations}
 					onResolve={onResolveViolation}
@@ -293,24 +287,12 @@ function StatCard({
 	color: string
 }) {
 	return (
-		<div style={{
-			padding: '16px',
-			background: 'var(--card)',
-			border: '1px solid var(--border)',
-			borderRadius: 'var(--radius-lg)',
-			display: 'flex',
-			alignItems: 'center',
-			gap: '12px'
-		}}>
-			<div style={{ color }}>{icon}</div>
-			<div>
-				<div style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px' }}>
-					{label}
-				</div>
-				<div style={{ fontSize: '16px', fontWeight: 600 }}>
-					{value}
-				</div>
+		<div className="modal-info-card">
+			<div className="card-icon" style={{ background: color }}>
+				{icon}
 			</div>
+			<div className="card-title">{label}</div>
+			<div className="card-value" style={{ color }}>{value}</div>
 		</div>
 	)
 }

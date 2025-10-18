@@ -211,33 +211,37 @@ export default function DashboardPage(): JSX.Element {
 						</div>
 
 						<button
-							className="btn btn-secondary"
+							className="modal-action-button"
 							onClick={() => setShowFilters(true)}
 							title="Bộ lọc"
 						>
-							<Filter size={18} />
+							<Filter />
+							Bộ lọc
 						</button>
 						<button
-							className="btn btn-secondary"
+							className="modal-action-button"
 							onClick={handleExportData}
 							title="Xuất dữ liệu Excel"
 						>
-							<FileSpreadsheet size={18} />
+							<FileSpreadsheet />
+							Xuất dữ liệu
 						</button>
 						<button
-							className="btn btn-secondary"
+							className="modal-action-button"
 							onClick={refreshData}
 							disabled={loading}
 							title="Làm mới"
 						>
-							<RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+							<RefreshCw className={loading ? 'animate-spin' : ''} />
+							Làm mới
 						</button>
 						<button
-							className="btn btn-secondary"
+							className="modal-action-button"
 							onClick={() => setShowSettings(true)}
 							title="Cài đặt"
 						>
-							<Settings size={18} />
+							<Settings />
+							Cài đặt
 						</button>
 					</div>
 				</div>

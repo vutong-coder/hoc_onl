@@ -1,5 +1,6 @@
 import React from 'react'
 import Modal from '../../components/common/Modal'
+import { FileText, Clock, Hash, Settings, CheckSquare } from 'lucide-react'
 
 interface AddExamModalProps {
 	isOpen: boolean
@@ -15,7 +16,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 	subjects
 }) => {
 	const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
-		const form = (e.target as HTMLButtonElement).closest('.modal-content')?.querySelector('form')
+		const form = (e.target as HTMLButtonElement).closest('.modal-content-modern')?.querySelector('form')
 		if (form) {
 			const formData = new FormData(form)
 			const examData = {
@@ -74,19 +75,23 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 				</>
 			}
 		>
-			<form>
-				<div className="form-group">
-					<label className="form-label">Tiêu đề đề thi *</label>
-					<input 
-						type="text" 
-						name="title" 
-						className="form-input" 
-						placeholder="VD: Kiểm tra giữa kỳ - Lập trình Web" 
-						required 
-					/>
-				</div>
+			<div className="modal-content-wrapper">
+				<form>
+					<div className="modal-modal-form-group">
+						<label className="form-label">
+							<FileText />
+							Tiêu đề đề thi <span className="required">*</span>
+						</label>
+						<input 
+							type="text" 
+							name="title" 
+							className="form-input" 
+							placeholder="VD: Kiểm tra giữa kỳ - Lập trình Web" 
+							required 
+						/>
+					</div>
 
-				<div className="form-group">
+				<div className="modal-form-group">
 					<label className="form-label">Mô tả</label>
 					<textarea 
 						name="description" 
@@ -96,8 +101,8 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 					/>
 				</div>
 
-				<div className="form-row">
-					<div className="form-group">
+				<div className="modal-form-row">
+					<div className="modal-form-group">
 						<label className="form-label">Môn học *</label>
 						<select name="subject" className="form-select" required>
 							{subjects.map(s => (
@@ -106,7 +111,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 						</select>
 					</div>
 
-					<div className="form-group">
+					<div className="modal-form-group">
 						<label className="form-label">Loại bài thi</label>
 						<select name="type" className="form-select" defaultValue="practice">
 							<option value="practice">Luyện tập</option>
@@ -118,8 +123,8 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 					</div>
 				</div>
 
-				<div className="form-row">
-					<div className="form-group">
+				<div className="modal-form-row">
+					<div className="modal-form-group">
 						<label className="form-label">Số câu hỏi *</label>
 						<input 
 							type="number" 
@@ -131,7 +136,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 						/>
 					</div>
 
-					<div className="form-group">
+					<div className="modal-form-group">
 						<label className="form-label">Thời gian (phút) *</label>
 						<input 
 							type="number" 
@@ -143,7 +148,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 						/>
 					</div>
 
-					<div className="form-group">
+					<div className="modal-form-group">
 						<label className="form-label">Độ khó</label>
 						<select name="difficulty" className="form-select" defaultValue="medium">
 							<option value="easy">Dễ</option>
@@ -153,8 +158,8 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 					</div>
 				</div>
 
-				<div className="form-row">
-					<div className="form-group">
+				<div className="modal-form-row">
+					<div className="modal-form-group">
 						<label className="form-label">Tổng điểm</label>
 						<input 
 							type="number" 
@@ -165,7 +170,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 						/>
 					</div>
 
-					<div className="form-group">
+					<div className="modal-form-group">
 						<label className="form-label">Điểm đạt</label>
 						<input 
 							type="number" 
@@ -176,7 +181,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 						/>
 					</div>
 
-					<div className="form-group">
+					<div className="modal-form-group">
 						<label className="form-label">Số lần thi tối đa</label>
 						<input 
 							type="number" 
@@ -238,6 +243,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 					<strong>💡 Lưu ý:</strong> Trường có dấu (*) là bắt buộc. Tổng điểm và Điểm đạt sẽ tự động tính nếu không nhập.
 				</div>
 			</form>
+			</div>
 		</Modal>
 	)
 }

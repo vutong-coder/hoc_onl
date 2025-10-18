@@ -32,111 +32,81 @@ const DashboardExportModal: React.FC<DashboardExportModalProps> = ({
 			title="Xuất dữ liệu Excel"
 			maxWidth="600px"
 		>
-			<div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-				<div style={{ marginBottom: '16px' }}>
-					<p style={{ color: 'var(--muted-foreground)', margin: 0 }}>
+			<div className="modal-content-wrapper">
+				<div className="modal-detail-section">
+					<div className="section-title">
+						<FileSpreadsheet />
+						<h4>Chọn loại dữ liệu xuất</h4>
+					</div>
+					<p style={{ color: 'var(--muted-foreground)', margin: '0 0 20px 0', fontSize: '15px' }}>
 						Chọn loại dữ liệu bạn muốn xuất ra file Excel:
 					</p>
 				</div>
 
-				<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '12px' }}>
-					<button
-						className="btn btn-primary"
-						onClick={onExportComplete}
-						style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-					>
-						<FileSpreadsheet size={18} />
-						<div style={{ textAlign: 'left' }}>
-							<div style={{ fontWeight: 600 }}>Dashboard hoàn chỉnh</div>
-							<div style={{ fontSize: '12px', opacity: 0.8 }}>Tất cả dữ liệu trong 1 file</div>
+				<div className="modal-selection-grid">
+					<div className="modal-selection-card" onClick={onExportComplete}>
+						<div className="card-icon">
+							<FileSpreadsheet />
 						</div>
-					</button>
+						<div className="card-title">Dashboard hoàn chỉnh</div>
+						<div className="card-description">Tất cả dữ liệu trong 1 file</div>
+					</div>
 
-					<button
-						className="btn btn-outline"
-						onClick={onExportStats}
-						style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-					>
-						<BarChart3 size={18} />
-						<div style={{ textAlign: 'left' }}>
-							<div style={{ fontWeight: 600 }}>Thống kê tổng quan</div>
-							<div style={{ fontSize: '12px', opacity: 0.8 }}>8 chỉ số chính</div>
+					<div className="modal-selection-card" onClick={onExportStats}>
+						<div className="card-icon">
+							<BarChart3 />
 						</div>
-					</button>
+						<div className="card-title">Thống kê tổng quan</div>
+						<div className="card-description">8 chỉ số chính</div>
+					</div>
 
-					<button
-						className="btn btn-outline"
-						onClick={onExportUserGrowth}
-						style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-					>
-						<TrendingUp size={18} />
-						<div style={{ textAlign: 'left' }}>
-							<div style={{ fontWeight: 600 }}>Tăng trưởng người dùng</div>
-							<div style={{ fontSize: '12px', opacity: 0.8 }}>30 ngày gần nhất</div>
+					<div className="modal-selection-card" onClick={onExportUserGrowth}>
+						<div className="card-icon">
+							<TrendingUp />
 						</div>
-					</button>
+						<div className="card-title">Tăng trưởng người dùng</div>
+						<div className="card-description">30 ngày gần nhất</div>
+					</div>
 
-					<button
-						className="btn btn-outline"
-						onClick={onExportCategories}
-						style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-					>
-						<BookOpen size={18} />
-						<div style={{ textAlign: 'left' }}>
-							<div style={{ fontWeight: 600 }}>Danh mục khóa học</div>
-							<div style={{ fontSize: '12px', opacity: 0.8 }}>8 danh mục</div>
+					<div className="modal-selection-card" onClick={onExportCategories}>
+						<div className="card-icon">
+							<BookOpen />
 						</div>
-					</button>
+						<div className="card-title">Danh mục khóa học</div>
+						<div className="card-description">8 danh mục</div>
+					</div>
 
-					<button
-						className="btn btn-outline"
-						onClick={onExportActivities}
-						style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-					>
-						<Activity size={18} />
-						<div style={{ textAlign: 'left' }}>
-							<div style={{ fontWeight: 600 }}>Hoạt động gần đây</div>
-							<div style={{ fontSize: '12px', opacity: 0.8 }}>10 hoạt động mới nhất</div>
+					<div className="modal-selection-card" onClick={onExportActivities}>
+						<div className="card-icon">
+							<Activity />
 						</div>
-					</button>
+						<div className="card-title">Hoạt động gần đây</div>
+						<div className="card-description">10 hoạt động mới nhất</div>
+					</div>
 
-					<button
-						className="btn btn-outline"
-						onClick={onExportPerformers}
-						style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-					>
-						<Users size={18} />
-						<div style={{ textAlign: 'left' }}>
-							<div style={{ fontWeight: 600 }}>Top Performers</div>
-							<div style={{ fontSize: '12px', opacity: 0.8 }}>5 người xuất sắc nhất</div>
+					<div className="modal-selection-card" onClick={onExportPerformers}>
+						<div className="card-icon">
+							<Users />
 						</div>
-					</button>
+						<div className="card-title">Top Performers</div>
+						<div className="card-description">5 người xuất sắc nhất</div>
+					</div>
 
-					<button
-						className="btn btn-outline"
-						onClick={onExportSystemHealth}
-						style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-start' }}
-					>
-						<CheckCircle size={18} />
-						<div style={{ textAlign: 'left' }}>
-							<div style={{ fontWeight: 600 }}>Tình trạng hệ thống</div>
-							<div style={{ fontSize: '12px', opacity: 0.8 }}>Health & Alerts</div>
+					<div className="modal-selection-card" onClick={onExportSystemHealth}>
+						<div className="card-icon">
+							<CheckCircle />
 						</div>
-					</button>
+						<div className="card-title">Tình trạng hệ thống</div>
+						<div className="card-description">Health & Alerts</div>
+					</div>
 				</div>
 
-				<div style={{ 
-					marginTop: '20px', 
-					padding: '16px', 
-					background: 'var(--muted)', 
-					borderRadius: 'var(--radius-md)',
-					border: '1px solid var(--border)'
-				}}>
-					<div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-						<Table size={16} />
-						<span style={{ fontWeight: 600, fontSize: '14px' }}>Thông tin xuất file</span>
+				<div className="modal-export-info">
+					<div className="export-title">
+						<Table />
+						<h4>Thông tin xuất file</h4>
 					</div>
-					<ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', color: 'var(--muted-foreground)' }}>
+					<ul className="export-list">
 						<li>File Excel (.xlsx) với nhiều sheet</li>
 						<li>Tên file tự động với ngày xuất</li>
 						<li>Dữ liệu được format theo tiếng Việt</li>

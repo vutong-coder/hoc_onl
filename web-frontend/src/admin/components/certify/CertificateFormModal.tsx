@@ -20,10 +20,10 @@ import {
 	Award,
 	Clock,
 	CheckCircle,
-	AlertTriangle
+	AlertTriangle,
+	Tag
 } from 'lucide-react'
 import Modal from '../common/Modal'
-import Badge from '../common/Badge'
 
 interface CertificateFormModalProps {
 	isOpen: boolean
@@ -323,33 +323,51 @@ export default function CertificateFormModal({
 			onClose={onClose}
 			title={editingTemplate ? 'Chỉnh sửa mẫu chứng chỉ' : 'Thêm mẫu chứng chỉ mới'}
 			maxWidth="1000px"
-		>
-			<div className="certificate-form-modal">
-				{/* Tab Navigation */}
-				<div className="form-tabs">
+			footer={
+				<>
 					<button
-						className={`tab-button ${activeTab === 'basic' ? 'active' : ''}`}
+						className="btn btn-secondary"
+						onClick={onClose}
+					>
+						<X size={16} />
+						Hủy
+					</button>
+					<button
+						className="btn btn-primary"
+						onClick={handleSave}
+					>
+						<Save size={16} />
+						{editingTemplate ? 'Cập nhật' : 'Tạo mới'}
+					</button>
+				</>
+			}
+		>
+			<div className="modal-content-wrapper">
+				{/* Tab Navigation */}
+				<div className="modal-tabs">
+					<button
+						className={`modal-tab ${activeTab === 'basic' ? 'active' : ''}`}
 						onClick={() => setActiveTab('basic')}
 					>
 						<FileText size={16} />
 						Thông tin cơ bản
 					</button>
 					<button
-						className={`tab-button ${activeTab === 'requirements' ? 'active' : ''}`}
+						className={`modal-tab ${activeTab === 'requirements' ? 'active' : ''}`}
 						onClick={() => setActiveTab('requirements')}
 					>
 						<CheckCircle size={16} />
 						Yêu cầu ({form.requirements.length})
 					</button>
 					<button
-						className={`tab-button ${activeTab === 'design' ? 'active' : ''}`}
+						className={`modal-tab ${activeTab === 'design' ? 'active' : ''}`}
 						onClick={() => setActiveTab('design')}
 					>
 						<Palette size={16} />
 						Thiết kế
 					</button>
 					<button
-						className={`tab-button ${activeTab === 'metadata' ? 'active' : ''}`}
+						className={`modal-tab ${activeTab === 'metadata' ? 'active' : ''}`}
 						onClick={() => setActiveTab('metadata')}
 					>
 						<Settings size={16} />
@@ -358,12 +376,20 @@ export default function CertificateFormModal({
 				</div>
 
 				{/* Tab Content */}
-				<div className="tab-content">
+				<div className="modal-tab-content">
 					{/* Basic Information Tab */}
 					{activeTab === 'basic' && (
-						<div className="form-section">
-							<div className="form-group">
-								<label>Tên chứng chỉ *</label>
+						<div className="modal-form-section">
+							<div className="section-title">
+								<FileText />
+								<h4>Thông tin cơ bản</h4>
+							</div>
+							
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Award />
+									Tên chứng chỉ <span className="required">*</span>
+								</label>
 								<input
 									type="text"
 									value={form.name}
@@ -373,8 +399,11 @@ export default function CertificateFormModal({
 								/>
 							</div>
 
-							<div className="form-group">
-								<label>Mô tả *</label>
+							<div className="modal-form-group">
+								<label className="form-label">
+									<FileText />
+									Mô tả <span className="required">*</span>
+								</label>
 								<textarea
 									value={form.description}
 									onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
@@ -384,9 +413,12 @@ export default function CertificateFormModal({
 								/>
 							</div>
 
-							<div className="form-row">
-								<div className="form-group">
-									<label>Danh mục *</label>
+							<div className="modal-form-row">
+								<div className="modal-form-group">
+									<label className="form-label">
+										<Award />
+										Danh mục <span className="required">*</span>
+									</label>
 									<select
 										value={form.category}
 										onChange={(e) => setForm(prev => ({ ...prev, category: e.target.value as CertificateCategory }))}
@@ -400,8 +432,11 @@ export default function CertificateFormModal({
 									</select>
 								</div>
 
-								<div className="form-group">
-									<label>Cấp độ *</label>
+								<div className="modal-form-group">
+									<label className="form-label">
+										<Award />
+										Cấp độ <span className="required">*</span>
+									</label>
 									<select
 										value={form.level}
 										onChange={(e) => setForm(prev => ({ ...prev, level: e.target.value as CertificateLevel }))}
@@ -416,9 +451,12 @@ export default function CertificateFormModal({
 								</div>
 							</div>
 
-							<div className="form-row">
-								<div className="form-group">
-									<label>Thời hạn (tháng) *</label>
+							<div className="modal-form-row">
+								<div className="modal-form-group">
+									<label className="form-label">
+										<Clock />
+										Thời hạn (tháng) <span className="required">*</span>
+									</label>
 									<input
 										type="number"
 										value={form.validityPeriod}
@@ -429,8 +467,11 @@ export default function CertificateFormModal({
 									/>
 								</div>
 
-								<div className="form-group">
-									<label>Người cấp *</label>
+								<div className="modal-form-group">
+									<label className="form-label">
+										<Award />
+										Người cấp <span className="required">*</span>
+									</label>
 									<input
 										type="text"
 										value={form.issuer}
@@ -441,8 +482,11 @@ export default function CertificateFormModal({
 								</div>
 							</div>
 
-							<div className="form-group">
-								<label>Logo người cấp</label>
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Upload />
+									Logo người cấp
+								</label>
 								<input
 									type="url"
 									value={form.issuerLogo}
@@ -452,8 +496,8 @@ export default function CertificateFormModal({
 								/>
 							</div>
 
-							<div className="form-group">
-								<label className="checkbox-label">
+							<div className="modal-form-group">
+								<label className="modal-checkbox-group">
 									<input
 										type="checkbox"
 										checked={form.isActive}
@@ -467,117 +511,165 @@ export default function CertificateFormModal({
 
 					{/* Requirements Tab */}
 					{activeTab === 'requirements' && (
-						<div className="form-section">
-							<div className="requirements-list">
-								<h3>Danh sách yêu cầu</h3>
-								{form.requirements.map((requirement) => (
-									<div key={requirement.id} className="requirement-item">
-										<div className="requirement-info">
-											<div className="requirement-type">
-												{getRequirementTypeLabel(requirement.type)}
+						<div className="modal-form-section">
+							<div className="section-title">
+								<CheckCircle />
+								<h4>Danh sách yêu cầu</h4>
+							</div>
+							
+							{form.requirements.length > 0 ? (
+								<div className="modal-list">
+									{form.requirements.map((requirement) => (
+										<div key={requirement.id} className="list-item">
+											<div className="item-icon">
+												<CheckCircle />
 											</div>
-											<div className="requirement-description">
-												{requirement.description}
+											<div className="item-content">
+												<div className="item-title">
+													{getRequirementTypeLabel(requirement.type)}
+												</div>
+												<div className="item-description">
+													{requirement.description}
+												</div>
 											</div>
-											<div className="requirement-details">
-												<span className="requirement-value">
+											<div className="item-meta">
+												<div className="item-time">
 													{requirement.value} {requirement.unit}
-												</span>
-												{requirement.isMandatory && (
-													<Badge variant="warning">Bắt buộc</Badge>
-												)}
+												</div>
+												<div className="item-status">
+													{requirement.isMandatory ? 'Bắt buộc' : 'Tùy chọn'}
+												</div>
 											</div>
+											<button
+												type="button"
+												className="btn btn-sm btn-outline btn-danger"
+												onClick={() => removeRequirement(requirement.id)}
+											>
+												<Trash2 size={16} />
+											</button>
 										</div>
-										<button
-											className="btn btn-sm btn-outline btn-danger"
-											onClick={() => removeRequirement(requirement.id)}
-										>
-											<Trash2 size={16} />
-										</button>
+									))}
+								</div>
+							) : (
+								<div className="modal-export-info">
+									<div className="export-title">
+										<AlertTriangle />
+										<h4>Chưa có yêu cầu nào</h4>
 									</div>
-								))}
+									<p style={{ margin: 0, color: '#64748b' }}>
+										Hãy thêm ít nhất một yêu cầu để tạo chứng chỉ.
+									</p>
+								</div>
+							)}
+						</div>
+					)}
+
+					{/* Add Requirement Section */}
+					{activeTab === 'requirements' && (
+						<div className="modal-form-section">
+							<div className="section-title">
+								<Plus />
+								<h4>Thêm yêu cầu mới</h4>
 							</div>
-
-							<div className="add-requirement">
-								<h3>Thêm yêu cầu mới</h3>
-								<div className="form-row">
-									<div className="form-group">
-										<label>Loại yêu cầu</label>
-										<select
-											value={newRequirement.type}
-											onChange={(e) => setNewRequirement(prev => ({ ...prev, type: e.target.value as RequirementType }))}
-											className="form-select"
-										>
-											{Object.values(['course_completion', 'exam_score', 'attendance_rate', 'assignment_submission', 'project_completion', 'time_spent', 'quiz_score', 'peer_review', 'instructor_approval', 'custom'] as RequirementType[]).map(type => (
-												<option key={type} value={type}>
-													{getRequirementTypeLabel(type)}
-												</option>
-											))}
-										</select>
-									</div>
-
-									<div className="form-group">
-										<label>Mô tả</label>
-										<input
-											type="text"
-											value={newRequirement.description || ''}
-											onChange={(e) => setNewRequirement(prev => ({ ...prev, description: e.target.value }))}
-											placeholder="Mô tả yêu cầu"
-											className="form-input"
-										/>
-									</div>
+							
+							<div className="modal-form-row">
+								<div className="modal-form-group">
+									<label className="form-label">
+										<CheckCircle />
+										Loại yêu cầu
+									</label>
+									<select
+										value={newRequirement.type}
+										onChange={(e) => setNewRequirement(prev => ({ ...prev, type: e.target.value as RequirementType }))}
+										className="form-select"
+									>
+										{Object.values(['course_completion', 'exam_score', 'attendance_rate', 'assignment_submission', 'project_completion', 'time_spent', 'quiz_score', 'peer_review', 'instructor_approval', 'custom'] as RequirementType[]).map(type => (
+											<option key={type} value={type}>
+												{getRequirementTypeLabel(type)}
+											</option>
+										))}
+									</select>
 								</div>
 
-								<div className="form-row">
-									<div className="form-group">
-										<label>Giá trị</label>
-										<input
-											type="number"
-											value={newRequirement.value || 0}
-											onChange={(e) => setNewRequirement(prev => ({ ...prev, value: parseInt(e.target.value) || 0 }))}
-											className="form-input"
-										/>
-									</div>
+								<div className="modal-form-group">
+									<label className="form-label">
+										<FileText />
+										Mô tả
+									</label>
+									<input
+										type="text"
+										value={newRequirement.description || ''}
+										onChange={(e) => setNewRequirement(prev => ({ ...prev, description: e.target.value }))}
+										placeholder="Mô tả yêu cầu"
+										className="form-input"
+									/>
+								</div>
+							</div>
 
-									<div className="form-group">
-										<label>Đơn vị</label>
-										<input
-											type="text"
-											value={newRequirement.unit || ''}
-											onChange={(e) => setNewRequirement(prev => ({ ...prev, unit: e.target.value }))}
-											placeholder="%, điểm, giờ, bài..."
-											className="form-input"
-										/>
-									</div>
-
-									<div className="form-group">
-										<label className="checkbox-label">
-											<input
-												type="checkbox"
-												checked={newRequirement.isMandatory || false}
-												onChange={(e) => setNewRequirement(prev => ({ ...prev, isMandatory: e.target.checked }))}
-											/>
-											<span>Bắt buộc</span>
-										</label>
-									</div>
+							<div className="modal-form-row">
+								<div className="modal-form-group">
+									<label className="form-label">
+										<CheckCircle />
+										Giá trị
+									</label>
+									<input
+										type="number"
+										value={newRequirement.value || 0}
+										onChange={(e) => setNewRequirement(prev => ({ ...prev, value: parseInt(e.target.value) || 0 }))}
+										className="form-input"
+									/>
 								</div>
 
-								<button
-									className="btn btn-primary"
-									onClick={addRequirement}
-								>
-									<Plus size={16} />
-									Thêm yêu cầu
-								</button>
+								<div className="modal-form-group">
+									<label className="form-label">
+										<CheckCircle />
+										Đơn vị
+									</label>
+									<input
+										type="text"
+										value={newRequirement.unit || ''}
+										onChange={(e) => setNewRequirement(prev => ({ ...prev, unit: e.target.value }))}
+										placeholder="%, điểm, giờ, bài..."
+										className="form-input"
+									/>
+								</div>
+
+								<div className="modal-form-group">
+									<label className="modal-checkbox-group">
+										<input
+											type="checkbox"
+											checked={newRequirement.isMandatory || false}
+											onChange={(e) => setNewRequirement(prev => ({ ...prev, isMandatory: e.target.checked }))}
+										/>
+										<span>Bắt buộc</span>
+									</label>
+								</div>
 							</div>
+
+							<button
+								type="button"
+								className="modal-action-button"
+								onClick={addRequirement}
+							>
+								<Plus />
+								Thêm yêu cầu
+							</button>
 						</div>
 					)}
 
 					{/* Design Tab */}
 					{activeTab === 'design' && (
-						<div className="form-section">
-							<div className="form-group">
-								<label>Layout</label>
+						<div className="modal-form-section">
+							<div className="section-title">
+								<Palette />
+								<h4>Thiết kế mẫu chứng chỉ</h4>
+							</div>
+							
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Palette />
+									Layout
+								</label>
 								<select
 									value={form.templateDesign.layout}
 									onChange={(e) => setForm(prev => ({
@@ -596,91 +688,121 @@ export default function CertificateFormModal({
 								</select>
 							</div>
 
-							<div className="form-group">
-								<label>Màu sắc</label>
-								<div className="color-inputs">
-									<div className="color-input">
-										<label>Màu chính</label>
-										<input
-											type="color"
-											value={form.templateDesign.colors.primary}
-											onChange={(e) => setForm(prev => ({
-												...prev,
-												templateDesign: {
-													...prev.templateDesign,
-													colors: {
-														...prev.templateDesign.colors,
-														primary: e.target.value
-													}
-												}
-											}))}
-										/>
-									</div>
-									<div className="color-input">
-										<label>Màu phụ</label>
-										<input
-											type="color"
-											value={form.templateDesign.colors.secondary}
-											onChange={(e) => setForm(prev => ({
-												...prev,
-												templateDesign: {
-													...prev.templateDesign,
-													colors: {
-														...prev.templateDesign.colors,
-														secondary: e.target.value
-													}
-												}
-											}))}
-										/>
-									</div>
-									<div className="color-input">
-										<label>Màu nhấn</label>
-										<input
-											type="color"
-											value={form.templateDesign.colors.accent}
-											onChange={(e) => setForm(prev => ({
-												...prev,
-												templateDesign: {
-													...prev.templateDesign,
-													colors: {
-														...prev.templateDesign.colors,
-														accent: e.target.value
-													}
-												}
-											}))}
-										/>
-									</div>
-								</div>
-							</div>
-
-							<div className="form-group">
-								<label>Phần tử</label>
-								<div className="element-checkboxes">
-									{Object.entries(form.templateDesign.elements).map(([key, value]) => (
-										<label key={key} className="checkbox-label">
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Palette />
+									Màu sắc
+								</label>
+								<div className="modal-info-pairs">
+									<div className="modal-info-pair">
+										<div className="info-label">Màu chính</div>
+										<div className="info-value">
 											<input
-												type="checkbox"
-												checked={value}
+												type="color"
+												value={form.templateDesign.colors.primary}
 												onChange={(e) => setForm(prev => ({
 													...prev,
 													templateDesign: {
 														...prev.templateDesign,
-														elements: {
-															...prev.templateDesign.elements,
-															[key]: e.target.checked
+														colors: {
+															...prev.templateDesign.colors,
+															primary: e.target.value
 														}
 													}
 												}))}
+												style={{ width: '60px', height: '40px', border: 'none', borderRadius: '8px' }}
 											/>
-											<span>{key === 'logo' ? 'Logo' : key === 'signature' ? 'Chữ ký' : key === 'seal' ? 'Con dấu' : key === 'border' ? 'Viền' : key === 'watermark' ? 'Watermark' : key === 'qrCode' ? 'QR Code' : key}</span>
-										</label>
+										</div>
+									</div>
+									<div className="modal-info-pair">
+										<div className="info-label">Màu phụ</div>
+										<div className="info-value">
+											<input
+												type="color"
+												value={form.templateDesign.colors.secondary}
+												onChange={(e) => setForm(prev => ({
+													...prev,
+													templateDesign: {
+														...prev.templateDesign,
+														colors: {
+															...prev.templateDesign.colors,
+															secondary: e.target.value
+														}
+													}
+												}))}
+												style={{ width: '60px', height: '40px', border: 'none', borderRadius: '8px' }}
+											/>
+										</div>
+									</div>
+									<div className="modal-info-pair">
+										<div className="info-label">Màu nhấn</div>
+										<div className="info-value">
+											<input
+												type="color"
+												value={form.templateDesign.colors.accent}
+												onChange={(e) => setForm(prev => ({
+													...prev,
+													templateDesign: {
+														...prev.templateDesign,
+														colors: {
+															...prev.templateDesign.colors,
+															accent: e.target.value
+														}
+													}
+												}))}
+												style={{ width: '60px', height: '40px', border: 'none', borderRadius: '8px' }}
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Settings />
+									Phần tử
+								</label>
+								<div className="modal-info-pairs">
+									{Object.entries(form.templateDesign.elements).map(([key, value]) => (
+										<div key={key} className="modal-info-pair">
+											<div className="info-label">
+												{key === 'logo' ? 'Logo' : 
+												 key === 'signature' ? 'Chữ ký' : 
+												 key === 'seal' ? 'Con dấu' : 
+												 key === 'border' ? 'Viền' : 
+												 key === 'watermark' ? 'Watermark' : 
+												 key === 'qrCode' ? 'QR Code' : key}
+											</div>
+											<div className="info-value">
+												<label className="modal-checkbox-group">
+													<input
+														type="checkbox"
+														checked={value}
+														onChange={(e) => setForm(prev => ({
+															...prev,
+															templateDesign: {
+																...prev.templateDesign,
+																elements: {
+																	...prev.templateDesign.elements,
+																	[key]: e.target.checked
+																}
+															}
+														}))}
+													/>
+													<span>{value ? 'Bật' : 'Tắt'}</span>
+												</label>
+											</div>
+										</div>
 									))}
 								</div>
 							</div>
 
-							<div className="form-row">
-								<div className="form-group">
-									<label>Chiều rộng</label>
+							<div className="modal-form-row">
+								<div className="modal-form-group">
+									<label className="form-label">
+										<Settings />
+										Chiều rộng
+									</label>
 									<input
 										type="number"
 										value={form.templateDesign.dimensions.width}
@@ -698,8 +820,11 @@ export default function CertificateFormModal({
 									/>
 								</div>
 
-								<div className="form-group">
-									<label>Chiều cao</label>
+								<div className="modal-form-group">
+									<label className="form-label">
+										<Settings />
+										Chiều cao
+									</label>
 									<input
 										type="number"
 										value={form.templateDesign.dimensions.height}
@@ -717,8 +842,11 @@ export default function CertificateFormModal({
 									/>
 								</div>
 
-								<div className="form-group">
-									<label>Đơn vị</label>
+								<div className="modal-form-group">
+									<label className="form-label">
+										<Settings />
+										Đơn vị
+									</label>
 									<select
 										value={form.templateDesign.dimensions.unit}
 										onChange={(e) => setForm(prev => ({
@@ -744,11 +872,19 @@ export default function CertificateFormModal({
 
 					{/* Metadata Tab */}
 					{activeTab === 'metadata' && (
-						<div className="form-section">
+						<div className="modal-form-section">
+							<div className="section-title">
+								<Settings />
+								<h4>Metadata</h4>
+							</div>
+							
 							{/* Tags */}
-							<div className="form-group">
-								<label>Tags</label>
-								<div className="array-input">
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Tag />
+									Tags
+								</label>
+								<div style={{ display: 'flex', gap: '8px' }}>
 									<input
 										type="text"
 										value={newTag}
@@ -763,31 +899,44 @@ export default function CertificateFormModal({
 										}}
 									/>
 									<button
-										className="btn btn-sm btn-primary"
+										type="button"
+										className="modal-action-button"
 										onClick={() => addToArray('tags', newTag)}
 									>
-										<Plus size={16} />
+										<Plus />
 									</button>
 								</div>
-								<div className="array-list">
-									{form.metadata.tags.map((tag, index) => (
-										<Badge key={index} variant="secondary">
-											{tag}
-											<button
-												className="remove-item"
-												onClick={() => removeFromArray('tags', index)}
-											>
-												<X size={12} />
-											</button>
-										</Badge>
-									))}
-								</div>
+								{form.metadata.tags.length > 0 && (
+									<div className="modal-tags" style={{ marginTop: '12px' }}>
+										{form.metadata.tags.map((tag, index) => (
+											<span key={index} className="modal-tag">
+												{tag}
+												<button
+													type="button"
+													onClick={() => removeFromArray('tags', index)}
+													style={{ 
+														marginLeft: '8px', 
+														background: 'none', 
+														border: 'none', 
+														color: 'inherit',
+														cursor: 'pointer'
+													}}
+												>
+													<X size={12} />
+												</button>
+											</span>
+										))}
+									</div>
+								)}
 							</div>
 
 							{/* Keywords */}
-							<div className="form-group">
-								<label>Từ khóa</label>
-								<div className="array-input">
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Tag />
+									Từ khóa
+								</label>
+								<div style={{ display: 'flex', gap: '8px' }}>
 									<input
 										type="text"
 										value={newKeyword}
@@ -802,31 +951,44 @@ export default function CertificateFormModal({
 										}}
 									/>
 									<button
-										className="btn btn-sm btn-primary"
+										type="button"
+										className="modal-action-button"
 										onClick={() => addToArray('keywords', newKeyword)}
 									>
-										<Plus size={16} />
+										<Plus />
 									</button>
 								</div>
-								<div className="array-list">
-									{form.metadata.keywords.map((keyword, index) => (
-										<Badge key={index} variant="info">
-											{keyword}
-											<button
-												className="remove-item"
-												onClick={() => removeFromArray('keywords', index)}
-											>
-												<X size={12} />
-											</button>
-										</Badge>
-									))}
-								</div>
+								{form.metadata.keywords.length > 0 && (
+									<div className="modal-tags" style={{ marginTop: '12px' }}>
+										{form.metadata.keywords.map((keyword, index) => (
+											<span key={index} className="modal-tag">
+												{keyword}
+												<button
+													type="button"
+													onClick={() => removeFromArray('keywords', index)}
+													style={{ 
+														marginLeft: '8px', 
+														background: 'none', 
+														border: 'none', 
+														color: 'inherit',
+														cursor: 'pointer'
+													}}
+												>
+													<X size={12} />
+												</button>
+											</span>
+										))}
+									</div>
+								)}
 							</div>
 
 							{/* Industry */}
-							<div className="form-group">
-								<label>Ngành nghề</label>
-								<div className="array-input">
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Tag />
+									Ngành nghề
+								</label>
+								<div style={{ display: 'flex', gap: '8px' }}>
 									<input
 										type="text"
 										value={newIndustry}
@@ -841,31 +1003,44 @@ export default function CertificateFormModal({
 										}}
 									/>
 									<button
-										className="btn btn-sm btn-primary"
+										type="button"
+										className="modal-action-button"
 										onClick={() => addToArray('industry', newIndustry)}
 									>
-										<Plus size={16} />
+										<Plus />
 									</button>
 								</div>
-								<div className="array-list">
-									{form.metadata.industry.map((industry, index) => (
-										<Badge key={index} variant="warning">
-											{industry}
-											<button
-												className="remove-item"
-												onClick={() => removeFromArray('industry', index)}
-											>
-												<X size={12} />
-											</button>
-										</Badge>
-									))}
-								</div>
+								{form.metadata.industry.length > 0 && (
+									<div className="modal-tags" style={{ marginTop: '12px' }}>
+										{form.metadata.industry.map((industry, index) => (
+											<span key={index} className="modal-tag">
+												{industry}
+												<button
+													type="button"
+													onClick={() => removeFromArray('industry', index)}
+													style={{ 
+														marginLeft: '8px', 
+														background: 'none', 
+														border: 'none', 
+														color: 'inherit',
+														cursor: 'pointer'
+													}}
+												>
+													<X size={12} />
+												</button>
+											</span>
+										))}
+									</div>
+								)}
 							</div>
 
 							{/* Prerequisites */}
-							<div className="form-group">
-								<label>Điều kiện tiên quyết</label>
-								<div className="array-input">
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Tag />
+									Điều kiện tiên quyết
+								</label>
+								<div style={{ display: 'flex', gap: '8px' }}>
 									<input
 										type="text"
 										value={newPrerequisite}
@@ -880,31 +1055,44 @@ export default function CertificateFormModal({
 										}}
 									/>
 									<button
-										className="btn btn-sm btn-primary"
+										type="button"
+										className="modal-action-button"
 										onClick={() => addToArray('prerequisites', newPrerequisite)}
 									>
-										<Plus size={16} />
+										<Plus />
 									</button>
 								</div>
-								<div className="array-list">
-									{form.metadata.prerequisites.map((prerequisite, index) => (
-										<Badge key={index} variant="secondary">
-											{prerequisite}
-											<button
-												className="remove-item"
-												onClick={() => removeFromArray('prerequisites', index)}
-											>
-												<X size={12} />
-											</button>
-										</Badge>
-									))}
-								</div>
+								{form.metadata.prerequisites.length > 0 && (
+									<div className="modal-tags" style={{ marginTop: '12px' }}>
+										{form.metadata.prerequisites.map((prerequisite, index) => (
+											<span key={index} className="modal-tag">
+												{prerequisite}
+												<button
+													type="button"
+													onClick={() => removeFromArray('prerequisites', index)}
+													style={{ 
+														marginLeft: '8px', 
+														background: 'none', 
+														border: 'none', 
+														color: 'inherit',
+														cursor: 'pointer'
+													}}
+												>
+													<X size={12} />
+												</button>
+											</span>
+										))}
+									</div>
+								)}
 							</div>
 
 							{/* Benefits */}
-							<div className="form-group">
-								<label>Lợi ích</label>
-								<div className="array-input">
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Tag />
+									Lợi ích
+								</label>
+								<div style={{ display: 'flex', gap: '8px' }}>
 									<input
 										type="text"
 										value={newBenefit}
@@ -919,31 +1107,44 @@ export default function CertificateFormModal({
 										}}
 									/>
 									<button
-										className="btn btn-sm btn-primary"
+										type="button"
+										className="modal-action-button"
 										onClick={() => addToArray('benefits', newBenefit)}
 									>
-										<Plus size={16} />
+										<Plus />
 									</button>
 								</div>
-								<div className="array-list">
-									{form.metadata.benefits.map((benefit, index) => (
-										<Badge key={index} variant="success">
-											{benefit}
-											<button
-												className="remove-item"
-												onClick={() => removeFromArray('benefits', index)}
-											>
-												<X size={12} />
-											</button>
-										</Badge>
-									))}
-								</div>
+								{form.metadata.benefits.length > 0 && (
+									<div className="modal-tags" style={{ marginTop: '12px' }}>
+										{form.metadata.benefits.map((benefit, index) => (
+											<span key={index} className="modal-tag">
+												{benefit}
+												<button
+													type="button"
+													onClick={() => removeFromArray('benefits', index)}
+													style={{ 
+														marginLeft: '8px', 
+														background: 'none', 
+														border: 'none', 
+														color: 'inherit',
+														cursor: 'pointer'
+													}}
+												>
+													<X size={12} />
+												</button>
+											</span>
+										))}
+									</div>
+								)}
 							</div>
 
 							{/* Recognition */}
-							<div className="form-group">
-								<label>Sự công nhận</label>
-								<div className="array-input">
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Tag />
+									Sự công nhận
+								</label>
+								<div style={{ display: 'flex', gap: '8px' }}>
 									<input
 										type="text"
 										value={newRecognition}
@@ -958,31 +1159,44 @@ export default function CertificateFormModal({
 										}}
 									/>
 									<button
-										className="btn btn-sm btn-primary"
+										type="button"
+										className="modal-action-button"
 										onClick={() => addToArray('recognition', newRecognition)}
 									>
-										<Plus size={16} />
+										<Plus />
 									</button>
 								</div>
-								<div className="array-list">
-									{form.metadata.recognition.map((recognition, index) => (
-										<Badge key={index} variant="info">
-											{recognition}
-											<button
-												className="remove-item"
-												onClick={() => removeFromArray('recognition', index)}
-											>
-												<X size={12} />
-											</button>
-										</Badge>
-									))}
-								</div>
+								{form.metadata.recognition.length > 0 && (
+									<div className="modal-tags" style={{ marginTop: '12px' }}>
+										{form.metadata.recognition.map((recognition, index) => (
+											<span key={index} className="modal-tag">
+												{recognition}
+												<button
+													type="button"
+													onClick={() => removeFromArray('recognition', index)}
+													style={{ 
+														marginLeft: '8px', 
+														background: 'none', 
+														border: 'none', 
+														color: 'inherit',
+														cursor: 'pointer'
+													}}
+												>
+													<X size={12} />
+												</button>
+											</span>
+										))}
+									</div>
+								)}
 							</div>
 
 							{/* Compliance */}
-							<div className="form-group">
-								<label>Tuân thủ</label>
-								<div className="array-input">
+							<div className="modal-form-group">
+								<label className="form-label">
+									<Tag />
+									Tuân thủ
+								</label>
+								<div style={{ display: 'flex', gap: '8px' }}>
 									<input
 										type="text"
 										value={newCompliance}
@@ -997,45 +1211,38 @@ export default function CertificateFormModal({
 										}}
 									/>
 									<button
-										className="btn btn-sm btn-primary"
+										type="button"
+										className="modal-action-button"
 										onClick={() => addToArray('compliance', newCompliance)}
 									>
-										<Plus size={16} />
+										<Plus />
 									</button>
 								</div>
-								<div className="array-list">
-									{form.metadata.compliance.map((compliance, index) => (
-										<Badge key={index} variant="danger">
-											{compliance}
-											<button
-												className="remove-item"
-												onClick={() => removeFromArray('compliance', index)}
-											>
-												<X size={12} />
-											</button>
-										</Badge>
-									))}
-								</div>
+								{form.metadata.compliance.length > 0 && (
+									<div className="modal-tags" style={{ marginTop: '12px' }}>
+										{form.metadata.compliance.map((compliance, index) => (
+											<span key={index} className="modal-tag">
+												{compliance}
+												<button
+													type="button"
+													onClick={() => removeFromArray('compliance', index)}
+													style={{ 
+														marginLeft: '8px', 
+														background: 'none', 
+														border: 'none', 
+														color: 'inherit',
+														cursor: 'pointer'
+													}}
+												>
+													<X size={12} />
+												</button>
+											</span>
+										))}
+									</div>
+								)}
 							</div>
 						</div>
 					)}
-				</div>
-
-				{/* Actions */}
-				<div className="modal-actions">
-					<button
-						className="btn btn-secondary"
-						onClick={onClose}
-					>
-						Hủy
-					</button>
-					<button
-						className="btn btn-primary"
-						onClick={handleSave}
-					>
-						<Save size={16} />
-						{editingTemplate ? 'Cập nhật' : 'Tạo mới'}
-					</button>
 				</div>
 			</div>
 		</Modal>

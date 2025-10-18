@@ -1,6 +1,9 @@
 // Analytics Page Styles
 // Comprehensive styling for the analytics dashboard and all its components
 
+// Import common modal & form styles
+@import './modal-common';
+
 // ============================================
 // PAGE LAYOUT & NAVIGATION
 // ============================================
@@ -118,7 +121,7 @@
   
   .analytics-content {
     .section {
-      margin-bottom: 40px;
+      margin-bottom: 64px; // Tăng từ 48px lên 64px để tạo khoảng cách lớn hơn
       
       .section-header {
         display: flex;
@@ -363,7 +366,10 @@
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  height: 100%; // Đảm bảo chart chiếm toàn bộ chiều cao
+  height: auto; // Thay đổi từ 100% thành auto để tránh overlap
+  min-height: 300px; // Đặt min-height thay vì height cố định
+  position: relative; // Đảm bảo positioning đúng
+  z-index: 1; // Đảm bảo không bị overlap
   
   &:hover {
     box-shadow: var(--shadow-md);
@@ -546,7 +552,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 24px;
-  margin-bottom: 32px;
+  margin-bottom: 64px; // Tăng từ 48px lên 64px để tạo khoảng cách lớn hơn
   align-items: stretch; // Đảm bảo tất cả charts có cùng chiều cao
 }
 
@@ -872,6 +878,8 @@
   gap: 24px;
   margin-bottom: 32px;
   align-items: stretch; // Đảm bảo tất cả items có cùng chiều cao
+  position: relative; // Đảm bảo positioning đúng
+  z-index: 2; // Đảm bảo hiển thị trên charts
 }
 
 // ============================================
@@ -1750,6 +1758,7 @@
     
     .charts-grid {
       grid-template-columns: 1fr;
+      margin-bottom: 56px; // Tăng từ 40px lên 56px cho tablet
     }
     
     .top-lists-grid {
@@ -1791,13 +1800,22 @@
   .kpi-grid {
     grid-template-columns: 1fr;
     gap: 12px;
+    margin-bottom: 32px; // Đảm bảo có khoảng cách trên mobile
+  }
+  
+  .charts-grid {
+    margin-bottom: 48px; // Tăng từ 32px lên 48px cho mobile
+  }
+  
+  .top-lists-grid {
+    margin-bottom: 32px; // Tăng từ 24px lên 32px cho mobile
+  }
+  
+  .kpi-card {
+    padding: 16px;
     
-    .kpi-card {
-      padding: 16px;
-      
-      .kpi-content .kpi-value {
-        font-size: 28px;
-      }
+    .kpi-content .kpi-value {
+      font-size: 28px;
     }
   }
   

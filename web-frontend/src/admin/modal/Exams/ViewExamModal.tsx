@@ -1,5 +1,6 @@
 import React from 'react'
 import Modal from '../../components/common/Modal'
+import { FileText, BookOpen, Clock, Hash, Target, User, Settings, CheckCircle, XCircle } from 'lucide-react'
 
 interface ViewExamModalProps {
 	isOpen: boolean
@@ -52,120 +53,115 @@ const ViewExamModal: React.FC<ViewExamModalProps> = ({
 			title="Chi tiết đề thi"
 			maxWidth="700px"
 		>
-			<div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-				<div>
-					<h3 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>
-						{exam.title}
-					</h3>
-					<p style={{ color: 'var(--muted-foreground)', margin: 0 }}>
-						{exam.description}
-					</p>
-				</div>
-
-				<div className="form-grid">
-					<div>
-						<label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--muted-foreground)' }}>
-							Môn học
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>{exam.subject}</p>
+			<div className="modal-content-wrapper">
+				{/* Exam Header Info */}
+				<div className="modal-info-card">
+					<div className="card-icon">
+						<FileText />
 					</div>
-
-					<div>
-						<label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--muted-foreground)' }}>
-							Loại bài thi
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>{getTypeLabel(exam.type)}</p>
-					</div>
-
-					<div>
-						<label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--muted-foreground)' }}>
-							Số câu hỏi
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>{exam.totalQuestions} câu</p>
-					</div>
-
-					<div>
-						<label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--muted-foreground)' }}>
-							Thời gian
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>{exam.duration} phút</p>
-					</div>
-
-					<div>
-						<label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--muted-foreground)' }}>
-							Tổng điểm
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>{exam.totalPoints} điểm</p>
-					</div>
-
-					<div>
-						<label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--muted-foreground)' }}>
-							Điểm đạt
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>{exam.passingScore} điểm</p>
-					</div>
-
-					<div>
-						<label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--muted-foreground)' }}>
-							Độ khó
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>{getDifficultyLabel(exam.difficulty)}</p>
-					</div>
-
-					<div>
-						<label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--muted-foreground)' }}>
-							Trạng thái
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>{getStatusLabel(exam.status)}</p>
-					</div>
-
-					<div>
-						<label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--muted-foreground)' }}>
-							Số lần thi tối đa
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>{exam.maxAttempts}</p>
-					</div>
-
-					<div>
-						<label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--muted-foreground)' }}>
-							Người tạo
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>{exam.createdBy}</p>
+					<div className="card-title">{exam.title}</div>
+					<div className="card-description">{exam.description}</div>
+					<div className="card-value">
+						<span className={`modal-status-badge ${exam.status === 'published' ? 'success' : exam.status === 'draft' ? 'warning' : exam.status === 'ongoing' ? 'info' : 'secondary'}`}>
+							{getStatusLabel(exam.status)}
+						</span>
 					</div>
 				</div>
 
-				<div style={{ 
-					padding: '16px',
-					background: 'var(--muted)',
-					borderRadius: 'var(--radius-md)',
-					display: 'grid',
-					gridTemplateColumns: 'repeat(3, 1fr)',
-					gap: '12px',
-					fontSize: '14px'
-				}}>
-					<div>
-						<label style={{ fontSize: '13px', color: 'var(--muted-foreground)' }}>
-							Xem lại câu hỏi
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>
-							{exam.allowReview ? '✓ Cho phép' : '✗ Không'}
-						</p>
+				{/* Basic Information */}
+				<div className="modal-detail-section">
+					<div className="section-title">
+						<FileText />
+						<h4>Thông tin cơ bản</h4>
 					</div>
-					<div>
-						<label style={{ fontSize: '13px', color: 'var(--muted-foreground)' }}>
-							Trộn câu hỏi
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>
-							{exam.shuffleQuestions ? '✓ Có' : '✗ Không'}
-						</p>
+					<div className="modal-info-pairs">
+						<div className="modal-info-pair">
+							<div className="info-label">Môn học</div>
+							<div className="info-value">{exam.subject}</div>
+						</div>
+						<div className="modal-info-pair">
+							<div className="info-label">Loại bài thi</div>
+							<div className="info-value">{getTypeLabel(exam.type)}</div>
+						</div>
+						<div className="modal-info-pair">
+							<div className="info-label">Số câu hỏi</div>
+							<div className="info-value">{exam.totalQuestions} câu</div>
+						</div>
+						<div className="modal-info-pair">
+							<div className="info-label">Thời gian</div>
+							<div className="info-value">{exam.duration} phút</div>
+						</div>
 					</div>
-					<div>
-						<label style={{ fontSize: '13px', color: 'var(--muted-foreground)' }}>
-							Hiển thị kết quả
-						</label>
-						<p style={{ margin: '4px 0 0', fontWeight: 500 }}>
-							{exam.showResults ? '✓ Có' : '✗ Không'}
-						</p>
+				</div>
+
+				{/* Scoring Information */}
+				<div className="modal-detail-section">
+					<div className="section-title">
+						<Target />
+						<h4>Thông tin điểm số</h4>
+					</div>
+					<div className="modal-info-pairs">
+						<div className="modal-info-pair">
+							<div className="info-label">Tổng điểm</div>
+							<div className="info-value">{exam.totalPoints} điểm</div>
+						</div>
+						<div className="modal-info-pair">
+							<div className="info-label">Điểm đạt</div>
+							<div className="info-value">{exam.passingScore} điểm</div>
+						</div>
+						<div className="modal-info-pair">
+							<div className="info-label">Độ khó</div>
+							<div className="info-value">{getDifficultyLabel(exam.difficulty)}</div>
+						</div>
+						<div className="modal-info-pair">
+							<div className="info-label">Số lần thi tối đa</div>
+							<div className="info-value">{exam.maxAttempts}</div>
+						</div>
+					</div>
+				</div>
+
+				{/* Creator Information */}
+				<div className="modal-detail-section">
+					<div className="section-title">
+						<User />
+						<h4>Thông tin người tạo</h4>
+					</div>
+					<div className="modal-info-pairs">
+						<div className="modal-info-pair">
+							<div className="info-label">Người tạo</div>
+							<div className="info-value">{exam.createdBy}</div>
+						</div>
+					</div>
+				</div>
+
+				{/* Settings */}
+				<div className="modal-detail-section">
+					<div className="section-title">
+						<Settings />
+						<h4>Cài đặt</h4>
+					</div>
+					<div className="modal-info-grid">
+						<div className="modal-info-card">
+							<div className="card-icon" style={{ background: exam.allowReview ? '#10b981' : '#ef4444' }}>
+								{exam.allowReview ? <CheckCircle /> : <XCircle />}
+							</div>
+							<div className="card-title">Xem lại câu hỏi</div>
+							<div className="card-value">{exam.allowReview ? 'Cho phép' : 'Không'}</div>
+						</div>
+						<div className="modal-info-card">
+							<div className="card-icon" style={{ background: exam.shuffleQuestions ? '#10b981' : '#ef4444' }}>
+								{exam.shuffleQuestions ? <CheckCircle /> : <XCircle />}
+							</div>
+							<div className="card-title">Trộn câu hỏi</div>
+							<div className="card-value">{exam.shuffleQuestions ? 'Có' : 'Không'}</div>
+						</div>
+						<div className="modal-info-card">
+							<div className="card-icon" style={{ background: exam.showResults ? '#10b981' : '#ef4444' }}>
+								{exam.showResults ? <CheckCircle /> : <XCircle />}
+							</div>
+							<div className="card-title">Hiển thị kết quả</div>
+							<div className="card-value">{exam.showResults ? 'Có' : 'Không'}</div>
+						</div>
 					</div>
 				</div>
 			</div>

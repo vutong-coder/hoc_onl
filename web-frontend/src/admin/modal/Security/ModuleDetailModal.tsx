@@ -1,7 +1,7 @@
 import React from 'react'
 import Modal from '../../components/common/Modal'
 import Badge from '../../components/common/Badge'
-import { Shield, Activity, TrendingUp, Clock, Database, Cpu, HardDrive } from 'lucide-react'
+import { Shield, Activity, TrendingUp, Clock, Database, Cpu, HardDrive, Info, Package, Settings } from 'lucide-react'
 
 interface ModuleDetailModalProps {
 	isOpen: boolean
@@ -56,31 +56,18 @@ const ModuleDetailModal: React.FC<ModuleDetailModalProps> = ({
 			title={`Chi tiết Module: ${module.name}`}
 			maxWidth="800px"
 		>
-			<div style={{ padding: '20px' }}>
+			<div className="modal-content-wrapper">
 				{/* Module Overview */}
-				<div style={{ 
-					display: 'grid', 
-					gridTemplateColumns: '1fr 1fr', 
-					gap: '20px', 
-					marginBottom: '24px' 
-				}}>
-					<div>
-						<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
-							Tên Module
-						</label>
-						<div style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>
-							{module.name}
-						</div>
-						<div style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
-							{module.description}
-						</div>
+				<div className="modal-info-card">
+					<div className="card-icon">
+						<Shield />
 					</div>
-					
-					<div>
-						<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
-							Trạng thái
-						</label>
-						<Badge variant={getStatusColor(module.status)} style={{ fontSize: '14px', padding: '6px 12px' }}>
+					<div className="card-content">
+						<div className="card-title">{module.name}</div>
+						<div className="card-description">{module.description}</div>
+					</div>
+					<div className="card-meta">
+						<Badge variant={getStatusColor(module.status)}>
 							{getStatusIcon(module.status)}
 							<span style={{ marginLeft: '6px' }}>
 								{module.status === 'active' ? 'Hoạt động' :
@@ -94,76 +81,48 @@ const ModuleDetailModal: React.FC<ModuleDetailModalProps> = ({
 				</div>
 
 				{/* Performance Metrics */}
-				<div style={{ marginBottom: '24px' }}>
-					<h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-						<TrendingUp size={18} />
-						Hiệu suất & Thống kê
-					</h3>
-					<div style={{ 
-						display: 'grid', 
-						gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-						gap: '16px' 
-					}}>
-						<div style={{ 
-							padding: '16px', 
-							background: 'var(--muted)', 
-							borderRadius: 'var(--radius-md)' 
-						}}>
-							<div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-								<Database size={16} color="var(--primary)" />
-								<span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
-									Điểm bảo mật
-								</span>
+				<div className="modal-detail-section">
+					<div className="section-title">
+						<TrendingUp />
+						<h4>Hiệu suất & Thống kê</h4>
+					</div>
+					<div className="modal-info-grid">
+						<div className="modal-info-card">
+							<div className="card-icon" style={{ background: '#3b82f6' }}>
+								<Database />
 							</div>
-							<div style={{ fontSize: '20px', fontWeight: 700 }}>
+							<div className="card-title">Điểm bảo mật</div>
+							<div className="card-value" style={{ color: '#3b82f6' }}>
 								{module.securityScore}/100
 							</div>
 						</div>
 
-						<div style={{ 
-							padding: '16px', 
-							background: 'var(--muted)', 
-							borderRadius: 'var(--radius-md)' 
-						}}>
-							<div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-								<Activity size={16} color="var(--success)" />
-								<span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
-									Giao dịch hôm nay
-								</span>
+						<div className="modal-info-card">
+							<div className="card-icon" style={{ background: '#10b981' }}>
+								<Activity />
 							</div>
-							<div style={{ fontSize: '20px', fontWeight: 700 }}>
+							<div className="card-title">Giao dịch hôm nay</div>
+							<div className="card-value" style={{ color: '#10b981' }}>
 								{formatNumber(module.todayTransactions)}
 							</div>
 						</div>
 
-						<div style={{ 
-							padding: '16px', 
-							background: 'var(--muted)', 
-							borderRadius: 'var(--radius-md)' 
-						}}>
-							<div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-								<Clock size={16} color="var(--warning)" />
-								<span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
-									Thời gian hoạt động
-								</span>
+						<div className="modal-info-card">
+							<div className="card-icon" style={{ background: '#f59e0b' }}>
+								<Clock />
 							</div>
-							<div style={{ fontSize: '20px', fontWeight: 700 }}>
-								{module.uptime}
+							<div className="card-title">Thời gian hoạt động</div>
+							<div className="card-value" style={{ color: '#f59e0b' }}>
+								{module.uptime}%
 							</div>
 						</div>
 
-						<div style={{ 
-							padding: '16px', 
-							background: 'var(--muted)', 
-							borderRadius: 'var(--radius-md)' 
-						}}>
-							<div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-								<Cpu size={16} color="var(--info)" />
-								<span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
-									CPU Usage
-								</span>
+						<div className="modal-info-card">
+							<div className="card-icon" style={{ background: '#8b5cf6' }}>
+								<Cpu />
 							</div>
-							<div style={{ fontSize: '20px', fontWeight: 700 }}>
+							<div className="card-title">CPU Usage</div>
+							<div className="card-value" style={{ color: '#8b5cf6' }}>
 								{module.cpuUsage}%
 							</div>
 						</div>
@@ -171,69 +130,64 @@ const ModuleDetailModal: React.FC<ModuleDetailModalProps> = ({
 				</div>
 
 				{/* Technical Details */}
-				<div style={{ marginBottom: '24px' }}>
-					<h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-						<HardDrive size={18} />
-						Thông tin kỹ thuật
-					</h3>
-					<div style={{ 
-						display: 'grid', 
-						gridTemplateColumns: '1fr 1fr', 
-						gap: '16px' 
-					}}>
-						<div>
-							<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
+				<div className="modal-detail-section">
+					<div className="section-title">
+						<HardDrive />
+						<h4>Thông tin kỹ thuật</h4>
+					</div>
+					<div className="modal-info-pairs">
+						<div className="modal-info-pair">
+							<div className="info-label">
+								<Info />
 								Version
-							</label>
-							<div style={{ fontSize: '14px', fontWeight: 500 }}>
-								{module.version}
 							</div>
+							<div className="info-value">{module.version}</div>
 						</div>
 						
-						<div>
-							<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
+						<div className="modal-info-pair">
+							<div className="info-label">
+								<HardDrive />
 								Memory Usage
-							</label>
-							<div style={{ fontSize: '14px', fontWeight: 500 }}>
-								{formatBytes(module.memoryUsage)}
 							</div>
+							<div className="info-value">{formatBytes(module.memoryUsage)}</div>
 						</div>
 						
-						<div>
-							<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
+						<div className="modal-info-pair">
+							<div className="info-label">
+								<Clock />
 								Last Updated
-							</label>
-							<div style={{ fontSize: '14px', fontWeight: 500 }}>
-								{new Date(module.lastUpdated).toLocaleString('vi-VN')}
 							</div>
+							<div className="info-value">{new Date(module.lastUpdated).toLocaleString('vi-VN')}</div>
 						</div>
 						
-						<div>
-							<label style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '4px', display: 'block' }}>
+						<div className="modal-info-pair">
+							<div className="info-label">
+								<Settings />
 								Environment
-							</label>
-							<div style={{ fontSize: '14px', fontWeight: 500 }}>
-								{module.environment}
 							</div>
+							<div className="info-value">{module.environment}</div>
 						</div>
 					</div>
 				</div>
 
 				{/* Dependencies */}
 				{module.dependencies && module.dependencies.length > 0 && (
-					<div>
-						<h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px' }}>
-							Dependencies
-						</h3>
-						<div style={{ 
-							padding: '12px', 
-							background: 'var(--muted)', 
-							borderRadius: 'var(--radius-md)',
-							fontSize: '12px',
-							fontFamily: 'monospace'
-						}}>
+					<div className="modal-detail-section">
+						<div className="section-title">
+							<Package />
+							<h4>Dependencies</h4>
+						</div>
+						<div className="modal-export-info">
 							{module.dependencies.map((dep: string, index: number) => (
-								<div key={index} style={{ marginBottom: '4px' }}>
+								<div key={index} style={{ 
+									fontSize: '12px',
+									fontFamily: 'monospace',
+									marginBottom: '4px',
+									padding: '4px 8px',
+									background: '#f8fafc',
+									borderRadius: '6px',
+									border: '1px solid #e2e8f0'
+								}}>
 									{dep}
 								</div>
 							))}

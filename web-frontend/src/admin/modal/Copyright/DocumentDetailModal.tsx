@@ -1,7 +1,6 @@
 import React from 'react'
 import Modal from '../../components/common/Modal'
-import Badge from '../../components/common/Badge'
-import { FileText, X } from 'lucide-react'
+import { FileText, X, Hash, Calendar, User, Tag, Link } from 'lucide-react'
 import { Document } from '../../types/copyright'
 
 interface DocumentDetailModalProps {
@@ -20,92 +19,140 @@ const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
 	if (!isOpen) return null
 
 	return (
-		<div className="modal-overlay">
-			<div className="modal-container document-detail-modal">
-				<div className="modal-header">
-					<div className="modal-title">
-						<FileText size={24} />
+		<div className="modal-overlay-modern">
+			<div className="modal-container-modern document-detail-modal">
+				<div className="modal-header-modern">
+					<div className="modal-title-modern">
+						<FileText size={36} />
 						<h2>{document.title || 'Chi tiết tài liệu'}</h2>
 					</div>
 					<button className="modal-close" onClick={onClose}>
-						<X size={20} />
+						<X size={22} />
 					</button>
 				</div>
 
-				<div className="document-detail-content">
-					<div className="document-info">
-						<FileText className="file-icon" />
-						<div className="document-meta">
-							<h3>{document.title}</h3>
-							<p>Tác giả: {document.author}</p>
-							<p>Ngày đăng ký: {new Date(document.registrationDate).toLocaleString('vi-VN')}</p>
+				<div className="modal-content-modern">
+					<div className="modal-content-wrapper">
+						{/* Document Header Info */}
+						<div className="modal-info-card">
+							<div className="card-icon">
+								<FileText />
+							</div>
+							<div className="card-title">{document.title}</div>
+							<div className="card-description">Tài liệu đã đăng ký bản quyền</div>
+							<div className="card-value">
+								<span className={`modal-status-badge ${document.status === 'verified' ? 'success' : document.status === 'pending' ? 'warning' : 'danger'}`}>
+									{document.status === 'verified' ? 'Đã xác minh' : 
+									 document.status === 'pending' ? 'Chờ xác minh' : 'Có tranh chấp'}
+								</span>
+							</div>
 						</div>
-						<Badge variant={document.status === 'verified' ? 'success' : document.status === 'pending' ? 'warning' : 'danger'}>
-							{document.status === 'verified' ? 'Đã xác minh' : 
-							 document.status === 'pending' ? 'Chờ xác minh' : 'Có tranh chấp'}
-						</Badge>
-					</div>
-					
-					<div className="content-section">
-						<h4>Mô tả</h4>
-						<p>{document.description}</p>
-					</div>
-					
-					<div className="content-section">
-						<h4>Thông tin Blockchain</h4>
-						<div className="blockchain-info">
-							<div className="info-item">
-								<span className="label">Hash:</span>
-								<span className="value">{document.hash}</span>
+
+						{/* Basic Information */}
+						<div className="modal-detail-section">
+							<div className="section-title">
+								<User />
+								<h4>Thông tin cơ bản</h4>
 							</div>
-							<div className="info-item">
-								<span className="label">Blockchain Hash:</span>
-								<span className="value">{document.blockchainHash}</span>
+							<div className="modal-info-pairs">
+								<div className="modal-info-pair">
+									<div className="info-label">Tác giả</div>
+									<div className="info-value">{document.author}</div>
+								</div>
+								<div className="modal-info-pair">
+									<div className="info-label">Ngày đăng ký</div>
+									<div className="info-value">{new Date(document.registrationDate).toLocaleString('vi-VN')}</div>
+								</div>
 							</div>
-							{document.transactionHash && (
-								<div className="info-item">
-									<span className="label">Transaction Hash:</span>
-									<span className="value">{document.transactionHash}</span>
-								</div>
-							)}
-							{document.blockNumber && (
-								<div className="info-item">
-									<span className="label">Block Number:</span>
-									<span className="value">{document.blockNumber.toLocaleString()}</span>
-								</div>
-							)}
-							{document.gasUsed && (
-								<div className="info-item">
-									<span className="label">Gas Used:</span>
-									<span className="value">{document.gasUsed.toLocaleString()}</span>
-								</div>
-							)}
 						</div>
-					</div>
-					
-					<div className="content-section">
-						<h4>Metadata</h4>
-						<div className="metadata-info">
-							<div className="info-item">
-								<span className="label">Danh mục:</span>
-								<span className="value">{document.metadata.category}</span>
+
+						{/* Description */}
+						<div className="modal-detail-section">
+							<div className="section-title">
+								<FileText />
+								<h4>Mô tả</h4>
 							</div>
-							<div className="info-item">
-								<span className="label">Ngôn ngữ:</span>
-								<span className="value">{document.metadata.language}</span>
+							<p style={{ fontSize: '15px', color: '#475569', lineHeight: '1.6', margin: 0 }}>
+								{document.description}
+							</p>
+						</div>
+
+						{/* Blockchain Information */}
+						<div className="modal-detail-section">
+							<div className="section-title">
+								<Hash />
+								<h4>Thông tin Blockchain</h4>
 							</div>
-							<div className="info-item">
-								<span className="label">Phiên bản:</span>
-								<span className="value">{document.metadata.version}</span>
+							<div className="modal-info-pairs">
+								<div className="modal-info-pair">
+									<div className="info-label">Hash</div>
+									<div className="info-value" style={{ fontFamily: 'monospace', fontSize: '13px' }}>
+										{document.hash}
+									</div>
+								</div>
+								<div className="modal-info-pair">
+									<div className="info-label">Blockchain Hash</div>
+									<div className="info-value" style={{ fontFamily: 'monospace', fontSize: '13px' }}>
+										{document.blockchainHash}
+									</div>
+								</div>
+								{document.transactionHash && (
+									<div className="modal-info-pair">
+										<div className="info-label">Transaction Hash</div>
+										<div className="info-value" style={{ fontFamily: 'monospace', fontSize: '13px' }}>
+											{document.transactionHash}
+										</div>
+									</div>
+								)}
+								{document.blockNumber && (
+									<div className="modal-info-pair">
+										<div className="info-label">Block Number</div>
+										<div className="info-value">{document.blockNumber.toLocaleString()}</div>
+									</div>
+								)}
+								{document.gasUsed && (
+									<div className="modal-info-pair">
+										<div className="info-label">Gas Used</div>
+										<div className="info-value">{document.gasUsed.toLocaleString()}</div>
+									</div>
+								)}
 							</div>
-							<div className="info-item">
-								<span className="label">Giấy phép:</span>
-								<span className="value">{document.metadata.license}</span>
+						</div>
+
+						{/* Metadata */}
+						<div className="modal-detail-section">
+							<div className="section-title">
+								<Tag />
+								<h4>Metadata</h4>
+							</div>
+							<div className="modal-info-pairs">
+								<div className="modal-info-pair">
+									<div className="info-label">Danh mục</div>
+									<div className="info-value">{document.metadata.category}</div>
+								</div>
+								<div className="modal-info-pair">
+									<div className="info-label">Ngôn ngữ</div>
+									<div className="info-value">{document.metadata.language}</div>
+								</div>
+								<div className="modal-info-pair">
+									<div className="info-label">Phiên bản</div>
+									<div className="info-value">{document.metadata.version}</div>
+								</div>
+								<div className="modal-info-pair">
+									<div className="info-label">Giấy phép</div>
+									<div className="info-value">{document.metadata.license}</div>
+								</div>
 							</div>
 							{document.metadata.keywords.length > 0 && (
-								<div className="info-item">
-									<span className="label">Từ khóa:</span>
-									<span className="value">{document.metadata.keywords.join(', ')}</span>
+								<div style={{ marginTop: '16px' }}>
+									<div style={{ fontSize: '13px', fontWeight: '600', color: '#667eea', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+										Từ khóa
+									</div>
+									<div className="modal-tags">
+										{document.metadata.keywords.map((keyword, index) => (
+											<span key={index} className="modal-tag">{keyword}</span>
+										))}
+									</div>
 								</div>
 							)}
 						</div>
