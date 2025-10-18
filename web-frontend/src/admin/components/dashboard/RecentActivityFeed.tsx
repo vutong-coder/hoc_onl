@@ -18,7 +18,7 @@ import {
 	FileText
 } from 'lucide-react'
 import Badge from '../common/Badge'
-import '../../styles/dashboard.css'
+import '../../styles/dashboard.scss'
 
 interface RecentActivityFeedProps {
 	activities: RecentActivity[]
@@ -32,49 +32,57 @@ const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
 	onActivityClick 
 }) => {
 	const getActivityIcon = (type: ActivityType) => {
+		const iconSize = 16
 		switch (type) {
 			case 'user_registration':
-				return <UserPlus size={16} />
+				return <UserPlus size={iconSize} />
 			case 'course_enrollment':
-				return <BookOpen size={16} />
+				return <BookOpen size={iconSize} />
 			case 'course_completion':
-				return <Award size={16} />
+				return <Award size={iconSize} />
 			case 'course_published':
-				return <Upload size={16} />
+				return <Upload size={iconSize} />
 			case 'course_updated':
-				return <RefreshCw size={16} />
+				return <RefreshCw size={iconSize} />
 			case 'payment_received':
-				return <CreditCard size={16} />
+				return <CreditCard size={iconSize} />
 			case 'certificate_issued':
-				return <GraduationCap size={16} />
+				return <GraduationCap size={iconSize} />
 			case 'review_submitted':
-				return <Star size={16} />
+				return <Star size={iconSize} />
 			case 'system_alert':
-				return <AlertTriangle size={16} />
+				return <AlertTriangle size={iconSize} />
 			case 'admin_action':
-				return <Settings size={16} />
+				return <Settings size={iconSize} />
 			default:
-				return <FileText size={16} />
+				return <FileText size={iconSize} />
 		}
 	}
 
 	const getActivityColor = (type: ActivityType) => {
 		switch (type) {
 			case 'user_registration':
+				return '#10b981' // Green
 			case 'course_enrollment':
+				return '#3b82f6' // Blue
 			case 'course_completion':
+				return '#8b5cf6' // Purple
 			case 'course_published':
-			case 'payment_received':
-			case 'certificate_issued':
-			case 'review_submitted':
-				return 'var(--success)'
+				return '#06b6d4' // Cyan
 			case 'course_updated':
-			case 'admin_action':
-				return 'var(--info)'
+				return '#6366f1' // Indigo
+			case 'payment_received':
+				return '#10b981' // Green
+			case 'certificate_issued':
+				return '#f59e0b' // Amber
+			case 'review_submitted':
+				return '#eab308' // Yellow
 			case 'system_alert':
-				return 'var(--warning)'
+				return '#ef4444' // Red
+			case 'admin_action':
+				return '#6366f1' // Indigo
 			default:
-				return 'var(--muted-foreground)'
+				return '#6b7280' // Gray
 		}
 	}
 
@@ -166,56 +174,49 @@ const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
 							className={`activity-item ${onActivityClick ? 'clickable' : ''}`}
 							onClick={() => onActivityClick?.(activity)}
 						>
-							<div className="activity-icon" style={{ color: getActivityColor(activity.type) }}>
+							<div className="activity-icon" style={{ backgroundColor: getActivityColor(activity.type) }}>
 								{getActivityIcon(activity.type)}
 							</div>
-							
+
 							<div className="activity-content">
-								<div className="activity-header-row">
+								<div className="activity-header-inline">
 									<div className="activity-title-text">
 										{activity.title}
 									</div>
-									<div className="activity-time">
+									<div className="activity-time-badge">
 										{formatTime(activity.timestamp)}
 									</div>
 								</div>
-								
+
 								<div className="activity-description">
 									{formatActivityDescription(activity)}
 								</div>
-								
-								{activity.user && (
-									<div className="activity-user">
-										<User size={12} />
-										<span>{activity.user}</span>
-									</div>
-								)}
-								
-								{activity.course && (
-									<div className="activity-course">
-										<BookOpen size={12} />
-										<span>{activity.course}</span>
-									</div>
-								)}
-								
-								<div className="activity-footer">
-									<Badge variant={getStatusBadgeVariant(activity.status)}>
-										{activity.status}
-									</Badge>
-									
-									{activity.metadata && (
-										<div className="activity-metadata">
-											{activity.metadata.certificateIssued && (
-												<Badge variant="info" style={{ fontSize: '10px', padding: '2px 6px' }}>
-													<GraduationCap size={10} style={{ marginRight: '3px' }} />
-													Chứng chỉ
-												</Badge>
-											)}
-											{activity.metadata.tokensEarned && (
-												<Badge variant="success" style={{ fontSize: '10px', padding: '2px 6px' }}>
-													+{activity.metadata.tokensEarned} token
-												</Badge>
-											)}
+
+								<div className="activity-meta-row">
+									{activity.user && (
+										<div className="activity-meta-item">
+											<User size={9} />
+											<span>{activity.user}</span>
+										</div>
+									)}
+
+									{activity.course && (
+										<div className="activity-meta-item">
+											<BookOpen size={9} />
+											<span>{activity.course}</span>
+										</div>
+									)}
+
+									{activity.metadata?.certificateIssued && (
+										<div className="activity-meta-item activity-badge-item">
+											<GraduationCap size={9} />
+											<span>Chứng chỉ</span>
+										</div>
+									)}
+
+									{activity.metadata?.tokensEarned && (
+										<div className="activity-meta-item activity-token-item">
+											+{activity.metadata.tokensEarned} token
 										</div>
 									)}
 								</div>

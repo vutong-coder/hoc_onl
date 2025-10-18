@@ -28,7 +28,7 @@ import DashboardSettingsModal from '../modal/Dashboard/DashboardSettingsModal'
 import DashboardFiltersModal from '../modal/Dashboard/DashboardFiltersModal'
 import DashboardExportModal from '../modal/Dashboard/DashboardExportModal'
 import ActivityDetailModal from '../modal/Dashboard/ActivityDetailModal'
-import { 
+import {
 	exportCompleteDashboardToExcel,
 	exportDashboardStatsToExcel,
 	exportUserGrowthToExcel,
@@ -38,7 +38,7 @@ import {
 	exportSystemHealthToExcel
 } from '../utils/dashboardExcelHelpers'
 import '../styles/common.css'
-import '../styles/dashboard.css'
+import '../styles/dashboard.scss'
 
 export default function DashboardPage(): JSX.Element {
 	const {
@@ -178,42 +178,35 @@ export default function DashboardPage(): JSX.Element {
 	const activitySummary = getActivitySummary()
 
 	return (
-		<div style={{ padding: '24px' }}>
+		<div className="dashboard-container">
 			{/* Header */}
-			<div style={{ marginBottom: '32px' }}>
-				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-					<div>
-						<h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', margin: 0 }}>
-							<BarChart3 size={32} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
+			<div className="dashboard-header">
+				<div className="dashboard-header-top">
+					<div className="dashboard-title-section">
+						<h1>
+							<BarChart3 size={32} />
 							Dashboard Tổng quan
 						</h1>
-						<p style={{ color: 'var(--muted-foreground)', margin: 0 }}>
-							Theo dõi hiệu suất và hoạt động của hệ thống học trực tuyến
-						</p>
+						<p>Theo dõi hiệu suất và hoạt động của hệ thống học trực tuyến</p>
 					</div>
 
-					<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+					<div className="dashboard-actions">
 						{/* System Health Indicator */}
-						<div style={{ 
-							display: 'flex', 
-							alignItems: 'center', 
-							gap: '8px',
-							padding: '8px 12px',
-							background: 'var(--muted)',
-							borderRadius: 'var(--radius-md)',
-							border: `1px solid ${getSystemHealthColor(systemHealth.status)}`
-						}}>
+						<div
+							className="system-health-indicator"
+							style={{
+								borderColor: getSystemHealthColor(systemHealth.status)
+							}}
+						>
 							<div style={{ color: getSystemHealthColor(systemHealth.status) }}>
 								{getSystemHealthIcon(systemHealth.status)}
 							</div>
-							<div>
-								<div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--foreground)' }}>
-									Hệ thống {systemHealth.status === 'healthy' ? 'Hoạt động tốt' : 
-												systemHealth.status === 'warning' ? 'Cảnh báo' : 'Lỗi'}
-								</div>
-								<div style={{ fontSize: '11px', color: 'var(--muted-foreground)' }}>
-									Uptime: {systemHealth.uptime}%
-								</div>
+							<div className="system-health-info">
+								<h4>
+									Hệ thống {systemHealth.status === 'healthy' ? 'Hoạt động tốt' :
+											systemHealth.status === 'warning' ? 'Cảnh báo' : 'Lỗi'}
+								</h4>
+								<p>Uptime: {systemHealth.uptime}%</p>
 							</div>
 						</div>
 
@@ -250,54 +243,24 @@ export default function DashboardPage(): JSX.Element {
 				</div>
 
 				{/* Quick Stats */}
-				<div style={{ 
-					display: 'grid', 
-					gridTemplateColumns: 'repeat(4, 1fr)', 
-					gap: '16px',
-					marginBottom: '24px'
-				}}>
+				<div className="quick-stats-grid">
 					{/* Card 1 - Hoạt động hôm nay */}
-					<div style={{ 
-						background: 'var(--card)',
-						borderRadius: 'var(--radius-lg)',
-						padding: '20px',
-						boxShadow: 'var(--shadow-sm)',
-						border: '1px solid var(--border)',
-						position: 'relative',
-						overflow: 'hidden'
-					}}>
-						<div style={{ 
-							position: 'absolute',
-							top: '0',
-							right: '0',
-							width: '80px',
-							height: '80px',
-							background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)',
-							borderRadius: '50%',
-							transform: 'translate(20px, -20px)'
-						}} />
-						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
-							<div style={{ 
-								width: '40px', 
-								height: '40px', 
-								borderRadius: 'var(--radius-md)', 
-								display: 'flex', 
-								alignItems: 'center', 
-								justifyContent: 'center',
-								background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-								color: 'white',
-								flexShrink: 0
-							}}>
+					<div className="stat-card">
+						<div
+							className="stat-card-bg"
+							style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%)' }}
+						/>
+						<div className="stat-card-content">
+							<div
+								className="stat-card-icon"
+								style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' }}
+							>
 								<Activity size={20} />
 							</div>
-							<div style={{ flex: 1 }}>
-								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
-									Hoạt động hôm nay
-								</div>
-								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
-									{activitySummary.total}
-								</div>
-								<div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 600, marginTop: '4px' }}>
+							<div className="stat-card-data">
+								<div className="stat-card-label">Hoạt động hôm nay</div>
+								<div className="stat-card-value">{activitySummary.total}</div>
+								<div className="stat-card-subtitle" style={{ color: '#3b82f6' }}>
 									Tổng hoạt động
 								</div>
 							</div>
@@ -305,47 +268,22 @@ export default function DashboardPage(): JSX.Element {
 					</div>
 
 					{/* Card 2 - Uptime hệ thống */}
-					<div style={{ 
-						background: 'var(--card)',
-						borderRadius: 'var(--radius-lg)',
-						padding: '20px',
-						boxShadow: 'var(--shadow-sm)',
-						border: '1px solid var(--border)',
-						position: 'relative',
-						overflow: 'hidden'
-					}}>
-						<div style={{ 
-							position: 'absolute',
-							top: '0',
-							right: '0',
-							width: '80px',
-							height: '80px',
-							background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
-							borderRadius: '50%',
-							transform: 'translate(20px, -20px)'
-						}} />
-						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
-							<div style={{ 
-								width: '40px', 
-								height: '40px', 
-								borderRadius: 'var(--radius-md)', 
-								display: 'flex', 
-								alignItems: 'center', 
-								justifyContent: 'center',
-								background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-								color: 'white',
-								flexShrink: 0
-							}}>
+					<div className="stat-card">
+						<div
+							className="stat-card-bg"
+							style={{ background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)' }}
+						/>
+						<div className="stat-card-content">
+							<div
+								className="stat-card-icon"
+								style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}
+							>
 								<CheckCircle size={20} />
 							</div>
-							<div style={{ flex: 1 }}>
-								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
-									Uptime hệ thống
-								</div>
-								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
-									{systemHealth.uptime}%
-								</div>
-								<div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>
+							<div className="stat-card-data">
+								<div className="stat-card-label">Uptime hệ thống</div>
+								<div className="stat-card-value">{systemHealth.uptime}%</div>
+								<div className="stat-card-subtitle" style={{ color: '#10b981' }}>
 									Thời gian hoạt động
 								</div>
 							</div>
@@ -353,47 +291,22 @@ export default function DashboardPage(): JSX.Element {
 					</div>
 
 					{/* Card 3 - Thời gian phản hồi */}
-					<div style={{ 
-						background: 'var(--card)',
-						borderRadius: 'var(--radius-lg)',
-						padding: '20px',
-						boxShadow: 'var(--shadow-sm)',
-						border: '1px solid var(--border)',
-						position: 'relative',
-						overflow: 'hidden'
-					}}>
-						<div style={{ 
-							position: 'absolute',
-							top: '0',
-							right: '0',
-							width: '80px',
-							height: '80px',
-							background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
-							borderRadius: '50%',
-							transform: 'translate(20px, -20px)'
-						}} />
-						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
-							<div style={{ 
-								width: '40px', 
-								height: '40px', 
-								borderRadius: 'var(--radius-md)', 
-								display: 'flex', 
-								alignItems: 'center', 
-								justifyContent: 'center',
-								background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-								color: 'white',
-								flexShrink: 0
-							}}>
+					<div className="stat-card">
+						<div
+							className="stat-card-bg"
+							style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)' }}
+						/>
+						<div className="stat-card-content">
+							<div
+								className="stat-card-icon"
+								style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}
+							>
 								<Clock size={20} />
 							</div>
-							<div style={{ flex: 1 }}>
-								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
-									Thời gian phản hồi
-								</div>
-								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
-									{systemHealth.responseTime}s
-								</div>
-								<div style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600, marginTop: '4px' }}>
+							<div className="stat-card-data">
+								<div className="stat-card-label">Thời gian phản hồi</div>
+								<div className="stat-card-value">{systemHealth.responseTime}s</div>
+								<div className="stat-card-subtitle" style={{ color: '#f59e0b' }}>
 									Trung bình phản hồi
 								</div>
 							</div>
@@ -401,47 +314,22 @@ export default function DashboardPage(): JSX.Element {
 					</div>
 
 					{/* Card 4 - Tỷ lệ lỗi */}
-					<div style={{ 
-						background: 'var(--card)',
-						borderRadius: 'var(--radius-lg)',
-						padding: '20px',
-						boxShadow: 'var(--shadow-sm)',
-						border: '1px solid var(--border)',
-						position: 'relative',
-						overflow: 'hidden'
-					}}>
-						<div style={{ 
-							position: 'absolute',
-							top: '0',
-							right: '0',
-							width: '80px',
-							height: '80px',
-							background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
-							borderRadius: '50%',
-							transform: 'translate(20px, -20px)'
-						}} />
-						<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', position: 'relative', zIndex: 1 }}>
-							<div style={{ 
-								width: '40px', 
-								height: '40px', 
-								borderRadius: 'var(--radius-md)', 
-								display: 'flex', 
-								alignItems: 'center', 
-								justifyContent: 'center',
-								background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-								color: 'white',
-								flexShrink: 0
-							}}>
+					<div className="stat-card">
+						<div
+							className="stat-card-bg"
+							style={{ background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)' }}
+						/>
+						<div className="stat-card-content">
+							<div
+								className="stat-card-icon"
+								style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}
+							>
 								<AlertTriangle size={20} />
 							</div>
-							<div style={{ flex: 1 }}>
-								<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', marginBottom: '6px', fontWeight: 500 }}>
-									Tỷ lệ lỗi
-								</div>
-								<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
-									{systemHealth.errorRate}%
-								</div>
-								<div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginTop: '4px' }}>
+							<div className="stat-card-data">
+								<div className="stat-card-label">Tỷ lệ lỗi</div>
+								<div className="stat-card-value">{systemHealth.errorRate}%</div>
+								<div className="stat-card-subtitle" style={{ color: '#ef4444' }}>
 									Tỷ lệ lỗi hệ thống
 								</div>
 							</div>
@@ -454,113 +342,60 @@ export default function DashboardPage(): JSX.Element {
 			<StatCardsGrid stats={stats} loading={loading} />
 
 			{/* Charts Section */}
-			<div style={{ 
-				display: 'grid', 
-				gridTemplateColumns: '1fr 1fr', 
-				gap: '24px',
-				marginBottom: '32px'
-			}}>
-				<UserGrowthChart 
-					data={userGrowth} 
-					chartData={chartData.userGrowth} 
-					loading={loading} 
+			<div className="dashboard-charts-section">
+				<UserGrowthChart
+					data={userGrowth}
+					chartData={chartData.userGrowth}
+					loading={loading}
 				/>
-				<CourseCategoryChart 
-					data={courseCategories} 
-					chartData={chartData.courseCategories} 
-					loading={loading} 
+				<CourseCategoryChart
+					data={courseCategories}
+					chartData={chartData.courseCategories}
+					loading={loading}
 				/>
 			</div>
 
 			{/* Bottom Section */}
-			<div style={{ 
-				display: 'grid', 
-				gridTemplateColumns: '2fr 1fr', 
-				gap: '24px'
-			}}>
-				<RecentActivityFeed 
-					activities={recentActivities} 
+			<div className="dashboard-bottom-section">
+				<RecentActivityFeed
+					activities={recentActivities}
 					loading={loading}
 					onActivityClick={handleActivityClick}
 				/>
 
 				{/* Top Performers */}
-				<div style={{ 
-					background: 'var(--card)', 
-					border: '1px solid var(--border)', 
-					borderRadius: 'var(--radius-lg)',
-					padding: '24px',
-					boxShadow: 'var(--shadow-sm)'
-				}}>
-					<div style={{ marginBottom: '20px' }}>
-						<div style={{ 
-							display: 'flex', 
-							alignItems: 'center', 
-							gap: '8px',
-							fontSize: '18px',
-							fontWeight: 600,
-							color: 'var(--foreground)',
-							marginBottom: '4px'
-						}}>
+				<div className="top-performers-card">
+					<div className="top-performers-header">
+						<div className="top-performers-title">
 							<TrendingUp size={20} />
 							Top Performers
 						</div>
-						<div style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
+						<div className="top-performers-subtitle">
 							Các khóa học và giảng viên xuất sắc nhất
 						</div>
 					</div>
 
-					<div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+					<div className="top-performers-list">
 						{topPerformers.slice(0, 5).map((performer, index) => (
-							<div key={performer.id} style={{ 
-								display: 'flex', 
-								alignItems: 'center', 
-								gap: '12px',
-								padding: '12px',
-								background: 'var(--muted)',
-								borderRadius: 'var(--radius-md)',
-								border: '1px solid var(--border)'
-							}}>
-								<div style={{ 
-									fontSize: '14px', 
-									fontWeight: 600, 
-									color: 'var(--primary)',
-									background: 'var(--primary-light)',
-									width: '24px',
-									height: '24px',
-									borderRadius: '50%',
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center'
-								}}>
+							<div key={performer.id} className="performer-item">
+								<div className="performer-rank">
 									#{index + 1}
 								</div>
 								{performer.avatar && (
-									<img 
-										src={performer.avatar} 
+									<img
+										src={performer.avatar}
 										alt={performer.name}
-										style={{ 
-											width: '32px', 
-											height: '32px', 
-											borderRadius: '50%',
-											objectFit: 'cover'
-										}}
+										className="performer-avatar"
 									/>
 								)}
-								<div style={{ flex: 1 }}>
-									<div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--foreground)' }}>
-										{performer.name}
-									</div>
-									<div style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
+								<div className="performer-info">
+									<div className="performer-name">{performer.name}</div>
+									<div className="performer-value">
 										{performer.value.toLocaleString()} {performer.unit}
 									</div>
 								</div>
-								<div style={{ textAlign: 'right' }}>
-									<div style={{ 
-										fontSize: '12px', 
-										fontWeight: 600, 
-										color: performer.growth > 0 ? 'var(--success)' : 'var(--danger)'
-									}}>
+								<div className="performer-growth">
+									<div className={`performer-growth-value ${performer.growth > 0 ? 'positive' : 'negative'}`}>
 										{performer.growth > 0 ? '+' : ''}{performer.growth}%
 									</div>
 								</div>
@@ -609,3 +444,4 @@ export default function DashboardPage(): JSX.Element {
 		</div>
 	)
 }
+

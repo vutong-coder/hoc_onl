@@ -5,6 +5,9 @@ export interface Document {
 	title: string
 	author: string
 	description: string
+	category: DocumentMetadata['category']
+	keywords: string[]
+	references: string[]
 	fileType: 'pdf' | 'docx' | 'txt' | 'md' | 'ppt' | 'xlsx'
 	fileSize: number
 	hash: string
@@ -85,6 +88,7 @@ export interface DocumentForm {
 	references?: string[]
 	doi?: string
 	isbn?: string
+	metadata?: Partial<DocumentMetadata>
 }
 
 export interface CopyrightFilters {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { ChartData, UserGrowthData } from '../../types/dashboard'
 import { TrendingUp, Users, UserPlus, Activity } from 'lucide-react'
-import '../../styles/dashboard.css'
+import '../../styles/dashboard.scss'
 
 interface UserGrowthChartProps {
 	data: UserGrowthData[]

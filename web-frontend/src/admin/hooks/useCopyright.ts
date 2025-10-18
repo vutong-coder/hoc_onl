@@ -94,6 +94,9 @@ export const useCopyright = () => {
 					title: `New Document ${Math.floor(Math.random() * 1000)}`,
 					author: `Author ${Math.floor(Math.random() * 100)}`,
 					description: 'Auto-generated test document',
+					category: 'academic',
+					keywords: ['test', 'auto-generated'],
+					references: [],
 					fileType: 'pdf',
 					fileSize: Math.random() * 5 * 1024 * 1024,
 					hash: `hash${Math.random().toString(36).substr(2, 9)}`,
@@ -170,6 +173,9 @@ export const useCopyright = () => {
 				title: form.title,
 				author: form.author,
 				description: form.description,
+				category: form.category,
+				keywords: form.keywords,
+				references: form.references || [],
 				fileType: form.file?.name.split('.').pop() as any || 'pdf',
 				fileSize: form.file?.size || 0,
 				hash: `hash${Math.random().toString(36).substr(2, 9)}`,
@@ -280,6 +286,88 @@ export const useCopyright = () => {
 				confidence: 0,
 				details: errorMessage,
 				evidence: []
+			}
+		} finally {
+			setLoading(false)
+		}
+	}, [documents])
+
+	const deleteDocument = useCallback(async (documentId: string): Promise<{ success: boolean; error?: string }> => {
+		setLoading(true)
+		setError(null)
+		
+		try {
+			await new Promise(resolve => setTimeout(resolve, 1000))
+			
+			const document = documents.find(doc => doc.id === documentId)
+			if (!document) {
+				throw new Error('Document not found')
+			}
+			
+			// Simulate deletion process
+			setDocuments(prev => prev.filter(doc => doc.id !== documentId))
+			
+			return {
+				success: true
+			}
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Delete failed'
+			setError(errorMessage)
+			return {
+				success: false,
+				error: errorMessage
+			}
+		} finally {
+			setLoading(false)
+		}
+	}, [documents])
+
+	const updateDocument = useCallback(async (documentId: string, form: DocumentForm): Promise<{ success: boolean; error?: string }> => {
+		setLoading(true)
+		setError(null)
+		
+		try {
+			await new Promise(resolve => setTimeout(resolve, 1500))
+			
+			const document = documents.find(doc => doc.id === documentId)
+			if (!document) {
+				throw new Error('Document not found')
+			}
+			
+			// Simulate update process
+			const updatedDocument: Document = {
+				...document,
+				title: form.title,
+				description: form.description,
+				author: form.author,
+				category: form.category,
+				keywords: form.keywords,
+				references: form.references || [],
+				metadata: {
+					...document.metadata,
+					...form.metadata
+				},
+				// Update file if provided
+				...(form.file && {
+					fileName: form.file.name,
+					fileSize: form.file.size,
+					fileType: form.file.type
+				})
+			}
+			
+			setDocuments(prev => prev.map(doc => 
+				doc.id === documentId ? updatedDocument : doc
+			))
+			
+			return {
+				success: true
+			}
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Update failed'
+			setError(errorMessage)
+			return {
+				success: false,
+				error: errorMessage
 			}
 		} finally {
 			setLoading(false)
@@ -448,6 +536,8 @@ export const useCopyright = () => {
 		// Actions
 		registerDocument,
 		verifyDocument,
+		deleteDocument,
+		updateDocument,
 		submitDispute,
 		updateFilters,
 		clearFilters,

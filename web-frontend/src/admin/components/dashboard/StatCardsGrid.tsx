@@ -2,7 +2,7 @@ import React from 'react'
 import { DashboardStats } from '../../types/dashboard'
 import StatCard from '../common/StatCard'
 import { Users, BookOpen, TrendingUp, DollarSign, Activity, Award, Calendar, CreditCard } from 'lucide-react'
-import '../../styles/dashboard.css'
+import '../../styles/dashboard.scss'
 
 interface StatCardsGridProps {
 	stats: DashboardStats

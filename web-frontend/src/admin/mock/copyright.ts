@@ -19,6 +19,9 @@ export const mockDocuments: Document[] = [
 		title: 'Machine Learning Fundamentals',
 		author: 'Dr. Nguyễn Văn An',
 		description: 'Comprehensive guide to machine learning algorithms and applications',
+		category: 'academic',
+		keywords: ['machine learning', 'AI', 'algorithms', 'data science'],
+		references: ['https://example.com/ref1', 'https://example.com/ref2'],
 		fileType: 'pdf',
 		fileSize: 2.5 * 1024 * 1024, // 2.5MB
 		hash: 'a1b2c3d4e5f6789012345678901234567890abcd',
@@ -61,6 +64,9 @@ export const mockDocuments: Document[] = [
 		title: 'Advanced React Patterns',
 		author: 'Trần Thị Lan',
 		description: 'Modern React development patterns and best practices',
+		category: 'research',
+		keywords: ['React', 'JavaScript', 'frontend', 'patterns'],
+		references: ['https://reactjs.org/docs', 'https://example.com/react-patterns'],
 		fileType: 'docx',
 		fileSize: 1.8 * 1024 * 1024, // 1.8MB
 		hash: 'b2c3d4e5f6789012345678901234567890abcdef1',
@@ -102,6 +108,9 @@ export const mockDocuments: Document[] = [
 		title: 'Blockchain Technology Overview',
 		author: 'Lê Minh Tuấn',
 		description: 'Introduction to blockchain technology and its applications',
+		category: 'presentation',
+		keywords: ['blockchain', 'cryptocurrency', 'distributed systems'],
+		references: ['https://bitcoin.org', 'https://ethereum.org'],
 		fileType: 'ppt',
 		fileSize: 3.2 * 1024 * 1024, // 3.2MB
 		hash: 'c3d4e5f6789012345678901234567890abcdef12',
@@ -154,6 +163,9 @@ export const mockDocuments: Document[] = [
 		title: 'Data Structures and Algorithms',
 		author: 'Hoàng Thị Mai',
 		description: 'Comprehensive study of data structures and algorithms',
+		category: 'textbook',
+		keywords: ['data structures', 'algorithms', 'computer science', 'programming'],
+		references: ['https://example.com/dsa-guide'],
 		fileType: 'pdf',
 		fileSize: 4.1 * 1024 * 1024, // 4.1MB
 		hash: 'd4e5f6789012345678901234567890abcdef1234',
@@ -183,6 +195,9 @@ export const mockDocuments: Document[] = [
 		title: 'Web Development Best Practices',
 		author: 'Vũ Đức Thành',
 		description: 'Modern web development techniques and best practices',
+		category: 'article',
+		keywords: ['web development', 'best practices', 'frontend', 'backend'],
+		references: ['https://web.dev', 'https://developer.mozilla.org'],
 		fileType: 'md',
 		fileSize: 0.8 * 1024 * 1024, // 0.8MB
 		hash: 'e5f6789012345678901234567890abcdef12345',

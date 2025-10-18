@@ -47,7 +47,7 @@ import {
 	Wifi,
 	WifiOff
 } from 'lucide-react'
-import '../styles/analytics.css'
+import '../styles/analytics.scss'
 import '../styles/table.css'
 import '../styles/common.css'
 import '../styles/form.css'
@@ -425,12 +425,12 @@ export const AnalyticsPage: React.FC = () => {
 				<div className="section-header">
 					<h2>Hoạt động gần đây</h2>
 				</div>
-				<Card className="activity-feed">
+				<div className="activity-feed">
 					<div className="activity-list">
 						{dashboard.recentActivity.map((activity) => (
 							<div key={activity.id} className="activity-item">
 								<div className="activity-icon">
-									<Activity className="w-4 h-4" />
+									<Activity className="w-6 h-6" />
 								</div>
 								<div className="activity-content">
 									<h4>{activity.title}</h4>
@@ -439,13 +439,14 @@ export const AnalyticsPage: React.FC = () => {
 										{new Date(activity.timestamp).toLocaleString('vi-VN')}
 									</span>
 								</div>
-								<Badge variant={activity.impact === 'high' ? 'danger' : activity.impact === 'medium' ? 'warning' : 'info'}>
-									{activity.impact}
-								</Badge>
+								<div className={`activity-badge ${activity.impact}`}>
+									{activity.impact === 'high' ? 'Cao' : activity.impact === 'medium' ? 'Trung bình' : 'Thấp'}
+								</div>
+								<div className={`activity-status ${activity.status || 'completed'}`}></div>
 							</div>
 						))}
 					</div>
-				</Card>
+				</div>
 			</div>
 
 			{/* Alerts */}

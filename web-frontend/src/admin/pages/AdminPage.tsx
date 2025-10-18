@@ -44,7 +44,7 @@ import {
 	generateAdminExcelTemplate
 } from '../utils/adminExcelHelpers'
 import '../styles/common.css'
-import '../styles/admin.css'
+import '../styles/admin.scss'
 
 export default function AdminPage(): JSX.Element {
 	const {

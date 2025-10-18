@@ -1,7 +1,7 @@
 import React from 'react'
 import Modal from '../../components/common/Modal'
 import Badge from '../../components/common/Badge'
-import { FileText } from 'lucide-react'
+import { FileText, X } from 'lucide-react'
 import { Document } from '../../types/copyright'
 
 interface DocumentDetailModalProps {
@@ -17,15 +17,22 @@ const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
 }) => {
 	if (!document) return null
 
+	if (!isOpen) return null
+
 	return (
-		<Modal
-			isOpen={isOpen}
-			onClose={onClose}
-			title={document.title || 'Chi tiết tài liệu'}
-			maxWidth="80vw"
-		>
-			<div className="document-detail">
-				<div className="document-header">
+		<div className="modal-overlay">
+			<div className="modal-container document-detail-modal">
+				<div className="modal-header">
+					<div className="modal-title">
+						<FileText size={24} />
+						<h2>{document.title || 'Chi tiết tài liệu'}</h2>
+					</div>
+					<button className="modal-close" onClick={onClose}>
+						<X size={20} />
+					</button>
+				</div>
+
+				<div className="document-detail-content">
 					<div className="document-info">
 						<FileText className="file-icon" />
 						<div className="document-meta">
@@ -33,14 +40,12 @@ const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
 							<p>Tác giả: {document.author}</p>
 							<p>Ngày đăng ký: {new Date(document.registrationDate).toLocaleString('vi-VN')}</p>
 						</div>
+						<Badge variant={document.status === 'verified' ? 'success' : document.status === 'pending' ? 'warning' : 'danger'}>
+							{document.status === 'verified' ? 'Đã xác minh' : 
+							 document.status === 'pending' ? 'Chờ xác minh' : 'Có tranh chấp'}
+						</Badge>
 					</div>
-					<Badge variant={document.status === 'verified' ? 'success' : document.status === 'pending' ? 'warning' : 'danger'}>
-						{document.status === 'verified' ? 'Đã xác minh' : 
-						 document.status === 'pending' ? 'Chờ xác minh' : 'Có tranh chấp'}
-					</Badge>
-				</div>
-				
-				<div className="document-content">
+					
 					<div className="content-section">
 						<h4>Mô tả</h4>
 						<p>{document.description}</p>
@@ -107,7 +112,7 @@ const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
 					</div>
 				</div>
 			</div>
-		</Modal>
+		</div>
 	)
 }
 

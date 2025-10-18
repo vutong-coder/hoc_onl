@@ -26,6 +26,8 @@ interface RegisteredDocsTableProps {
 	loading?: boolean
 	onViewDocument: (document: Document) => void
 	onVerifyDocument: (documentId: string) => void
+	onEditDocument: (document: Document) => void
+	onDeleteDocument: (documentId: string) => void
 	onExportDocuments: (documents: Document[]) => void
 	onRefresh: () => void
 	filters: CopyrightFilters
@@ -37,6 +39,8 @@ export const RegisteredDocsTable: React.FC<RegisteredDocsTableProps> = ({
 	loading = false,
 	onViewDocument,
 	onVerifyDocument,
+	onEditDocument,
+	onDeleteDocument,
 	onExportDocuments,
 	onRefresh,
 	filters,
@@ -46,6 +50,7 @@ export const RegisteredDocsTable: React.FC<RegisteredDocsTableProps> = ({
 	const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 	const [selectedDocuments, setSelectedDocuments] = useState<string[]>([])
 	const [showFilters, setShowFilters] = useState(false)
+	const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
 	const handleSort = (field: keyof Document) => {
 		if (sortField === field) {
@@ -87,6 +92,25 @@ export const RegisteredDocsTable: React.FC<RegisteredDocsTableProps> = ({
 		} else {
 			setSelectedDocuments(documents.map(doc => doc.id))
 		}
+	}
+
+	const handleEditDocument = (document: Document) => {
+		onEditDocument(document)
+	}
+
+	const handleDeleteDocument = (documentId: string) => {
+		setDeleteConfirmId(documentId)
+	}
+
+	const confirmDelete = () => {
+		if (deleteConfirmId) {
+			onDeleteDocument(deleteConfirmId)
+			setDeleteConfirmId(null)
+		}
+	}
+
+	const cancelDelete = () => {
+		setDeleteConfirmId(null)
 	}
 
 	const getStatusIcon = (status: Document['status']) => {
@@ -469,31 +493,23 @@ export const RegisteredDocsTable: React.FC<RegisteredDocsTableProps> = ({
 												</button>
 											)}
 											
-											<div className="dropdown-menu">
-												<button className="btn btn-icon btn-secondary dropdown-trigger">
-													<MoreVertical size={18} />
-												</button>
-												<div className="dropdown-content">
-													<button onClick={() => onViewDocument(document)}>
-														<Eye className="dropdown-icon" />
-														Xem chi tiết
-													</button>
-													{document.status === 'pending' && (
-														<button onClick={() => onVerifyDocument(document.id)}>
-															<CheckCircle className="dropdown-icon" />
-															Xác minh
-														</button>
-													)}
-													<button>
-														<Edit className="dropdown-icon" />
-														Chỉnh sửa
-													</button>
-													<button className="danger">
-														<Trash2 className="dropdown-icon" />
-														Xóa
-													</button>
-												</div>
-											</div>
+											<button
+												className="btn btn-edit btn-sm"
+												onClick={() => handleEditDocument(document)}
+												title="Chỉnh sửa"
+											>
+												<Edit size={16} />
+												Chỉnh sửa
+											</button>
+											
+											<button
+												className="btn btn-delete btn-sm"
+												onClick={() => handleDeleteDocument(document.id)}
+												title="Xóa"
+											>
+												<Trash2 size={16} />
+												Xóa
+											</button>
 										</div>
 									</td>
 								</tr>
@@ -509,6 +525,36 @@ export const RegisteredDocsTable: React.FC<RegisteredDocsTableProps> = ({
 					<span>Hiển thị {sortedDocuments.length} trong tổng số {documents.length} tài liệu</span>
 				</div>
 			</div>
+
+			{/* Delete Confirmation Dialog */}
+			{deleteConfirmId && (
+				<div className="delete-confirmation-overlay">
+					<div className="delete-confirmation-dialog">
+						<div className="dialog-header">
+							<h3>Xác nhận xóa tài liệu</h3>
+						</div>
+						<div className="dialog-content">
+							<p>Bạn có chắc chắn muốn xóa tài liệu này không?</p>
+							<p className="warning-text">Hành động này không thể hoàn tác.</p>
+						</div>
+						<div className="dialog-actions">
+							<button
+								className="btn btn-secondary"
+								onClick={cancelDelete}
+							>
+								Hủy
+							</button>
+							<button
+								className="btn btn-danger"
+								onClick={confirmDelete}
+							>
+								<Trash2 size={16} />
+								Xóa
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	)
 }

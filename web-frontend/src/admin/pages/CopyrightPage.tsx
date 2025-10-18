@@ -28,13 +28,14 @@ import Badge from '../components/common/Badge'
 import { DocumentRegistrar } from '../components/copyright/DocumentRegistrar'
 import RegisterDocumentModal from '../modal/Copyright/RegisterDocumentModal'
 import DocumentDetailModal from '../modal/Copyright/DocumentDetailModal'
+import { EditDocumentModal } from '../modal/Copyright/EditDocumentModal'
 import ExportModal from '../modal/Copyright/ExportModal'
 import SettingsModal from '../modal/Copyright/SettingsModal'
 import { RegisteredDocsTable } from '../components/copyright/RegisteredDocsTable'
 import { CopyrightStatsComponent } from '../components/copyright/CopyrightStats'
 import { useCopyright } from '../hooks/useCopyright'
 import { Document, DocumentForm, ExportOptions } from '../types/copyright'
-import '../styles/copyright.css'
+import '../styles/copyright.scss'
 import '../styles/table.css'
 import '../styles/common.css'
 import '../styles/form.css'
@@ -51,6 +52,8 @@ export const CopyrightPage: React.FC = () => {
 		isRealTimeEnabled,
 		registerDocument,
 		verifyDocument,
+		deleteDocument,
+		updateDocument,
 		exportDocuments,
 		updateFilters,
 		clearFilters,
@@ -63,6 +66,7 @@ export const CopyrightPage: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<'overview' | 'register' | 'documents' | 'stats'>('overview')
 	const [showRegisterModal, setShowRegisterModal] = useState(false)
 	const [showDocumentModal, setShowDocumentModal] = useState(false)
+	const [showEditModal, setShowEditModal] = useState(false)
 	const [selectedDocument, setSelectedDocument] = useState<Document | null>(null)
 	const [showExportModal, setShowExportModal] = useState(false)
 	const [showSettingsModal, setShowSettingsModal] = useState(false)
@@ -105,6 +109,33 @@ export const CopyrightPage: React.FC = () => {
 			addNotification(result.verified ? 'Xác minh thành công' : 'Xác minh thất bại', result.verified ? 'success' : 'error')
 		} else {
 			addNotification('Lỗi khi xác minh', 'error')
+		}
+	}
+
+	const handleEditDocument = (document: Document) => {
+		setSelectedDocument(document)
+		setShowEditModal(true)
+		addNotification(`Đang chỉnh sửa: ${document.title}`, 'info')
+	}
+
+	const handleSaveEdit = async (documentId: string, form: DocumentForm) => {
+		const result = await updateDocument(documentId, form)
+		if (result.success) {
+			addNotification('Cập nhật tài liệu thành công', 'success')
+			setShowEditModal(false)
+			setSelectedDocument(null)
+		} else {
+			addNotification(result.error || 'Cập nhật thất bại', 'error')
+		}
+		return result
+	}
+
+	const handleDeleteDocument = async (documentId: string) => {
+		const result = await deleteDocument(documentId)
+		if (result.success) {
+			addNotification('Xóa tài liệu thành công', 'success')
+		} else {
+			addNotification(result.error || 'Xóa tài liệu thất bại', 'error')
 		}
 	}
 
@@ -611,6 +642,8 @@ export const CopyrightPage: React.FC = () => {
 							loading={loading}
 							onViewDocument={handleViewDocument}
 							onVerifyDocument={handleVerifyDocument}
+							onEditDocument={handleEditDocument}
+							onDeleteDocument={handleDeleteDocument}
 							onExportDocuments={handleExportDocuments}
 							onRefresh={handleRefreshAll}
 							filters={filters}
@@ -766,6 +799,18 @@ export const CopyrightPage: React.FC = () => {
 				onExportDocuments={handleExportDocuments}
 				documents={documents}
 				isExporting={isExporting}
+			/>
+
+			{/* Edit Document Modal */}
+			<EditDocumentModal
+				isOpen={showEditModal}
+				onClose={() => {
+					setShowEditModal(false)
+					setSelectedDocument(null)
+				}}
+				document={selectedDocument}
+				onSave={handleSaveEdit}
+				loading={loading}
 			/>
 
 			{/* Settings Modal */}

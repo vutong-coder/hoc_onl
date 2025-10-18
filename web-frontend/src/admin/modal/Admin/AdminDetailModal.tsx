@@ -1,5 +1,5 @@
 import React from 'react'
-import { Users, Shield } from 'lucide-react'
+import { Users, Shield, Mail, Phone, MapPin, Calendar, Clock, User, Award } from 'lucide-react'
 import Modal from '../../components/common/Modal'
 import Badge from '../../components/common/Badge'
 
@@ -40,12 +40,23 @@ const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
 		return labels[status] || status
 	}
 
+	const getStatusVariant = (status: string) => {
+		const variants: Record<string, "success" | "warning" | "danger" | "secondary"> = {
+			active: 'success',
+			inactive: 'secondary',
+			suspended: 'warning',
+			pending: 'warning',
+			locked: 'danger'
+		}
+		return variants[status] || 'secondary'
+	}
+
 	return (
 		<Modal
 			isOpen={isOpen}
 			onClose={onClose}
 			title={admin.fullName || 'Chi tiết Admin'}
-			maxWidth="800px"
+			maxWidth="900px"
 		>
 			<div className="admin-detail-modal-content">
 				<div className="admin-detail-header">
@@ -53,7 +64,7 @@ const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
 						{admin.avatar ? (
 							<img src={admin.avatar} alt={admin.fullName} />
 						) : (
-							<Users size={40} />
+							<Users size={48} />
 						)}
 					</div>
 					<div className="admin-detail-info">
@@ -66,7 +77,7 @@ const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
 								</Badge>
 							</div>
 							<div className="meta-item">
-								<Badge variant="secondary">
+								<Badge variant={getStatusVariant(admin.status)}>
 									{getStatusLabel(admin.status)}
 								</Badge>
 							</div>
@@ -80,21 +91,30 @@ const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
 
 				<div className="admin-detail-sections">
 					<div className="detail-section">
-						<h3>Thông tin liên hệ</h3>
+						<h3>
+							<Mail size={20} />
+							Thông tin liên hệ
+						</h3>
 						<div className="contact-info">
 							<div className="contact-item">
-								<span className="contact-label">Email:</span>
+								<span className="contact-label">
+									<Mail size={14} /> Email
+								</span>
 								<span className="contact-value">{admin.email}</span>
 							</div>
 							{admin.metadata.phone && (
 								<div className="contact-item">
-									<span className="contact-label">Phone:</span>
+									<span className="contact-label">
+										<Phone size={14} /> Phone
+									</span>
 									<span className="contact-value">{admin.metadata.phone}</span>
 								</div>
 							)}
 							{admin.metadata.address && (
 								<div className="contact-item">
-									<span className="contact-label">Address:</span>
+									<span className="contact-label">
+										<MapPin size={14} /> Address
+									</span>
 									<span className="contact-value">{admin.metadata.address}</span>
 								</div>
 							)}
@@ -102,7 +122,10 @@ const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
 					</div>
 
 					<div className="detail-section">
-						<h3>Quyền hạn</h3>
+						<h3>
+							<Shield size={20} />
+							Quyền hạn ({admin.permissions.length})
+						</h3>
 						<div className="permissions-list">
 							{admin.permissions.map((permission: string) => (
 								<Badge key={permission} variant="info">
@@ -113,26 +136,37 @@ const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
 					</div>
 
 					<div className="detail-section">
-						<h3>Thông tin hoạt động</h3>
+						<h3>
+							<Clock size={20} />
+							Thông tin hoạt động
+						</h3>
 						<div className="activity-info">
 							<div className="activity-item">
-								<span className="activity-label">Đăng nhập cuối:</span>
+								<span className="activity-label">
+									<Clock size={14} /> Đăng nhập cuối
+								</span>
 								<span className="activity-value">
 									{new Date(admin.lastLoginAt).toLocaleString('vi-VN')}
 								</span>
 							</div>
 							<div className="activity-item">
-								<span className="activity-label">Tạo bởi:</span>
+								<span className="activity-label">
+									<User size={14} /> Tạo bởi
+								</span>
 								<span className="activity-value">{admin.createdBy}</span>
 							</div>
 							<div className="activity-item">
-								<span className="activity-label">Ngày tạo:</span>
+								<span className="activity-label">
+									<Calendar size={14} /> Ngày tạo
+								</span>
 								<span className="activity-value">
 									{new Date(admin.createdAt).toLocaleString('vi-VN')}
 								</span>
 							</div>
 							<div className="activity-item">
-								<span className="activity-label">Cập nhật cuối:</span>
+								<span className="activity-label">
+									<Calendar size={14} /> Cập nhật cuối
+								</span>
 								<span className="activity-value">
 									{new Date(admin.updatedAt).toLocaleString('vi-VN')}
 								</span>
@@ -142,14 +176,20 @@ const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
 
 					{admin.metadata.bio && (
 						<div className="detail-section">
-							<h3>Giới thiệu</h3>
+							<h3>
+								<User size={20} />
+								Giới thiệu
+							</h3>
 							<p className="bio-content">{admin.metadata.bio}</p>
 						</div>
 					)}
 
 					{admin.metadata.skills && admin.metadata.skills.length > 0 && (
 						<div className="detail-section">
-							<h3>Kỹ năng</h3>
+							<h3>
+								<Award size={20} />
+								Kỹ năng ({admin.metadata.skills.length})
+							</h3>
 							<div className="skills-list">
 								{admin.metadata.skills.map((skill: string) => (
 									<Badge key={skill} variant="success">{skill}</Badge>
