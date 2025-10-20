@@ -13,7 +13,7 @@ export default function UserLayout(): JSX.Element {
 			fontFamily: 'var(--font-sans)'
 		}}>
 			<UserHeader />
-			<main style={{ flex: 1 }}>
+			<main style={{ flex: 1, paddingTop: '80px' }}>
 				<Outlet />
 			</main>
 		</div>

@@ -1,13 +1,13 @@
 import React from 'react'
 import Modal from '../../components/common/Modal'
 import { Download } from 'lucide-react'
-import { Document } from '../../types/copyright'
+import { AdminDocument } from '../../hooks/useCopyright'
 
 interface ExportModalProps {
 	isOpen: boolean
 	onClose: () => void
-	onExportDocuments: (documents: Document[]) => Promise<void>
-	documents: Document[]
+	onExportDocuments: (documents: AdminDocument[]) => Promise<void>
+	documents: AdminDocument[]
 	isExporting: boolean
 }
 

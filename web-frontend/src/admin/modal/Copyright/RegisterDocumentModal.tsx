@@ -1,7 +1,7 @@
 import React from 'react'
 import Modal from '../../components/common/Modal'
 import { DocumentRegistrar } from '../../components/copyright/DocumentRegistrar'
-import { DocumentForm } from '../../types/copyright'
+import { DocumentForm } from '../../hooks/useCopyright'
 
 interface RegisterDocumentModalProps {
 	isOpen: boolean

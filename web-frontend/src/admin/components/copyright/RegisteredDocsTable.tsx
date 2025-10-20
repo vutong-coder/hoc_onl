@@ -19,19 +19,19 @@ import {
 	RefreshCw
 } from 'lucide-react'
 import Badge from '../common/Badge'
-import { Document, CopyrightFilters } from '../../types/copyright'
+import { AdminDocument, AdminFilters } from '../../hooks/useCopyright'
 
 interface RegisteredDocsTableProps {
-	documents: Document[]
+	documents: AdminDocument[]
 	loading?: boolean
-	onViewDocument: (document: Document) => void
+	onViewDocument: (document: AdminDocument) => void
 	onVerifyDocument: (documentId: string) => void
-	onEditDocument: (document: Document) => void
+	onEditDocument: (document: AdminDocument) => void
 	onDeleteDocument: (documentId: string) => void
-	onExportDocuments: (documents: Document[]) => void
+	onExportDocuments: (documents: AdminDocument[]) => void
 	onRefresh: () => void
-	filters: CopyrightFilters
-	onFiltersChange: (filters: Partial<CopyrightFilters>) => void
+	filters: AdminFilters
+	onFiltersChange: (filters: Partial<AdminFilters>) => void
 }
 
 export const RegisteredDocsTable: React.FC<RegisteredDocsTableProps> = ({
@@ -46,7 +46,7 @@ export const RegisteredDocsTable: React.FC<RegisteredDocsTableProps> = ({
 	filters,
 	onFiltersChange
 }) => {
-	const [sortField, setSortField] = useState<keyof Document>('registrationDate')
+	const [sortField, setSortField] = useState<keyof AdminDocument>('registrationDate')
 	const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 	const [selectedDocuments, setSelectedDocuments] = useState<string[]>([])
 	const [showFilters, setShowFilters] = useState(false)

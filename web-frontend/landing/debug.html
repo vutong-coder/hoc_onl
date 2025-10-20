@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCKH Landing Page</title>
+    <link rel="stylesheet" href="./index-DUY3xYeL.css">
+</head>
+<body>
+    <div id="root">
+        <h1>Loading...</h1>
+        <p>If you see this, the JavaScript hasn't loaded yet.</p>
+    </div>
+    <script type="module">
+        console.log('Starting to load JS...');
+        try {
+            await import('./index-CpCRZnel.js');
+            console.log('JS loaded successfully');
+        } catch (error) {
+            console.error('Error loading JS:', error);
+            document.getElementById('root').innerHTML = '<h1>Error loading JavaScript</h1><p>' + error.message + '</p>';
+        }
+    </script>
+</body>
+</html>

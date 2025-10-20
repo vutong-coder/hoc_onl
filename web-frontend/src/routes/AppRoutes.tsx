@@ -23,6 +23,7 @@ import SettingsPage from '../pages/SettingsPage'
 import LeaderboardPage from '../pages/LeaderboardPage'
 import RewardStorePage from '../pages/RewardStorePage'
 import TokenTransferPage from '../pages/TokenTransferPage'
+import CopyrightPage from '../pages/CopyrightPage'
 import { checkAuth } from '../store/slices/authSlice'
 
 export default function AppRoutes(): JSX.Element {
@@ -64,6 +65,7 @@ export default function AppRoutes(): JSX.Element {
                 <Route path="compete/:contestId" element={<ContestDetailPage />} />
 				<Route path="exam" element={<ExamPage />} />
 				<Route path="reward" element={<RewardPage />} />
+				<Route path="copyright" element={<CopyrightPage />} />
 				<Route path="profile" element={<ProfilePage />} />
 				<Route path="settings" element={<SettingsPage />} />
 				<Route path="leaderboard" element={<LeaderboardPage />} />

@@ -33,8 +33,7 @@ import ExportModal from '../modal/Copyright/ExportModal'
 import SettingsModal from '../modal/Copyright/SettingsModal'
 import { RegisteredDocsTable } from '../components/copyright/RegisteredDocsTable'
 import { CopyrightStatsComponent } from '../components/copyright/CopyrightStats'
-import { useCopyright } from '../hooks/useCopyright'
-import { Document, DocumentForm, ExportOptions } from '../types/copyright'
+import { useCopyright, AdminDocument, DocumentForm, ExportOptions } from '../hooks/useCopyright'
 import '../styles/copyright.scss'
 import '../styles/table.css'
 import '../styles/common.css'
@@ -67,7 +66,7 @@ export const CopyrightPage: React.FC = () => {
 	const [showRegisterModal, setShowRegisterModal] = useState(false)
 	const [showDocumentModal, setShowDocumentModal] = useState(false)
 	const [showEditModal, setShowEditModal] = useState(false)
-	const [selectedDocument, setSelectedDocument] = useState<Document | null>(null)
+	const [selectedDocument, setSelectedDocument] = useState<AdminDocument | null>(null)
 	const [showExportModal, setShowExportModal] = useState(false)
 	const [showSettingsModal, setShowSettingsModal] = useState(false)
 	const [notifications, setNotifications] = useState<string[]>([])
@@ -97,7 +96,7 @@ export const CopyrightPage: React.FC = () => {
 		return result
 	}
 
-	const handleViewDocument = (document: Document) => {
+	const handleViewDocument = (document: AdminDocument) => {
 		setSelectedDocument(document)
 		setShowDocumentModal(true)
 		addNotification(`Đã mở chi tiết: ${document.title}`, 'info')
@@ -112,7 +111,7 @@ export const CopyrightPage: React.FC = () => {
 		}
 	}
 
-	const handleEditDocument = (document: Document) => {
+	const handleEditDocument = (document: AdminDocument) => {
 		setSelectedDocument(document)
 		setShowEditModal(true)
 		addNotification(`Đang chỉnh sửa: ${document.title}`, 'info')
@@ -139,7 +138,7 @@ export const CopyrightPage: React.FC = () => {
 		}
 	}
 
-	const handleExportDocuments = async (documentsToExport: Document[]) => {
+	const handleExportDocuments = async (documentsToExport: AdminDocument[]) => {
 		setIsExporting(true)
 		try {
 			const options: ExportOptions = {
@@ -151,10 +150,10 @@ export const CopyrightPage: React.FC = () => {
 			
 			const result = await exportDocuments(options)
 			if (result.success) {
-				addNotification(result.message, 'success')
+				addNotification(result.message || 'Xuất dữ liệu thành công', 'success')
 				setShowExportModal(false)
 			} else {
-				addNotification(result.message, 'error')
+				addNotification(result.message || 'Xuất dữ liệu thất bại', 'error')
 			}
 		} catch (error) {
 			addNotification('Lỗi khi xuất dữ liệu', 'error')
@@ -286,7 +285,7 @@ export const CopyrightPage: React.FC = () => {
 									</div>
 									<div style={{ flex: 1 }}>
 										<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1, marginBottom: '4px' }}>
-											{stats.verifiedDocuments.toLocaleString()}
+											{stats.totalVerified.toLocaleString()}
 										</div>
 										<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', fontWeight: 500 }}>
 											Đã xác minh
@@ -376,7 +375,7 @@ export const CopyrightPage: React.FC = () => {
 									</div>
 									<div style={{ flex: 1 }}>
 										<div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--foreground)', lineHeight: 1, marginBottom: '4px' }}>
-											{stats.blockchainTransactions.toLocaleString()}
+											{stats.blockchainTransactions?.toLocaleString() || '0'}
 										</div>
 										<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', fontWeight: 500 }}>
 											Giao dịch Blockchain
@@ -746,6 +745,14 @@ export const CopyrightPage: React.FC = () => {
 				</div>
 			)}
 
+			{/* Blockchain Connection Status */}
+			{!blockchainInfo && (
+				<div className="info-banner">
+					<Info className="w-5 h-5" />
+					<span>Chưa kết nối với blockchain. Vui lòng cài đặt MetaMask để sử dụng đầy đủ tính năng.</span>
+				</div>
+			)}
+
 			{/* Navigation Tabs */}
 			<div className="copyright-tabs">
 				<div className="tabs-header">
@@ -781,7 +788,10 @@ export const CopyrightPage: React.FC = () => {
 			<RegisterDocumentModal
 				isOpen={showRegisterModal}
 				onClose={() => setShowRegisterModal(false)}
-				onRegister={handleRegisterDocument}
+				onRegister={async (form) => {
+					const result = await handleRegisterDocument(form);
+					return result;
+				}}
 				loading={loading}
 			/>
 
@@ -796,7 +806,9 @@ export const CopyrightPage: React.FC = () => {
 			<ExportModal
 				isOpen={showExportModal}
 				onClose={() => setShowExportModal(false)}
-				onExportDocuments={handleExportDocuments}
+				onExportDocuments={async (docsToExport) => {
+					await handleExportDocuments(docsToExport);
+				}}
 				documents={documents}
 				isExporting={isExporting}
 			/>
@@ -809,7 +821,10 @@ export const CopyrightPage: React.FC = () => {
 					setSelectedDocument(null)
 				}}
 				document={selectedDocument}
-				onSave={handleSaveEdit}
+				onSave={async (documentId, form) => {
+					const result = await handleSaveEdit(documentId, form);
+					return result;
+				}}
 				loading={loading}
 			/>
 

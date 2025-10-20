@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { LogOut, Menu, X, Bell, Search, MessageCircle, Moon, Sun, Grid3X3, ChevronDown, User, Trophy, Settings, Bookmark, Users, FileText, Shield } from 'lucide-react'
+import { LogOut, Menu, X, Bell, Search, MessageCircle, Moon, Sun, Grid3X3, ChevronDown, User, Trophy, Settings, Bookmark, Users, FileText, Shield, Copyright } from 'lucide-react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { logoutUser } from '../../store/slices/authSlice'
@@ -22,6 +22,7 @@ export default function UserHeader(): JSX.Element {
 		const path = location.pathname
 		if (path.includes('/certify')) return 'certify'
 		if (path.includes('/compete')) return 'compete'
+		if (path.includes('/copyright')) return 'copyright'
 		return 'prepare' // default to prepare
 	}
 
@@ -431,10 +432,7 @@ export default function UserHeader(): JSX.Element {
 												{ icon: <User style={{ width: '16px', height: '16px' }} />, label: 'Hồ sơ', onClick: () => navigate('/user/profile') },
 												{ icon: <Trophy style={{ width: '16px', height: '16px' }} />, label: 'Bảng xếp hạng', onClick: () => navigate('/user/leaderboard') },
 												{ icon: <Settings style={{ width: '16px', height: '16px' }} />, label: 'Cài đặt', onClick: () => navigate('/user/settings') },
-												{ icon: <Bookmark style={{ width: '16px', height: '16px' }} />, label: 'Đánh dấu' },
-												{ icon: <Users style={{ width: '16px', height: '16px' }} />, label: 'Mạng lưới' },
-												{ icon: <FileText style={{ width: '16px', height: '16px' }} />, label: 'Bài nộp' },
-												{ icon: <Shield style={{ width: '16px', height: '16px' }} />, label: 'Quản trị' },
+												{ icon: <Copyright style={{ width: '16px', height: '16px' }} />, label: 'Bản quyền', onClick: () => navigate('/user/copyright') },
 												{ icon: <LogOut style={{ width: '16px', height: '16px' }} />, label: 'Đăng xuất', onClick: handleLogout }
 											].map((item, index) => (
 												<button

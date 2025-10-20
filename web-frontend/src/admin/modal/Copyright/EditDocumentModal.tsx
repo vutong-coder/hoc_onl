@@ -15,12 +15,12 @@ import {
 	CheckCircle,
 	Loader2
 } from 'lucide-react'
-import { Document, DocumentForm } from '../../types/copyright'
+import { AdminDocument, DocumentForm } from '../../hooks/useCopyright'
 
 interface EditDocumentModalProps {
 	isOpen: boolean
 	onClose: () => void
-	document: Document | null
+	document: AdminDocument | null
 	onSave: (documentId: string, form: DocumentForm) => Promise<{ success: boolean; error?: string }>
 	loading?: boolean
 }

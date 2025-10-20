@@ -1,560 +1,570 @@
-// Copyright Hook
+import { useState, useEffect, useCallback } from 'react';
+import { copyrightService, DocumentMetadata, DocumentCopyright, CopyrightStats } from '../../services/blockchain/copyrightService';
+import { mockAdminDocuments, mockAdminStats, mockAdminDashboard } from '../data/mockCopyright';
 
-import { useState, useEffect, useCallback } from 'react'
-import {
-	Document,
-	CopyrightStats,
-	VerificationRecord,
-	DisputeRecord,
-	CopyrightDashboard,
-	DocumentForm,
-	CopyrightFilters,
-	RegistrationResult,
-	VerificationResult,
-	DisputeForm,
-	ExportOptions,
-	BlockchainInfo,
-	AuthorStats,
-	CategoryStats
-} from '../types/copyright'
-import {
-	mockDocuments,
-	mockCopyrightStats,
-	mockVerificationRecords,
-	mockDisputeRecords,
-	mockCopyrightDashboard,
-	mockBlockchainInfo,
-	mockAuthorStats,
-	mockCategoryStats,
-	getDocumentById,
-	getDocumentsByStatus,
-	getDocumentsByAuthor,
-	getDocumentsByCategory,
-	getVerificationHistory,
-	getDisputesByDocument,
-	getActiveDisputes,
-	getPendingVerifications
-} from '../mock/copyright'
-
-export const useCopyright = () => {
-	// State management
-	const [documents, setDocuments] = useState<Document[]>(mockDocuments)
-	const [stats, setStats] = useState<CopyrightStats>(mockCopyrightStats)
-	const [dashboard, setDashboard] = useState<CopyrightDashboard>(mockCopyrightDashboard)
-	const [loading, setLoading] = useState(false)
-	const [error, setError] = useState<string | null>(null)
-	const [filters, setFilters] = useState<CopyrightFilters>({
-		search: '',
-		status: 'all',
-		category: 'all',
-		license: 'all',
-		dateRange: {
-			start: '',
-			end: ''
-		},
-		author: '',
-		showDisputed: false,
-		showVerified: false
-	})
-	const [blockchainInfo, setBlockchainInfo] = useState<BlockchainInfo>(mockBlockchainInfo)
-	const [isRealTimeEnabled, setIsRealTimeEnabled] = useState(true)
-
-	// Filtered documents
-	const filteredDocuments = documents.filter(doc => {
-		const matchesSearch = !filters.search || 
-			doc.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-			doc.author.toLowerCase().includes(filters.search.toLowerCase()) ||
-			doc.description.toLowerCase().includes(filters.search.toLowerCase())
-		
-		const matchesStatus = filters.status === 'all' || doc.status === filters.status
-		const matchesCategory = filters.category === 'all' || doc.metadata.category === filters.category
-		const matchesLicense = filters.license === 'all' || doc.metadata.license === filters.license
-		const matchesAuthor = !filters.author || doc.author.toLowerCase().includes(filters.author.toLowerCase())
-		
-		const matchesDateRange = !filters.dateRange.start || !filters.dateRange.end ||
-			(new Date(doc.registrationDate) >= new Date(filters.dateRange.start) &&
-			 new Date(doc.registrationDate) <= new Date(filters.dateRange.end))
-		
-		const matchesDisputed = !filters.showDisputed || doc.disputes.length > 0
-		const matchesVerified = !filters.showVerified || doc.status === 'verified'
-		
-		return matchesSearch && matchesStatus && matchesCategory && matchesLicense && 
-			   matchesAuthor && matchesDateRange && matchesDisputed && matchesVerified
-	})
-
-	// Real-time updates simulation
-	useEffect(() => {
-		if (!isRealTimeEnabled) return
-
-		const interval = setInterval(() => {
-			// Simulate new document registration
-			if (Math.random() < 0.1) {
-				const newDoc: Document = {
-					id: `doc-${Date.now()}`,
-					title: `New Document ${Math.floor(Math.random() * 1000)}`,
-					author: `Author ${Math.floor(Math.random() * 100)}`,
-					description: 'Auto-generated test document',
-					category: 'academic',
-					keywords: ['test', 'auto-generated'],
-					references: [],
-					fileType: 'pdf',
-					fileSize: Math.random() * 5 * 1024 * 1024,
-					hash: `hash${Math.random().toString(36).substr(2, 9)}`,
-					blockchainHash: `0x${Math.random().toString(36).substr(2, 40)}`,
-					transactionHash: `0x${Math.random().toString(36).substr(2, 40)}`,
-					blockNumber: 18456793 + Math.floor(Math.random() * 100),
-					gasUsed: 100000 + Math.floor(Math.random() * 100000),
-					registrationDate: new Date().toISOString(),
-					lastModified: new Date().toISOString(),
-					status: 'pending',
-					metadata: {
-						category: 'academic',
-						keywords: ['test', 'auto-generated'],
-						language: 'en',
-						version: '1.0',
-						license: 'copyright'
-					},
-					verificationHistory: [],
-					disputes: []
-				}
-				
-				setDocuments(prev => [newDoc, ...prev])
-				setStats(prev => ({
-					...prev,
-					totalDocuments: prev.totalDocuments + 1,
-					registeredToday: prev.registeredToday + 1,
-					pendingVerification: prev.pendingVerification + 1
-				}))
-			}
-
-			// Simulate verification updates
-			if (Math.random() < 0.15) {
-				const pendingDocs = documents.filter(doc => doc.status === 'pending')
-				if (pendingDocs.length > 0) {
-					const randomDoc = pendingDocs[Math.floor(Math.random() * pendingDocs.length)]
-					const newStatus = Math.random() > 0.1 ? 'verified' : 'disputed'
-					
-					setDocuments(prev => prev.map(doc => 
-						doc.id === randomDoc.id 
-							? { ...doc, status: newStatus }
-							: doc
-					))
-					
-					setStats(prev => ({
-						...prev,
-						pendingVerification: Math.max(0, prev.pendingVerification - 1),
-						verifiedDocuments: newStatus === 'verified' ? prev.verifiedDocuments + 1 : prev.verifiedDocuments,
-						disputedDocuments: newStatus === 'disputed' ? prev.disputedDocuments + 1 : prev.disputedDocuments
-					}))
-				}
-			}
-		}, 10000) // Update every 10 seconds
-
-		return () => clearInterval(interval)
-	}, [isRealTimeEnabled, documents])
-
-	// Document operations
-	const registerDocument = useCallback(async (form: DocumentForm): Promise<RegistrationResult> => {
-		setLoading(true)
-		setError(null)
-		
-		try {
-			// Simulate API call delay
-			await new Promise(resolve => setTimeout(resolve, 2000))
-			
-			// Simulate blockchain transaction
-			const transactionHash = `0x${Math.random().toString(36).substr(2, 40)}`
-			const blockNumber = 18456793 + Math.floor(Math.random() * 100)
-			const gasUsed = 100000 + Math.floor(Math.random() * 100000)
-			const ipfsHash = `Qm${Math.random().toString(36).substr(2, 44)}`
-			
-			const newDocument: Document = {
-				id: `doc-${Date.now()}`,
-				title: form.title,
-				author: form.author,
-				description: form.description,
-				category: form.category,
-				keywords: form.keywords,
-				references: form.references || [],
-				fileType: form.file?.name.split('.').pop() as any || 'pdf',
-				fileSize: form.file?.size || 0,
-				hash: `hash${Math.random().toString(36).substr(2, 9)}`,
-				blockchainHash: `0x${Math.random().toString(36).substr(2, 40)}`,
-				transactionHash,
-				blockNumber,
-				gasUsed,
-				registrationDate: new Date().toISOString(),
-				lastModified: new Date().toISOString(),
-				status: 'pending',
-				ipfsHash,
-				metadata: {
-					category: form.category,
-					keywords: form.keywords,
-					language: form.language,
-					version: form.version,
-					license: form.license,
-					originalSource: form.originalSource,
-					references: form.references,
-					doi: form.doi,
-					isbn: form.isbn
-				},
-				verificationHistory: [],
-				disputes: []
-			}
-			
-			setDocuments(prev => [newDocument, ...prev])
-			setStats(prev => ({
-				...prev,
-				totalDocuments: prev.totalDocuments + 1,
-				registeredToday: prev.registeredToday + 1,
-				pendingVerification: prev.pendingVerification + 1,
-				blockchainTransactions: prev.blockchainTransactions + 1
-			}))
-			
-			return {
-				success: true,
-				documentId: newDocument.id,
-				transactionHash,
-				blockNumber,
-				gasUsed,
-				ipfsHash
-			}
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Failed to register document'
-			setError(errorMessage)
-			return {
-				success: false,
-				documentId: '',
-				error: errorMessage
-			}
-		} finally {
-			setLoading(false)
-		}
-	}, [])
-
-	const verifyDocument = useCallback(async (documentId: string): Promise<VerificationResult> => {
-		setLoading(true)
-		setError(null)
-		
-		try {
-			await new Promise(resolve => setTimeout(resolve, 1500))
-			
-			const document = documents.find(doc => doc.id === documentId)
-			if (!document) {
-				throw new Error('Document not found')
-			}
-			
-			// Simulate verification process
-			const confidence = 85 + Math.random() * 15 // 85-100%
-			const verified = confidence > 90
-			
-			const verificationRecord: VerificationRecord = {
-				id: `ver-${Date.now()}`,
-				documentId,
-				verifier: 'AI Validator',
-				verificationType: 'ai_check',
-				status: verified ? 'verified' : 'failed',
-				timestamp: new Date().toISOString(),
-				details: verified ? 'Document verified successfully' : 'Verification failed - low confidence',
-				confidence,
-				evidence: ['ai_analysis', 'hash_verification']
-			}
-			
-			setDocuments(prev => prev.map(doc => 
-				doc.id === documentId 
-					? { 
-						...doc, 
-						status: verified ? 'verified' : 'disputed',
-						verificationHistory: [...doc.verificationHistory, verificationRecord]
-					}
-					: doc
-			))
-			
-			return {
-				success: true,
-				verified,
-				confidence,
-				details: verificationRecord.details,
-				evidence: verificationRecord.evidence
-			}
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Verification failed'
-			setError(errorMessage)
-			return {
-				success: false,
-				verified: false,
-				confidence: 0,
-				details: errorMessage,
-				evidence: []
-			}
-		} finally {
-			setLoading(false)
-		}
-	}, [documents])
-
-	const deleteDocument = useCallback(async (documentId: string): Promise<{ success: boolean; error?: string }> => {
-		setLoading(true)
-		setError(null)
-		
-		try {
-			await new Promise(resolve => setTimeout(resolve, 1000))
-			
-			const document = documents.find(doc => doc.id === documentId)
-			if (!document) {
-				throw new Error('Document not found')
-			}
-			
-			// Simulate deletion process
-			setDocuments(prev => prev.filter(doc => doc.id !== documentId))
-			
-			return {
-				success: true
-			}
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Delete failed'
-			setError(errorMessage)
-			return {
-				success: false,
-				error: errorMessage
-			}
-		} finally {
-			setLoading(false)
-		}
-	}, [documents])
-
-	const updateDocument = useCallback(async (documentId: string, form: DocumentForm): Promise<{ success: boolean; error?: string }> => {
-		setLoading(true)
-		setError(null)
-		
-		try {
-			await new Promise(resolve => setTimeout(resolve, 1500))
-			
-			const document = documents.find(doc => doc.id === documentId)
-			if (!document) {
-				throw new Error('Document not found')
-			}
-			
-			// Simulate update process
-			const updatedDocument: Document = {
-				...document,
-				title: form.title,
-				description: form.description,
-				author: form.author,
-				category: form.category,
-				keywords: form.keywords,
-				references: form.references || [],
-				metadata: {
-					...document.metadata,
-					...form.metadata
-				},
-				// Update file if provided
-				...(form.file && {
-					fileName: form.file.name,
-					fileSize: form.file.size,
-					fileType: form.file.type
-				})
-			}
-			
-			setDocuments(prev => prev.map(doc => 
-				doc.id === documentId ? updatedDocument : doc
-			))
-			
-			return {
-				success: true
-			}
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Update failed'
-			setError(errorMessage)
-			return {
-				success: false,
-				error: errorMessage
-			}
-		} finally {
-			setLoading(false)
-		}
-	}, [documents])
-
-	const submitDispute = useCallback(async (form: DisputeForm): Promise<{ success: boolean; disputeId?: string; error?: string }> => {
-		setLoading(true)
-		setError(null)
-		
-		try {
-			await new Promise(resolve => setTimeout(resolve, 1000))
-			
-			const disputeRecord: DisputeRecord = {
-				id: `dispute-${Date.now()}`,
-				documentId: form.documentId,
-				claimant: form.claimant,
-				reason: form.reason,
-				description: form.description,
-				status: 'open',
-				createdAt: new Date().toISOString(),
-				evidence: form.evidence.map(file => file.name)
-			}
-			
-			setDocuments(prev => prev.map(doc => 
-				doc.id === form.documentId 
-					? { 
-						...doc, 
-						status: 'disputed',
-						disputes: [...doc.disputes, disputeRecord]
-					}
-					: doc
-			))
-			
-			setStats(prev => ({
-				...prev,
-				disputedDocuments: prev.disputedDocuments + 1
-			}))
-			
-			return {
-				success: true,
-				disputeId: disputeRecord.id
-			}
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Failed to submit dispute'
-			setError(errorMessage)
-			return {
-				success: false,
-				error: errorMessage
-			}
-		} finally {
-			setLoading(false)
-		}
-	}, [])
-
-	// Filter operations
-	const updateFilters = useCallback((newFilters: Partial<CopyrightFilters>) => {
-		setFilters(prev => ({ ...prev, ...newFilters }))
-	}, [])
-
-	const clearFilters = useCallback(() => {
-		setFilters({
-			search: '',
-			status: 'all',
-			category: 'all',
-			license: 'all',
-			dateRange: { start: '', end: '' },
-			author: '',
-			showDisputed: false,
-			showVerified: false
-		})
-	}, [])
-
-	// Export operations
-	const exportDocuments = useCallback(async (options: ExportOptions): Promise<{ success: boolean; message: string }> => {
-		setLoading(true)
-		setError(null)
-		
-		try {
-			await new Promise(resolve => setTimeout(resolve, 2000))
-			
-			// Simulate export process
-			const exportData = filteredDocuments.map(doc => ({
-				id: doc.id,
-				title: doc.title,
-				author: doc.author,
-				status: doc.status,
-				category: doc.metadata.category,
-				registrationDate: doc.registrationDate,
-				hash: doc.hash,
-				blockchainHash: doc.blockchainHash
-			}))
-			
-			// Simulate file download
-			const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
-			const url = URL.createObjectURL(blob)
-			const a = document.createElement('a')
-			a.href = url
-			a.download = `copyright_documents_${new Date().toISOString().split('T')[0]}.${options.format}`
-			document.body.appendChild(a)
-			a.click()
-			document.body.removeChild(a)
-			URL.revokeObjectURL(url)
-			
-			return {
-				success: true,
-				message: `Exported ${exportData.length} documents successfully`
-			}
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Export failed'
-			setError(errorMessage)
-			return {
-				success: false,
-				message: errorMessage
-			}
-		} finally {
-			setLoading(false)
-		}
-	}, [filteredDocuments])
-
-	// Utility functions
-	const getDocumentById = useCallback((id: string): Document | undefined => {
-		return documents.find(doc => doc.id === id)
-	}, [documents])
-
-	const getDocumentsByStatus = useCallback((status: Document['status']): Document[] => {
-		return documents.filter(doc => doc.status === status)
-	}, [documents])
-
-	const getDocumentsByAuthor = useCallback((author: string): Document[] => {
-		return documents.filter(doc => doc.author.toLowerCase().includes(author.toLowerCase()))
-	}, [documents])
-
-	const getDocumentsByCategory = useCallback((category: Document['metadata']['category']): Document[] => {
-		return documents.filter(doc => doc.metadata.category === category)
-	}, [documents])
-
-	const refreshData = useCallback(async () => {
-		setLoading(true)
-		setError(null)
-		
-		try {
-			await new Promise(resolve => setTimeout(resolve, 1000))
-			// In real app, this would fetch fresh data from API
-			setStats(mockCopyrightStats)
-			setDashboard(mockCopyrightDashboard)
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Failed to refresh data')
-		} finally {
-			setLoading(false)
-		}
-	}, [])
-
-	return {
-		// Data
-		documents: filteredDocuments,
-		allDocuments: documents,
-		stats,
-		dashboard,
-		blockchainInfo,
-		loading,
-		error,
-		filters,
-		isRealTimeEnabled,
-		
-		// Actions
-		registerDocument,
-		verifyDocument,
-		deleteDocument,
-		updateDocument,
-		submitDispute,
-		updateFilters,
-		clearFilters,
-		exportDocuments,
-		refreshData,
-		setIsRealTimeEnabled,
-		
-		// Utilities
-		getDocumentById,
-		getDocumentsByStatus,
-		getDocumentsByAuthor,
-		getDocumentsByCategory,
-		
-		// Mock data helpers
-		authorStats: mockAuthorStats,
-		categoryStats: mockCategoryStats,
-		verificationRecords: mockVerificationRecords,
-		disputeRecords: mockDisputeRecords
-	}
+// Admin-specific types
+export interface AdminDocument extends DocumentCopyright {
+  id: string;
+  author: string;
+  institution?: string;
+  status: 'pending' | 'verified' | 'disputed' | 'rejected';
+  registrationDate: string;
+  verificationDate?: string;
+  disputes?: AdminDispute[];
+  verificationHistory?: AdminVerification[];
 }
+
+export interface AdminDispute {
+  id: string;
+  documentId: string;
+  disputerAddress: string;
+  reason: string;
+  evidence: string[];
+  status: 'open' | 'resolved' | 'rejected';
+  createdAt: string;
+  resolvedAt?: string;
+  resolution?: string;
+}
+
+export interface AdminVerification {
+  id: string;
+  documentId: string;
+  verifierAddress: string;
+  status: 'approved' | 'rejected';
+  comments?: string;
+  timestamp: string;
+}
+
+export interface AdminDashboard {
+  recentDocuments: AdminDocument[];
+  pendingVerifications: AdminDocument[];
+  disputedDocuments: AdminDocument[];
+  blockchainStatus: {
+    isConnected: boolean;
+    lastBlock: number;
+    averageGasPrice: string;
+    networkCongestion: string;
+    estimatedConfirmationTime: string;
+  };
+}
+
+export interface AdminStats extends CopyrightStats {
+  disputedDocuments: number;
+  rejectedDocuments: number;
+  pendingVerifications: number;
+  averageVerificationTime: number;
+  blockchainTransactions: number;
+  registrationFee?: string;
+  verificationFee?: string;
+}
+
+export interface DocumentForm {
+  title: string;
+  description: string;
+  category: string;
+  fileExtension: string;
+  fileSize: number;
+  tags: string[];
+  authorName?: string;
+  institution?: string;
+  keywords?: string[];
+  abstract?: string;
+  file?: File;
+  content?: string;
+}
+
+export interface ExportOptions {
+  format: 'excel' | 'csv' | 'pdf';
+  includeMetadata: boolean;
+  includeVerificationHistory: boolean;
+  includeDisputes: boolean;
+  dateRange?: {
+    from: string;
+    to: string;
+  };
+}
+
+export interface AdminFilters {
+  status?: string[];
+  category?: string[];
+  dateRange?: {
+    from: string;
+    to: string;
+  };
+  search?: string;
+  verified?: boolean;
+  disputed?: boolean;
+}
+
+export interface AdminResult<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}
+
+
+export function useCopyright() {
+  const [documents, setDocuments] = useState<AdminDocument[]>(mockAdminDocuments);
+  const [stats, setStats] = useState<AdminStats>(mockAdminStats);
+  const [dashboard, setDashboard] = useState<AdminDashboard>(mockAdminDashboard);
+  const [blockchainInfo, setBlockchainInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<AdminFilters>({});
+  const [isRealTimeEnabled, setIsRealTimeEnabled] = useState(false);
+
+  // Initialize blockchain connection
+  useEffect(() => {
+    const initializeBlockchain = async () => {
+      try {
+        setLoading(true);
+        const isConnected = await copyrightService.connectWallet();
+        if (isConnected) {
+          const stats = await copyrightService.getStatistics();
+          if (stats) {
+            setStats(prev => ({
+              ...prev,
+              totalDocuments: stats?.totalDocuments || prev.totalDocuments,
+              totalVerified: stats?.totalVerified || prev.totalVerified,
+              totalOwners: stats?.totalOwners || prev.totalOwners,
+              contractBalance: stats?.contractBalance || prev.contractBalance
+            }));
+          }
+        }
+      } catch (err: any) {
+        setError(err.message || 'Failed to initialize blockchain connection');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeBlockchain();
+  }, []);
+
+  // Real-time updates
+  useEffect(() => {
+    if (!isRealTimeEnabled) return;
+
+    const interval = setInterval(async () => {
+      try {
+        await refreshData();
+      } catch (err) {
+        console.error('Real-time update failed:', err);
+      }
+    }, 30000); // Update every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [isRealTimeEnabled]);
+
+  const registerDocument = useCallback(async (form: DocumentForm): Promise<AdminResult> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      let result;
+      
+      if (form.file) {
+        const metadata: DocumentMetadata = {
+          title: form.title,
+          description: form.description,
+          category: form.category as any,
+          fileExtension: form.fileExtension,
+          fileSize: form.fileSize,
+          tags: form.tags,
+          authorName: form.authorName,
+          institution: form.institution,
+          keywords: form.keywords,
+          abstract: form.abstract
+        };
+        
+        result = await copyrightService.registerDocument(form.file, metadata);
+      } else if (form.content) {
+        const metadata: DocumentMetadata = {
+          title: form.title,
+          description: form.description,
+          category: form.category as any,
+          fileExtension: form.fileExtension,
+          fileSize: form.fileSize,
+          tags: form.tags,
+          authorName: form.authorName,
+          institution: form.institution,
+          keywords: form.keywords,
+          abstract: form.abstract
+        };
+        
+        result = await copyrightService.registerTextDocument(form.content, metadata);
+      } else {
+        throw new Error('No file or content provided');
+      }
+
+      if (result.success && result.documentHash) {
+        // Add to local documents list
+        const newDocument: AdminDocument = {
+          id: Date.now().toString(),
+          documentHash: result.documentHash,
+          owner: await copyrightService.getCurrentAddress() || '',
+          title: form.title,
+          description: form.description,
+          category: form.category,
+          fileExtension: form.fileExtension,
+          fileSize: form.fileSize,
+          timestamp: Math.floor(Date.now() / 1000),
+          isVerified: false,
+          isActive: true,
+          ipfsHash: '',
+          tags: form.tags,
+          author: form.authorName || 'Unknown',
+          institution: form.institution,
+          status: 'pending',
+          registrationDate: new Date().toISOString().split('T')[0],
+          verificationHistory: []
+        };
+
+        setDocuments(prev => [newDocument, ...prev]);
+        setStats(prev => ({
+          ...prev,
+          totalDocuments: prev.totalDocuments + 1
+        }));
+
+        return {
+          success: true,
+          data: newDocument,
+          message: 'Document registered successfully'
+        };
+      } else {
+        return {
+          success: false,
+          error: result.error || 'Registration failed'
+        };
+      }
+    } catch (err: any) {
+      setError(err.message || 'Registration failed');
+      return {
+        success: false,
+        error: err.message || 'Registration failed'
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const verifyDocument = useCallback(async (documentId: string): Promise<AdminResult & { verified?: boolean }> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const document = documents.find(doc => doc.id === documentId);
+      if (!document) {
+        return {
+          success: false,
+          error: 'Document not found'
+        };
+      }
+
+      const result = await copyrightService.verifyDocument(document.documentHash);
+      
+      if (result.success) {
+        // Get current address
+        const currentAddress = await copyrightService.getCurrentAddress() || '';
+
+        // Update document status
+        setDocuments(prev => prev.map(doc => 
+          doc.id === documentId 
+            ? { 
+                ...doc, 
+                isVerified: true, 
+                status: 'verified' as const,
+                verificationDate: new Date().toISOString().split('T')[0],
+                verificationHistory: [
+                  ...doc.verificationHistory || [],
+                  {
+                    id: Date.now().toString(),
+                    documentId,
+                    verifierAddress: currentAddress,
+                    status: 'approved',
+                    comments: 'Verified by admin',
+                    timestamp: new Date().toISOString()
+                  }
+                ]
+              }
+            : doc
+        ));
+
+        setStats(prev => ({
+          ...prev,
+          totalVerified: prev.totalVerified + 1,
+          pendingVerifications: Math.max(0, prev.pendingVerifications - 1)
+        }));
+
+        return {
+          success: true,
+          verified: true,
+          message: 'Document verified successfully'
+        };
+      } else {
+        return {
+          success: false,
+          verified: false,
+          error: result.error || 'Verification failed'
+        };
+      }
+    } catch (err: any) {
+      setError(err.message || 'Verification failed');
+      return {
+        success: false,
+        verified: false,
+        error: err.message || 'Verification failed'
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, [documents]);
+
+  const deleteDocument = useCallback(async (documentId: string): Promise<AdminResult> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const document = documents.find(doc => doc.id === documentId);
+      if (!document) {
+        return {
+          success: false,
+          error: 'Document not found'
+        };
+      }
+
+      const result = await copyrightService.deactivateDocument(document.documentHash);
+      
+      if (result) {
+        setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+        setStats(prev => ({
+          ...prev,
+          totalDocuments: Math.max(0, prev.totalDocuments - 1)
+        }));
+
+        return {
+          success: true,
+          message: 'Document deleted successfully'
+        };
+      } else {
+        return {
+          success: false,
+          error: 'Failed to delete document'
+        };
+      }
+    } catch (err: any) {
+      setError(err.message || 'Delete failed');
+      return {
+        success: false,
+        error: err.message || 'Delete failed'
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, [documents]);
+
+  const updateDocument = useCallback(async (documentId: string, form: DocumentForm): Promise<AdminResult> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const document = documents.find(doc => doc.id === documentId);
+      if (!document) {
+        return {
+          success: false,
+          error: 'Document not found'
+        };
+      }
+
+      // Update title
+      if (form.title !== document.title) {
+        const titleResult = await copyrightService.updateDocument(
+          document.documentHash,
+          'title',
+          form.title
+        );
+        if (!titleResult) {
+          return {
+            success: false,
+            error: 'Failed to update title'
+          };
+        }
+      }
+
+      // Update description
+      if (form.description !== document.description) {
+        const descResult = await copyrightService.updateDocument(
+          document.documentHash,
+          'description',
+          form.description
+        );
+        if (!descResult) {
+          return {
+            success: false,
+            error: 'Failed to update description'
+          };
+        }
+      }
+
+      // Update tags
+      const tagsResult = await copyrightService.updateDocumentTags(
+        document.documentHash,
+        form.tags
+      );
+      if (!tagsResult) {
+        return {
+          success: false,
+          error: 'Failed to update tags'
+        };
+      }
+
+      // Update local state
+      setDocuments(prev => prev.map(doc => 
+        doc.id === documentId 
+          ? { 
+              ...doc, 
+              title: form.title,
+              description: form.description,
+              tags: form.tags,
+              author: form.authorName || doc.author,
+              institution: form.institution || doc.institution
+            }
+          : doc
+      ));
+
+      return {
+        success: true,
+        message: 'Document updated successfully'
+      };
+    } catch (err: any) {
+      setError(err.message || 'Update failed');
+      return {
+        success: false,
+        error: err.message || 'Update failed'
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, [documents]);
+
+  const exportDocuments = useCallback(async (options: ExportOptions): Promise<AdminResult> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Simulate export process
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const exportData = {
+        documents: documents.filter(doc => {
+          if (options.dateRange) {
+            const docDate = new Date(doc.registrationDate);
+            const fromDate = new Date(options.dateRange.from);
+            const toDate = new Date(options.dateRange.to);
+            if (docDate < fromDate || docDate > toDate) return false;
+          }
+          return true;
+        }),
+        stats,
+        exportOptions: options,
+        exportedAt: new Date().toISOString()
+      };
+
+      // Create and download file
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
+        type: 'application/json' 
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `copyright-documents-export-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      return {
+        success: true,
+        message: 'Documents exported successfully'
+      };
+    } catch (err: any) {
+      setError(err.message || 'Export failed');
+      return {
+        success: false,
+        error: err.message || 'Export failed'
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, [documents, stats]);
+
+  const updateFilters = useCallback((newFilters: Partial<AdminFilters>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  }, []);
+
+  const clearFilters = useCallback(() => {
+    setFilters({});
+  }, []);
+
+  const refreshData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Refresh blockchain data
+      const blockchainStats = await copyrightService.getStatistics();
+      if (blockchainStats) {
+        setStats(prev => ({
+          ...prev,
+          totalDocuments: blockchainStats.totalDocuments,
+          totalVerified: blockchainStats.totalVerified,
+          totalOwners: blockchainStats.totalOwners,
+          contractBalance: blockchainStats.contractBalance
+        }));
+      }
+
+      // Refresh dashboard
+      setDashboard(prev => ({
+        ...prev,
+        recentDocuments: documents.slice(0, 3),
+        pendingVerifications: documents.filter(doc => doc.status === 'pending'),
+        disputedDocuments: documents.filter(doc => doc.status === 'disputed')
+      }));
+    } catch (err: any) {
+      setError(err.message || 'Failed to refresh data');
+    } finally {
+      setLoading(false);
+    }
+  }, [documents]);
+
+  const getDocumentById = useCallback((id: string): AdminDocument | null => {
+    return documents.find(doc => doc.id === id) || null;
+  }, [documents]);
+
+  return {
+    // Data
+    documents,
+    stats,
+    dashboard,
+    blockchainInfo,
+    loading,
+    error,
+    filters,
+    isRealTimeEnabled,
+
+    // Actions
+    registerDocument,
+    verifyDocument,
+    deleteDocument,
+    updateDocument,
+    exportDocuments,
+    updateFilters,
+    clearFilters,
+    refreshData,
+    setIsRealTimeEnabled,
+    getDocumentById
+  };
+}
+
+export default useCopyright;

@@ -1,422 +1,403 @@
-// Document Registrar Component
-
-import React, { useState } from 'react'
-import { Upload, FileText, Hash, Shield, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
-import { DocumentForm, RegistrationResult } from '../../types/copyright'
+import React, { useState } from 'react';
+import { Upload, FileText, AlertCircle, CheckCircle, X, Loader2 } from 'lucide-react';
+import { DocumentForm } from '../../hooks/useCopyright';
+import styles from './DocumentRegistrar.module.css';
 
 interface DocumentRegistrarProps {
-	onRegister: (form: DocumentForm) => Promise<RegistrationResult>
-	loading?: boolean
+  onRegister: (form: DocumentForm) => Promise<any>;
+  loading?: boolean;
 }
 
-export const DocumentRegistrar: React.FC<DocumentRegistrarProps> = ({ onRegister, loading = false }) => {
-	const [form, setForm] = useState<DocumentForm>({
-		title: '',
-		author: '',
-		description: '',
-		file: null,
-		category: 'academic',
-		keywords: [],
-		language: 'en',
-		version: '1.0',
-		license: 'copyright',
-		originalSource: '',
-		references: [],
-		doi: '',
-		isbn: ''
-	})
-	
-	const [keywordInput, setKeywordInput] = useState('')
-	const [referenceInput, setReferenceInput] = useState('')
-	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [result, setResult] = useState<RegistrationResult | null>(null)
+export const DocumentRegistrar: React.FC<DocumentRegistrarProps> = ({ 
+  onRegister, 
+  loading = false 
+}) => {
+  const [uploadType, setUploadType] = useState<'file' | 'text'>('file');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [textContent, setTextContent] = useState('');
+  const [form, setForm] = useState<DocumentForm>({
+    title: '',
+    description: '',
+    category: 'other',
+    fileExtension: '',
+    fileSize: 0,
+    tags: [],
+    authorName: '',
+    institution: '',
+    keywords: [],
+    abstract: ''
+  });
+  const [newTag, setNewTag] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState<{
+    success: boolean;
+    message?: string;
+    error?: string;
+  } | null>(null);
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0]
-		if (file) {
-			setForm(prev => ({ ...prev, file }))
-		}
-	}
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-	const addKeyword = () => {
-		if (keywordInput.trim() && !form.keywords.includes(keywordInput.trim())) {
-			setForm(prev => ({
-				...prev,
-				keywords: [...prev.keywords, keywordInput.trim()]
-			}))
-			setKeywordInput('')
-		}
-	}
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file
+      if (file.size > 100 * 1024 * 1024) { // 100MB
+        alert('File quá lớn. Kích thước tối đa: 100MB');
+        return;
+      }
 
-	const removeKeyword = (keyword: string) => {
-		setForm(prev => ({
-			...prev,
-			keywords: prev.keywords.filter(k => k !== keyword)
-		}))
-	}
+      const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+      const allowedExtensions = ['.pdf', '.doc', '.docx', '.txt', '.md', '.rtf'];
+      if (!allowedExtensions.includes(extension)) {
+        alert(`Định dạng file không được hỗ trợ. Các định dạng được hỗ trợ: ${allowedExtensions.join(', ')}`);
+        return;
+      }
 
-	const addReference = () => {
-		if (referenceInput.trim() && !form.references?.includes(referenceInput.trim())) {
-			setForm(prev => ({
-				...prev,
-				references: [...(prev.references || []), referenceInput.trim()]
-			}))
-			setReferenceInput('')
-		}
-	}
+      setSelectedFile(file);
+      setForm(prev => ({
+        ...prev,
+        fileExtension: extension,
+        fileSize: file.size,
+        title: file.name.replace(/\.[^/.]+$/, '') // Remove extension from title
+      }));
+    }
+  };
 
-	const removeReference = (reference: string) => {
-		setForm(prev => ({
-			...prev,
-			references: prev.references?.filter(r => r !== reference) || []
-		}))
-	}
+  const handleAddTag = () => {
+    if (newTag.trim() && form.tags.length < 10) {
+      setForm(prev => ({
+        ...prev,
+        tags: [...prev.tags, newTag.trim()]
+      }));
+      setNewTag('');
+    }
+  };
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		if (!form.file) {
-			alert('Please select a file to upload')
-			return
-		}
+  const handleRemoveTag = (tagToRemove: string) => {
+    setForm(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }));
+  };
 
-		setIsSubmitting(true)
-		setResult(null)
+  const handleSubmit = async () => {
+    if (!form.title.trim()) {
+      alert('Vui lòng nhập tiêu đề tài liệu');
+      return;
+    }
 
-		try {
-			const result = await onRegister(form)
-			setResult(result)
-			
-			if (result.success) {
-				// Reset form on success
-				setForm({
-					title: '',
-					author: '',
-					description: '',
-					file: null,
-					category: 'academic',
-					keywords: [],
-					language: 'en',
-					version: '1.0',
-					license: 'copyright',
-					originalSource: '',
-					references: [],
-					doi: '',
-					isbn: ''
-				})
-				setKeywordInput('')
-				setReferenceInput('')
-			}
-		} catch (error) {
-			setResult({
-				success: false,
-				documentId: '',
-				error: error instanceof Error ? error.message : 'Registration failed'
-			})
-		} finally {
-			setIsSubmitting(false)
-		}
-	}
+    if (!form.description.trim()) {
+      alert('Vui lòng nhập mô tả tài liệu');
+      return;
+    }
 
-	return (
-		<div className="document-registrar">
-			<div className="registrar-header">
-				<h3>Đăng ký bản quyền tài liệu mới</h3>
-				<p>Upload và đăng ký tài liệu của bạn lên blockchain để bảo vệ bản quyền</p>
-			</div>
+    if (uploadType === 'file' && !selectedFile) {
+      alert('Vui lòng chọn file');
+      return;
+    }
 
-			<form onSubmit={handleSubmit} className="registrar-form">
-				{/* File Upload Section */}
-				<div className="form-section">
-					<h4>Thông tin tài liệu</h4>
-					<div className="file-upload-area">
-						<div className="file-upload-box">
-							<Upload className="upload-icon" />
-							<div className="upload-content">
-								{form.file ? (
-									<div className="file-selected">
-										<FileText className="file-icon" />
-										<div className="file-info">
-											<span className="file-name">{form.file.name}</span>
-											<span className="file-size">{(form.file.size / 1024 / 1024).toFixed(2)} MB</span>
-										</div>
-									</div>
-								) : (
-									<div className="upload-prompt">
-										<p>Kéo thả file vào đây hoặc click để chọn</p>
-										<p className="upload-hint">Hỗ trợ: PDF, DOCX, TXT, MD, PPT, XLSX (tối đa 10MB)</p>
-									</div>
-								)}
-							</div>
-							<input
-								type="file"
-								onChange={handleFileChange}
-								accept=".pdf,.docx,.txt,.md,.ppt,.xlsx"
-								className="file-input"
-							/>
-						</div>
-					</div>
-				</div>
+    if (uploadType === 'text' && !textContent.trim()) {
+      alert('Vui lòng nhập nội dung văn bản');
+      return;
+    }
 
-				{/* Basic Information */}
-				<div className="form-section">
-					<h4>Thông tin cơ bản</h4>
-					<div className="form-grid">
-						<div className="form-group">
-							<label htmlFor="title">Tiêu đề tài liệu *</label>
-							<input
-								type="text"
-								id="title"
-								value={form.title}
-								onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
-								required
-								placeholder="Nhập tiêu đề tài liệu"
-							/>
-						</div>
-						<div className="form-group">
-							<label htmlFor="author">Tác giả *</label>
-							<input
-								type="text"
-								id="author"
-								value={form.author}
-								onChange={(e) => setForm(prev => ({ ...prev, author: e.target.value }))}
-								required
-								placeholder="Nhập tên tác giả"
-							/>
-						</div>
-						<div className="form-group full-width">
-							<label htmlFor="description">Mô tả</label>
-							<textarea
-								id="description"
-								value={form.description}
-								onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
-								placeholder="Mô tả ngắn gọn về nội dung tài liệu"
-								rows={3}
-							/>
-						</div>
-					</div>
-				</div>
+    setIsSubmitting(true);
+    setSubmitResult(null);
 
-				{/* Metadata */}
-				<div className="form-section">
-					<h4>Thông tin metadata</h4>
-					<div className="form-grid">
-						<div className="form-group">
-							<label htmlFor="category">Danh mục</label>
-							<select
-								id="category"
-								value={form.category}
-								onChange={(e) => setForm(prev => ({ ...prev, category: e.target.value as any }))}
-							>
-								<option value="academic">Học thuật</option>
-								<option value="research">Nghiên cứu</option>
-								<option value="textbook">Sách giáo khoa</option>
-								<option value="thesis">Luận văn</option>
-								<option value="article">Bài báo</option>
-								<option value="presentation">Thuyết trình</option>
-							</select>
-						</div>
-						<div className="form-group">
-							<label htmlFor="language">Ngôn ngữ</label>
-							<select
-								id="language"
-								value={form.language}
-								onChange={(e) => setForm(prev => ({ ...prev, language: e.target.value }))}
-							>
-								<option value="vi">Tiếng Việt</option>
-								<option value="en">English</option>
-								<option value="zh">中文</option>
-								<option value="ja">日本語</option>
-								<option value="ko">한국어</option>
-							</select>
-						</div>
-						<div className="form-group">
-							<label htmlFor="version">Phiên bản</label>
-							<input
-								type="text"
-								id="version"
-								value={form.version}
-								onChange={(e) => setForm(prev => ({ ...prev, version: e.target.value }))}
-								placeholder="1.0"
-							/>
-						</div>
-						<div className="form-group">
-							<label htmlFor="license">Giấy phép</label>
-							<select
-								id="license"
-								value={form.license}
-								onChange={(e) => setForm(prev => ({ ...prev, license: e.target.value as any }))}
-							>
-								<option value="copyright">Bản quyền</option>
-								<option value="cc-by">CC BY</option>
-								<option value="cc-by-sa">CC BY-SA</option>
-								<option value="cc-by-nc">CC BY-NC</option>
-								<option value="public-domain">Public Domain</option>
-							</select>
-						</div>
-					</div>
-				</div>
+    try {
+      const submitForm: DocumentForm = {
+        ...form,
+        file: selectedFile || undefined,
+        content: uploadType === 'text' ? textContent : undefined
+      };
 
-				{/* Keywords */}
-				<div className="form-section">
-					<h4>Từ khóa</h4>
-					<div className="keywords-input">
-						<div className="keyword-input-group">
-							<input
-								type="text"
-								value={keywordInput}
-								onChange={(e) => setKeywordInput(e.target.value)}
-								placeholder="Nhập từ khóa"
-								onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addKeyword())}
-							/>
-							<button type="button" onClick={addKeyword} className="btn btn-secondary btn-sm">
-								Thêm
-							</button>
-						</div>
-						<div className="keywords-list">
-							{form.keywords.map((keyword, index) => (
-								<span key={index} className="keyword-tag">
-									{keyword}
-									<button
-										type="button"
-										onClick={() => removeKeyword(keyword)}
-										className="remove-keyword"
-									>
-										×
-									</button>
-								</span>
-							))}
-						</div>
-					</div>
-				</div>
+      const result = await onRegister(submitForm);
 
-				{/* References */}
-				<div className="form-section">
-					<h4>Tham khảo</h4>
-					<div className="references-input">
-						<div className="reference-input-group">
-							<input
-								type="url"
-								value={referenceInput}
-								onChange={(e) => setReferenceInput(e.target.value)}
-								placeholder="Nhập URL tham khảo"
-								onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addReference())}
-							/>
-							<button type="button" onClick={addReference} className="btn btn-secondary btn-sm">
-								Thêm
-							</button>
-						</div>
-						<div className="references-list">
-							{form.references?.map((reference, index) => (
-								<div key={index} className="reference-item">
-									<a href={reference} target="_blank" rel="noopener noreferrer">
-										{reference}
-									</a>
-									<button
-										type="button"
-										onClick={() => removeReference(reference)}
-										className="remove-reference"
-									>
-										×
-									</button>
-								</div>
-							))}
-						</div>
-					</div>
-				</div>
+      if (result.success) {
+        setSubmitResult({
+          success: true,
+          message: 'Đăng ký tài liệu thành công!'
+        });
 
-				{/* Additional Information */}
-				<div className="form-section">
-					<h4>Thông tin bổ sung</h4>
-					<div className="form-grid">
-						<div className="form-group">
-							<label htmlFor="originalSource">Nguồn gốc</label>
-							<input
-								type="text"
-								id="originalSource"
-								value={form.originalSource || ''}
-								onChange={(e) => setForm(prev => ({ ...prev, originalSource: e.target.value }))}
-								placeholder="Nguồn gốc của tài liệu"
-							/>
-						</div>
-						<div className="form-group">
-							<label htmlFor="doi">DOI</label>
-							<input
-								type="text"
-								id="doi"
-								value={form.doi || ''}
-								onChange={(e) => setForm(prev => ({ ...prev, doi: e.target.value }))}
-								placeholder="10.1000/182"
-							/>
-						</div>
-						<div className="form-group">
-							<label htmlFor="isbn">ISBN</label>
-							<input
-								type="text"
-								id="isbn"
-								value={form.isbn || ''}
-								onChange={(e) => setForm(prev => ({ ...prev, isbn: e.target.value }))}
-								placeholder="978-0-123456-78-9"
-							/>
-						</div>
-					</div>
-				</div>
+        // Reset form
+        setForm({
+          title: '',
+          description: '',
+          category: 'other',
+          fileExtension: '',
+          fileSize: 0,
+          tags: [],
+          authorName: '',
+          institution: '',
+          keywords: [],
+          abstract: ''
+        });
+        setSelectedFile(null);
+        setTextContent('');
+        setNewTag('');
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      } else {
+        setSubmitResult({
+          success: false,
+          error: result.error || 'Đăng ký thất bại'
+        });
+      }
+    } catch (error: any) {
+      setSubmitResult({
+        success: false,
+        error: error.message || 'Đăng ký thất bại'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-				{/* Result Display */}
-				{result && (
-					<div className={`result-display ${result.success ? 'success' : 'error'}`}>
-						{result.success ? (
-							<>
-								<CheckCircle className="result-icon" />
-								<div className="result-content">
-									<h4>Đăng ký thành công!</h4>
-									<p>Document ID: {result.documentId}</p>
-									{result.transactionHash && (
-										<p>Transaction Hash: {result.transactionHash}</p>
-									)}
-									{result.blockNumber && (
-										<p>Block Number: {result.blockNumber}</p>
-									)}
-									{result.gasUsed && (
-										<p>Gas Used: {result.gasUsed.toLocaleString()}</p>
-									)}
-									{result.ipfsHash && (
-										<p>IPFS Hash: {result.ipfsHash}</p>
-									)}
-								</div>
-							</>
-						) : (
-							<>
-								<AlertCircle className="result-icon" />
-								<div className="result-content">
-									<h4>Đăng ký thất bại</h4>
-									<p>{result.error}</p>
-								</div>
-							</>
-						)}
-					</div>
-				)}
+  return (
+    <div className={styles.documentRegistrar}>
+      <div className={styles.header}>
+        <h2>Đăng ký tài liệu mới</h2>
+        <p>Đăng ký bản quyền tài liệu học thuật trên blockchain</p>
+      </div>
 
-				{/* Submit Button */}
-				<div className="form-actions">
-					<button
-						type="submit"
-						disabled={isSubmitting || loading}
-						className="btn btn-primary btn-lg"
-					>
-						{isSubmitting ? (
-							<>
-								<Loader2 className="spinner" />
-								Đang đăng ký...
-							</>
-						) : (
-							<>
-								<Shield className="btn-icon" />
-								Đăng ký bản quyền
-							</>
-						)}
-					</button>
-				</div>
-			</form>
-		</div>
-	)
-}
+      {/* Upload Type Selection */}
+      <div className={styles.uploadTypeSection}>
+        <label>Loại tài liệu:</label>
+        <div className={styles.uploadTypeButtons}>
+          <button
+            className={`${styles.uploadTypeButton} ${uploadType === 'file' ? styles.active : ''}`}
+            onClick={() => setUploadType('file')}
+          >
+            <FileText size={16} />
+            Upload File
+          </button>
+          <button
+            className={`${styles.uploadTypeButton} ${uploadType === 'text' ? styles.active : ''}`}
+            onClick={() => setUploadType('text')}
+          >
+            <FileText size={16} />
+            Nhập văn bản
+          </button>
+        </div>
+      </div>
+
+      {/* File Upload */}
+      {uploadType === 'file' && (
+        <div className={styles.fileUploadSection}>
+          <label>Chọn file tài liệu:</label>
+          <div 
+            className={styles.fileDropZone}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {selectedFile ? (
+              <div className={styles.selectedFile}>
+                <FileText size={24} />
+                <div>
+                  <p>{selectedFile.name}</p>
+                  <p>{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                </div>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedFile(null);
+                    setForm(prev => ({ ...prev, fileExtension: '', fileSize: 0 }));
+                  }}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <div className={styles.dropZoneContent}>
+                <Upload size={40} color="var(--primary)" />
+                <p>Nhấp để chọn file hoặc kéo thả file vào đây</p>
+                <p className={styles.supportedFormats}>
+                  Định dạng hỗ trợ: PDF, DOC, DOCX, TXT, MD, RTF
+                </p>
+                <p style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginTop: '8px' }}>
+                  Kích thước tối đa: 100MB
+                </p>
+              </div>
+            )}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.doc,.docx,.txt,.md,.rtf"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+          />
+        </div>
+      )}
+
+      {/* Text Input */}
+      {uploadType === 'text' && (
+        <div className={styles.textInputSection}>
+          <label>Nội dung văn bản:</label>
+          <div style={{ position: 'relative' }}>
+            <textarea
+              value={textContent}
+              onChange={(e) => setTextContent(e.target.value)}
+              placeholder="Nhập nội dung tài liệu cần đăng ký bản quyền..."
+              rows={12}
+              maxLength={10000}
+              required
+            />
+            <div className={styles.characterCount}>
+              {textContent.length} / 10000 ký tự
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Metadata Form */}
+      <div className={styles.metadataSection}>
+        <h3>Thông tin tài liệu</h3>
+        
+        <div className={styles.formRow}>
+          <div className={styles.formGroup}>
+            <label>Tiêu đề *</label>
+            <input
+              type="text"
+              value={form.title}
+              onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
+              placeholder="Nhập tiêu đề tài liệu"
+              maxLength={200}
+              required
+            />
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label>Loại tài liệu *</label>
+            <select
+              value={form.category}
+              onChange={(e) => setForm(prev => ({ ...prev, category: e.target.value }))}
+              required
+            >
+              <option value="thesis">Luận văn/Luận án</option>
+              <option value="research">Nghiên cứu khoa học</option>
+              <option value="paper">Bài báo khoa học</option>
+              <option value="report">Báo cáo</option>
+              <option value="presentation">Bài thuyết trình</option>
+              <option value="coursework">Bài tập lớn</option>
+              <option value="assignment">Bài tập</option>
+              <option value="other">Khác</option>
+            </select>
+          </div>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label>Mô tả *</label>
+          <textarea
+            value={form.description}
+            onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
+            placeholder="Mô tả ngắn gọn về tài liệu"
+            rows={3}
+            maxLength={1000}
+          />
+        </div>
+
+        <div className={styles.formRow}>
+          <div className={styles.formGroup}>
+            <label>Tác giả</label>
+            <input
+              type="text"
+              value={form.authorName || ''}
+              onChange={(e) => setForm(prev => ({ ...prev, authorName: e.target.value }))}
+              placeholder="Tên tác giả"
+            />
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label>Tổ chức</label>
+            <input
+              type="text"
+              value={form.institution || ''}
+              onChange={(e) => setForm(prev => ({ ...prev, institution: e.target.value }))}
+              placeholder="Tên tổ chức/trường học"
+            />
+          </div>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label>Tóm tắt</label>
+          <textarea
+            value={form.abstract || ''}
+            onChange={(e) => setForm(prev => ({ ...prev, abstract: e.target.value }))}
+            placeholder="Tóm tắt nội dung tài liệu"
+            rows={4}
+          />
+        </div>
+
+        {/* Tags */}
+        <div className={styles.formGroup}>
+          <label>Tags</label>
+          <div className={styles.tagsInput}>
+            <input
+              type="text"
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+              placeholder="Nhập tag và nhấn Enter"
+              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+              maxLength={50}
+            />
+            <button onClick={handleAddTag} disabled={!newTag.trim()}>
+              Thêm
+            </button>
+          </div>
+          <div className={styles.tagsList}>
+            {form.tags.map((tag, index) => (
+              <span key={index} className={styles.tag}>
+                {tag}
+                <button onClick={() => handleRemoveTag(tag)}>
+                  <X size={12} />
+                </button>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Submit Result */}
+      {submitResult && (
+        <div className={`${styles.result} ${submitResult.success ? styles.success : styles.error}`}>
+          {submitResult.success ? (
+            <>
+              <CheckCircle size={20} />
+              <div>
+                <p>Đăng ký tài liệu thành công!</p>
+                <p>{submitResult.message}</p>
+              </div>
+            </>
+          ) : (
+            <>
+              <AlertCircle size={20} />
+              <div>
+                <p>Đăng ký tài liệu thất bại</p>
+                <p>{submitResult.error}</p>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className={styles.actions}>
+        <button 
+          className={styles.registerButton}
+          onClick={handleSubmit}
+          disabled={isSubmitting || loading}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className={styles.spinner} />
+              Đang đăng ký...
+            </>
+          ) : (
+            'Đăng ký bản quyền'
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};

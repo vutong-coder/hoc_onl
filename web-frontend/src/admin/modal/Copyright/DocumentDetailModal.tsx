@@ -1,12 +1,12 @@
 import React from 'react'
 import Modal from '../../components/common/Modal'
 import { FileText, X, Hash, Calendar, User, Tag, Link } from 'lucide-react'
-import { Document } from '../../types/copyright'
+import { AdminDocument } from '../../hooks/useCopyright'
 
 interface DocumentDetailModalProps {
 	isOpen: boolean
 	onClose: () => void
-	document: Document | null
+	document: AdminDocument | null
 }
 
 const DocumentDetailModal: React.FC<DocumentDetailModalProps> = ({
