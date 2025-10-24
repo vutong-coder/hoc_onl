@@ -1,21 +1,41 @@
 .hero {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  padding: 80px 0 120px;
+  background: linear-gradient(135deg, var(--card) 0%, var(--muted) 100%);
+  padding: 100px 0 140px;
   position: relative;
   overflow: hidden;
+  border-bottom: 1px solid var(--border);
 }
 
 .hero::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23f0f9ff\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-  opacity: 0.6;
+  top: -50%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+  opacity: 0.08;
   pointer-events: none;
-  z-index: 1;
+  animation: float 20s ease-in-out infinite;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -5%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+  opacity: 0.08;
+  pointer-events: none;
+  animation: float 25s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -30px) rotate(5deg); }
+  66% { transform: translate(-20px, 20px) rotate(-5deg); }
 }
 
 .container {
@@ -37,31 +57,38 @@
   max-width: 600px;
 }
 
-
 .title {
-  font-size: 48px;
-  font-weight: 800;
-  color: #1e293b;
+  font-size: 52px;
+  font-weight: 900;
+  color: var(--foreground);
   line-height: 1.1;
-  margin-bottom: 24px;
-  letter-spacing: -0.02em;
+  margin-bottom: 28px;
+  letter-spacing: -0.03em;
 }
 
 .certificationTitle {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: inline-block;
+  animation: gradientShift 8s ease infinite;
+  background-size: 200% 200%;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .subtitle {
-  color: #6b7280;
+  color: var(--muted-foreground);
   font-weight: 600;
 }
 
 .description {
   font-size: 18px;
-  color: #64748b;
+  color: var(--muted-foreground);
   line-height: 1.6;
   margin-bottom: 32px;
 }
@@ -76,12 +103,37 @@
 .stat {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  gap: 10px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, var(--card) 0%, var(--muted) 100%);
   border-radius: 12px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 2px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary) 0%, var(--accent) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stat:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary);
+}
+
+.stat:hover::before {
+  opacity: 1;
 }
 
 .statIcon {
@@ -91,32 +143,42 @@
 .statText {
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: var(--foreground);
 }
 
 .levelBadge {
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+.levelBadge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
 .getCertifiedButton {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
   color: white;
   border: none;
-  border-radius: 12px;
-  padding: 16px 48px;
-  font-size: 18px;
-  font-weight: 600;
+  border-radius: 14px;
+  padding: 18px 56px;
+  font-size: 19px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
   margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .getCertifiedButton::before {
@@ -126,27 +188,44 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s ease;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.getCertifiedButton::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
 }
 
 .getCertifiedButton:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 15px rgba(16, 185, 129, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
 }
 
 .getCertifiedButton:hover::before {
   left: 100%;
 }
 
+.getCertifiedButton:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
 .getCertifiedButton:active {
-  transform: translateY(0);
+  transform: translateY(-2px);
 }
 
 .testimonial {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--muted-foreground);
   margin: 0;
 }
 
@@ -156,7 +235,7 @@
 
 .companiesTitle {
   font-size: 16px;
-  color: #6b7280;
+  color: var(--muted-foreground);
   margin-bottom: 32px;
   font-weight: 500;
 }
@@ -173,112 +252,39 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 60px;
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 12px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  font-size: 14px;
-  font-weight: 600;
-  color: #374151;
-  transition: all 0.2s ease;
+  height: 70px;
+  background: linear-gradient(135deg, var(--card) 0%, var(--muted) 100%);
+  border-radius: 14px;
+  border: 2px solid var(--border);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.logo::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .logo:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  border-color: var(--primary);
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .hero {
-    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-  }
-  
-  .hero::before {
-    background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-  }
-  
-  
-  .title {
-    color: #f1f5f9;
-  }
-  
-  .subtitle {
-    color: #9ca3af;
-  }
-  
-  .description {
-    color: #d1d5db;
-  }
-  
-  .stat {
-    background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-    border: 1px solid rgba(71, 85, 105, 0.3);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .statText {
-    color: #f3f4f6;
-  }
-  
-  .testimonial {
-    color: #9ca3af;
-  }
-  
-  .companiesTitle {
-    color: #9ca3af;
-  }
-  
-  .logo {
-    background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-    border: 1px solid rgba(71, 85, 105, 0.3);
-    color: #f3f4f6;
-  }
-}
-
-.dark .hero {
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-}
-
-.dark .hero::before {
-  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"400\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"800\" r=\"350\" fill=\"url(%23bg)\"/></svg>");
-}
-
-
-.dark .title {
-  color: #f1f5f9;
-}
-
-.dark .subtitle {
-  color: #9ca3af;
-}
-
-.dark .description {
-  color: #d1d5db;
-}
-
-.dark .stat {
-  background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.dark .statText {
-  color: #f3f4f6;
-}
-
-.dark .testimonial {
-  color: #9ca3af;
-}
-
-.dark .companiesTitle {
-  color: #9ca3af;
-}
-
-.dark .logo {
-  background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  color: #f3f4f6;
+.logo:hover::before {
+  opacity: 0.3;
 }
 
 /* Responsive design */
@@ -306,7 +312,6 @@
   .content {
     gap: 40px;
   }
-  
   
   .title {
     font-size: 36px;

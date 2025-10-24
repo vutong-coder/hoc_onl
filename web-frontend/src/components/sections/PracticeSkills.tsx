@@ -54,23 +54,23 @@ export default function PracticeSkills({
 	const getCategoryColor = (category: string) => {
 		switch (category) {
 			case 'algorithm':
-				return '#3b82f6'
+				return 'var(--primary)'
 			case 'language':
-				return '#10b981'
+				return 'var(--primary)'
 			case 'framework':
-				return '#f59e0b'
+				return 'var(--accent)'
 			case 'tool':
-				return '#8b5cf6'
+				return 'var(--primary)'
 			default:
 				return 'var(--muted-foreground)'
 		}
 	}
 
 	const getProgressColor = (progress: number) => {
-		if (progress >= 80) return '#10b981'
-		if (progress >= 60) return '#3b82f6'
-		if (progress >= 40) return '#f59e0b'
-		return '#ef4444'
+		if (progress >= 80) return 'var(--primary)'
+		if (progress >= 60) return 'var(--primary)'
+		if (progress >= 40) return 'var(--accent)'
+		return 'var(--destructive)'
 	}
 
 	return (
@@ -116,8 +116,8 @@ export default function PracticeSkills({
 				<button 
 					style={{ 
 						padding: '10px 24px', 
-						border: '1px solid rgba(226, 232, 240, 0.8)', 
-						color: '#3b82f6', 
+						border: '1px solid var(--border)', 
+						color: 'var(--primary)', 
 						borderRadius: '8px', 
 						background: 'transparent', 
 						cursor: 'pointer',
@@ -127,14 +127,14 @@ export default function PracticeSkills({
 						fontWeight: 500
 					}}
 					onMouseEnter={(e) => {
-						e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'
-						e.currentTarget.style.borderColor = '#3b82f6'
+						e.currentTarget.style.background = 'var(--primary-light)'
+						e.currentTarget.style.borderColor = 'var(--primary)'
 						e.currentTarget.style.transform = 'translateY(-2px)'
-						e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)'
+						e.currentTarget.style.boxShadow = 'var(--shadow-md)'
 					}}
 					onMouseLeave={(e) => {
 						e.currentTarget.style.background = 'transparent'
-						e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 0.8)'
+						e.currentTarget.style.borderColor = 'var(--border)'
 						e.currentTarget.style.transform = 'translateY(0)'
 						e.currentTarget.style.boxShadow = 'none'
 					}}

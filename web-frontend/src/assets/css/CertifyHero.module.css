@@ -4,6 +4,18 @@
   padding: 100px 0;
   position: relative;
   overflow: hidden;
+  animation: fadeInScale 0.8s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .hero::before {
@@ -16,6 +28,18 @@
   background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23ffffff" stop-opacity="0.1"/><stop offset="100%" stop-color="%23ffffff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="300" fill="url(%23a)"/><circle cx="800" cy="300" r="200" fill="url(%23a)"/><circle cx="400" cy="700" r="250" fill="url(%23a)"/></svg>');
   opacity: 0.3;
   pointer-events: none;
+  animation: patternPulse 15s ease-in-out infinite;
+}
+
+@keyframes patternPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
 }
 
 .container {
@@ -53,6 +77,18 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  animation: titleSlideIn 1s ease-out;
+}
+
+@keyframes titleSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .features {
@@ -61,6 +97,18 @@
   gap: 48px;
   max-width: 1100px;
   margin: 0 auto;
+  animation: featuresSlideUp 1.2s ease-out;
+}
+
+@keyframes featuresSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .feature {
@@ -84,12 +132,19 @@
   height: 3px;
   background: linear-gradient(90deg, #fbbf24, #f59e0b, #d97706);
   border-radius: 16px 16px 0 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
 }
 
 .feature:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
   background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+.feature:hover::before {
+  transform: scaleX(1);
 }
 
 .featureTitle {
@@ -108,93 +163,47 @@
   font-weight: 400;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .hero {
-    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-  }
-  
-  .hero::before {
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23000000" stop-opacity="0.2"/><stop offset="100%" stop-color="%23000000" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="300" fill="url(%23a)"/><circle cx="800" cy="300" r="200" fill="url(%23a)"/><circle cx="400" cy="700" r="250" fill="url(%23a)"/></svg>');
-    opacity: 0.4;
-  }
-  
-  .badge {
-    color: rgba(255, 255, 255, 0.95);
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-  }
-  
-  .title {
-    background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  
-  .feature {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  
-  .feature:hover {
-    background: rgba(255, 255, 255, 0.15);
-  }
-  
-  .feature::before {
-    background: linear-gradient(90deg, #fbbf24, #f59e0b, #d97706);
-  }
-  
-  .featureTitle {
-    color: white;
-  }
-  
-  .featureDescription {
-    color: rgba(255, 255, 255, 0.9);
-  }
-}
-
 /* Dark mode class-based (for theme toggle) */
-.dark .hero {
+:global(.dark) .hero {
   background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
 }
 
-.dark .hero::before {
+:global(.dark) .hero::before {
   background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23000000" stop-opacity="0.2"/><stop offset="100%" stop-color="%23000000" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="300" fill="url(%23a)"/><circle cx="800" cy="300" r="200" fill="url(%23a)"/><circle cx="400" cy="700" r="250" fill="url(%23a)"/></svg>');
   opacity: 0.4;
 }
 
-.dark .badge {
+:global(.dark) .badge {
   color: rgba(255, 255, 255, 0.95);
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.dark .title {
+:global(.dark) .title {
   background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.dark .feature {
+:global(.dark) .feature {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.dark .feature:hover {
+:global(.dark) .feature:hover {
   background: rgba(255, 255, 255, 0.15);
 }
 
-.dark .feature::before {
+:global(.dark) .feature::before {
   background: linear-gradient(90deg, #fbbf24, #f59e0b, #d97706);
 }
 
-.dark .featureTitle {
+:global(.dark) .featureTitle {
   color: white;
 }
 
-.dark .featureDescription {
+:global(.dark) .featureDescription {
   color: rgba(255, 255, 255, 0.9);
 }
 

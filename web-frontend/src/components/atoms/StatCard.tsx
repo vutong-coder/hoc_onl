@@ -14,13 +14,13 @@ export default function StatCard({ title, value, icon, gradient = 'primary', sub
 		switch (gradient) {
 			case 'primary':
 				return {
-					background: '#10b981', // Green background
-					color: 'white'
+					background: 'var(--gradient-primary)',
+					color: 'var(--primary-foreground)'
 				}
 			case 'accent':
 				return {
-					background: '#f59e0b', // Orange background  
-					color: 'black'
+					background: 'var(--gradient-accent)',
+					color: 'var(--accent-foreground)'
 				}
 			default:
 				return {
@@ -33,23 +33,23 @@ export default function StatCard({ title, value, icon, gradient = 'primary', sub
 	const gradientStyles = getGradientStyles()
 
 	return (
-		<div style={{ 
-			background: gradientStyles.background, 
-			padding: '16px', 
+		<div style={{
+			background: gradientStyles.background,
+			padding: '16px',
 			borderRadius: 'var(--radius-md)',
 			transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
 			cursor: 'pointer',
 			position: 'relative',
 			overflow: 'hidden',
-			boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+			boxShadow: 'var(--shadow-sm)'
 		}}
 		onMouseEnter={(e) => {
 			e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
-			e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+			e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
 		}}
 		onMouseLeave={(e) => {
 			e.currentTarget.style.transform = 'translateY(0) scale(1)';
-			e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+			e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
 		}}
 		onMouseDown={(e) => {
 			e.currentTarget.style.transform = 'translateY(-2px) scale(1.01)';

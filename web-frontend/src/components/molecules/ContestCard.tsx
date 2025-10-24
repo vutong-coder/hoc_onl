@@ -32,15 +32,15 @@ const ContestCard: React.FC<ContestCardProps> = ({
   const getTypeColor = (type: Contest['type']) => {
     switch (type) {
       case 'global':
-        return '#3b82f6'; // Blue
+        return 'var(--primary)'; // Blue
       case 'college':
-        return '#8b5cf6'; // Purple
+        return 'var(--primary)'; // Purple
       case 'hiring':
-        return '#10b981'; // Green
+        return 'var(--primary)'; // Green
       case 'practice':
-        return '#f59e0b'; // Orange
+        return 'var(--accent)'; // Orange
       default:
-        return '#6b7280'; // Gray
+        return 'var(--muted-foreground)'; // Gray
     }
   };
 

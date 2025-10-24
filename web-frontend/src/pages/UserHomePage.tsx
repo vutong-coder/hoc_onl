@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState } from 'react'
 import WelcomeBanner from '../components/sections/WelcomeBanner'
 import MockInterviews from '../components/sections/MockInterviews'
 import PracticeSkills from '../components/sections/PracticeSkills'
@@ -7,9 +7,15 @@ import RecentExams from '../components/sections/RecentExams'
 import CourseProgress from '../components/sections/CourseProgress'
 import UpcomingExams from '../components/sections/UpcomingExams'
 import Footer from '../components/layouts/Footer'
+import RewardStoreModal from '../components/molecules/RewardStoreModal'
+import TokenTransferModal from '../components/molecules/TokenTransferModal'
 import styles from '../assets/css/UserHomePage.module.css'
 
 export default function UserHomePage(): JSX.Element {
+	const [showRewardStore, setShowRewardStore] = useState(false)
+	const [showWithdrawModal, setShowWithdrawModal] = useState(false)
+	const [tokenBalance, setTokenBalance] = useState(1250)
+	const [walletAddress, setWalletAddress] = useState<string | undefined>(undefined)
 	const handleStartInterview = (interviewId: string) => {
 		console.log(`Start interview ${interviewId}`)
 	}
@@ -94,7 +100,11 @@ export default function UserHomePage(): JSX.Element {
 								minHeight: '280px'
 							}}>
 								{/* Token Wallet */}
-								<TokenWallet />
+								<TokenWallet
+									onRedeemGifts={() => setShowRewardStore(true)}
+									onWithdraw={() => setShowWithdrawModal(true)}
+									tokenBalance={tokenBalance}
+								/>
 							</div>
 						</div>
 
@@ -150,6 +160,23 @@ export default function UserHomePage(): JSX.Element {
 
 		{/* Footer */}
 		<Footer />
+
+		{/* Modals - Rendered at page level for full screen display */}
+		<RewardStoreModal
+			isOpen={showRewardStore}
+			onClose={() => setShowRewardStore(false)}
+			currentBalance={tokenBalance}
+			walletAddress={walletAddress}
+			userId="user-123"
+		/>
+
+		<TokenTransferModal
+			isOpen={showWithdrawModal}
+			onClose={() => setShowWithdrawModal(false)}
+			currentBalance={tokenBalance}
+			walletAddress={walletAddress}
+			userId="user-123"
+		/>
 	</div>
 )
 }

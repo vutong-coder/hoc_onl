@@ -23,13 +23,13 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   const getStatusColor = (status: Contest['status']) => {
     switch (status) {
       case 'active':
-        return '#10b981'; // Green
+        return 'var(--primary)'; // Green
       case 'upcoming':
-        return '#f59e0b'; // Orange
+        return 'var(--accent)'; // Orange
       case 'archived':
-        return '#6b7280'; // Gray
+        return 'var(--muted-foreground)'; // Gray
       default:
-        return '#6b7280';
+        return 'var(--muted-foreground)';
     }
   };
 

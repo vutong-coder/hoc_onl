@@ -19,19 +19,22 @@ interface InterviewCardProps {
 
 export default function InterviewCard({ interview, onStartInterview, onUnlockInterview }: InterviewCardProps): JSX.Element {
 	return (
-		<div 
-			style={{ 
-				padding: '16px', 
-				borderRadius: 'var(--radius-lg)', 
-				border: '1px solid var(--border)', 
+		<div
+			style={{
+				padding: '16px',
+				borderRadius: 'var(--radius-lg)',
+				border: '1px solid var(--border)',
 				background: 'var(--card)',
-				transition: 'all 0.3s ease',
+				transition: 'all 0.2s',
 				position: 'relative',
-				cursor: interview.isLocked ? 'default' : 'pointer'
+				cursor: interview.isLocked ? 'default' : 'pointer',
+				opacity: interview.isLocked ? 0.7 : 1,
+				boxShadow: 'var(--shadow-sm)',
+				overflow: 'hidden'
 			}}
 			onMouseEnter={(e) => {
 				if (!interview.isLocked) {
-					e.currentTarget.style.borderColor = 'var(--accent)'
+					e.currentTarget.style.borderColor = 'var(--primary)'
 					e.currentTarget.style.transform = 'translateY(-2px)'
 					e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
 				}
@@ -40,7 +43,7 @@ export default function InterviewCard({ interview, onStartInterview, onUnlockInt
 				if (!interview.isLocked) {
 					e.currentTarget.style.borderColor = 'var(--border)'
 					e.currentTarget.style.transform = 'translateY(0)'
-					e.currentTarget.style.boxShadow = 'none'
+					e.currentTarget.style.boxShadow = 'var(--shadow-sm)'
 				}
 			}}
 		>
@@ -97,24 +100,27 @@ export default function InterviewCard({ interview, onStartInterview, onUnlockInt
 						<span style={{ fontSize: '14px' }}>Premium</span>
 					</div>
 				) : (
-					<button 
+					<button
 						onClick={() => onStartInterview?.(interview.id)}
-						style={{ 
-							background: 'var(--primary)', 
-							color: 'var(--primary-foreground)', 
-							padding: '8px 16px', 
-							borderRadius: 'var(--radius-md)', 
-							fontSize: '14px', 
-							fontWeight: 500, 
-							border: 'none', 
+						style={{
+							background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+							color: 'white',
+							padding: '8px 16px',
+							borderRadius: 'var(--radius-md)',
+							fontSize: '14px',
+							fontWeight: 500,
+							border: 'none',
 							cursor: 'pointer',
-							transition: 'background-color var(--transition-normal)'
+							transition: 'transform 0.2s, box-shadow 0.2s',
+							boxShadow: 'none'
 						}}
 						onMouseEnter={(e) => {
-							e.currentTarget.style.background = 'var(--accent)'
+							e.currentTarget.style.transform = 'translateY(-2px)'
+							e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
 						}}
 						onMouseLeave={(e) => {
-							e.currentTarget.style.background = 'var(--primary)'
+							e.currentTarget.style.transform = 'translateY(0)'
+							e.currentTarget.style.boxShadow = 'none'
 						}}
 					>
 						Dùng thử miễn phí
@@ -122,16 +128,23 @@ export default function InterviewCard({ interview, onStartInterview, onUnlockInt
 				)}
 				
 				{interview.isLocked && (
-					<button 
+					<button
 						onClick={() => onUnlockInterview?.(interview.id)}
-						style={{ 
-							color: 'var(--accent)', 
-							fontSize: '14px', 
-							fontWeight: 500, 
-							background: 'none', 
-							border: 'none', 
+						style={{
+							color: 'var(--accent)',
+							fontSize: '14px',
+							fontWeight: 500,
+							background: 'none',
+							border: 'none',
 							cursor: 'pointer',
-							transition: 'color var(--transition-normal)'
+							transition: 'color 0.2s',
+							textDecoration: 'underline'
+						}}
+						onMouseEnter={(e) => {
+							e.currentTarget.style.color = 'var(--primary)'
+						}}
+						onMouseLeave={(e) => {
+							e.currentTarget.style.color = 'var(--accent)'
 						}}
 					>
 						Mở khóa

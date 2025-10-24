@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { LogOut, Menu, X, Bell, Search, MessageCircle, Moon, Grid3X3, ChevronDown, User, Trophy, Settings, Bookmark, Users, FileText, Shield } from 'lucide-react'
+import { LogOut, Menu, X, Bell, Search, MessageCircle, Moon, Sun, Grid3X3, ChevronDown, User, Trophy, Settings, Bookmark, Users, FileText, Shield, Copyright } from 'lucide-react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { logoutUser } from '../../store/slices/authSlice'
+import { useTheme } from '../../contexts/ThemeContext'
 import Logo from '../atoms/Logo'
 
 export default function UserHeader(): JSX.Element {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 	const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
 	const [userMenuOpen, setUserMenuOpen] = useState(false)
+	const { theme, toggleTheme, isManualOverride } = useTheme()
 	const [searchQuery, setSearchQuery] = useState('')
 	const dispatch = useAppDispatch()
 	const navigate = useNavigate()
@@ -20,6 +22,7 @@ export default function UserHeader(): JSX.Element {
 		const path = location.pathname
 		if (path.includes('/certify')) return 'certify'
 		if (path.includes('/compete')) return 'compete'
+		if (path.includes('/copyright')) return 'copyright'
 		return 'prepare' // default to prepare
 	}
 
@@ -125,7 +128,7 @@ export default function UserHeader(): JSX.Element {
 									left: 0,
 									right: 0,
 									height: '2px',
-									background: '#00ff00',
+									background: 'var(--primary)',
 									borderRadius: '1px'
 								}}
 							/>
@@ -153,7 +156,7 @@ export default function UserHeader(): JSX.Element {
 									left: 0,
 									right: 0,
 									height: '2px',
-									background: '#00ff00',
+									background: 'var(--primary)',
 									borderRadius: '1px'
 								}}
 							/>
@@ -181,7 +184,7 @@ export default function UserHeader(): JSX.Element {
 									left: 0,
 									right: 0,
 									height: '2px',
-									background: '#00ff00',
+									background: 'var(--primary)',
 									borderRadius: '1px'
 								}}
 							/>
@@ -221,25 +224,25 @@ export default function UserHeader(): JSX.Element {
 								style={{
 									width: '220px',
 									height: '40px',
-									background: '#f3f4f6',
-									border: '1px solid #d1d5db',
+									background: 'var(--input)',
+									border: '1px solid var(--border)',
 									borderRadius: '8px',
 									paddingLeft: '40px',
 									paddingRight: '16px',
 									fontSize: '14px',
-									color: '#374151',
+									color: 'var(--foreground)',
 									transition: 'all 0.2s ease',
 									display: 'block',
 									zIndex: 1,
 									position: 'relative'
 								}}
 								onFocus={(e) => {
-									e.target.style.borderColor = '#3b82f6'
+									e.target.style.borderColor = 'var(--primary)'
 									e.target.style.boxShadow = '0 0 0 2px rgba(59, 130, 246, 0.2)'
 									e.target.style.outline = 'none'
 								}}
 								onBlur={(e) => {
-									e.target.style.borderColor = '#d1d5db'
+									e.target.style.borderColor = 'var(--border)'
 									e.target.style.boxShadow = 'none'
 								}}
 							/>
@@ -324,8 +327,9 @@ export default function UserHeader(): JSX.Element {
 							<MessageCircle style={{ width: '20px', height: '20px' }} />
 						</button>
 
-						{/* Dark Mode Toggle */}
+						{/* Theme Toggle */}
 						<button 
+							onClick={toggleTheme}
 							style={{
 								width: '40px',
 								height: '40px',
@@ -350,8 +354,13 @@ export default function UserHeader(): JSX.Element {
 								e.currentTarget.style.color = 'var(--foreground)'
 								e.currentTarget.style.transform = 'scale(1)'
 							}}
+							title={`Chuyển sang chế độ ${theme === 'light' ? 'tối' : 'sáng'}${isManualOverride ? '' : ' (theo trình duyệt)'}`}
 						>
-							<Moon style={{ width: '20px', height: '20px' }} />
+							{theme === 'dark' ? (
+								<Sun style={{ width: '20px', height: '20px' }} />
+							) : (
+								<Moon style={{ width: '20px', height: '20px' }} />
+							)}
 						</button>
 
 						{/* User Avatar with Dropdown */}
@@ -409,10 +418,10 @@ export default function UserHeader(): JSX.Element {
 										top: '100%',
 										right: 0,
 										marginTop: '8px',
-										background: 'white',
+										background: 'var(--card)',
 										borderRadius: '8px',
 										boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-										border: '1px solid #e5e7eb',
+										border: '1px solid var(--border)',
 										minWidth: '200px',
 										zIndex: 1000,
 										overflow: 'hidden'
@@ -420,13 +429,10 @@ export default function UserHeader(): JSX.Element {
 										{/* Menu Items */}
 										<div style={{ padding: '8px 0' }}>
 											{[
-												{ icon: <User style={{ width: '16px', height: '16px' }} />, label: 'Hồ sơ' },
-												{ icon: <Trophy style={{ width: '16px', height: '16px' }} />, label: 'Bảng xếp hạng' },
-												{ icon: <Settings style={{ width: '16px', height: '16px' }} />, label: 'Cài đặt' },
-												{ icon: <Bookmark style={{ width: '16px', height: '16px' }} />, label: 'Đánh dấu' },
-												{ icon: <Users style={{ width: '16px', height: '16px' }} />, label: 'Mạng lưới' },
-												{ icon: <FileText style={{ width: '16px', height: '16px' }} />, label: 'Bài nộp' },
-												{ icon: <Shield style={{ width: '16px', height: '16px' }} />, label: 'Quản trị' },
+												{ icon: <User style={{ width: '16px', height: '16px' }} />, label: 'Hồ sơ', onClick: () => navigate('/user/profile') },
+												{ icon: <Trophy style={{ width: '16px', height: '16px' }} />, label: 'Bảng xếp hạng', onClick: () => navigate('/user/leaderboard') },
+												{ icon: <Settings style={{ width: '16px', height: '16px' }} />, label: 'Cài đặt', onClick: () => navigate('/user/settings') },
+												{ icon: <Copyright style={{ width: '16px', height: '16px' }} />, label: 'Bản quyền', onClick: () => navigate('/user/copyright') },
 												{ icon: <LogOut style={{ width: '16px', height: '16px' }} />, label: 'Đăng xuất', onClick: handleLogout }
 											].map((item, index) => (
 												<button
@@ -441,19 +447,19 @@ export default function UserHeader(): JSX.Element {
 														display: 'flex',
 														alignItems: 'center',
 														gap: '12px',
-														color: '#6b7280',
+														color: 'var(--muted-foreground)',
 														fontSize: '14px',
 														fontWeight: 400,
 														transition: 'all var(--transition-normal)',
 														textAlign: 'left'
 													}}
 													onMouseEnter={(e) => {
-														e.currentTarget.style.background = '#f3f4f6'
-														e.currentTarget.style.color = '#374151'
+														e.currentTarget.style.background = 'var(--accent)'
+														e.currentTarget.style.color = 'var(--accent-foreground)'
 													}}
 													onMouseLeave={(e) => {
 														e.currentTarget.style.background = 'transparent'
-														e.currentTarget.style.color = '#6b7280'
+														e.currentTarget.style.color = 'var(--muted-foreground)'
 													}}
 												>
 													{item.icon}

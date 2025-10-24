@@ -1,12 +1,14 @@
 .footer {
-  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-  padding: 20px 8px; /* Match the padding from developer tools: 20px 8px */
-  margin: 24px auto 16px; /* Match the margin from developer tools: 24px auto 16px */
-  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  background: linear-gradient(135deg, var(--card) 0%, var(--muted) 100%);
+  padding: 28px 16px;
+  margin: 40px auto 24px;
+  border-top: 3px solid;
+  border-image: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%) 1;
   position: relative;
-  max-width: 800px; /* Match compete page max-width */
-  border-radius: 6px; /* Match compete page border-radius */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Add subtle shadow like compete page */
+  max-width: 1000px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
 }
 
 .footer::before {
@@ -16,10 +18,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23f1f5f9\" stop-opacity=\"0.2\"/><stop offset=\"100%\" stop-color=\"%23f1f5f9\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"200\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"700\" r=\"250\" fill=\"url(%23bg)\"/></svg>");
-  opacity: 0.3;
+  background: radial-gradient(circle at 30% 50%, var(--primary) 0%, transparent 50%),
+              radial-gradient(circle at 70% 50%, var(--accent) 0%, transparent 50%);
+  opacity: 0.05;
   pointer-events: none;
   z-index: 1;
+}
+
+.footer:hover {
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18);
+  transform: translateY(-2px);
 }
 
 /* Container styling removed - footer handles its own layout */
@@ -29,95 +37,60 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 20px; /* Increased gap to match compete page spacing */
+  gap: 24px;
+  position: relative;
+  z-index: 2;
 }
 
 .link {
   background: none;
   border: none;
-  color: #3b82f6;
-  font-size: 14px;
-  font-weight: 500;
+  color: var(--primary);
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 4px 8px; /* Keep same padding as compete page */
-  border-radius: 6px; /* Match compete page border-radius */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 6px 12px;
+  border-radius: 8px;
   text-decoration: none;
+  position: relative;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
 }
 
 .link:hover {
-  color: #2563eb;
-  background: rgba(59, 130, 246, 0.1);
-  text-decoration: underline;
+  color: var(--primary);
+  background: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.link:hover::after {
+  width: 80%;
 }
 
 .link:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
 }
 
 .separator {
-  color: #94a3b8;
+  color: var(--muted-foreground);
   font-size: 14px;
   font-weight: 400;
   margin: 0 4px;
   user-select: none;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .footer {
-    background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
-    border-top-color: #374151;
-  }
-  
-  .footer::before {
-    background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.2\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"200\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"700\" r=\"250\" fill=\"url(%23bg)\"/></svg>");
-  }
-  
-  .link {
-    color: #60a5fa;
-  }
-  
-  .link:hover {
-    color: #3b82f6;
-    background: rgba(96, 165, 250, 0.1);
-  }
-  
-  .link:focus {
-    outline-color: #60a5fa;
-  }
-  
-  .separator {
-    color: #6b7280;
-  }
-}
-
-.dark .footer {
-  background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
-  border-top-color: #374151;
-}
-
-.dark .footer::before {
-  background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><defs><radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23374151\" stop-opacity=\"0.2\"/><stop offset=\"100%\" stop-color=\"%23374151\" stop-opacity=\"0\"/></radialGradient></defs><circle cx=\"200\" cy=\"200\" r=\"300\" fill=\"url(%23bg)\"/><circle cx=\"800\" cy=\"300\" r=\"200\" fill=\"url(%23bg)\"/><circle cx=\"400\" cy=\"700\" r=\"250\" fill=\"url(%23bg)\"/></svg>");
-}
-
-.dark .link {
-  color: #60a5fa;
-}
-
-.dark .link:hover {
-  color: #3b82f6;
-  background: rgba(96, 165, 250, 0.1);
-}
-
-.dark .link:focus {
-  outline-color: #60a5fa;
-}
-
-.dark .separator {
-  color: #6b7280;
-}
 
 /* Responsive design */
 @media (max-width: 768px) {

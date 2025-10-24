@@ -1,6 +1,6 @@
 .contestListItem {
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;
   display: flex;
@@ -8,13 +8,13 @@
   justify-content: space-between;
   gap: 20px;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .contestListItem:hover {
-  border-color: #d1d5db;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transform: translateY(-1px);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+  transform: translateX(4px);
 }
 
 .contestInfo {
@@ -32,7 +32,7 @@
 .title {
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--foreground);
   margin: 0;
   line-height: 1.4;
 }
@@ -49,7 +49,7 @@
 
 .description {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--muted-foreground);
   margin: 0 0 8px 0;
   line-height: 1.4;
 }
@@ -62,7 +62,7 @@
 
 .region {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--muted-foreground);
   font-weight: 500;
 }
 
@@ -71,9 +71,9 @@
 }
 
 .actionButton {
-  background: white;
-  border: 1px solid #d1d5db;
-  color: #374151;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border: none;
+  color: white;
   font-size: 14px;
   font-weight: 500;
   padding: 8px 16px;
@@ -81,16 +81,20 @@
   cursor: pointer;
   transition: all 0.2s ease;
   min-width: 120px;
+  box-shadow: none;
 }
 
 .actionButton:hover {
-  background: #f9fafb;
-  border-color: #9ca3af;
-  color: #1f2937;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.actionButton:active {
+  transform: translateY(0);
 }
 
 .actionButton:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
@@ -98,86 +102,6 @@
   transform: translateY(1px);
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .contestListItem {
-    background: #1e293b;
-    border-color: #374151;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  }
-  
-  .contestListItem:hover {
-    border-color: #4b5563;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  }
-  
-  .title {
-    color: #f1f5f9;
-  }
-  
-  .description {
-    color: #d1d5db;
-  }
-  
-  .region {
-    color: #9ca3af;
-  }
-  
-  .actionButton {
-    background: #1e293b;
-    border-color: #374151;
-    color: #d1d5db;
-  }
-  
-  .actionButton:hover {
-    background: #334155;
-    border-color: #4b5563;
-    color: #f1f5f9;
-  }
-  
-  .actionButton:focus {
-    outline-color: #60a5fa;
-  }
-}
-
-.dark .contestListItem {
-  background: #1e293b;
-  border-color: #374151;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.dark .contestListItem:hover {
-  border-color: #4b5563;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-.dark .title {
-  color: #f1f5f9;
-}
-
-.dark .description {
-  color: #d1d5db;
-}
-
-.dark .region {
-  color: #9ca3af;
-}
-
-.dark .actionButton {
-  background: #1e293b;
-  border-color: #374151;
-  color: #d1d5db;
-}
-
-.dark .actionButton:hover {
-  background: #334155;
-  border-color: #4b5563;
-  color: #f1f5f9;
-}
-
-.dark .actionButton:focus {
-  outline-color: #60a5fa;
-}
 
 /* Responsive design */
 @media (max-width: 768px) {

@@ -65,7 +65,7 @@ export default function DailyStreakCard({
 							width: '12px', 
 							height: '12px', 
 							borderRadius: '50%', 
-							background: isCompleted ? '#10b981' : 'var(--muted)', 
+							background: isCompleted ? 'var(--primary)' : 'var(--muted)', 
 							transition: 'background-color 0.3s ease'
 						}} 
 					/>
@@ -88,7 +88,7 @@ export default function DailyStreakCard({
 				<span style={{ 
 					fontSize: '16px', 
 					fontWeight: 700, 
-					color: '#f59e0b' 
+					color: 'var(--accent)' 
 				}}>
 					{currentStreak} ngày
 				</span>

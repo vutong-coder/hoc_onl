@@ -9,18 +9,18 @@
 	--card-foreground: oklch(0.9850 0 0);
 	--popover: oklch(0.2050 0 0);
 	--popover-foreground: oklch(0.9850 0 0);
-	--primary: oklch(0.6489 0.2370 26.9728);
-	--primary-foreground: oklch(0.9850 0 0);
+	--primary: #10b981;
+	--primary-foreground: #ffffff;
 	--secondary: oklch(0.9700 0 0);
 	--secondary-foreground: oklch(0.2050 0 0);
-	--muted: oklch(0.9700 0 0);
-	--muted-foreground: oklch(0.5560 0 0);
-	--accent: oklch(0.7323 0.2492 142.4953);
-	--accent-foreground: oklch(0.2050 0 0);
+	--muted: oklch(0.25 0 0);
+	--muted-foreground: oklch(0.6 0 0);
+	--accent: #f59e0b;
+	--accent-foreground: #000000;
 	--destructive: oklch(0.5770 0.2450 27.3250);
 	--destructive-foreground: oklch(0.9850 0 0);
-	--border: oklch(0.9220 0 0);
-	--input: oklch(0.9220 0 0);
+	--border: oklch(0.3 0 0);
+	--input: oklch(0.3 0 0);
 	--ring: oklch(0.7080 0 0);
 	
 	/* Chart Colors */
@@ -91,8 +91,8 @@
 	--transition-bounce: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 	
 	/* Gradients */
-	--gradient-primary: linear-gradient(135deg, var(--primary) 0%, oklch(0.7 0.25 30) 100%);
-	--gradient-accent: linear-gradient(135deg, var(--accent) 0%, oklch(0.8 0.2 150) 100%);
+	--gradient-primary: #10b981;
+	--gradient-accent: #f59e0b;
 	--gradient-card: linear-gradient(135deg, var(--card) 0%, oklch(0.22 0 0) 100%);
 	--gradient-background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); /* Match certify page dark mode */
 	--gradient-success: linear-gradient(135deg, oklch(0.6 0.2 140) 0%, oklch(0.7 0.15 160) 100%);
@@ -111,57 +111,102 @@
 	--glass-border: oklch(0.3 0 0 / 0.3);
 	--glass-bg-light: oklch(0.15 0 0 / 0.6);
 	--glass-border-light: oklch(0.25 0 0 / 0.2);
-	
+
+	/* Leaderboard Medal Colors - Dark Mode */
+	--medal-gold: #FFD700;
+	--medal-silver: #C0C0C0;
+	--medal-bronze: #CD7F32;
+	--rank-gold-bg: rgba(255, 215, 0, 0.05);
+	--rank-silver-bg: rgba(192, 192, 192, 0.05);
+	--rank-bronze-bg: rgba(205, 127, 50, 0.05);
+
+	/* Primary/Accent Light variants for gradients */
+	--primary-light: oklch(0.6489 0.2370 26.9728 / 0.15);
+	--accent-light: oklch(0.7323 0.2492 142.4953 / 0.15);
+	--primary-rgb: 255, 107, 53;
+
 	/* Typography */
 	--tracking-normal: 0em;
 }
 
-/* Light Theme */
-@media (prefers-color-scheme: light) {
-	:root {
-		--background: oklch(0.98 0 0);
-		--foreground: oklch(0.15 0 0);
-		--card: oklch(1 0 0);
-		--card-foreground: oklch(0.15 0 0);
-		--popover: oklch(1 0 0);
-		--popover-foreground: oklch(0.15 0 0);
-		--primary: oklch(0.6 0.15 160);
-		--primary-foreground: oklch(0.98 0 0);
-		--secondary: oklch(0.9 0.05 160);
-		--secondary-foreground: oklch(0.15 0 0);
-		--muted: oklch(0.92 0 0);
-		--muted-foreground: oklch(0.5 0 0);
-		--accent: oklch(0.85 0.1 50);
-		--accent-foreground: oklch(0.15 0 0);
-		--destructive: oklch(0.6 0.2 20);
-		--destructive-foreground: oklch(0.98 0 0);
-		--border: oklch(0.88 0 0);
-		--input: oklch(0.88 0 0);
-		--ring: oklch(0.7 0.1 160);
-		--chart-1: oklch(0.6 0.15 160);
-		--chart-2: oklch(0.7 0.1 50);
-		--chart-3: oklch(0.5 0.2 200);
-		--chart-4: oklch(0.8 0.1 300);
-		--chart-5: oklch(0.6 0.15 260);
-		--sidebar: oklch(0.95 0 0);
-		--sidebar-foreground: oklch(0.15 0 0);
-		--sidebar-primary: oklch(0.6 0.15 160);
-		--sidebar-primary-foreground: oklch(0.98 0 0);
-		--sidebar-accent: oklch(0.85 0.1 50);
-		--sidebar-accent-foreground: oklch(0.15 0 0);
-		--sidebar-border: oklch(0.88 0 0);
-		--sidebar-ring: oklch(0.7 0.1 160);
-		--sidebar-hover: oklch(0.9 0 0);
-		--sidebar-hover-foreground: oklch(0.15 0 0);
-		
-		/* Enhanced colors and gradients for light theme */
-		--gradient-primary: linear-gradient(135deg, var(--primary) 0%, oklch(0.5 0.2 170) 100%);
-		--gradient-accent: linear-gradient(135deg, var(--accent) 0%, oklch(0.7 0.15 60) 100%);
-		--gradient-card: linear-gradient(135deg, var(--card) 0%, oklch(0.95 0 0) 100%);
-		--gradient-background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); /* Match certify page light mode */
-		--glow-primary: 0 0 20px oklch(0.6 0.15 160 / 0.3);
-		--glow-accent: 0 0 20px oklch(0.85 0.1 50 / 0.3);
-		--glass-bg: oklch(0.95 0 0 / 0.8);
-		--glass-border: oklch(0.85 0 0 / 0.3);
-	}
+/* Light Theme - Class based (user toggle) */
+.light {
+	--background: oklch(0.98 0 0);
+	--foreground: oklch(0.15 0 0);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.15 0 0);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.15 0 0);
+	--primary: #10b981;
+	--primary-foreground: #ffffff;
+	--secondary: oklch(0.9 0.05 160);
+	--secondary-foreground: oklch(0.15 0 0);
+	--muted: oklch(0.92 0 0);
+	--muted-foreground: oklch(0.5 0 0);
+	--accent: #f59e0b;
+	--accent-foreground: #000000;
+	--destructive: oklch(0.6 0.2 20);
+	--destructive-foreground: oklch(0.98 0 0);
+	--border: oklch(0.88 0 0);
+	--input: oklch(0.88 0 0);
+	--ring: oklch(0.7 0.1 160);
+	--chart-1: oklch(0.6 0.15 160);
+	--chart-2: oklch(0.7 0.1 50);
+	--chart-3: oklch(0.5 0.2 200);
+	--chart-4: oklch(0.8 0.1 300);
+	--chart-5: oklch(0.6 0.15 260);
+	--sidebar: oklch(0.95 0 0);
+	--sidebar-foreground: oklch(0.15 0 0);
+	--sidebar-primary: #10b981;
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: #f59e0b;
+	--sidebar-accent-foreground: #000000;
+	--sidebar-border: oklch(0.88 0 0);
+	--sidebar-ring: oklch(0.7 0.1 160);
+	--sidebar-hover: oklch(0.9 0 0);
+	--sidebar-hover-foreground: oklch(0.15 0 0);
+
+	/* Enhanced colors and gradients for light theme */
+	--gradient-primary: #10b981;
+	--gradient-accent: #f59e0b;
+	--gradient-card: linear-gradient(135deg, var(--card) 0%, oklch(0.95 0 0) 100%);
+	--gradient-background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+	--glow-primary: 0 0 20px rgba(16, 185, 129, 0.3);
+	--glow-accent: 0 0 20px rgba(245, 158, 11, 0.3);
+	--glass-bg: oklch(0.95 0 0 / 0.8);
+	--glass-border: oklch(0.85 0 0 / 0.3);
+
+	/* Leaderboard Medal Colors - Light Mode */
+	--medal-gold: #D4AF37;
+	--medal-silver: #A8A9AD;
+	--medal-bronze: #CD7F32;
+	--rank-gold-bg: rgba(212, 175, 55, 0.1);
+	--rank-silver-bg: rgba(168, 169, 173, 0.1);
+	--rank-bronze-bg: rgba(205, 127, 50, 0.1);
+
+	/* Primary/Accent Light variants - adjusted for light mode */
+	--primary-light: rgba(16, 185, 129, 0.2);
+	--accent-light: rgba(245, 158, 11, 0.2);
+	--primary-rgb: 16, 185, 129;
+}
+
+/* Dark Theme - Class based (user toggle) */
+.dark {
+	/* Uses default :root variables */
+}
+
+/* Ensure smooth theme transitions */
+html {
+	transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Force theme application to html element */
+html.light {
+	background: var(--background);
+	color: var(--foreground);
+}
+
+html.dark {
+	background: var(--background);
+	color: var(--foreground);
 }
