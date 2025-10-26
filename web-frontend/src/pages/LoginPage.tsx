@@ -65,7 +65,7 @@ export default function LoginPage(): JSX.Element {
 
 		// Dispatch login action
 		dispatch(loginUser({
-			email: formData.email,
+			usernameOrEmail: formData.email,
 			password: formData.password
 		}))
 	}
@@ -87,10 +87,15 @@ export default function LoginPage(): JSX.Element {
 
 	// WebAuthn Authentication
 	const startWebAuthnAuthentication = async () => {
+		if (!formData.email) {
+            setErrors(prev => ({ ...prev, email: 'Please enter your email to use WebAuthn.' }));
+            return;
+        }
+
 		setWebAuthnLoading(true)
 		try {
 			// Step 1: Get assertion options from server (qua API Gateway - localhost:8080)
-			const response = await fetch('http://localhost:8080/api/webauthn/assertion/options', {
+			const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/identity/api/webauthn/assertion/options`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -101,32 +106,30 @@ export default function LoginPage(): JSX.Element {
 			})
 
 			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`)
+				const errorData = await response.json();
+				throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
 			}
 
-			const options = await response.json()
-			console.log('Assertion options:', options)
-
-			// Step 2: Get assertion from authenticator
-			const publicKeyCredentialRequestOptions = {
-				challenge: base64UrlToArrayBuffer(options.challenge),
-				rpId: options.rpId,
-				allowCredentials: options.allowCredentials.map((cred: any) => ({
-					...cred,
-					id: base64UrlToArrayBuffer(cred.id)
-				})),
-				userVerification: options.userVerification || 'preferred',
-				timeout: options.timeout || 60000
-			}
-
-			const assertion = await navigator.credentials.get({
-				publicKey: publicKeyCredentialRequestOptions
-			}) as PublicKeyCredential
-
+			            const options = await response.json()
+			            console.log('Assertion options:', options)
+			
+			            // Step 2: Get assertion from authenticator
+			            const assertion = await navigator.credentials.get({
+			                publicKey: {
+			                    challenge: base64UrlToArrayBuffer(options.publicKey.challenge),
+			                    rpId: options.publicKey.rpId,
+			                    allowCredentials: options.publicKey.allowCredentials.map((cred: any) => ({
+			                        ...cred,
+			                        id: base64UrlToArrayBuffer(cred.id)
+			                    })),
+			                    userVerification: options.publicKey.userVerification || 'preferred',
+			                    timeout: options.publicKey.timeout || 60000
+			                }
+			            }) as PublicKeyCredential
 			console.log('Got assertion:', assertion)
 
 			// Step 3: Send assertion to server for verification (qua API Gateway - localhost:8080)
-			const response2 = await fetch('http://localhost:8080/api/webauthn/assertion/result', {
+			const response2 = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/identity/api/webauthn/assertion/result`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -140,18 +143,34 @@ export default function LoginPage(): JSX.Element {
 				})
 			})
 
-			const result = await response2.json()
-			console.log('Authentication result:', result)
-
-			if (result.success) {
-				// WebAuthn authentication successful
-				alert('Đăng nhập WebAuthn thành công!')
-				// Here you would typically dispatch a login success action
-				// and redirect based on user role
-			} else {
-				alert('Đăng nhập WebAuthn thất bại: ' + (result.error || 'Unknown error'))
-			}
-
+			            const result = await response2.json()
+						console.log('Authentication result:', result)
+			
+						if (result.success && result.data) {
+							// WebAuthn authentication successful
+							alert('Đăng nhập WebAuthn thành công!')
+			
+							const { accessToken, refreshToken, user: backendUser } = result.data;
+			
+							const user = {
+								id: backendUser.id.toString(),
+								email: backendUser.email,
+								name: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
+								role: backendUser.roles[0]?.toLowerCase(),
+								avatar: backendUser.avatarUrl
+							};
+			
+							localStorage.setItem('accessToken', accessToken);
+							localStorage.setItem('refreshToken', refreshToken);
+							localStorage.setItem('user', JSON.stringify(user));
+			
+							dispatch({
+								type: 'auth/loginUser/fulfilled',
+								payload: user,
+							});
+						} else {
+							alert('Đăng nhập WebAuthn thất bại: ' + (result.message || 'Unknown error'))
+						}
 		} catch (error: any) {
 			console.error('WebAuthn authentication error:', error)
 			alert('Lỗi đăng nhập WebAuthn: ' + error.message)

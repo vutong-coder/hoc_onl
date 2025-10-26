@@ -1,66 +1,89 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
 import AuthForm from '../components/molecules/AuthForm'
 import Input from '../components/atoms/Input'
 import PasswordStrength from '../components/atoms/PasswordStrength'
 import SocialAuthButtons from '../components/molecules/SocialAuthButtons'
 import { validateEmail, validatePassword, validateName, validateConfirmPassword, checkPasswordStrength } from '../utils/authValidation'
+import { registerUser, clearError } from '../store/slices/authSlice'
 
 export default function RegisterPage(): JSX.Element {
+	const dispatch = useAppDispatch()
+	const navigate = useNavigate()
+	const { loading, error } = useAppSelector((state) => state.auth)
+
 	const [formData, setFormData] = useState({
-		name: '',
+		username: '',
 		email: '',
 		password: '',
-		confirmPassword: ''
+		confirmPassword: '',
+		firstName: '',
+		lastName: ''
 	})
 	const [errors, setErrors] = useState<Record<string, string>>({})
-	const [loading, setLoading] = useState(false)
 	const [showPassword, setShowPassword] = useState(false)
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 	const [passwordStrength, setPasswordStrength] = useState<'weak' | 'fair' | 'good' | 'strong'>('weak')
 	const [webAuthnLoading, setWebAuthnLoading] = useState(false)
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+
+		// Validate form
+		const usernameError = validateName(formData.username)
+		const emailError = validateEmail(formData.email)
+		const passwordError = validatePassword(formData.password)
+		const confirmPasswordError = validateConfirmPassword(formData.password, formData.confirmPassword)
+		const firstNameError = validateName(formData.firstName)
+		const lastNameError = validateName(formData.lastName)
+
+		if (usernameError || emailError || passwordError || confirmPasswordError || firstNameError || lastNameError) {
+			setErrors({
+				username: usernameError || '',
+				email: emailError || '',
+				password: passwordError || '',
+				confirmPassword: confirmPasswordError || '',
+				firstName: firstNameError || '',
+				lastName: lastNameError || ''
+			})
+			return
+		}
+
+		// Dispatch register action
+		const result = await dispatch(registerUser({
+			username: formData.username,
+			email: formData.email,
+			password: formData.password,
+			firstName: formData.firstName,
+			lastName: formData.lastName
+		}))
+
+		if (registerUser.fulfilled.match(result)) {
+			// Registration success, redirect to login
+			alert('Registration successful! Please log in.')
+			navigate('/auth/login')
+		}
+	}
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
-		setFormData(prev => ({ ...prev, [name]: value }))
-		
-		// Clear error when user starts typing
+		setFormData(prev => ({
+			...prev,
+			[name]: value
+		}))
+
+		// Clear errors when user starts typing
 		if (errors[name]) {
-			setErrors(prev => ({ ...prev, [name]: '' }))
+			setErrors(prev => ({
+				...prev,
+				[name]: ''
+			}))
 		}
 
 		// Update password strength
 		if (name === 'password') {
 			setPasswordStrength(checkPasswordStrength(value))
 		}
-	}
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		
-		// Validate form
-		const nameError = validateName(formData.name)
-		const emailError = validateEmail(formData.email)
-		const passwordError = validatePassword(formData.password)
-		const confirmPasswordError = validateConfirmPassword(formData.password, formData.confirmPassword)
-		
-		if (nameError || emailError || passwordError || confirmPasswordError) {
-			setErrors({
-				name: nameError || '',
-				email: emailError || '',
-				password: passwordError || '',
-				confirmPassword: confirmPasswordError || ''
-			})
-			return
-		}
-
-		setLoading(true)
-		
-		// Simulate API call
-		setTimeout(() => {
-			setLoading(false)
-			console.log('Register data:', formData)
-		}, 1000)
 	}
 
 	const handleGoogleAuth = () => {
@@ -80,28 +103,61 @@ export default function RegisterPage(): JSX.Element {
 
 	// WebAuthn Registration
 	const startWebAuthnRegistration = async () => {
+		// First, validate the form data required for user registration
+		const usernameError = validateName(formData.username)
+		const emailError = validateEmail(formData.email)
+		const passwordError = validatePassword(formData.password)
+		const confirmPasswordError = validateConfirmPassword(formData.password, formData.confirmPassword)
+		const firstNameError = validateName(formData.firstName)
+		const lastNameError = validateName(formData.lastName)
+
+		if (usernameError || emailError || passwordError || confirmPasswordError || firstNameError || lastNameError) {
+			setErrors({
+				username: usernameError || '',
+				email: emailError || '',
+				password: passwordError || '',
+				confirmPassword: confirmPasswordError || '',
+				firstName: firstNameError || '',
+				lastName: lastNameError || ''
+			})
+			return
+		}
+
 		setWebAuthnLoading(true)
 		try {
-			// Step 1: Get registration options from server (qua API Gateway - localhost:8080)
-			const response = await fetch('http://localhost:8080/api/webauthn/registration/options', {
+			// Step 1: Register the user with their password first
+			const registerResult = await dispatch(registerUser({
+				username: formData.username,
+				email: formData.email,
+				password: formData.password,
+				firstName: formData.firstName,
+				lastName: formData.lastName
+			}))
+
+			if (!registerUser.fulfilled.match(registerResult)) {
+				throw new Error(registerResult.payload as string || 'User registration failed. Please check the details and try again.')
+			}
+
+			// Step 2: Get WebAuthn registration options from the server
+			const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/identity/api/webauthn/registration/options`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					username: formData.email,
-					displayName: formData.name || formData.email
+					username: formData.email, // Use email as the username for WebAuthn
+					displayName: `${formData.firstName} ${formData.lastName}`.trim() || formData.email
 				})
 			})
 
 			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`)
+				const errorData = await response.json()
+				throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
 			}
 
 			const options = await response.json()
-			console.log('Registration options:', options)
 
-			// Step 2: Create PublicKeyCredential with WebAuthn API
+			// Step 3: Create PublicKeyCredential with WebAuthn API
 			const publicKeyCredentialCreationOptions = {
 				challenge: base64UrlToArrayBuffer(options.challenge),
 				rp: options.rp,
@@ -119,10 +175,8 @@ export default function RegisterPage(): JSX.Element {
 				publicKey: publicKeyCredentialCreationOptions
 			}) as PublicKeyCredential
 
-			console.log('Created credential:', credential)
-
-			// Step 3: Send registration result to server (qua API Gateway - localhost:8080)
-			const response2 = await fetch('http://localhost:8080/api/webauthn/registration/result', {
+			// Step 4: Send registration result to the server
+			const response2 = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/identity/api/webauthn/registration/result`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -132,22 +186,40 @@ export default function RegisterPage(): JSX.Element {
 					credentialId: arrayBufferToBase64Url(credential.rawId),
 					clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON),
 					attestationObject: arrayBufferToBase64Url((credential.response as any).attestationObject),
-					publicKey: '' // Simplified for demo
+					publicKey: '' // Simplified for demo, backend might not need it if parsing attestationObject
 				})
 			})
 
 			const result = await response2.json()
-			console.log('Registration result:', result)
 
-			if (result.success) {
-				alert('Đăng ký WebAuthn thành công! Bạn có thể đăng nhập không mật khẩu.')
+			if (result.success && result.data) {
+				alert('Registration and WebAuthn setup successful! You are now logged in.')
+
+				const { accessToken, refreshToken, user: backendUser } = result.data;
+
+				const user = {
+					id: backendUser.id.toString(),
+					email: backendUser.email,
+					name: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
+					role: backendUser.roles[0]?.toLowerCase(),
+					avatar: backendUser.avatarUrl
+				};
+
+				localStorage.setItem('accessToken', accessToken);
+				localStorage.setItem('refreshToken', refreshToken);
+				localStorage.setItem('user', JSON.stringify(user));
+
+				dispatch({
+					type: 'auth/loginUser/fulfilled',
+					payload: user,
+				});
 			} else {
-				alert('Đăng ký WebAuthn thất bại: ' + result.message)
+				alert('WebAuthn registration failed: ' + result.message)
 			}
 
 		} catch (error: any) {
 			console.error('WebAuthn registration error:', error)
-			alert('Lỗi đăng ký WebAuthn: ' + error.message)
+			alert('An error occurred during WebAuthn registration: ' + error.message)
 		} finally {
 			setWebAuthnLoading(false)
 		}
@@ -189,6 +261,7 @@ export default function RegisterPage(): JSX.Element {
 			onSubmit={handleSubmit}
 			buttonText="Tạo tài khoản"
 			loading={loading}
+			error={error}
 			afterButton={
 				<div>
 					<SocialAuthButtons
@@ -242,16 +315,38 @@ export default function RegisterPage(): JSX.Element {
 			}
 		>
 			<Input
-				id="name"
-				name="name"
+				id="username"
+				name="username"
 				type="text"
-				value={formData.name}
+				value={formData.username}
 				onChange={handleInputChange}
-				placeholder="Nhập họ và tên của bạn"
-				error={errors.name}
+				placeholder="Nhập tên đăng nhập"
+				error={errors.username}
 				required
 			/>
-			
+
+			<Input
+				id="firstName"
+				name="firstName"
+				type="text"
+				value={formData.firstName}
+				onChange={handleInputChange}
+				placeholder="Nhập họ"
+				error={errors.firstName}
+				required
+			/>
+
+			<Input
+				id="lastName"
+				name="lastName"
+				type="text"
+				value={formData.lastName}
+				onChange={handleInputChange}
+				placeholder="Nhập tên"
+				error={errors.lastName}
+				required
+			/>
+
 			<Input
 				id="email"
 				name="email"
