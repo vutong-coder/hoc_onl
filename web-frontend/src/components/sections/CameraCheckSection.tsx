@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Camera, CheckCircle, AlertCircle, Lightbulb } from 'lucide-react';
 import { ProctoringView } from '../molecules/ProctoringView';
+import { AICameraMonitor } from '../molecules/AICameraMonitor';
+import { CheatingDetection } from '../../hooks/useAICameraMonitor';
 
 export interface CameraCheckSectionProps {
   onCameraReady: (stream: MediaStream) => void;
@@ -15,6 +17,20 @@ export const CameraCheckSection: React.FC<CameraCheckSectionProps> = ({
   isCameraWorking,
   cameraError
 }) => {
+  const [aiViolations, setAiViolations] = useState<CheatingDetection[]>([]);
+  const [aiMetrics, setAiMetrics] = useState<any>(null);
+
+  // Handle AI violations during camera check
+  const handleViolationDetected = useCallback((detection: CheatingDetection) => {
+    setAiViolations(prev => [...prev, detection]);
+    console.log('AI detected violation during camera check:', detection);
+  }, []);
+
+  // Handle AI metrics update
+  const handleMetricsUpdate = useCallback((metrics: any) => {
+    setAiMetrics(metrics);
+  }, []);
+
   return (
     <div style={{
       display: 'grid',
@@ -57,6 +73,23 @@ export const CameraCheckSection: React.FC<CameraCheckSectionProps> = ({
             showControls={true}
           />
         </div>
+
+        {/* AI Camera Monitor - Hidden but functional */}
+        <div style={{ 
+          position: 'absolute', 
+          top: '-9999px', 
+          left: '-9999px',
+          width: '1px',
+          height: '1px',
+          overflow: 'hidden'
+        }}>
+          <AICameraMonitor
+            examId="camera-check"
+            studentId="pre-check-student"
+            onViolationDetected={handleViolationDetected}
+            onMetricsUpdate={handleMetricsUpdate}
+          />
+        </div>
         
         {cameraError && (
           <div style={{
@@ -86,6 +119,24 @@ export const CameraCheckSection: React.FC<CameraCheckSectionProps> = ({
             <CheckCircle style={{ width: '20px', height: '20px', color: '#059669', marginRight: 'var(--space-2)' }} />
             <p style={{ color: '#065f46', fontSize: '14px', fontWeight: 600, margin: 0 }}>
               Camera đã sẵn sàng!
+            </p>
+          </div>
+        )}
+
+        {/* AI Status Display */}
+        {aiMetrics && (
+          <div style={{
+            background: '#f0f9ff',
+            border: '1px solid #7dd3fc',
+            padding: 'var(--space-3)',
+            borderRadius: 'var(--radius-md)',
+            marginTop: 'var(--space-3)'
+          }}>
+            <p style={{ color: '#0c4a6e', fontSize: '12px', fontWeight: 600, margin: 0 }}>
+              🤖 AI Camera Monitor: Đang hoạt động
+            </p>
+            <p style={{ color: '#075985', fontSize: '11px', margin: 'var(--space-1) 0 0 0' }}>
+              FPS: {aiMetrics.fps} | Resolution: {aiMetrics.resolution} | Brightness: {aiMetrics.brightness}%
             </p>
           </div>
         )}
@@ -138,8 +189,35 @@ export const CameraCheckSection: React.FC<CameraCheckSectionProps> = ({
             <li style={{ marginBottom: 'var(--space-2)' }}>• Luôn giữ khuôn mặt trong tầm nhìn camera</li>
             <li style={{ marginBottom: 'var(--space-2)' }}>• Không được che camera</li>
             <li style={{ marginBottom: 'var(--space-2)' }}>• Không được rời khỏi chỗ ngồi</li>
-            <li>• Tập trung vào màn hình máy tính</li>
+            <li style={{ marginBottom: 'var(--space-2)' }}>• Tập trung vào màn hình máy tính</li>
+            <li style={{ marginBottom: 'var(--space-2)' }}>• Không được chuyển tab hoặc mở ứng dụng khác</li>
+            <li>• AI sẽ giám sát và cảnh báo nếu có hành vi bất thường</li>
           </ul>
+        </div>
+
+        {/* AI Monitoring Info */}
+        <div style={{
+          background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+          padding: 'var(--space-4)',
+          borderRadius: 'var(--radius-md)',
+          marginTop: 'var(--space-4)',
+          border: '1px solid #f59e0b'
+        }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#92400e', marginBottom: 'var(--space-3)' }}>
+            🤖 AI Camera Monitoring
+          </h3>
+          <p style={{ fontSize: '13px', color: '#a16207', marginBottom: 'var(--space-2)', lineHeight: 1.5 }}>
+            Hệ thống AI sẽ tự động giám sát và phát hiện:
+          </p>
+          <ul style={{ fontSize: '12px', color: '#a16207', lineHeight: 1.5, paddingLeft: 'var(--space-3)' }}>
+            <li>• Khuôn mặt không trong tầm nhìn</li>
+            <li>• Nhiều người trong khung hình</li>
+            <li>• Chuyển tab hoặc ứng dụng khác</li>
+            <li>• Hành vi bất thường khác</li>
+          </ul>
+          <p style={{ fontSize: '12px', color: '#92400e', marginTop: 'var(--space-2)', fontWeight: 600 }}>
+            ⚠️ Nếu phát hiện vi phạm, hệ thống sẽ hiển thị cảnh báo và có thể dừng bài thi.
+          </p>
         </div>
       </div>
     </div>
