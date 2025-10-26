@@ -23,7 +23,8 @@ export default function ProctoringPage(): JSX.Element {
 		setAutoRefresh,
 		terminateSession,
 		sendWarning,
-		resolveViolation
+		resolveViolation,
+		loading
 	} = useProctoring()
 
 	const [viewMode, setViewMode] = useState<ViewMode>('grid')
@@ -385,10 +386,41 @@ export default function ProctoringPage(): JSX.Element {
 				boxShadow: 'var(--shadow-sm)',
 				minHeight: '400px'
 			}}>
-				<SessionGrid
-					sessions={sessions}
-					onSessionClick={handleSessionClick}
-				/>
+				{loading ? (
+					<div style={{ 
+						display: 'flex', 
+						justifyContent: 'center', 
+						alignItems: 'center', 
+						minHeight: '400px',
+						flexDirection: 'column',
+						gap: '16px'
+					}}>
+						<div style={{ fontSize: '16px', color: 'var(--muted-foreground)' }}>
+							Đang tải dữ liệu...
+						</div>
+					</div>
+				) : sessions.length === 0 ? (
+					<div style={{ 
+						display: 'flex', 
+						justifyContent: 'center', 
+						alignItems: 'center', 
+						minHeight: '400px',
+						flexDirection: 'column',
+						gap: '16px'
+					}}>
+						<div style={{ fontSize: '16px', color: 'var(--muted-foreground)' }}>
+							Chưa có phiên thi nào
+						</div>
+						<div style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
+							Dữ liệu sẽ hiển thị khi có thí sinh đang làm bài
+						</div>
+					</div>
+				) : (
+					<SessionGrid
+						sessions={sessions}
+						onSessionClick={handleSessionClick}
+					/>
+				)}
 			</div>
 
 			{/* Detail Modal */}
