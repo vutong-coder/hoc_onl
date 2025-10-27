@@ -22,10 +22,8 @@ export default function RegisterPage(): JSX.Element {
 		lastName: ''
 	})
 	const [errors, setErrors] = useState<Record<string, string>>({})
-	const [showPassword, setShowPassword] = useState(false)
-	const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 	const [passwordStrength, setPasswordStrength] = useState<'weak' | 'fair' | 'good' | 'strong'>('weak')
-	const [webAuthnLoading, setWebAuthnLoading] = useState(false)
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 
@@ -91,168 +89,10 @@ export default function RegisterPage(): JSX.Element {
 		// TODO: Implement Google OAuth
 	}
 
-	const handleFacebookAuth = () => {
-		console.log('Facebook authentication')
-		// TODO: Implement Facebook OAuth
-	}
-
 	const handleGitHubAuth = () => {
 		console.log('GitHub authentication')
 		// TODO: Implement GitHub OAuth
 	}
-
-	// WebAuthn Registration
-	const startWebAuthnRegistration = async () => {
-		// First, validate the form data required for user registration
-		const usernameError = validateName(formData.username)
-		const emailError = validateEmail(formData.email)
-		const passwordError = validatePassword(formData.password)
-		const confirmPasswordError = validateConfirmPassword(formData.password, formData.confirmPassword)
-		const firstNameError = validateName(formData.firstName)
-		const lastNameError = validateName(formData.lastName)
-
-		if (usernameError || emailError || passwordError || confirmPasswordError || firstNameError || lastNameError) {
-			setErrors({
-				username: usernameError || '',
-				email: emailError || '',
-				password: passwordError || '',
-				confirmPassword: confirmPasswordError || '',
-				firstName: firstNameError || '',
-				lastName: lastNameError || ''
-			})
-			return
-		}
-
-		setWebAuthnLoading(true)
-		try {
-			// Step 1: Register the user with their password first
-			const registerResult = await dispatch(registerUser({
-				username: formData.username,
-				email: formData.email,
-				password: formData.password,
-				firstName: formData.firstName,
-				lastName: formData.lastName
-			}))
-
-			if (!registerUser.fulfilled.match(registerResult)) {
-				throw new Error(registerResult.payload as string || 'User registration failed. Please check the details and try again.')
-			}
-
-			// Step 2: Get WebAuthn registration options from the server
-			const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/identity/api/webauthn/registration/options`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					username: formData.email, // Use email as the username for WebAuthn
-					displayName: `${formData.firstName} ${formData.lastName}`.trim() || formData.email
-				})
-			})
-
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
-			}
-
-			const options = await response.json()
-
-			// Step 3: Create PublicKeyCredential with WebAuthn API
-			const publicKeyCredentialCreationOptions = {
-				challenge: base64UrlToArrayBuffer(options.challenge),
-				rp: options.rp,
-				user: {
-					id: base64UrlToArrayBuffer(options.user.id),
-					name: options.user.name,
-					displayName: options.user.displayName
-				},
-				pubKeyCredParams: options.pubKeyCredParams,
-				authenticatorSelection: options.authenticatorSelection,
-				attestation: options.attestation
-			}
-
-			const credential = await navigator.credentials.create({
-				publicKey: publicKeyCredentialCreationOptions
-			}) as PublicKeyCredential
-
-			// Step 4: Send registration result to the server
-			const response2 = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/identity/api/webauthn/registration/result`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					username: formData.email,
-					credentialId: arrayBufferToBase64Url(credential.rawId),
-					clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON),
-					attestationObject: arrayBufferToBase64Url((credential.response as any).attestationObject),
-					publicKey: '' // Simplified for demo, backend might not need it if parsing attestationObject
-				})
-			})
-
-			const result = await response2.json()
-
-			if (result.success && result.data) {
-				alert('Registration and WebAuthn setup successful! You are now logged in.')
-
-				const { accessToken, refreshToken, user: backendUser } = result.data;
-
-				const user = {
-					id: backendUser.id.toString(),
-					email: backendUser.email,
-					name: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
-					role: backendUser.roles[0]?.toLowerCase(),
-					avatar: backendUser.avatarUrl
-				};
-
-				localStorage.setItem('accessToken', accessToken);
-				localStorage.setItem('refreshToken', refreshToken);
-				localStorage.setItem('user', JSON.stringify(user));
-
-				dispatch({
-					type: 'auth/loginUser/fulfilled',
-					payload: user,
-				});
-			} else {
-				alert('WebAuthn registration failed: ' + result.message)
-			}
-
-		} catch (error: any) {
-			console.error('WebAuthn registration error:', error)
-			alert('An error occurred during WebAuthn registration: ' + error.message)
-		} finally {
-			setWebAuthnLoading(false)
-		}
-	}
-
-	// Utility functions for WebAuthn
-	function arrayBufferToBase64Url(buffer: ArrayBuffer): string {
-		const bytes = new Uint8Array(buffer)
-		let binary = ''
-		for (let i = 0; i < bytes.byteLength; i++) {
-			binary += String.fromCharCode(bytes[i])
-		}
-		return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
-	}
-
-	function base64UrlToArrayBuffer(base64Url: string): ArrayBuffer {
-		const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-		const padded = base64 + '='.repeat((4 - base64.length % 4) % 4)
-		const binary = atob(padded)
-		const buffer = new ArrayBuffer(binary.length)
-		const bytes = new Uint8Array(buffer)
-		for (let i = 0; i < binary.length; i++) {
-			bytes[i] = binary.charCodeAt(i)
-		}
-		return buffer
-	}
-
-	// Check WebAuthn support (runtime check)
-	const isWebAuthnSupported = typeof window !== 'undefined' &&
-									window.navigator &&
-									'credentials' in window.navigator &&
-									typeof window.navigator.credentials.create === 'function' &&
-									typeof window.navigator.credentials.get === 'function'
 
 	return (
 		<AuthForm
@@ -268,30 +108,6 @@ export default function RegisterPage(): JSX.Element {
 						onGoogleAuth={handleGoogleAuth}
 						onGitHubAuth={handleGitHubAuth}
 					/>
-					{isWebAuthnSupported && (
-						<div style={{ marginTop: '1rem', textAlign: 'center' }}>
-							<button
-								type="button"
-								onClick={startWebAuthnRegistration}
-								disabled={webAuthnLoading}
-								style={{
-									width: '100%',
-									padding: '0.75rem',
-									backgroundColor: webAuthnLoading ? '#ccc' : '#007bff',
-									color: 'white',
-									border: 'none',
-									borderRadius: '0.375rem',
-									fontSize: '1rem',
-									cursor: webAuthnLoading ? 'not-allowed' : 'pointer'
-								}}
-							>
-								{webAuthnLoading ? '⏳ Đang đăng ký...' : '🔐 Đăng ký không mật khẩu (WebAuthn)'}
-							</button>
-							<p style={{ fontSize: '0.875rem', color: '#6c757d', marginTop: '0.5rem' }}>
-								Đăng ký thiết bị bảo mật để đăng nhập không cần mật khẩu sau này
-							</p>
-						</div>
-					)}
 				</div>
 			}
 			footer={
