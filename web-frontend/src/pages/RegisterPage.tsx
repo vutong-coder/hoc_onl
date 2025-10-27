@@ -1,31 +1,81 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
 import AuthForm from '../components/molecules/AuthForm'
 import Input from '../components/atoms/Input'
 import PasswordStrength from '../components/atoms/PasswordStrength'
 import SocialAuthButtons from '../components/molecules/SocialAuthButtons'
 import { validateEmail, validatePassword, validateName, validateConfirmPassword, checkPasswordStrength } from '../utils/authValidation'
+import { registerUser, clearError } from '../store/slices/authSlice'
 
 export default function RegisterPage(): JSX.Element {
+	const dispatch = useAppDispatch()
+	const navigate = useNavigate()
+	const { loading, error } = useAppSelector((state) => state.auth)
+
 	const [formData, setFormData] = useState({
-		name: '',
+		username: '',
 		email: '',
 		password: '',
-		confirmPassword: ''
+		confirmPassword: '',
+		firstName: '',
+		lastName: ''
 	})
 	const [errors, setErrors] = useState<Record<string, string>>({})
-	const [loading, setLoading] = useState(false)
-	const [showPassword, setShowPassword] = useState(false)
-	const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 	const [passwordStrength, setPasswordStrength] = useState<'weak' | 'fair' | 'good' | 'strong'>('weak')
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+
+		// Validate form
+		const usernameError = validateName(formData.username)
+		const emailError = validateEmail(formData.email)
+		const passwordError = validatePassword(formData.password)
+		const confirmPasswordError = validateConfirmPassword(formData.password, formData.confirmPassword)
+		const firstNameError = validateName(formData.firstName)
+		const lastNameError = validateName(formData.lastName)
+
+		if (usernameError || emailError || passwordError || confirmPasswordError || firstNameError || lastNameError) {
+			setErrors({
+				username: usernameError || '',
+				email: emailError || '',
+				password: passwordError || '',
+				confirmPassword: confirmPasswordError || '',
+				firstName: firstNameError || '',
+				lastName: lastNameError || ''
+			})
+			return
+		}
+
+		// Dispatch register action
+		const result = await dispatch(registerUser({
+			username: formData.username,
+			email: formData.email,
+			password: formData.password,
+			firstName: formData.firstName,
+			lastName: formData.lastName
+		}))
+
+		if (registerUser.fulfilled.match(result)) {
+			// Registration success, redirect to login
+			alert('Registration successful! Please log in.')
+			navigate('/auth/login')
+		}
+	}
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
-		setFormData(prev => ({ ...prev, [name]: value }))
-		
-		// Clear error when user starts typing
+		setFormData(prev => ({
+			...prev,
+			[name]: value
+		}))
+
+		// Clear errors when user starts typing
 		if (errors[name]) {
-			setErrors(prev => ({ ...prev, [name]: '' }))
+			setErrors(prev => ({
+				...prev,
+				[name]: ''
+			}))
 		}
 
 		// Update password strength
@@ -34,42 +84,9 @@ export default function RegisterPage(): JSX.Element {
 		}
 	}
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		
-		// Validate form
-		const nameError = validateName(formData.name)
-		const emailError = validateEmail(formData.email)
-		const passwordError = validatePassword(formData.password)
-		const confirmPasswordError = validateConfirmPassword(formData.password, formData.confirmPassword)
-		
-		if (nameError || emailError || passwordError || confirmPasswordError) {
-			setErrors({
-				name: nameError || '',
-				email: emailError || '',
-				password: passwordError || '',
-				confirmPassword: confirmPasswordError || ''
-			})
-			return
-		}
-
-		setLoading(true)
-		
-		// Simulate API call
-		setTimeout(() => {
-			setLoading(false)
-			console.log('Register data:', formData)
-		}, 1000)
-	}
-
 	const handleGoogleAuth = () => {
 		console.log('Google authentication')
 		// TODO: Implement Google OAuth
-	}
-
-	const handleFacebookAuth = () => {
-		console.log('Facebook authentication')
-		// TODO: Implement Facebook OAuth
 	}
 
 	const handleGitHubAuth = () => {
@@ -84,11 +101,14 @@ export default function RegisterPage(): JSX.Element {
 			onSubmit={handleSubmit}
 			buttonText="Tạo tài khoản"
 			loading={loading}
+			error={error}
 			afterButton={
-				<SocialAuthButtons
-					onGoogleAuth={handleGoogleAuth}
-					onGitHubAuth={handleGitHubAuth}
-				/>
+				<div>
+					<SocialAuthButtons
+						onGoogleAuth={handleGoogleAuth}
+						onGitHubAuth={handleGitHubAuth}
+					/>
+				</div>
 			}
 			footer={
 				<p style={{ margin: 0 }}>
@@ -111,16 +131,38 @@ export default function RegisterPage(): JSX.Element {
 			}
 		>
 			<Input
-				id="name"
-				name="name"
+				id="username"
+				name="username"
 				type="text"
-				value={formData.name}
+				value={formData.username}
 				onChange={handleInputChange}
-				placeholder="Nhập họ và tên của bạn"
-				error={errors.name}
+				placeholder="Nhập tên đăng nhập"
+				error={errors.username}
 				required
 			/>
-			
+
+			<Input
+				id="firstName"
+				name="firstName"
+				type="text"
+				value={formData.firstName}
+				onChange={handleInputChange}
+				placeholder="Nhập họ"
+				error={errors.firstName}
+				required
+			/>
+
+			<Input
+				id="lastName"
+				name="lastName"
+				type="text"
+				value={formData.lastName}
+				onChange={handleInputChange}
+				placeholder="Nhập tên"
+				error={errors.lastName}
+				required
+			/>
+
 			<Input
 				id="email"
 				name="email"

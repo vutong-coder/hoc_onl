@@ -8,7 +8,7 @@ export interface User {
 }
 
 export interface LoginCredentials {
-	email: string
+	usernameOrEmail: string
 	password: string
 }
 
@@ -45,10 +45,10 @@ export class MockAuthService {
 		// Simulate network delay
 		await new Promise(resolve => setTimeout(resolve, 1000))
 
-		const { email, password } = credentials
+		const { usernameOrEmail, password } = credentials
 
-		// Find user by email
-		const user = mockUsers.find(u => u.email === email)
+		// Find user by email (since usernameOrEmail can be email)
+		const user = mockUsers.find(u => u.email === usernameOrEmail)
 
 		if (!user) {
 			return {
@@ -105,14 +105,17 @@ export class MockAuthService {
 
 	// Simulate register (for demo purposes)
 	static async register(userData: {
-		name: string
+		username: string
 		email: string
 		password: string
+		firstName: string
+		lastName: string
+		phoneNumber?: string
 	}): Promise<AuthResponse> {
 		// Simulate network delay
 		await new Promise(resolve => setTimeout(resolve, 1000))
 
-		const { email, name, password } = userData
+		const { username, email, firstName, lastName, password } = userData
 
 		// Check if user already exists
 		const existingUser = mockUsers.find(u => u.email === email)
@@ -127,7 +130,7 @@ export class MockAuthService {
 		const newUser: User = {
 			id: (mockUsers.length + 1).toString(),
 			email,
-			name,
+			name: `${firstName} ${lastName}`.trim(),
 			role: 'user',
 			avatar: `https://avatars.githubusercontent.com/u/${mockUsers.length + 1}?v=4`
 		}

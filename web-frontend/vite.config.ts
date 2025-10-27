@@ -8,6 +8,15 @@ export default defineConfig({
 		host: true,
 		open: false,
 		strictPort: true,
+		proxy: {
+			// Proxy API requests to avoid CORS issues
+			'/api': {
+				target: 'http://localhost:8080',
+				changeOrigin: true,
+				secure: false
+				// Removed rewrite since backend uses /api/v1/auth paths
+			}
+		}
 	},
 	preview: {
 		port: 4173,

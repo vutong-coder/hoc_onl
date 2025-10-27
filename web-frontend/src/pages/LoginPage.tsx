@@ -16,6 +16,7 @@ export default function LoginPage(): JSX.Element {
 	const [errors, setErrors] = useState<Record<string, string>>({})
 	const [rememberMe, setRememberMe] = useState(false)
 	const [showPassword, setShowPassword] = useState(false)
+	const [webAuthnLoading, setWebAuthnLoading] = useState(false)
 
 	const dispatch = useAppDispatch()
 	const navigate = useNavigate()
@@ -64,7 +65,7 @@ export default function LoginPage(): JSX.Element {
 
 		// Dispatch login action
 		dispatch(loginUser({
-			email: formData.email,
+			usernameOrEmail: formData.email,
 			password: formData.password
 		}))
 	}
@@ -84,6 +85,129 @@ export default function LoginPage(): JSX.Element {
 		// TODO: Implement GitHub OAuth
 	}
 
+	// WebAuthn Authentication
+	const startWebAuthnAuthentication = async () => {
+		if (!formData.email) {
+            setErrors(prev => ({ ...prev, email: 'Please enter your email to use WebAuthn.' }));
+            return;
+        }
+
+		setWebAuthnLoading(true)
+		try {
+			// Step 1: Get assertion options from server (qua API Gateway - localhost:8080)
+			const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/identity/api/webauthn/assertion/options`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					username: formData.email // Use email as username for WebAuthn
+				})
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+			}
+
+			            const options = await response.json()
+			            console.log('Assertion options:', options)
+			
+			            // Step 2: Get assertion from authenticator
+			            const assertion = await navigator.credentials.get({
+			                publicKey: {
+			                    challenge: base64UrlToArrayBuffer(options.publicKey.challenge),
+			                    rpId: options.publicKey.rpId,
+			                    allowCredentials: options.publicKey.allowCredentials.map((cred: any) => ({
+			                        ...cred,
+			                        id: base64UrlToArrayBuffer(cred.id)
+			                    })),
+			                    userVerification: options.publicKey.userVerification || 'preferred',
+			                    timeout: options.publicKey.timeout || 60000
+			                }
+			            }) as PublicKeyCredential
+			console.log('Got assertion:', assertion)
+
+			// Step 3: Send assertion to server for verification (qua API Gateway - localhost:8080)
+			const response2 = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/identity/api/webauthn/assertion/result`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					username: formData.email,
+					credentialId: arrayBufferToBase64Url(assertion.rawId),
+					clientDataJSON: arrayBufferToBase64Url(assertion.response.clientDataJSON),
+					authenticatorData: arrayBufferToBase64Url((assertion.response as any).authenticatorData),
+					signature: arrayBufferToBase64Url((assertion.response as any).signature)
+				})
+			})
+
+			            const result = await response2.json()
+						console.log('Authentication result:', result)
+			
+						if (result.success && result.data) {
+							// WebAuthn authentication successful
+							alert('Đăng nhập WebAuthn thành công!')
+			
+							const { accessToken, refreshToken, user: backendUser } = result.data;
+			
+							const user = {
+								id: backendUser.id.toString(),
+								email: backendUser.email,
+								name: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
+								role: backendUser.roles[0]?.toLowerCase(),
+								avatar: backendUser.avatarUrl
+							};
+			
+							localStorage.setItem('accessToken', accessToken);
+							localStorage.setItem('refreshToken', refreshToken);
+							localStorage.setItem('user', JSON.stringify(user));
+			
+							dispatch({
+								type: 'auth/loginUser/fulfilled',
+								payload: user,
+							});
+						} else {
+							alert('Đăng nhập WebAuthn thất bại: ' + (result.message || 'Unknown error'))
+						}
+		} catch (error: any) {
+			console.error('WebAuthn authentication error:', error)
+			alert('Lỗi đăng nhập WebAuthn: ' + error.message)
+		} finally {
+			setWebAuthnLoading(false)
+		}
+	}
+
+	// Utility functions for WebAuthn
+	function arrayBufferToBase64Url(buffer: ArrayBuffer): string {
+		const bytes = new Uint8Array(buffer)
+		let binary = ''
+		for (let i = 0; i < bytes.byteLength; i++) {
+			binary += String.fromCharCode(bytes[i])
+		}
+		return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+	}
+
+	function base64UrlToArrayBuffer(base64Url: string): ArrayBuffer {
+		const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+		const padded = base64 + '='.repeat((4 - base64.length % 4) % 4)
+		const binary = atob(padded)
+		const buffer = new ArrayBuffer(binary.length)
+		const bytes = new Uint8Array(buffer)
+		for (let i = 0; i < binary.length; i++) {
+			bytes[i] = binary.charCodeAt(i)
+		}
+		return buffer
+	}
+
+	// Check WebAuthn support (runtime check)
+	const isWebAuthnSupported = typeof window !== 'undefined' &&
+									window.navigator &&
+									'credentials' in window.navigator &&
+									typeof window.navigator.credentials.create === 'function' &&
+									typeof window.navigator.credentials.get === 'function'
+
 	return (
 		<AuthForm
 			title="Chào mừng trở lại"
@@ -93,10 +217,33 @@ export default function LoginPage(): JSX.Element {
 			loading={loading}
 			error={error}
 			afterButton={
-				<SocialAuthButtons
-					onGoogleAuth={handleGoogleAuth}
-					onGitHubAuth={handleGitHubAuth}
-				/>
+				<div>
+					<SocialAuthButtons
+						onGoogleAuth={handleGoogleAuth}
+						onGitHubAuth={handleGitHubAuth}
+					/>
+					{isWebAuthnSupported && (
+						<div style={{ marginTop: '1rem', textAlign: 'center' }}>
+							<button
+								type="button"
+								onClick={startWebAuthnAuthentication}
+								disabled={webAuthnLoading}
+								style={{
+									width: '100%',
+									padding: '0.75rem',
+									backgroundColor: webAuthnLoading ? '#ccc' : '#28a745',
+									color: 'white',
+									border: 'none',
+									borderRadius: '0.375rem',
+									fontSize: '1rem',
+									cursor: webAuthnLoading ? 'not-allowed' : 'pointer'
+								}}
+							>
+								{webAuthnLoading ? '⏳ Đang xác thực...' : '🔐 Đăng nhập không mật khẩu (WebAuthn)'}
+							</button>
+						</div>
+					)}
+				</div>
 			}
 			footer={
 				<p style={{ margin: 0 }}>

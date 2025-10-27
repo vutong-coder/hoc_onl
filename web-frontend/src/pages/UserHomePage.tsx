@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useAppSelector } from '../store/hooks'
 import WelcomeBanner from '../components/sections/WelcomeBanner'
 import MockInterviews from '../components/sections/MockInterviews'
 import PracticeSkills from '../components/sections/PracticeSkills'
@@ -12,6 +13,7 @@ import TokenTransferModal from '../components/molecules/TokenTransferModal'
 import styles from '../assets/css/UserHomePage.module.css'
 
 export default function UserHomePage(): JSX.Element {
+	const { user } = useAppSelector((state) => state.auth)
 	const [showRewardStore, setShowRewardStore] = useState(false)
 	const [showWithdrawModal, setShowWithdrawModal] = useState(false)
 	const [tokenBalance, setTokenBalance] = useState(1250)
@@ -64,7 +66,7 @@ export default function UserHomePage(): JSX.Element {
 				}}>
 					{/* Welcome Banner */}
 					<WelcomeBanner 
-						userName="User" 
+						userName={user?.name || 'User'} 
 						level={5} 
 						xp={2500}
 						totalExams={12}

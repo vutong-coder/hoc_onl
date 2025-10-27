@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import MockAuthService, { User, LoginCredentials } from '../../data/mockAuthService'
+import { login, register } from '../../services/api/authApi'
+import { User, LoginCredentials } from '../../data/mockAuthService'
+import type { RegisterCredentials } from '../../services/api/authApi'
 
 export type UserRole = 'admin' | 'user' | null
 
@@ -19,16 +21,44 @@ const initialState: AuthState = {
 	error: null
 }
 
-// Async thunks
 export const loginUser = createAsyncThunk(
 	'auth/loginUser',
 	async (credentials: LoginCredentials, { rejectWithValue }) => {
 		try {
-			const response = await MockAuthService.login(credentials)
+			const response = await login(credentials)
+			if (response.success && response.data && response.data.user) {
+				const backendUser = response.data.user;
+				const user: User = {
+					id: backendUser.id.toString(),
+					email: backendUser.email,
+					name: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
+					role: backendUser.roles[0]?.toLowerCase() as 'admin' | 'user',
+					avatar: backendUser.avatarUrl
+				};
+
+				localStorage.setItem('accessToken', response.data.accessToken);
+				localStorage.setItem('refreshToken', response.data.refreshToken);
+				localStorage.setItem('user', JSON.stringify(user));
+
+				return user
+			} else {
+				return rejectWithValue(response.message || 'Login failed')
+			}
+		} catch (error: any) {
+			return rejectWithValue(error.message || 'Network error')
+		}
+	}
+)
+
+export const registerUser = createAsyncThunk(
+	'auth/registerUser',
+	async (credentials: RegisterCredentials, { rejectWithValue }) => {
+		try {
+			const response = await register(credentials)
 			if (response.success && response.user) {
 				return response.user
 			} else {
-				return rejectWithValue(response.message || 'Login failed')
+				return rejectWithValue(response.message || 'Registration failed')
 			}
 		} catch (error) {
 			return rejectWithValue('Network error')
@@ -39,18 +69,31 @@ export const loginUser = createAsyncThunk(
 export const logoutUser = createAsyncThunk(
 	'auth/logoutUser',
 	async () => {
-		await MockAuthService.logout()
+		// Placeholder: Call logout API if available
+		// await logout()
+		localStorage.removeItem('accessToken');
+		localStorage.removeItem('refreshToken');
+		localStorage.removeItem('user');
+		return true
 	}
 )
 
 export const checkAuth = createAsyncThunk(
 	'auth/checkAuth',
-	async () => {
-		const user = MockAuthService.getCurrentUser()
-		if (user && MockAuthService.isAuthenticated()) {
-			return user
+	async (_, { rejectWithValue }) => {
+		try {
+			const userStr = localStorage.getItem('user');
+			const accessToken = localStorage.getItem('accessToken');
+
+			if (userStr && accessToken) {
+				const user = JSON.parse(userStr);
+				return user;
+			} else {
+				return rejectWithValue('Not authenticated');
+			}
+		} catch (error) {
+			return rejectWithValue('Failed to parse user data');
 		}
-		throw new Error('Not authenticated')
 	}
 )
 
@@ -69,7 +112,7 @@ const authSlice = createSlice({
 				state.loading = true
 				state.error = null
 			})
-			.addCase(loginUser.fulfilled, (state, action) => {
+			.addCase(loginUser.fulfilled, (state, action: PayloadAction<User>) => {
 				state.loading = false
 				state.loggedIn = true
 				state.user = action.payload
@@ -83,15 +126,22 @@ const authSlice = createSlice({
 				state.role = null
 				state.error = action.payload as string
 			})
-			// Logout
-			.addCase(logoutUser.fulfilled, (state) => {
-				state.loggedIn = false
-				state.user = null
-				state.role = null
+			// Register
+			.addCase(registerUser.pending, (state) => {
+				state.loading = true
 				state.error = null
 			})
+			.addCase(registerUser.fulfilled, (state, action) => {
+				state.loading = false
+				state.error = null
+				// Optionally set loggedIn if register auto-logs in
+			})
+			.addCase(registerUser.rejected, (state, action) => {
+				state.loading = false
+				state.error = action.payload as string
+			})
 			// Check auth
-			.addCase(checkAuth.fulfilled, (state, action) => {
+			.addCase(checkAuth.fulfilled, (state, action: PayloadAction<User>) => {
 				state.loggedIn = true
 				state.user = action.payload
 				state.role = action.payload.role
@@ -101,8 +151,14 @@ const authSlice = createSlice({
 				state.user = null
 				state.role = null
 			})
-	},
-})
+			// Logout
+			.addCase(logoutUser.fulfilled, (state) => {
+				state.loggedIn = false
+				state.user = null
+				state.role = null
+			})
+		},
+	})
 
 export const { clearError } = authSlice.actions
 export default authSlice.reducer
