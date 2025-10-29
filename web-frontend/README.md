@@ -1,6 +1,6 @@
 # 🎓 NCKH Online Examination System
 
-> Hệ thống thi trực tuyến hiện đại với giám sát camera và xác thực blockchain
+> Hệ thống thi trực tuyến hiện đại với giám sát camera AI và xác thực blockchain
 
 [![React](https://img.shields.io/badge/React-18.3.1-61dafb?logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6.3-3178c6?logo=typescript)](https://www.typescriptlang.org/)
@@ -10,35 +10,37 @@
 ## ✨ Tính năng nổi bật
 
 ### 🎓 Hệ thống thi trực tuyến
-- 🎥 **Giám sát camera thời gian thực** - Đảm bảo tính công bằng trong thi cử
+- 🎥 **Giám sát camera AI thời gian thực** - Phát hiện gian lận bằng AI
 - ⏱️ **Quản lý thời gian thông minh** - Đồng hồ đếm ngược và cảnh báo
-- 🔒 **Bảo mật cao** - Chống gian lận với nhiều lớp bảo mật
+- 🔒 **Bảo mật cao** - Chống gian lận với nhiều lớp bảo mật + Blockchain
 - 📊 **Dashboard trực quan** - Theo dõi tiến độ và kết quả
 - 💾 **Auto-save** - Tự động lưu câu trả lời mỗi 30 giây
+- 🚨 **Violation Alerts** - Cảnh báo vi phạm với auto-stop exam
 
-### 🛠️ Admin Panel chuyên nghiệp
-- 👥 **Quản lý người dùng** - CRUD đầy đủ với tìm kiếm và lọc
-- 📝 **Quản lý bài thi** - Tạo, chỉnh sửa, sao chép, nhập/xuất Excel
-- 🎯 **Giám sát real-time** - Theo dõi phiên thi với camera và vi phạm
+### 🛠️ Admin Panel chuyên nghiệp (13 pages)
+- 👥 **Quản lý người dùng** - CRUD đầy đủ + Excel import/export
+- 📝 **Quản lý bài thi** - 10 tính năng: tạo, sửa, sao chép, sinh đề ngẫu nhiên, Excel
+- 🎯 **Giám sát real-time** - Proctoring dashboard với 13 loại vi phạm
 - 🔐 **Bảo mật & Blockchain** - Dashboard 4 module blockchain
-- 🎁 **Hệ thống thưởng** - Quản lý token và quà tặng
+- 🎁 **Hệ thống thưởng** - Quản lý token ERC-20 và reward store
+- 📄 **Bản quyền tài liệu** - Đăng ký và bảo vệ bản quyền trên blockchain
 
 ### 🔗 Blockchain & Token System
 - 🪙 **Token ERC-20** - Smart contract LearnToken với thưởng tự động
 - 💰 **Ví đa chữ ký** - Bảo mật cao cho giao dịch
-- 🏪 **Reward Store** - Đổi token lấy khóa học và quà tặng
-- 🏦 **Rút tiền** - Chuyển token về ngân hàng Việt Nam
+- 🏪 **Reward Store** - Đổi token lấy khóa học và quà tặng (50+ items)
+- 🏦 **Rút tiền** - Chuyển token về 19 ngân hàng Việt Nam
+- 🛡️ **Copyright Registry** - Smart contract bảo vệ bản quyền tài liệu
 
 ### 🎨 Giao diện & Trải nghiệm
 - 🎨 **Giao diện hiện đại** - Dark/Light theme với Glassmorphism
 - 📱 **Responsive design** - Hoạt động mượt mà trên mọi thiết bị
-- ⚡ **Performance tối ưu** - React.memo, useMemo, useCallback
+- ⚡ **Performance tối ưu** - React.memo, useMemo, useCallback (75% improvement)
 - ♿ **Accessibility** - ARIA labels và keyboard navigation
 
 ## 🚀 Bắt đầu nhanh
 
 ### Yêu cầu hệ thống
-
 - **Node.js** >= 16.0.0
 - **npm** >= 8.0.0
 - **Camera** (để sử dụng tính năng giám sát)
@@ -59,9 +61,28 @@ npm install
 npm run dev
 ```
 
-Mở trình duyệt và truy cập: `http://localhost:4173`
+Mở trình duyệt và truy cập: `http://localhost:5173`
 
-### Deploy Smart Contract
+### Cài đặt Backend Services
+
+#### Proctoring Service (Node.js + Python AI)
+
+```bash
+cd Code-spark/services/proctoring-service
+
+# Windows
+start-all.bat
+
+# Linux/Mac
+chmod +x start-all.sh
+./start-all.sh
+```
+
+Services sẽ chạy trên:
+- **Python AI Service**: http://localhost:8000
+- **Node.js Backend**: http://localhost:8082
+
+### Deploy Smart Contracts
 
 ```bash
 # Di chuyển vào thư mục contracts
@@ -88,8 +109,9 @@ npx hardhat run scripts/verify.js --network sepolia
 ### Cấu hình Frontend với Smart Contract
 
 ```bash
-# Thêm contract address vào .env
+# Thêm contract addresses vào .env
 echo "VITE_LEARN_TOKEN_ADDRESS=0xYourContractAddress" >> .env
+echo "VITE_COPYRIGHT_REGISTRY_ADDRESS=0xYourContractAddress" >> .env
 
 # Restart dev server
 npm run dev
@@ -105,65 +127,6 @@ npm run build
 npm run preview
 ```
 
-## 🔗 Smart Contract Deployment
-
-### Hardhat Setup
-- **Hardhat** - Ethereum development environment
-- **OpenZeppelin Contracts** - Secure smart contract standards
-- **Ethers.js** - Blockchain interaction library
-- **Sepolia Testnet** - Ethereum test network
-
-### Contract Features
-```solidity
-// LearnToken.sol - ERC-20 Token
-contract LearnToken is ERC20, Ownable, Pausable {
-    // Auto-reward functions
-    function awardLessonCompletion(address user) external onlyMinter
-    function awardExamPass(address user, uint256 score) external onlyMinter
-    function awardCertification(address user) external onlyMinter
-    function awardContestWin(address user, uint256 rank) external onlyMinter
-    
-    // Security features
-    function pause() external onlyOwner
-    function unpause() external onlyOwner
-    function addMinter(address minter) external onlyOwner
-    function removeMinter(address minter) external onlyOwner
-}
-```
-
-### Deployment Scripts
-- **deploy.js** - Main deployment script với balance check
-- **verify.js** - Etherscan verification script
-- **interact.js** - Interactive testing script
-
-### Environment Configuration
-```env
-# .env file
-SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
-PRIVATE_KEY=your_private_key_here
-ETHERSCAN_API_KEY=your_etherscan_api_key
-```
-
-### Deployment Process
-1. **Get Test ETH**: Sepolia faucets (5-10 phút)
-2. **Get API Keys**: Infura/Alchemy + Etherscan (free)
-3. **Configure .env**: Add keys và private key
-4. **Deploy**: `npx hardhat run scripts/deploy.js --network sepolia`
-5. **Verify**: `npx hardhat run scripts/verify.js --network sepolia`
-6. **Update Frontend**: Add contract address to .env
-
-### Cost & Time
-- **Deploy Cost**: ~0.01-0.03 ETH (testnet)
-- **Total Setup Time**: ~15-20 phút
-- **Verification Time**: ~2-3 phút
-
-### Security Features
-- ✅ **Access Control**: Owner và Minter roles
-- ✅ **Pause/Unpause**: Emergency stop functionality
-- ✅ **Gas Optimization**: 200 runs optimization
-- ✅ **OpenZeppelin**: Battle-tested contracts
-- ✅ **Testnet First**: Deploy testnet trước mainnet
-
 ## 📁 Cấu trúc dự án
 
 ```
@@ -171,842 +134,320 @@ web-frontend/
 ├── src/
 │   ├── admin/               # 🛠️ Admin Module (13 pages)
 │   │   ├── components/      # Admin components
-│   │   │   ├── common/      # Reusable components (Table, Modal, Badge...)
-│   │   │   ├── admin/       # Admin-specific components
-│   │   │   ├── analytics/   # Analytics components
-│   │   │   ├── exams/       # Exam management components
-│   │   │   ├── proctoring/  # Proctoring components
-│   │   │   ├── security/    # Security & blockchain components
-│   │   │   └── users/       # User management components
-│   │   ├── pages/           # Admin pages (13 pages)
-│   │   │   ├── DashboardPage.tsx
-│   │   │   ├── UsersPage.tsx
-│   │   │   ├── ExamsPage.tsx
-│   │   │   ├── ProctoringPage.tsx
-│   │   │   ├── SecurityPage.tsx
-│   │   │   ├── RewardPage.tsx
-│   │   │   └── ... (7 more pages)
-│   │   ├── hooks/           # Admin custom hooks
-│   │   ├── mock/            # Mock data for admin
-│   │   ├── types/           # Admin TypeScript types
-│   │   ├── styles/          # Admin-specific CSS
-│   │   └── routes/          # Admin routing
+│   │   │   ├── common/      # Reusable components
+│   │   │   ├── exams/       # Exam management
+│   │   │   ├── proctoring/  # Proctoring dashboard
+│   │   │   ├── security/    # Security & blockchain
+│   │   │   └── users/       # User management
+│   │   ├── pages/           # 13 admin pages
+│   │   ├── hooks/           # Custom hooks
+│   │   ├── services/        # API services
+│   │   ├── types/           # TypeScript types
+│   │   └── styles/          # CSS modules
 │   ├── components/          # User Components
-│   │   ├── atoms/           # UI cơ bản (Button, Input, Card...)
-│   │   ├── molecules/       # Components kết hợp (ExamQuestion, Timer...)
-│   │   ├── sections/        # Các section lớn (Hero, Features...)
-│   │   └── layouts/         # Layout components (Header, Sidebar...)
+│   │   ├── atoms/           # Button, Input, Card...
+│   │   ├── molecules/       # ExamQuestion, Timer...
+│   │   └── sections/        # Hero, Features...
 │   ├── pages/               # User Pages
-│   │   ├── LandingPage.tsx
-│   │   ├── LoginPage.tsx
-│   │   ├── ExamPreCheckPage.tsx
-│   │   ├── ExamTakingPage.tsx
-│   │   ├── ExamResultPage.tsx
-│   │   ├── RewardPage.tsx
-│   │   └── TokenTransferPage.tsx
 │   ├── hooks/               # Custom hooks
 │   │   ├── useCamera.ts
-│   │   ├── useExamTimer.ts
-│   │   ├── useTokenRewards.ts
-│   │   └── useMultisigWallet.ts
-│   ├── store/               # Redux store
-│   │   └── slices/
-│   │       ├── authSlice.ts
-│   │       ├── examSlice.ts
-│   │       └── walletSlice.ts
+│   │   ├── useAICameraMonitor.ts
+│   │   ├── useFrameStorage.ts
+│   │   └── useTokenRewards.ts
 │   ├── services/            # API services
-│   │   ├── examService.ts
-│   │   ├── monitorService.ts
-│   │   ├── blockchain/
-│   │   └── api/
-│   │       ├── tokenApi.ts
-│   │       └── mockData.ts
-│   ├── test/                # Testing setup
-│   │   ├── setup.ts
-│   │   └── test-utils.tsx
-│   ├── routes/              # Routing configuration
-│   ├── utils/               # Utilities & helpers
-│   └── assets/              # CSS & static files
+│   │   ├── api/             # API clients
+│   │   │   ├── proctoringApi.ts
+│   │   │   └── tokenApi.ts
+│   │   └── blockchain/      # Blockchain services
+│   ├── store/               # Redux store
+│   └── test/               # Testing setup
 ├── contracts/               # 🔗 Smart Contracts
-│   ├── LearnToken.sol       # ERC-20 Token contract
-│   ├── scripts/              # Deployment scripts
-│   │   ├── deploy.js
-│   │   ├── verify.js
-│   │   └── interact.js
-│   ├── hardhat.config.js     # Hardhat configuration
-│   └── DEPLOYMENT_GUIDE.md   # Deployment guide
-├── public/                   # Public assets
-└── dist/                     # Build output
+│   ├── LearnToken.sol       # ERC-20 Token
+│   ├── CopyrightRegistry.sol # Copyright protection
+│   └── scripts/             # Deployment scripts
+└── public/                  # Public assets
 ```
 
 ## 🎯 Luồng hoạt động hệ thống thi
 
 ```
-┌─────────────────┐
-│   Dashboard     │  User xem danh sách bài thi
-└────────┬────────┘
-         │ Click "Start Exam"
-         ▼
-┌─────────────────┐
-│ Pre-Check Page  │  Kiểm tra camera & hướng dẫn
-└────────┬────────┘
-         │ Camera Ready
-         ▼
-┌─────────────────┐
-│ Exam Taking     │  Làm bài thi với giám sát
-│    Page         │  • Auto-save mỗi 30s
-│                 │  • Screenshot mỗi 10s
-│                 │  • Timer countdown
-└────────┬────────┘
-         │ Submit hoặc hết giờ
-         ▼
-┌─────────────────┐
-│ Result Page     │  Hiển thị kết quả và thống kê
-└─────────────────┘
+1. Dashboard → Xem danh sách bài thi
+2. Click "Start Exam"
+3. Pre-Check Page → Kiểm tra camera với AI monitoring
+4. Exam Taking Page → Làm bài với:
+   - Camera giám sát hiển thị (ProctoringView)
+   - AI phân tích ẩn (AICameraMonitor)
+   - Auto-save mỗi 30s
+   - Screenshot mỗi 10s
+   - Violation alerts với countdown 15s
+5. Submit hoặc hết giờ
+6. Result Page → Hiển thị kết quả và thống kê
 ```
 
-## 🛠️ Admin Module - Quản trị hệ thống
+## 🎥 Hệ thống Camera AI Proctoring
 
-### 📊 Dashboard Tổng quan
-- **Thống kê real-time**: Số lượng users, exams, sessions đang hoạt động
-- **Biểu đồ trực quan**: Charts về performance và usage
-- **Quick actions**: Truy cập nhanh các tính năng quan trọng
-- **Notifications**: Cảnh báo và thông báo hệ thống
+### Dual Camera System
 
-### 👥 Quản lý Người dùng
-- **CRUD đầy đủ**: Tạo, xem, chỉnh sửa, xóa users
-- **Tìm kiếm & lọc**: Theo tên, email, vai trò, trạng thái
-- **Phân trang**: 10 items/trang với navigation
-- **Bulk actions**: Khóa/mở khóa nhiều users cùng lúc
-- **Role management**: Admin, Giảng viên, Học viên, User
+**1. ProctoringView (Camera hiển thị)**
+- Hiển thị cho thí sinh thấy camera đang hoạt động
+- Kích thước: 352x264px trong sidebar
+- Có thể thu nhỏ/phóng to
+- Status indicator
 
-### 📝 Quản lý Bài thi
-- **10 tính năng chính**:
-  - ➕ Thêm đề thi với form 14 trường
-  - ✏️ Chỉnh sửa đề thi (pre-filled data)
-  - 📋 Sao chép đề thi với 1 click
-  - 🗑️ Xóa đề thi với confirmation
-  - 👁️ Xem chi tiết đầy đủ
-  - 🔀 Sinh đề ngẫu nhiên (4 modes độ khó)
-  - ⬆️ Nhập từ Excel với preview
-  - ⬇️ Xuất Excel với 19 columns
-  - 🔍 Tìm kiếm & lọc (4 filters)
-  - 📄 Phân trang với navigation
-- **Excel Integration**: Import/Export với validation
-- **Auto-calculation**: Tự động tính điểm và thời gian
+**2. AICameraMonitor (Camera phân tích)**
+- Ẩn (display: none) - chỉ phân tích
+- Tự động bật sau 2 giây
+- Phân tích frame để phát hiện vi phạm
+- Ghi log lên blockchain
 
-### 🎯 Giám sát Real-time
-- **Live Dashboard**: 4 stats cards với auto-refresh
-- **Session Cards**: Hiển thị 6 phiên thi với metrics
-- **Risk Assessment**: 4 mức độ rủi ro (Low/Medium/High/Critical)
-- **Violation Tracking**: 13 loại vi phạm với severity levels
-- **Admin Actions**: Gửi cảnh báo, dừng phiên thi
-- **Event Log**: Nhật ký hoạt động với timestamps
+### AI Detection Types
+
+1. **FACE_NOT_DETECTED** - Không phát hiện khuôn mặt
+2. **MULTIPLE_FACES** - Nhiều người trong frame
+3. **MOBILE_PHONE_DETECTED** - Phát hiện điện thoại
+4. **CAMERA_TAMPERED** - Camera bị che (phân tích độ sáng)
+5. **LOOKING_AWAY** - Nhìn ra khỏi màn hình
+6. **TAB_SWITCH** - Chuyển tab/cửa sổ
+
+### Violation Alert System
+
+- **Severity Levels**: Low, Medium, High, Critical
+- **Alert Modal**: Hiển thị khi phát hiện vi phạm
+- **Countdown Timer**: 15 giây với progress bar
+- **Auto-stop Exam**: Tự động dừng nếu không phản hồi
+- **Blockchain Logging**: Ghi vi phạm lên blockchain
+
+### Frame Storage System
+
+- Lưu trữ frames (base64) và AI responses
+- Tính toán statistics (violation types, severity counts)
+- Auto cleanup old data
+- Export data as JSON
+- Storage size tracking
+
+## 🛠️ Admin Module Chi Tiết
+
+### 📝 Quản lý Bài Thi (10 tính năng)
+
+1. **➕ Thêm đề thi** - Form 14 trường với validation
+2. **✏️ Chỉnh sửa** - Pre-filled form với auto-calculation
+3. **📋 Sao chép** - Duplicate với 1 click
+4. **🗑️ Xóa** - Confirmation modal
+5. **👁️ Xem chi tiết** - Full information modal
+6. **🔀 Sinh đề ngẫu nhiên** - 4 modes độ khó:
+   - Mixed Auto (40-40-20)
+   - Mixed Custom (tùy chỉnh phân bổ)
+   - Easy/Medium/Hard only
+7. **⬆️ Nhập từ Excel** - Import với preview và validation
+8. **⬇️ Xuất Excel** - Export 19 columns với Vietnamese labels
+9. **🔍 Tìm kiếm & Lọc** - 4 filters kết hợp
+10. **📄 Phân trang** - 10 items/trang với navigation
+
+### 🎯 Giám sát Real-time (Proctoring Dashboard)
+
+- **Live Stats**: Active sessions, high-risk sessions, violations
+- **Session Cards**: Hiển thị 6 metrics:
+  - User info + Exam title
+  - Risk level badge
+  - Camera/Audio status
+  - Connection status
+  - Face detection count
+  - Violations count
+- **Detail Modal**: Video stream area, stats grid, event log
+- **Violation Tracking**: 13 loại vi phạm với 4 severity levels
+- **Admin Actions**: Send warning, terminate session
+- **Auto-refresh**: Every 3-5 seconds
 
 ### 🔐 Bảo mật & Blockchain
-- **4 Blockchain Modules**:
-  - Chống gian lận (Anti-cheat) - Ethereum
-  - Bảo vệ bản quyền (Copyright) - Ethereum
-  - Token thưởng (Rewards) - Polygon
-  - Ví đa chữ ký (Multisig) - Ethereum
-- **Real-time Monitoring**: Module status, transactions, alerts
-- **Security Alerts**: 8 loại cảnh báo với 4 mức độ
-- **Activity Log**: 8 loại hoạt động với chi tiết
-- **Performance Metrics**: Response time, uptime, error rate
 
-### 🎁 Hệ thống Thưởng
-- **Token Management**: Quản lý LearnToken ERC-20
-- **Reward Store**: 50+ quà tặng (courses, vouchers, electronics)
-- **Transaction History**: Lịch sử earn/spend/reward/withdrawal
-- **Bank Integration**: 19 ngân hàng Việt Nam
-- **Analytics**: Thống kê token usage và trends
+**4 Blockchain Modules:**
+1. **Anti-cheat** (Ethereum) - Immutable exam records
+2. **Copyright Protection** (Ethereum) - Document hash registry
+3. **Token Rewards** (Polygon) - Low-cost token distribution
+4. **Multisig Wallet** (Ethereum) - Enhanced security
 
-### 📈 Analytics & Báo cáo
-- **Exam Analytics**: Thống kê kết quả thi, độ khó
-- **User Analytics**: Hoạt động users, engagement
-- **Token Analytics**: Token flow, popular rewards
-- **Security Analytics**: Violations, risk trends
-- **Export Reports**: PDF, Excel, CSV formats
+**Dashboard Features:**
+- Module status monitoring
+- Real-time transactions tracking
+- Security alerts (8 types, 4 severity levels)
+- Activity log (8 activity types)
+- Performance metrics
 
-### 🏢 Quản lý Tổ chức
-- **Organization CRUD**: Tạo và quản lý organizations
-- **User Assignment**: Gán users vào organizations
-- **Hierarchy Management**: Cấu trúc phân cấp
-- **Bulk Operations**: Import/Export users
+### 📄 Bản quyền Tài liệu
 
-### 📚 Quản lý Khóa học
-- **Course Management**: CRUD operations
-- **Content Management**: Videos, documents, quizzes
-- **Progress Tracking**: User progress và completion
-- **Certification**: Tự động cấp chứng chỉ
+**Tính năng:**
+- Đăng ký tài liệu mới (file hoặc text)
+- Upload với metadata đầy đủ
+- Blockchain hash registration
+- Tìm kiếm và lọc tài liệu
+- Xác minh tài liệu
+- Quản lý tranh chấp
+- Thống kê và báo cáo
+- Export dữ liệu (Excel, CSV, JSON)
 
-### 🔧 Quản trị Hệ thống
-- **System Settings**: Cấu hình global settings
-- **User Roles**: Quản lý permissions và roles
-- **Audit Logs**: Nhật ký hoạt động admin
-- **Backup & Restore**: Sao lưu và khôi phục dữ liệu
+**Smart Contract:** CopyrightRegistry.sol
+- SHA-256 hash storage
+- Timestamp verification
+- Access control
+- IPFS support
 
-## 🔑 Tính năng chính
+## 🔗 API Integration
 
-### 1. 🎥 Hệ thống giám sát
+### Proctoring API
 
-**Camera Monitoring**
-- Yêu cầu quyền camera/microphone
-- Video stream trực tiếp
-- Chụp ảnh giám sát định kỳ (10s)
-- Mã hóa và gửi lên server
-
-**Anti-Cheating**
-- Phát hiện rời khỏi tab
-- Theo dõi focus window
-- Phát hiện nhiều người
-- Ghi âm môi trường
-
-### 2. ⏰ Quản lý thời gian
-
-- Đồng hồ đếm ngược chính xác
-- Thanh tiến trình trực quan
-- Cảnh báo trước khi hết giờ (5 phút, 1 phút)
-- Tự động nộp bài khi timeout
-
-### 3. 📝 Quản lý câu hỏi
-
-- Hỗ trợ nhiều loại: trắc nghiệm, code, tự luận
-- Navigation linh hoạt giữa câu hỏi
-- Đánh dấu để xem lại
-- Theo dõi trạng thái (đã làm/chưa làm)
-
-### 4. 💾 Lưu trữ thông minh
-
-- Auto-save câu trả lời (30s)
-- Lưu khi chuyển câu hỏi
-- Sync với server real-time
-- Backup local storage
-
-### 5. 🔐 Bảo mật
-
-- HTTPS required cho camera
-- JWT authentication
-- Session management
-- Blockchain verification (Ethers.js)
-- Encryption for screenshots
-
-### 6. 🪙 Hệ thống Token ERC-20
-
-**Smart Contract LearnToken**
-- ✅ Token tiêu chuẩn ERC-20 với OpenZeppelin
-- ✅ Phát thưởng tự động cho các hoạt động:
-  - Hoàn thành bài học: 10 token
-  - Vượt qua kỳ thi: 50 token (+ bonus nếu điểm cao)
-  - Chuỗi ngày học tập: 5 token/ngày (+ bonus theo tuần)
-  - Đạt chứng chỉ: 200 token
-  - Thắng cuộc thi: 500 token (x2 nếu hạng 1)
-- ✅ Rút token về ngân hàng (minimum 100 token)
-- ✅ Chi tiêu token để mua khóa học/đổi quà
-- ✅ Pause/unpause functions
-- ✅ Access control (Owner, Minters)
-
-**Token Wallet System**
-- ✅ Kết nối MetaMask
-- ✅ Hiển thị số dư real-time từ blockchain
-- ✅ Hiển thị tổng token đã kiếm
-- ✅ Lịch sử giao dịch với timestamps
-- ✅ Auto-sync với smart contract
-
-**Reward Store**
-- ✅ 50+ quà tặng đa dạng:
-  - Khóa học: Python, React/Node, Data Science
-  - Vouchers: Shopee, Grab Food, Lazada, Starbucks
-  - Đồ điện tử: Tai nghe, chuột gaming, webcam
-  - Quà vật lý: Áo thun, balo, bình nước
-- ✅ Filter theo category và giá
-- ✅ Search và pagination
-- ✅ Stock management
-- ✅ Redemption tracking
-
-**Bank Integration**
-- ✅ 19 ngân hàng Việt Nam hỗ trợ
-- ✅ Rút token về ngân hàng
-- ✅ Phí giao dịch 2%
-- ✅ Minimum withdrawal: 100 tokens
-- ✅ Transaction history với status tracking
-
-### 7. 🔗 Blockchain Integration
-
-**4 Blockchain Modules**
-1. **Chống gian lận** (Anti-cheat) - Ethereum
-   - Immutable exam records
-   - Tamper-proof results
-   - Smart contract verification
-
-2. **Bảo vệ bản quyền** (Copyright Protection) - Ethereum
-   - Content fingerprinting
-   - Plagiarism detection
-   - Copyright claims
-
-3. **Token thưởng** (Token Rewards) - Polygon
-   - Low-cost transactions
-   - Fast confirmation
-   - Reward distribution
-
-4. **Ví đa chữ ký** (Multisig Wallet) - Ethereum
-   - Enhanced security
-   - Multi-party approval
-   - Fund protection
-
-**Technical Features**
-- ✅ Ethers.js v6 integration
-- ✅ MetaMask wallet connection
-- ✅ Real-time transaction monitoring
-- ✅ Gas optimization
-- ✅ Error handling và retry logic
-- ✅ Network switching (Mainnet/Testnet)
-
-## 🛠️ Tech Stack
-
-### Frontend Core
-- **React 18** - UI library với hooks và concurrent features
-- **TypeScript 5.6.3** - Type safety và better DX
-- **Vite 7.1.9** - Build tool & dev server siêu nhanh
-- **React Router v6** - Client-side routing với data loading
-
-### State Management
-- **Redux Toolkit 2.9.0** - Global state với RTK Query
-- **React Context** - Local state và theme management
-- **Zustand** - Lightweight state cho admin module
-
-### Styling & UI
-- **CSS Modules** - Scoped styling với variables
-- **CSS Variables** - Dynamic theming (Dark/Light)
-- **OKLCH Color Space** - Modern color system
-- **Glassmorphism** - Modern UI effects
-- **Responsive Design** - Mobile-first approach
-
-### HTTP & API
-- **Axios 1.12.2** - HTTP client với interceptors
-- **REST API** - Backend communication
-- **Mock Data** - Development với realistic data
-- **API Types** - 413 lines TypeScript interfaces
-
-### Blockchain & Web3
-- **Ethers.js 6.15.0** - Web3 integration và smart contracts
-- **MetaMask** - Wallet connection và transaction signing
-- **Hardhat** - Smart contract development và deployment
-- **OpenZeppelin** - Secure smart contract standards
-
-### Testing & Quality
-- **Vitest 3.2.4** - Fast unit testing framework
-- **React Testing Library** - Component testing utilities
-- **Jest DOM** - Custom matchers cho DOM testing
-- **Testing Library User Event** - User interaction simulation
-- **28 Tests Passing** - 100% pass rate
-
-### Development Tools
-- **ESLint** - Code linting với TypeScript rules
-- **Prettier** - Code formatting
-- **TypeScript ESLint** - TypeScript-specific linting
-- **JSX A11y** - Accessibility linting
-- **React Hooks ESLint** - Hooks rules
-
-### File Processing
-- **XLSX 0.18.5** - Excel file parsing và generation
-- **File Saver 2.0.5** - Client-side file downloads
-- **Date-fns 4.1.0** - Modern date utility library
-
-### Icons & Assets
-- **Lucide React 0.468.0** - Beautiful icon library
-- **Custom Components** - Design system components
-- **SVG Icons** - Scalable vector graphics
-
-### Performance Optimization
-- **React.memo** - Prevent unnecessary re-renders
-- **useMemo** - Memoize expensive calculations
-- **useCallback** - Stable function references
-- **Code Splitting** - Lazy loading components
-- **Bundle Analysis** - Optimize bundle size
-
-## ⚡ Performance Optimization
-
-### React Performance Features
-- **React.memo** - Prevent unnecessary re-renders
-- **useMemo** - Memoize expensive calculations
-- **useCallback** - Stable function references
-- **Code Splitting** - Lazy loading components
-- **Bundle Analysis** - Optimize bundle size
-
-### Optimized Components
-- **Button Component**: Memoized với sizeStyles, variantStyles
-- **ExamQuestion Component**: Memoized với typeInfo calculation
-- **ExamNavigation Component**: Memoized với pre-calculated values
-- **QuestionNavigator Component**: Memoized với ARIA roles
-
-### Performance Metrics
-- **Before Optimization**:
-  - Button re-renders: ~50-60 per user interaction
-  - ExamQuestion re-renders: ~30-40 when switching questions
-  - Bundle size: 617.71 KB
-
-- **After Optimization**:
-  - Button re-renders: ~10-15 per user interaction (↓ 75%)
-  - ExamQuestion re-renders: ~15-20 when switching questions (↓ 50%)
-  - Bundle size: 617.71 KB (same, but runtime performance improved significantly)
-
-### useExamSession Hook Optimization
-```typescript
-// Memoized calculations
-const currentQuestion = useMemo(() => 
-  exam.questions[currentQuestionIndex], 
-  [exam.questions, currentQuestionIndex]
-)
-
-const totalQuestions = useMemo(() => 
-  exam.questions.length, 
-  [exam.questions]
-)
-
-// Stable function references
-const handleAnswerChange = useCallback((questionId: number, answer: any) => {
-  // Implementation
-}, [dispatch])
-
-const handleNextQuestion = useCallback(() => {
-  // Implementation
-}, [currentQuestionIndex, totalQuestions])
+**Endpoints:**
+```
+GET    /api/proctoring/sessions              # Lấy tất cả sessions
+GET    /api/proctoring/sessions/:id          # Chi tiết session
+POST   /api/proctoring/sessions/:id/terminate # Dừng session
+GET    /api/sessions/:id/events              # Lấy events của session
+PATCH  /api/proctoring/events/:id/review     # Đánh dấu đã xử lý
+GET    /api/proctoring/events/:id/media      # Lấy screenshots
+POST   /api/proctoring/analyze-frame         # Phân tích frame AI
 ```
 
-### Accessibility Improvements
-- **ARIA Labels**: Clear descriptive labels in Vietnamese
-- **Keyboard Navigation**: Full keyboard support
-- **Screen Reader**: Proper semantic HTML
-- **Focus Management**: Logical tab order
-- **Color Contrast**: WCAG AA compliant
-
-## 📚 API Services
-
-### examService
-```typescript
-// Lấy thông tin bài thi
-fetchExamDetails(examId: string): Promise<ExamDetails>
-
-// Bắt đầu session thi
-startExamSession(examId: string): Promise<SessionData>
-
-// Lưu câu trả lời
-saveAnswer(questionId: number, answer: any): Promise<void>
-
-// Nộp bài thi
-submitExam(examId: string, answers: Answer[]): Promise<Result>
-
-// Gửi ảnh giám sát
-sendScreenshot(examId: string, image: Blob): Promise<void>
+**Data Flow:**
+```
+Frontend → proctoringApi.ts → Backend API (8082) → Python AI (8000) → PostgreSQL
 ```
 
-### monitorService
-```typescript
-// Ghi lại hành vi
-logBehavior(event: BehaviorEvent): Promise<void>
+### Copyright API
 
-// Phát hiện gian lận
-detectCheating(data: MonitorData): Promise<CheatingAlert>
+**Endpoints:**
+```
+POST   /api/copyright/register              # Đăng ký tài liệu
+POST   /api/copyright/register-text         # Đăng ký văn bản
+POST   /api/copyright/verify/:hash          # Xác minh tài liệu
+GET    /api/copyright/document/:hash        # Thông tin tài liệu
+POST   /api/copyright/search                # Tìm kiếm
+GET    /api/copyright/statistics            # Thống kê
+```
+
+## 🪙 Token System ERC-20
+
+### Smart Contract Features
+
+```solidity
+contract LearnToken is ERC20, Ownable, Pausable {
+    // Auto-reward functions
+    function awardLessonCompletion(address user)      // 10 tokens
+    function awardExamPass(address user, uint256 score) // 50 tokens
+    function awardDailyStreak(address user)           // 5 tokens/day
+    function awardCertification(address user)         // 200 tokens
+    function awardContestWin(address user, uint256 rank) // 500 tokens
+    
+    // Security
+    function pause() external onlyOwner
+    function addMinter(address minter) external onlyOwner
+}
+```
+
+### Reward Store (50+ items)
+
+- **Courses**: Python, React/Node, Data Science, Mobile App
+- **Vouchers**: Shopee, Grab Food, Lazada, Starbucks, CGV
+- **Electronics**: Tai nghe, chuột gaming, webcam, loa
+- **Physical**: Áo thun, balo, bình nước, sổ tay
+
+### Bank Integration
+
+- 19 ngân hàng Việt Nam
+- Minimum withdrawal: 100 tokens
+- Transaction fee: 2%
+- Processing time: 1-3 ngày
+
+## 🧪 Testing
+
+### Test Setup
+
+**Vitest 3.2.4** - Fast unit testing framework
+- React Testing Library
+- Jest DOM matchers
+- 28 tests passing (100%)
+
+**Test Coverage:**
+- Button Component (10 tests)
+- ExamNavigation Component (9 tests)
+- useCamera Hook (9 tests)
+
+**Run Tests:**
+```bash
+npm test                    # Run all tests
+npm run test:ui            # Run với UI
+npm run test:coverage      # Coverage report
 ```
 
 ## 🎨 Design System
 
-### Colors
-- **Primary**: `oklch(0.65 0.25 30)` - Orange gradient
-- **Secondary**: `oklch(0.95 0.01 60)` - Light gray
-- **Accent**: `oklch(0.70 0.20 180)` - Cyan
-- **Success**: `oklch(0.70 0.20 140)` - Green
-- **Warning**: `oklch(0.75 0.20 80)` - Yellow
-- **Error**: `oklch(0.60 0.25 20)` - Red
+### Colors (OKLCH)
+- Primary: `oklch(0.65 0.25 30)` - Orange
+- Success: `oklch(0.70 0.20 140)` - Green
+- Error: `oklch(0.60 0.25 20)` - Red
+- Warning: `oklch(0.75 0.20 80)` - Yellow
 
 ### Typography
-- **Display**: Poppins (headings)
-- **Body**: Inter (content)
-- **Mono**: JetBrains Mono (code)
-- **Accent**: Space Grotesk (special)
+- Display: Poppins
+- Body: Inter
+- Mono: JetBrains Mono
 
-### Spacing Scale
-```
-xs: 4px, sm: 8px, md: 16px, lg: 24px,
-xl: 32px, 2xl: 48px, 3xl: 64px, 4xl: 96px
-```
+## 📊 Performance Optimization
 
-## 🧪 Testing & Quality Assurance
+### Metrics
+- **Button re-renders**: ↓ 75% (từ 50-60 → 10-15)
+- **ExamQuestion re-renders**: ↓ 50% (từ 30-40 → 15-20)
+- **Bundle size**: 617.71 KB
 
-### Test Setup với Vitest
-- **Vitest 3.2.4** - Fast unit testing framework
-- **React Testing Library** - Component testing utilities
-- **Jest DOM** - Custom matchers cho DOM testing
-- **Testing Library User Event** - User interaction simulation
-
-### Test Configuration
-```typescript
-// vitest.config.unit.ts
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
-    globals: true,
-    coverage: {
-      reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'src/test/']
-    }
-  }
-})
-```
-
-### Test Coverage (28 Tests Passing)
-- **Button Component** (10 tests)
-  - Renders với children
-  - Handles click events
-  - Disabled state
-  - Loading state
-  - Variant styles (primary, secondary, outline)
-  - Size styles (sm, md, lg)
-  - Type attribute
-  - Custom className
-  - Memoization check
-
-- **ExamNavigation Component** (9 tests)
-  - Renders all buttons
-  - Handler callbacks
-  - Button disable logic (first/last question)
-  - Button enable logic (middle question)
-  - Correct button rendering
-  - Memoization check
-
-- **useCamera Hook** (9 tests)
-  - Initial state
-  - Start camera success
-  - Permission denied handling
-  - Camera not found handling
-  - Camera in use handling
-  - Stop camera
-  - Multiple start prevention
-  - Cleanup on unmount
-  - Media constraints
-
-### Test Utilities
-```typescript
-// src/test/test-utils.tsx
-export function renderWithProviders(
-  ui: React.ReactElement,
-  options?: RenderOptions
-) {
-  // Render với Redux store & Router
-}
-
-export function createMockExam() {
-  // Mock exam data factory
-}
-
-export function createMockQuestion() {
-  // Mock question factory
-}
-```
-
-### Running Tests
-```bash
-npm test                    # Run all tests
-npm run test:ui            # Run với UI interface
-npm run test:coverage      # Run với coverage report
-npm test -- --watch       # Watch mode
-```
+### Techniques
+- React.memo cho components
+- useMemo cho expensive calculations
+- useCallback cho stable references
+- Code splitting & lazy loading
 
 ## 🔧 Scripts
 
 ```bash
-npm run dev        # Start dev server (localhost:5173)
-npm run build      # Build cho production
-npm run preview    # Preview production build
-npm run lint       # Chạy ESLint
-npm test           # Run tests với Vitest
-npm run test:ui    # Run tests với UI
-npm run test:coverage # Run tests với coverage
+npm run dev            # Development server
+npm run build          # Production build
+npm run preview        # Preview build
+npm test               # Run tests
+npm run lint           # Lint code
 ```
 
 ## 📖 Hướng dẫn sử dụng
 
 ### Cho học sinh
+1. Đăng ký/Đăng nhập
+2. Xem danh sách bài thi
+3. Pre-check camera
+4. Làm bài thi (có AI monitoring)
+5. Xem kết quả
 
-1. **Đăng ký/Đăng nhập**
-   - Tạo tài khoản mới hoặc đăng nhập
-   - Xác thực email (nếu cần)
-
-2. **Xem danh sách bài thi**
-   - Truy cập Dashboard
-   - Chọn bài thi cần làm
-
-3. **Chuẩn bị thi**
-   - Đọc kỹ hướng dẫn
-   - Cho phép quyền camera/microphone
-   - Kiểm tra camera hoạt động
-
-4. **Làm bài thi**
-   - Đọc và trả lời câu hỏi
-   - Sử dụng navigation để di chuyển
-   - Đánh dấu câu cần xem lại
-   - Nộp bài hoặc chờ hết giờ
-
-5. **Xem kết quả**
-   - Kiểm tra điểm số
-   - Xem phân tích chi tiết
-   - Lưu chứng chỉ (nếu đạt)
-
-### Cho giám thị
-
-1. **Giám sát real-time**
-   - Theo dõi camera của thí sinh
-   - Nhận cảnh báo gian lận
-   - Xem hành vi bất thường
-
-2. **Quản lý bài thi**
-   - Tạo bài thi mới
-   - Cấu hình thời gian
-   - Thêm câu hỏi
-
-3. **Xem báo cáo**
-   - Thống kê kết quả
-   - Phân tích dữ liệu
-   - Export reports
+### Cho admin
+1. Truy cập `/admin/dashboard`
+2. Quản lý users, exams, proctoring
+3. Giám sát real-time violations
+4. Quản lý blockchain modules
 
 ## 🔍 Troubleshooting
 
 ### Camera không hoạt động
-```
-✓ Kiểm tra quyền truy cập trong browser
-✓ Đảm bảo không có app khác dùng camera
-✓ Thử refresh hoặc restart browser
-✓ Kiểm tra HTTPS (camera chỉ hoạt động trên HTTPS)
-```
+- Kiểm tra quyền browser
+- Đảm bảo HTTPS/localhost
+- Không có app khác dùng camera
 
-### Lỗi kết nối
-```
-✓ Kiểm tra internet connection
-✓ Xem console log để debug
-✓ Clear cache và reload
-✓ Thử browser khác
-```
+### Lỗi kết nối backend
+- Kiểm tra services đang chạy
+- Xem console logs
+- Clear cache và reload
 
-### Bài thi không load
-```
-✓ Kiểm tra API endpoint
-✓ Xem network tab trong DevTools
-✓ Kiểm tra authentication token
-✓ Liên hệ support
-```
-
-## 🚦 Browser Support
-
-| Browser | Version | Status |
-|---------|---------|--------|
-| Chrome  | 90+     | ✅ Supported |
-| Firefox | 88+     | ✅ Supported |
-| Safari  | 14+     | ✅ Supported |
-| Edge    | 90+     | ✅ Supported |
-
-## 🎯 Roadmap
-
-### Phase 1 - Core Features ✅ COMPLETED
-- [x] Authentication system với JWT
-- [x] Exam management với CRUD operations
-- [x] Camera monitoring với real-time detection
-- [x] Timer & auto-submit functionality
-- [x] Admin panel với 13 pages
-- [x] User management với search & filters
-- [x] Excel import/export cho exams
-- [x] Real-time proctoring dashboard
-- [x] Security & blockchain monitoring
-- [x] Token ERC-20 system với rewards
-- [x] Reward store với 50+ items
-- [x] Bank integration cho withdrawals
-- [x] Performance optimization với React.memo
-- [x] Testing setup với Vitest (28 tests)
-- [x] Smart contract deployment setup
-- [x] TypeScript strict types (413 lines)
-
-### Phase 2 - Advanced Features ✅ COMPLETED
-- [x] AI-powered cheat detection simulation
-- [x] Real-time monitoring dashboard
-- [x] Advanced filtering & search
-- [x] Excel integration với validation
-- [x] Mock data system cho development
-- [x] Accessibility improvements (ARIA)
-- [x] Responsive design optimization
-- [x] Error handling & validation
-- [x] Loading states & user feedback
-- [x] Professional UI/UX design
-
-### Phase 3 - Ecosystem 🚧 IN PROGRESS
-- [ ] Mobile app (React Native)
-- [ ] AI question generation
-- [ ] Advanced analytics dashboard
-- [ ] Multi-language support (i18n)
-- [ ] Real-time notifications
-- [ ] Advanced reporting system
-- [ ] API documentation
-- [ ] WebSocket integration
-
-### Phase 4 - Enterprise 🔮 PLANNED
-- [ ] SSO integration (OAuth, SAML)
-- [ ] Advanced reporting & BI
-- [ ] API for third-party integration
-- [ ] White-label solution
-- [ ] Multi-tenant architecture
-- [ ] Advanced security features
-- [ ] Compliance & audit trails
-- [ ] Enterprise support
-
-### Phase 5 - AI & ML 🔮 FUTURE
-- [ ] AI-powered proctoring
-- [ ] Eye tracking integration
-- [ ] Facial recognition
-- [ ] Voice analysis
-- [ ] Behavioral analysis
-- [ ] Automated grading
-- [ ] Plagiarism detection
-- [ ] Smart recommendations
-
-## 🎉 Tính năng mới đã hoàn thành
-
-### 🛠️ Admin Module (13 pages)
-- **Dashboard**: Thống kê real-time với charts
-- **Users**: CRUD với search, filter, pagination
-- **Exams**: 10 tính năng bao gồm Excel import/export
-- **Proctoring**: Real-time monitoring với 13 loại vi phạm
-- **Security**: Dashboard 4 blockchain modules
-- **Rewards**: Quản lý token và reward store
-- **Courses**: Quản lý khóa học và content
-- **Organizations**: Quản lý tổ chức và hierarchy
-- **Analytics**: Báo cáo và thống kê chi tiết
-- **Copyright**: Bảo vệ bản quyền tài liệu
-- **System Admin**: Cấu hình hệ thống
-- **Monitor**: Giám sát real-time
-- **Certify**: Quản lý chứng chỉ
-
-### 🪙 Token System ERC-20
-- **Smart Contract**: LearnToken với OpenZeppelin
-- **Auto Rewards**: 5 loại thưởng tự động
-- **Reward Store**: 50+ quà tặng đa dạng
-- **Bank Integration**: 19 ngân hàng Việt Nam
-- **Transaction History**: Lịch sử đầy đủ
-- **MetaMask Integration**: Wallet connection
-
-### 🧪 Testing & Quality
-- **Vitest Setup**: 28 tests passing (100%)
-- **React Testing Library**: Component testing
-- **Mock Data**: Realistic development data
-- **TypeScript**: 413 lines strict types
-- **ESLint**: Code quality enforcement
-
-### ⚡ Performance Optimization
-- **React.memo**: 75% giảm re-renders
-- **useMemo/useCallback**: Stable references
-- **Bundle Analysis**: Optimized size
-- **Accessibility**: ARIA labels và keyboard nav
-
-### 🔗 Blockchain Integration
-- **Hardhat Setup**: Complete deployment environment
-- **4 Blockchain Modules**: Anti-cheat, Copyright, Rewards, Multisig
-- **Ethers.js v6**: Modern Web3 integration
-- **Security Features**: Access control, pause/unpause
-
-## 📊 Project Statistics
-
-### Code Quality
-- **TypeScript**: 100% type coverage
-- **Tests**: 28/28 passing (100%)
-- **Linter**: 0 errors
-- **Build**: Success (14.64s)
-- **Bundle Size**: 617.71 KB
-
-### Features Completed
-- **Admin Pages**: 13/13 (100%)
-- **User Features**: 8/8 (100%)
-- **Blockchain**: 4/4 modules (100%)
-- **Testing**: 28/28 tests (100%)
-- **Performance**: Optimized (75% improvement)
-
-### Documentation
-- **README**: Comprehensive (1000+ lines)
-- **Admin Docs**: Complete module documentation
-- **API Types**: 413 lines TypeScript interfaces
-- **Deployment Guide**: 400+ lines Hardhat setup
-- **Test Coverage**: Detailed testing documentation
-
-Chúng tôi rất hoan nghênh mọi đóng góp! Vui lòng làm theo các bước:
-
-1. Fork repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
-### Code Style
-- Sử dụng TypeScript strict mode
-- Follow ESLint rules
-- Write meaningful commit messages
-- Add comments cho logic phức tạp
-- Update documentation
+### MetaMask không kết nối
+- Cài đặt extension
+- Kiểm tra network (Sepolia cho testnet)
+- Refresh page
 
 ## 📄 License
 
-Dự án này được cấp phép theo giấy phép **MIT License** - xem file [LICENSE](LICENSE) để biết chi tiết.
-
-## 👥 Team
-
-- **Vũ Tống** - *Lead Developer* - [@vutong-coder](https://github.com/vutong-coder)
-
-## 📞 Liên hệ & Hỗ trợ
-
-- **GitHub Issues**: [Create an issue](https://github.com/vutong-coder/hoc_onl/issues)
-- **Email**: support@nckh-exam.com
-- **Documentation**: [Wiki](https://github.com/vutong-coder/hoc_onl/wiki)
-
-## 🙏 Acknowledgments
-
-- [React](https://reactjs.org/) - UI framework tuyệt vời
-- [Vite](https://vitejs.dev/) - Build tool siêu nhanh
-- [Redux Toolkit](https://redux-toolkit.js.org/) - State management đơn giản
-- [Lucide](https://lucide.dev/) - Beautiful icons
-- [Ethers.js](https://docs.ethers.org/) - Web3 integration
-
----
-
-## 🚀 Ready for Production!
-
-Dự án đã hoàn thiện với:
-- ✅ **13 Admin Pages** với đầy đủ tính năng
-- ✅ **Token ERC-20 System** với smart contract
-- ✅ **28 Tests Passing** (100% pass rate)
-- ✅ **Performance Optimized** (75% improvement)
-- ✅ **TypeScript Strict** (413 lines types)
-- ✅ **Smart Contract Ready** để deploy
-
-### Quick Start
-```bash
-# Frontend
-npm install && npm run dev
-
-# Smart Contract
-cd contracts && npm install
-npx hardhat run scripts/deploy.js --network sepolia
-```
-
-### Admin Access
-```
-URL: http://localhost:5173/admin/dashboard
-Role: admin (required)
-```
-
-### Token Features
-```
-Reward Store: http://localhost:5173/reward
-Token Transfer: http://localhost:5173/token-transfer
-MetaMask: Required for blockchain features
-```
+MIT License - Xem file [LICENSE](LICENSE) để biết chi tiết.
 
 ---
 

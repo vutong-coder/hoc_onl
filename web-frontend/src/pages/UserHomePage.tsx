@@ -9,15 +9,11 @@ import CourseProgress from '../components/sections/CourseProgress'
 import UpcomingExams from '../components/sections/UpcomingExams'
 import Footer from '../components/layouts/Footer'
 import RewardStoreModal from '../components/molecules/RewardStoreModal'
-import TokenTransferModal from '../components/molecules/TokenTransferModal'
 import styles from '../assets/css/UserHomePage.module.css'
 
 export default function UserHomePage(): JSX.Element {
 	const { user } = useAppSelector((state) => state.auth)
 	const [showRewardStore, setShowRewardStore] = useState(false)
-	const [showWithdrawModal, setShowWithdrawModal] = useState(false)
-	const [tokenBalance, setTokenBalance] = useState(1250)
-	const [walletAddress, setWalletAddress] = useState<string | undefined>(undefined)
 	const handleStartInterview = (interviewId: string) => {
 		console.log(`Start interview ${interviewId}`)
 	}
@@ -103,9 +99,7 @@ export default function UserHomePage(): JSX.Element {
 							}}>
 								{/* Token Wallet */}
 								<TokenWallet
-									onRedeemGifts={() => setShowRewardStore(true)}
-									onWithdraw={() => setShowWithdrawModal(true)}
-									tokenBalance={tokenBalance}
+									userId={user?.id}
 								/>
 							</div>
 						</div>
@@ -167,17 +161,7 @@ export default function UserHomePage(): JSX.Element {
 		<RewardStoreModal
 			isOpen={showRewardStore}
 			onClose={() => setShowRewardStore(false)}
-			currentBalance={tokenBalance}
-			walletAddress={walletAddress}
-			userId="user-123"
-		/>
-
-		<TokenTransferModal
-			isOpen={showWithdrawModal}
-			onClose={() => setShowWithdrawModal(false)}
-			currentBalance={tokenBalance}
-			walletAddress={walletAddress}
-			userId="user-123"
+			userId={user?.id || 'user-123'}
 		/>
 	</div>
 )

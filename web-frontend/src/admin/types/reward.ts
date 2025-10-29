@@ -98,6 +98,7 @@ export interface TokenInfo {
 	marketCap: number // USD
 	holders: number
 	transfers24h: number
+	circulatingSupply: number
 	rewardPool: number // Available tokens for rewards
 	distributedToday: number
 	distributedThisMonth: number

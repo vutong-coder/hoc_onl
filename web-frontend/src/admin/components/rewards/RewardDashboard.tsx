@@ -28,7 +28,8 @@ export default function RewardDashboard({
 	rulePerformance 
 }: RewardDashboardProps): JSX.Element {
 	
-	const formatNumber = (num: number) => {
+	const formatNumber = (num: number | undefined) => {
+		if (num === undefined || num === null) return '0'
 		if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
 		if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
 		return num.toString()
@@ -293,16 +294,16 @@ export default function RewardDashboard({
 				</div>
 
 				{/* Top Performing Rules */}
-				<div className="performance-card">
+				<div className="reward-performance-card">
 					<div className="card-header">
 						<h3 className="card-title">
 							<Award size={20} />
 							Luật thưởng hiệu quả nhất
 						</h3>
 					</div>
-					<div className="performance-list">
+					<div className="reward-performance-list">
 						{rulePerformance.slice(0, 5).map((rule, index) => (
-							<div key={rule.ruleId} className="performance-item">
+							<div key={rule.ruleId} className="reward-performance-item">
 								<div className="performance-rank">#{index + 1}</div>
 								<div className="performance-info">
 									<div className="performance-name">{rule.ruleName}</div>
@@ -315,7 +316,7 @@ export default function RewardDashboard({
 									</div>
 								</div>
 								<div className="performance-tokens">
-									{rule.averageTokensPerUse} tokens/lần
+									{rule.averageTokensPerUse || 0} tokens/lần
 								</div>
 							</div>
 						))}

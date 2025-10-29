@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { 
 	Gift, 
 	Plus, 
@@ -8,13 +8,15 @@ import {
 	List,
 	Activity,
 	Settings,
-	RefreshCw
+	RefreshCw,
+	Coins
 } from 'lucide-react'
 import useRewards from '../hooks/useRewards'
 import RewardDashboard from '../components/rewards/RewardDashboard'
 import RewardRulesTable from '../components/rewards/RewardRulesTable'
 import TransactionLog from '../components/rewards/TransactionLog'
 import RuleEditorModal from '../components/rewards/RuleEditorModal'
+import GrantTokenModal from '../components/rewards/GrantTokenModal'
 import SearchBar from '../components/common/SearchBar'
 import TransactionDetailModal from '../modal/Rewards/TransactionDetailModal'
 import '../styles/common.css'
@@ -41,11 +43,26 @@ export default function RewardPage(): JSX.Element {
 		activeTab,
 		setActiveTab,
 		selectedTransaction,
-		setSelectedTransaction
+		setSelectedTransaction,
+		loadTokenData
 	} = useRewards()
+
+	const [isGrantTokenModalOpen, setIsGrantTokenModalOpen] = useState(false)
 
 	const handleAddRule = () => {
 		openRuleEditor()
+	}
+
+	const handleOpenGrantToken = () => {
+		setIsGrantTokenModalOpen(true)
+	}
+
+	const handleCloseGrantToken = () => {
+		setIsGrantTokenModalOpen(false)
+	}
+
+	const handleGrantTokenSuccess = () => {
+		loadTokenData() // Refresh data after granting tokens
 	}
 
 	const handleEditRule = (rule: any) => {
@@ -112,6 +129,18 @@ export default function RewardPage(): JSX.Element {
 					</div>
 
 					<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+						<button
+							className="btn btn-secondary"
+							onClick={handleOpenGrantToken}
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								gap: '8px'
+							}}
+						>
+							<Coins size={18} />
+							Cấp Token
+						</button>
 						<button
 							className="btn btn-primary"
 							onClick={handleAddRule}
@@ -366,6 +395,13 @@ export default function RewardPage(): JSX.Element {
 				isOpen={!!selectedTransaction}
 				onClose={() => setSelectedTransaction(null)}
 				transaction={selectedTransaction}
+			/>
+
+			{/* Grant Token Modal */}
+			<GrantTokenModal
+				isOpen={isGrantTokenModalOpen}
+				onClose={handleCloseGrantToken}
+				onSuccess={handleGrantTokenSuccess}
 			/>
 		</div>
 	)

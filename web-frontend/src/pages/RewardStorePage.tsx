@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { X, Gift, ShoppingCart, Loader2, CheckCircle, AlertCircle, Search, ArrowLeft } from 'lucide-react'
-import { type GiftItem } from '../services/api/tokenApi'
-import { mockGifts } from '../services/api/mockData'
+import { useAppSelector } from '../store/hooks'
+import { type GiftItem, getAvailableGifts } from '../services/api/tokenApi'
+import { getBalance, spendTokens } from '../services/api/tokenRewardApi'
 
 export default function RewardStorePage(): JSX.Element {
     const navigate = useNavigate()
+    const { user } = useAppSelector((state) => state.auth)
+    const userId = user?.id
+    
     const [gifts, setGifts] = useState<GiftItem[]>([])
     const [filteredGifts, setFilteredGifts] = useState<GiftItem[]>([])
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
@@ -19,10 +23,9 @@ export default function RewardStorePage(): JSX.Element {
     const [success, setSuccess] = useState(false)
     const [step, setStep] = useState<'browse' | 'confirm' | 'success'>('browse')
 
-    // Mock balance - in real app, get from Redux/Context
-    const currentBalance = 1250
-    const userId = 'user-123'
-    const walletAddress = '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb'
+    // Load balance from API
+    const [currentBalance, setCurrentBalance] = useState(0)
+    const [loadingBalance, setLoadingBalance] = useState(false)
 
     const categories = [
         { value: 'all', label: 'Tất cả' },
@@ -35,20 +38,39 @@ export default function RewardStorePage(): JSX.Element {
 
     useEffect(() => {
         loadGifts()
-    }, [])
+        if (userId) {
+            loadBalance()
+        }
+    }, [userId])
 
     useEffect(() => {
         filterGifts()
     }, [gifts, selectedCategory, searchQuery])
 
+    const loadBalance = async () => {
+        if (!userId) return
+        
+        setLoadingBalance(true)
+        try {
+            const balanceData = await getBalance(userId)
+            setCurrentBalance(balanceData.balance || 0)
+        } catch (err) {
+            console.error('Error loading balance:', err)
+            setCurrentBalance(0)
+        } finally {
+            setLoadingBalance(false)
+        }
+    }
+
     const loadGifts = async () => {
         setIsLoading(true)
         try {
-            await new Promise(resolve => setTimeout(resolve, 300))
-            setGifts(mockGifts)
+            const giftsData = await getAvailableGifts()
+            setGifts(giftsData)
         } catch (err) {
             console.error('Error loading gifts:', err)
-            setGifts(mockGifts)
+            setError('Không thể tải danh sách quà tặng')
+            setGifts([])
         } finally {
             setIsLoading(false)
         }
@@ -101,16 +123,16 @@ export default function RewardStorePage(): JSX.Element {
         setError(null)
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500))
-
-            console.log('Mock redemption:', {
-                userId,
-                walletAddress,
-                giftId: selectedGift.id,
-                quantity,
-                deliveryAddress: deliveryAddress || undefined,
-                totalCost
+            // Call API to spend tokens
+            await spendTokens({
+                studentId: userId,
+                amount: totalCost,
+                reasonCode: 'PURCHASE',
+                relatedId: selectedGift.id
             })
+
+            // Refresh balance after successful purchase
+            await loadBalance()
 
             setStep('success')
             setSuccess(true)
@@ -135,11 +157,15 @@ export default function RewardStorePage(): JSX.Element {
         <div style={{
             minHeight: '100vh',
             background: 'var(--background)',
-            padding: '24px'
+            padding: '24px',
+            boxSizing: 'border-box',
+            width: '100%'
         }}>
             <div style={{
                 maxWidth: '1400px',
-                margin: '0 auto'
+                margin: '0 auto',
+                width: '100%',
+                boxSizing: 'border-box'
             }}>
                 {/* Header */}
                 <div style={{
@@ -224,7 +250,9 @@ export default function RewardStorePage(): JSX.Element {
                                     transform: 'translateY(-50%)',
                                     width: '20px',
                                     height: '20px',
-                                    color: 'var(--muted-foreground)'
+                                    color: 'var(--muted-foreground)',
+                                    pointerEvents: 'none',
+                                    zIndex: 1
                                 }} />
                                 <input
                                     type="text"
@@ -233,11 +261,13 @@ export default function RewardStorePage(): JSX.Element {
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     style={{
                                         width: '100%',
-                                        padding: '14px 14px 14px 48px',
+                                        padding: '14px 16px 14px 48px',
                                         borderRadius: 'var(--radius-md)',
                                         border: '1px solid var(--border)',
                                         fontSize: '16px',
-                                        background: 'var(--background)'
+                                        background: 'var(--background)',
+                                        boxSizing: 'border-box',
+                                        outline: 'none'
                                     }}
                                 />
                             </div>

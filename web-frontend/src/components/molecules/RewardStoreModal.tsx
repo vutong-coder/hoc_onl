@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Gift, ShoppingCart, Loader2, CheckCircle, AlertCircle, Search } from 'lucide-react'
-import { type GiftItem } from '../../services/api/tokenApi'
-import { mockGifts } from '../../services/api/mockData'
+import { type GiftItem, getAvailableGifts } from '../../services/api/tokenApi'
+import { getBalance, spendTokens } from '../../services/api/tokenRewardApi'
 
 interface RewardStoreModalProps {
     isOpen: boolean
     onClose: () => void
-    currentBalance: number
-    walletAddress?: string
     userId?: string
 }
 
 export default function RewardStoreModal({
     isOpen,
     onClose,
-    currentBalance,
-    walletAddress,
     userId
 }: RewardStoreModalProps): JSX.Element | null {
+    const [currentBalance, setCurrentBalance] = useState(0)
+    const [loadingBalance, setLoadingBalance] = useState(false)
     const [gifts, setGifts] = useState<GiftItem[]>([])
     const [filteredGifts, setFilteredGifts] = useState<GiftItem[]>([])
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
@@ -43,8 +42,24 @@ export default function RewardStoreModal({
     useEffect(() => {
         if (isOpen) {
             loadGifts()
+            loadBalance()
         }
-    }, [isOpen])
+    }, [isOpen, userId])
+
+    const loadBalance = async () => {
+        if (!userId) return
+        
+        setLoadingBalance(true)
+        try {
+            const balanceData = await getBalance(userId)
+            setCurrentBalance(balanceData.balance || 0)
+        } catch (err) {
+            console.error('Error loading balance:', err)
+            setCurrentBalance(0)
+        } finally {
+            setLoadingBalance(false)
+        }
+    }
 
     useEffect(() => {
         filterGifts()
@@ -53,13 +68,12 @@ export default function RewardStoreModal({
     const loadGifts = async () => {
         setIsLoading(true)
         try {
-            // Simulate API delay for realism
-            await new Promise(resolve => setTimeout(resolve, 300))
-            // Use mock data directly
-            setGifts(mockGifts)
+            const giftsData = await getAvailableGifts()
+            setGifts(giftsData)
         } catch (err) {
             console.error('Error loading gifts:', err)
-            setGifts(mockGifts) // Fallback to mock data
+            setError('Không thể tải danh sách quà tặng')
+            setGifts([])
         } finally {
             setIsLoading(false)
         }
@@ -91,7 +105,7 @@ export default function RewardStoreModal({
     }
 
     const handleConfirmRedeem = async () => {
-        if (!selectedGift || !userId || !walletAddress) {
+        if (!selectedGift || !userId) {
             setError('Thông tin không hợp lệ')
             return
         }
@@ -112,19 +126,17 @@ export default function RewardStoreModal({
         setError(null)
 
         try {
-            // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 1500))
-
-            // Mock successful redemption
-            console.log('Mock redemption:', {
-                userId,
-                walletAddress,
-                giftId: selectedGift.id,
-                quantity,
-                deliveryAddress: deliveryAddress || undefined,
-                totalCost
+            // Call API to spend tokens
+            await spendTokens({
+                studentId: userId,
+                amount: totalCost,
+                reasonCode: 'PURCHASE',
+                relatedId: selectedGift.id
             })
 
+            // Refresh balance after purchase
+            await loadBalance()
+            
             setStep('success')
             setSuccess(true)
         } catch (err: any) {
@@ -151,7 +163,7 @@ export default function RewardStoreModal({
 
     if (!isOpen) return null
 
-    return (
+    const modalContent = (
         <div style={{
             position: 'fixed',
             top: 0,
@@ -555,4 +567,7 @@ export default function RewardStoreModal({
             `}</style>
         </div>
     )
+
+    // Render modal using Portal to mount it at document.body
+    return createPortal(modalContent, document.body)
 }

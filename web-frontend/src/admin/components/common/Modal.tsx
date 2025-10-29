@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import '../../styles/common.css'
 
@@ -50,7 +51,7 @@ export default function Modal({
 
 	if (!isOpen) return null
 
-	return (
+	const modalContent = (
 		<div className="modal-overlay-modern" onClick={onClose}>
 			<div 
 				className="modal-container-modern" 
@@ -82,5 +83,8 @@ export default function Modal({
 			</div>
 		</div>
 	)
+
+	// Render modal using Portal to mount it at document.body
+	return createPortal(modalContent, document.body)
 }
 

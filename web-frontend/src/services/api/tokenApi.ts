@@ -1,5 +1,22 @@
 import { api } from './examApi'
-import { mockBanks, mockGifts } from './mockData'
+import tokenRewardApi, {
+  grantTokens as grantTokensReward,
+  spendTokens as spendTokensReward,
+  getBalance as getBalanceReward,
+  getHistory as getHistoryReward,
+  type GrantTokenRequest,
+  type SpendTokenRequest,
+  type BalanceResponse,
+  type HistoryResponse,
+} from './tokenRewardApi'
+
+// Re-export token reward API types
+export type {
+  GrantTokenRequest,
+  SpendTokenRequest,
+  BalanceResponse,
+  HistoryResponse,
+} from './tokenRewardApi'
 
 export interface RewardRequest {
 	userId: string
@@ -8,14 +25,6 @@ export interface RewardRequest {
 	reason?: string
 }
 
-export interface WithdrawalRequest {
-	userId: string
-	walletAddress: string
-	amount: number
-	bankAccount: string
-	bankName: string
-	accountHolder: string
-}
 
 export interface GiftItem {
 	id: string
@@ -46,7 +55,7 @@ export interface TokenTransaction {
 	id: string
 	userId: string
 	walletAddress: string
-	type: 'earn' | 'spend' | 'withdrawal' | 'reward'
+	type: 'earn' | 'spend' | 'reward'
 	amount: number
 	description: string
 	transactionHash?: string
@@ -97,19 +106,16 @@ export async function awardContestWin(request: RewardRequest & { rank: number })
 
 /**
  * Get available gifts for redemption
+ * Uses token-reward-service backend
  */
 export async function getAvailableGifts(category?: string): Promise<GiftItem[]> {
-	try {
-		const params = category ? { category } : {}
-		const res = await api.get<GiftItem[]>('/tokens/gifts', { params })
-		return res.data
-	} catch (error) {
-		// Return mock data if API fails
-		console.log('Using mock gift data')
-		return category && category !== 'all'
-			? mockGifts.filter(g => g.category === category)
-			: mockGifts
+	const API_BASE_URL = import.meta.env.VITE_TOKEN_REWARD_API_URL || 'http://localhost:9009'
+	const params = category && category !== 'all' ? `?category=${category}` : ''
+	const res = await fetch(`${API_BASE_URL}/api/tokens/gifts${params}`)
+	if (!res.ok) {
+		throw new Error('Failed to fetch gifts')
 	}
+	return await res.json()
 }
 
 /**
@@ -136,21 +142,6 @@ export async function unlockCourse(request: CourseUnlockRequest): Promise<TokenT
 	return res.data
 }
 
-/**
- * Request withdrawal to bank account
- */
-export async function requestBankWithdrawal(request: WithdrawalRequest): Promise<TokenTransaction> {
-	const res = await api.post<TokenTransaction>('/tokens/withdrawal/bank', request)
-	return res.data
-}
-
-/**
- * Get withdrawal transaction status
- */
-export async function getWithdrawalStatus(transactionId: string): Promise<TokenTransaction> {
-	const res = await api.get<TokenTransaction>(`/tokens/withdrawal/${transactionId}`)
-	return res.data
-}
 
 /**
  * Get user's token transaction history
@@ -170,18 +161,45 @@ export async function getUserTransactionHistory(
 
 /**
  * Get user's token balance from backend
+ * Uses token-reward-service
  */
-export async function getUserTokenBalance(userId: string): Promise<{
+export async function getUserTokenBalance(userId: string | number): Promise<{
 	balance: number
 	totalEarned: number
 	totalSpent: number
 }> {
-	const res = await api.get<{
-		balance: number
-		totalEarned: number
-		totalSpent: number
-	}>(`/tokens/balance/${userId}`)
-	return res.data
+	const data = await getBalanceReward(userId)
+	return {
+		balance: data.balance || 0,
+		totalEarned: data.totalEarned || 0,
+		totalSpent: data.totalSpent || 0,
+	}
+}
+
+/**
+ * Grant tokens using token-reward-service
+ */
+export async function grantTokens(request: GrantTokenRequest): Promise<any> {
+	return grantTokensReward(request)
+}
+
+/**
+ * Spend tokens using token-reward-service
+ */
+export async function spendTokens(request: SpendTokenRequest): Promise<any> {
+	return spendTokensReward(request)
+}
+
+
+/**
+ * Get transaction history using token-reward-service
+ */
+export async function getTransactionHistory(
+	userId: string | number,
+	page: number = 1,
+	limit: number = 10
+): Promise<HistoryResponse> {
+	return getHistoryReward(userId, page, limit)
 }
 
 /**
@@ -220,44 +238,3 @@ export async function getTokenStats(): Promise<{
 	return res.data
 }
 
-/**
- * Get supported banks for withdrawal
- */
-export async function getSupportedBanks(): Promise<Array<{
-	code: string
-	name: string
-	shortName: string
-	logo: string
-}>> {
-	try {
-		const res = await api.get<Array<{
-			code: string
-			name: string
-			shortName: string
-			logo: string
-		}>>('/tokens/banks')
-		return res.data
-	} catch (error) {
-		// Return mock data if API fails
-		console.log('Using mock bank data')
-		return mockBanks
-	}
-}
-
-/**
- * Calculate withdrawal fee
- */
-export async function calculateWithdrawalFee(amount: number): Promise<{
-	amount: number
-	fee: number
-	netAmount: number
-	rate: number
-}> {
-	const res = await api.post<{
-		amount: number
-		fee: number
-		netAmount: number
-		rate: number
-	}>('/tokens/withdrawal/calculate-fee', { amount })
-	return res.data
-}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Wallet, TrendingUp, Gift, Coins, CreditCard, Loader2, AlertCircle } from 'lucide-react'
+import { Wallet, TrendingUp, Gift, Coins, Download, Loader2, AlertCircle, ExternalLink } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import {
     connectWallet,
     getWalletInfo,
@@ -10,41 +11,30 @@ import {
     removeAccountsListener,
     type WalletInfo
 } from '../../services/blockchain/walletService'
+import { getBalance, getHistory, withdrawTokens } from '../../services/api/tokenRewardApi'
+import TokenWithdrawModal from '../molecules/TokenWithdrawModal'
 
 interface TokenWalletProps {
-    tokenBalance?: number
-    totalEarned?: number
-    recentTransactions?: Array<{
+    userId?: string
+}
+
+export default function TokenWallet({ userId }: TokenWalletProps): JSX.Element {
+    const navigate = useNavigate()
+    const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null)
+    const [isConnecting, setIsConnecting] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    
+    // Token reward data from API
+    const [tokenBalance, setTokenBalance] = useState(0)
+    const [totalEarned, setTotalEarned] = useState(0)
+    const [recentTransactions, setRecentTransactions] = useState<Array<{
         type: 'earn' | 'spend' | 'reward'
         amount: number
         description: string
         date: string
-    }>
-    onViewTransactions?: () => void
-    onBuyTokens?: () => void
-    onWithdraw?: () => void
-    onRedeemGifts?: () => void
-    userId?: string
-}
-
-export default function TokenWallet({
-    tokenBalance = 1250,
-    totalEarned = 5000,
-    recentTransactions = [
-        { type: 'earn', amount: 100, description: 'Hoàn thành Python cơ bản', date: '2 giờ trước' },
-        { type: 'spend', amount: -50, description: 'Mở khóa khóa học nâng cao', date: '1 ngày trước' },
-        { type: 'reward', amount: 200, description: 'Thưởng chuỗi ngày', date: '2 ngày trước' },
-        { type: 'earn', amount: 75, description: 'Điểm cao bài kiểm tra', date: '3 ngày trước' }
-    ],
-    onViewTransactions,
-    onBuyTokens,
-    onWithdraw,
-    onRedeemGifts,
-    userId
-}: TokenWalletProps): JSX.Element {
-    const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null)
-    const [isConnecting, setIsConnecting] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    }>>([])
+    const [loadingTokens, setLoadingTokens] = useState(false)
+    const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false)
 
     // Load wallet info on mount
     useEffect(() => {
@@ -65,6 +55,80 @@ export default function TokenWallet({
             removeAccountsListener(handleAccountsChanged)
         }
     }, [])
+
+    // Load token balance and history from API
+    useEffect(() => {
+        if (userId) {
+            loadTokenData()
+        }
+    }, [userId])
+
+    const loadTokenData = async () => {
+        if (!userId) return
+        
+        setLoadingTokens(true)
+        try {
+            // Fetch balance
+            const balanceData = await getBalance(userId)
+            setTokenBalance(balanceData.balance || 0)
+            setTotalEarned(balanceData.totalEarned || balanceData.balance || 0)
+
+            // Fetch recent transactions (limit 4)
+            const historyData = await getHistory(userId, 1, 4)
+            
+            // Transform backend data to component format
+            const dataArray = (historyData as any).rewards || historyData.transactions || []
+            const transformedTransactions = dataArray.map((item: any) => {
+                const isEarn = item.transaction_type === 'EARN'
+                const amount = item.tokensAwarded || item.amount || 0
+                
+                // Get reason label
+                const reasonLabels: Record<string, string> = {
+                    'COURSE_COMPLETION': 'Hoàn thành khóa học',
+                    'EXAM_PASS': 'Đạt kỳ thi',
+                    'ASSIGNMENT_SUBMIT': 'Nộp bài tập',
+                    'DAILY_LOGIN': 'Đăng nhập hàng ngày',
+                    'QUIZ_PERFECT': 'Quiz hoàn hảo',
+                    'WITHDRAW': 'Rút token',
+                    'ADMIN_BONUS': 'Thưởng từ Admin',
+                    'PURCHASE': 'Mua sắm'
+                }
+                
+                const description = reasonLabels[item.reasonCode] || item.reasonCode || 'Giao dịch token'
+                
+                // Format date
+                const date = new Date(item.awardedAt || item.createdAt)
+                const now = new Date()
+                const diffMs = now.getTime() - date.getTime()
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+                
+                let dateStr = ''
+                if (diffHours < 1) dateStr = 'Vừa xong'
+                else if (diffHours < 24) dateStr = `${diffHours} giờ trước`
+                else if (diffDays === 1) dateStr = 'Hôm qua'
+                else if (diffDays < 7) dateStr = `${diffDays} ngày trước`
+                else dateStr = date.toLocaleDateString('vi-VN')
+
+                return {
+                    type: isEarn ? 'earn' : (item.reasonCode === 'WITHDRAW' ? 'spend' : 'spend'),
+                    amount: isEarn ? amount : -amount,
+                    description,
+                    date: dateStr
+                }
+            })
+
+            setRecentTransactions(transformedTransactions)
+        } catch (err) {
+            console.error('Error loading token data:', err)
+            // Reset to zero if API fails
+            setTokenBalance(0)
+            setTotalEarned(0)
+            setRecentTransactions([])
+        } finally {
+            setLoadingTokens(false)
+        }
+    }
 
     const loadWalletInfo = async () => {
         try {
@@ -106,8 +170,41 @@ export default function TokenWallet({
         }
     }
 
-    const displayBalance = walletInfo ? parseFloat(walletInfo.balance) : tokenBalance
-    const displayEarned = walletInfo ? parseFloat(walletInfo.totalEarned) : totalEarned
+    // Always use off-chain balance from API (token-reward-service)
+    // Blockchain wallet is only for displaying connected address
+    const displayBalance = tokenBalance
+    const displayEarned = totalEarned
+    const isLoading = isConnecting || loadingTokens
+
+    const handleWithdraw = async (amount: number, toAddress: string) => {
+        if (!userId) {
+            return { success: false, message: 'Vui lòng đăng nhập' }
+        }
+
+        try {
+            const result = await withdrawTokens({ studentId: userId, amount, toAddress })
+            // Refresh token data after successful withdrawal
+            await loadTokenData()
+            return {
+                success: true,
+                message: result.message || 'Rút token thành công',
+                txHash: result.transactionHash
+            }
+        } catch (err: any) {
+            return {
+                success: false,
+                message: err.message || 'Không thể rút token'
+            }
+        }
+    }
+
+    const handleViewAllTransactions = () => {
+        navigate('/user/rewards')
+    }
+
+    const handleRedeemGifts = () => {
+        navigate('/user/rewards/store')
+    }
 
     return (
         <div className="card stagger-load hover-lift interactive" style={{
@@ -201,82 +298,129 @@ export default function TokenWallet({
                         <span style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
                             Số dư hiện tại
                         </span>
-                        <span style={{ fontSize: '24px', fontWeight: 700, color: 'var(--accent)', display: 'flex', alignItems: 'center' }}>
-                            <Coins style={{ width: '24px', height: '24px', marginRight: '4px' }} />
-                            {formatTokenAmount(displayBalance)}
-                        </span>
+                        {loadingTokens ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Loader2 style={{ width: '20px', height: '20px', animation: 'spin 1s linear infinite', color: 'var(--accent)' }} />
+                                <span style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>Đang tải...</span>
+                            </div>
+                        ) : (
+                            <span style={{ fontSize: '24px', fontWeight: 700, color: 'var(--accent)', display: 'flex', alignItems: 'center' }}>
+                                <Coins style={{ width: '24px', height: '24px', marginRight: '4px' }} />
+                                {formatTokenAmount(displayBalance)}
+                            </span>
+                        )}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: 'var(--muted-foreground)', marginTop: '4px' }}>
                         <TrendingUp style={{ width: '16px', height: '16px', marginRight: '4px' }} />
-                        Tổng đã kiếm: {formatTokenAmount(displayEarned)} token
+                        Tổng đã kiếm: {loadingTokens ? '...' : formatTokenAmount(displayEarned)} token
                     </div>
                 </div>
 
                 {/* Action Buttons */}
                 <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
+                    display: 'flex',
+                    flexDirection: 'column',
                     gap: '8px',
                     marginBottom: '20px'
                 }}>
                     <button
-                        onClick={onRedeemGifts}
+                        onClick={() => setIsWithdrawModalOpen(true)}
+                        disabled={tokenBalance === 0 || loadingTokens}
                         style={{
-                            padding: '10px',
-                            background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+                            padding: '10px 12px',
+                            background: (tokenBalance === 0 || loadingTokens) ? 'var(--muted)' : 'linear-gradient(135deg, #667eea, #764ba2)',
                             color: 'white',
                             border: 'none',
                             borderRadius: 'var(--radius-md)',
-                            cursor: 'pointer',
+                            cursor: (tokenBalance === 0 || loadingTokens) ? 'not-allowed' : 'pointer',
                             fontSize: '13px',
                             fontWeight: 500,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             gap: '6px',
-                            transition: 'transform 0.2s, box-shadow 0.2s'
+                            transition: 'transform 0.2s, box-shadow 0.2s',
+                            opacity: (tokenBalance === 0 || loadingTokens) ? 0.5 : 1
                         }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)'
-                            e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
+                            if (tokenBalance > 0 && !loadingTokens) {
+                                e.currentTarget.style.transform = 'translateY(-2px)'
+                                e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
+                            }
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.transform = 'translateY(0)'
                             e.currentTarget.style.boxShadow = 'none'
                         }}
                     >
-                        <Gift style={{ width: '16px', height: '16px' }} />
-                        Đổi quà
+                        <Download style={{ width: '16px', height: '16px' }} />
+                        Rút Token
                     </button>
-                    <button
-                        onClick={onWithdraw}
-                        style={{
-                            padding: '10px',
-                            background: 'var(--card)',
-                            color: 'var(--foreground)',
-                            border: '1px solid var(--border)',
-                            borderRadius: 'var(--radius-md)',
-                            cursor: 'pointer',
-                            fontSize: '13px',
-                            fontWeight: 500,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '6px',
-                            transition: 'transform 0.2s, border-color 0.2s'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)'
-                            e.currentTarget.style.borderColor = 'var(--primary)'
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)'
-                            e.currentTarget.style.borderColor = 'var(--border)'
-                        }}
-                    >
-                        <CreditCard style={{ width: '16px', height: '16px' }} />
-                        Rút tiền
-                    </button>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                        <button
+                            onClick={handleViewAllTransactions}
+                            style={{
+                                padding: '8px 10px',
+                                background: 'var(--muted)',
+                                color: 'var(--foreground)',
+                                border: '1px solid var(--border)',
+                                borderRadius: 'var(--radius-md)',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 500,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '4px',
+                                transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = 'var(--primary)'
+                                e.currentTarget.style.color = 'white'
+                                e.currentTarget.style.borderColor = 'var(--primary)'
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'var(--muted)'
+                                e.currentTarget.style.color = 'var(--foreground)'
+                                e.currentTarget.style.borderColor = 'var(--border)'
+                            }}
+                        >
+                            <ExternalLink style={{ width: '14px', height: '14px' }} />
+                            Chi tiết
+                        </button>
+                        <button
+                            onClick={handleRedeemGifts}
+                            style={{
+                                padding: '8px 10px',
+                                background: 'var(--muted)',
+                                color: 'var(--foreground)',
+                                border: '1px solid var(--border)',
+                                borderRadius: 'var(--radius-md)',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 500,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '4px',
+                                transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = 'var(--accent)'
+                                e.currentTarget.style.color = 'white'
+                                e.currentTarget.style.borderColor = 'var(--accent)'
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'var(--muted)'
+                                e.currentTarget.style.color = 'var(--foreground)'
+                                e.currentTarget.style.borderColor = 'var(--border)'
+                            }}
+                        >
+                            <Gift style={{ width: '14px', height: '14px' }} />
+                            Đổi quà
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -286,6 +430,17 @@ export default function TokenWallet({
                     <h4 style={{ fontSize: '14px', fontWeight: 500, marginBottom: '12px' }}>
                         Giao dịch gần đây
                     </h4>
+                    {loadingTokens ? (
+                        <div style={{ textAlign: 'center', padding: '24px', color: 'var(--muted-foreground)' }}>
+                            <Loader2 style={{ width: '24px', height: '24px', margin: '0 auto 8px', animation: 'spin 1s linear infinite' }} />
+                            <p style={{ fontSize: '13px', margin: 0 }}>Đang tải giao dịch...</p>
+                        </div>
+                    ) : recentTransactions.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '24px', color: 'var(--muted-foreground)' }}>
+                            <Coins style={{ width: '32px', height: '32px', margin: '0 auto 8px', opacity: 0.3 }} />
+                            <p style={{ fontSize: '13px', margin: 0 }}>Chưa có giao dịch nào</p>
+                        </div>
+                    ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {recentTransactions.map((transaction, index) => (
                             <div key={index} style={{
@@ -338,30 +493,17 @@ export default function TokenWallet({
                             </div>
                         ))}
                     </div>
-                    <button
-                        onClick={onViewTransactions}
-                        style={{
-                            width: '100%',
-                            marginTop: '12px',
-                            fontSize: '14px',
-                            color: 'var(--accent)',
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            textDecoration: 'underline',
-                            transition: 'color 0.2s'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.color = 'var(--primary)'
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.color = 'var(--accent)'
-                        }}
-                    >
-                        Xem tất cả giao dịch
-                    </button>
+                    )}
                 </div>
             </div>
+
+            {/* Withdraw Modal */}
+            <TokenWithdrawModal
+                isOpen={isWithdrawModalOpen}
+                onClose={() => setIsWithdrawModalOpen(false)}
+                currentBalance={tokenBalance}
+                onWithdraw={handleWithdraw}
+            />
 
             {/* Add spin animation */}
             <style>{`

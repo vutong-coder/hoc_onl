@@ -9,14 +9,49 @@ import {
 	RewardType
 } from '../types/reward'
 import { 
-	mockRewardDashboard,
 	mockRewardRules,
-	mockRewardTransactions,
-	mockTokenInfo
 } from '../mock/rewards'
+import adminTokenRewardApi, { getUserRewardSummary, getAdminStats, getAllTransactions, getTopUsers, getRulePerformance } from '../services/tokenRewardApi'
+
+// Initial dashboard state - Empty data, will be loaded from API
+const initialDashboard: RewardDashboard = {
+	stats: {
+		totalRules: 0,
+		activeRules: 0,
+		totalTransactions: 0,
+		todayTransactions: 0,
+		totalTokensDistributed: 0,
+		todayTokensDistributed: 0,
+		averageRewardPerUser: 0,
+		topRewardRule: 'N/A',
+		successRate: 0,
+		pendingTransactions: 0,
+		failedTransactions: 0
+	},
+	rules: mockRewardRules, // Rules management not implemented in API yet
+	recentTransactions: [],
+	tokenInfo: {
+		symbol: 'LEARN',
+		name: 'LearnToken',
+		contractAddress: '0x0000000000000000000000000000000000000000',
+		decimals: 18,
+		totalSupply: '0',
+		currentPrice: 0,
+		marketCap: 0,
+		holders: 0,
+		transfers24h: 0,
+		circulatingSupply: 0,
+		rewardPool: 0,
+		distributedToday: 0,
+		distributedThisMonth: 0
+	},
+	topUsers: [],
+	rulePerformance: []
+}
 
 export default function useRewards() {
-	const [dashboard, setDashboard] = useState<RewardDashboard>(mockRewardDashboard)
+	const [dashboard, setDashboard] = useState<RewardDashboard>(initialDashboard)
+	const [loading, setLoading] = useState(false)
 	const [filters, setFilters] = useState<RewardFilters>({
 		search: '',
 		ruleType: 'all',
@@ -292,59 +327,118 @@ export default function useRewards() {
 		closeRuleEditor()
 	}, [editingRule, addRule, updateRule, closeRuleEditor])
 
-	// Simulate real-time updates
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setDashboard(prev => {
-				// Simulate new transactions occasionally
-				if (Math.random() < 0.1) { // 10% chance
-					const activeRules = prev.rules.filter(rule => rule.isActive)
-					if (activeRules.length > 0) {
-						const randomRule = activeRules[Math.floor(Math.random() * activeRules.length)]
-						const users = ['Nguyễn Văn A', 'Trần Thị B', 'Lê Văn C', 'Phạm Thị D']
-						const randomUser = users[Math.floor(Math.random() * users.length)]
-						
-						const newTransaction: RewardTransaction = {
-							id: `tx-${Date.now()}`,
-							userId: `user-${Math.floor(Math.random() * 1000)}`,
-							userName: randomUser,
-							ruleId: randomRule.id,
-							ruleName: randomRule.name,
-							type: randomRule.type,
-							tokenAmount: randomRule.tokenAmount,
-							tokenSymbol: randomRule.tokenSymbol,
-							status: 'completed',
-							transactionHash: `0x${Math.random().toString(16).substr(2, 8)}...`,
-							blockNumber: Math.floor(Math.random() * 1000000) + 18000000,
-							gasUsed: Math.floor(Math.random() * 20000) + 30000,
-							createdAt: new Date().toISOString(),
-							processedAt: new Date().toISOString()
-						}
-
-						return {
-							...prev,
-							recentTransactions: [newTransaction, ...prev.recentTransactions].slice(0, 100),
-							stats: {
-								...prev.stats,
-								totalTransactions: prev.stats.totalTransactions + 1,
-								todayTransactions: prev.stats.todayTransactions + 1,
-								totalTokensDistributed: prev.stats.totalTokensDistributed + randomRule.tokenAmount,
-								todayTokensDistributed: prev.stats.todayTokensDistributed + randomRule.tokenAmount
-							},
-							rules: prev.rules.map(rule =>
-								rule.id === randomRule.id
-									? { ...rule, usageCount: rule.usageCount + 1, lastUsed: new Date().toISOString() }
-									: rule
-							)
-						}
-					}
+	// Function to load token data from API
+	const loadTokenData = useCallback(async () => {
+		setLoading(true)
+		try {
+			// Fetch admin stats
+			const stats = await getAdminStats()
+			
+			// Fetch all transactions
+			const transactionsData = await getAllTransactions(1, 100)
+			
+			// Fetch top users
+			const topUsersData = await getTopUsers(10)
+			
+			// Fetch rule performance
+			const rulePerformanceData = await getRulePerformance()
+			
+			// Transform rule performance to match RulePerformance interface
+			const transformedRulePerformance = rulePerformanceData.map((rule: any) => ({
+				...rule,
+				averageTokensPerUse: rule.averageReward
+			}))
+			
+			// Transform transactions to match RewardTransaction format
+			const transformedTransactions: RewardTransaction[] = transactionsData.transactions.map((tx: any) => ({
+				id: tx.id,
+				userId: tx.studentId,
+				userName: `User ${tx.studentId}`,
+				ruleId: tx.relatedId || '',
+				ruleName: tx.reasonCode?.replace(/_/g, ' ') || 'Custom',
+				type: tx.reasonCode || 'custom',
+				tokenAmount: tx.tokensAwarded,
+				tokenSymbol: 'LEARN',
+				status: 'completed' as TransactionStatus,
+				transactionHash: tx.relatedId || '',
+				createdAt: tx.awardedAt,
+				processedAt: tx.awardedAt,
+				metadata: {
+					reasonCode: tx.reasonCode,
+					transactionType: tx.transaction_type
 				}
-				return prev
+			}))
+			
+			// Transform top users to match UserRewardSummary format
+			const transformedTopUsers = topUsersData.map((user: any) => ({
+				userId: user.studentId,
+				userName: `User ${user.studentId}`,
+				totalEarned: user.totalEarned,
+				totalSpent: user.totalSpent,
+				currentBalance: user.balance,
+				tokenSymbol: 'LEARN',
+				rewardCount: user.transactionCount,
+				topRewardType: 'custom' as any
+			}))
+			
+			// Calculate most used reward reason
+			const reasonCounts: Record<string, number> = {}
+			transactionsData.transactions.forEach((tx: any) => {
+				if (tx.reasonCode && tx.transaction_type === 'EARN') {
+					reasonCounts[tx.reasonCode] = (reasonCounts[tx.reasonCode] || 0) + 1
+				}
 			})
-		}, 10000) // Update every 10 seconds
-
-		return () => clearInterval(interval)
+			const topRewardRule = Object.entries(reasonCounts)
+				.sort(([,a], [,b]) => (b as number) - (a as number))[0]?.[0] || 'N/A'
+			
+			// Update dashboard with real data
+			setDashboard(prev => ({
+				...prev,
+				stats: {
+					totalRules: prev.rules.length,
+					activeRules: prev.rules.filter(r => r.isActive).length,
+					totalTransactions: stats.totalTransactions,
+					todayTransactions: stats.todayTransactions || 0,
+					totalTokensDistributed: stats.totalTokensIssued,
+					todayTokensDistributed: stats.todayTokensDistributed || 0,
+					averageRewardPerUser: stats.totalUsers > 0 ? Math.round(stats.totalTokensIssued / stats.totalUsers) : 0,
+					topRewardRule: topRewardRule,
+					successRate: stats.totalTransactions > 0 
+						? Math.round((stats.totalEarnTransactions / stats.totalTransactions) * 100) 
+						: 100,
+					pendingTransactions: 0,
+					failedTransactions: 0
+				},
+				recentTransactions: transformedTransactions,
+				topUsers: transformedTopUsers,
+				rulePerformance: transformedRulePerformance,
+				tokenInfo: {
+					symbol: 'LEARN',
+					name: 'LearnToken',
+					contractAddress: '0x0000000000000000000000000000000000000000',
+					decimals: 18,
+					totalSupply: stats.totalTokensIssued.toString(),
+					currentPrice: 0,
+					marketCap: 0,
+					holders: stats.totalUsers,
+					transfers24h: stats.todayTransactions || 0,
+					circulatingSupply: stats.currentBalance,
+					rewardPool: stats.currentBalance,
+					distributedToday: stats.todayTokensDistributed || 0,
+					distributedThisMonth: stats.totalTokensIssued
+				}
+			}))
+		} catch (error) {
+			console.error('❌ Error loading token data:', error)
+		} finally {
+			setLoading(false)
+		}
 	}, [])
+
+	// Load real token data on mount
+	useEffect(() => {
+		loadTokenData()
+	}, [loadTokenData])
 
 	// Helper functions
 	const getRuleById = useCallback((id: string) => {
@@ -372,6 +466,7 @@ export default function useRewards() {
 		rules: filteredRules,
 		transactions: filteredTransactions,
 		filters,
+		loading,
 		
 		// Actions
 		updateFilter,
@@ -381,6 +476,7 @@ export default function useRewards() {
 		toggleRuleStatus,
 		duplicateRule,
 		retryTransaction,
+		loadTokenData,
 		
 		// Modal management
 		isRuleEditorOpen,

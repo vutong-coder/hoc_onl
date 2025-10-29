@@ -6,7 +6,7 @@ interface WalletState {
 	totalSpent: number
 	transactions: Array<{
 		id: string
-		type: 'earn' | 'spend' | 'reward' | 'withdrawal'
+		type: 'earn' | 'spend' | 'reward'
 		amount: number
 		description: string
 		date: string

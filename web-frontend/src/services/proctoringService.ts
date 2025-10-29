@@ -1,77 +1,30 @@
 /**
- * Proctoring Service - Gọi API backend để phân tích frame camera
+ * Proctoring Service - Re-export from api/proctoringApi.ts for backward compatibility
  */
 
-const PROCTORING_API_URL = 'http://localhost:8082/api';
+// Re-export types
+export type {
+  FrameAnalysisRequest,
+  Detection,
+  FrameAnalysisResponse,
+} from './api/proctoringApi';
 
-export interface FrameAnalysisRequest {
-  image: string; // Base64 encoded image
-  examId: string;
-  studentId: string;
-}
+// Re-export functions
+import proctoringApi, { analyzeFrame as _analyzeFrame, getEventsBySession as _getEventsBySession } from './api/proctoringApi';
 
-export interface Detection {
-  type: 'FACE_NOT_DETECTED' | 'MULTIPLE_FACES' | 'MOBILE_PHONE_DETECTED' | 'CAMERA_TAMPERED' | 'LOOKING_AWAY' | 'tab_switch';
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  confidence: number;
-  timestamp: number;
-  description: string;
-  metadata?: any;
-}
-
-export interface FrameAnalysisResponse {
-  detections: Detection[];
-}
-
+// Legacy class-based interface for backward compatibility
 class ProctoringService {
-  /**
-   * Gửi frame camera đến backend để phân tích bằng AI
-   */
-  async analyzeFrame(request: FrameAnalysisRequest): Promise<FrameAnalysisResponse> {
-    try {
-
-      const response = await fetch(`${PROCTORING_API_URL}/proctoring/analyze-frame`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-      });
-
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('proctoringService: HTTP error response', errorText);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('proctoringService: Error calling API:', error);
-      // Return empty detections on error instead of throwing
-      return { detections: [] };
-    }
+  async analyzeFrame(request: import('./api/proctoringApi').FrameAnalysisRequest): Promise<import('./api/proctoringApi').FrameAnalysisResponse> {
+    return _analyzeFrame(request);
   }
 
-  /**
-   * Lấy danh sách vi phạm của một phiên thi
-   */
   async getSessionEvents(sessionId: string) {
-    try {
-      const response = await fetch(`${PROCTORING_API_URL}/sessions/${sessionId}/events`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching session events:', error);
-      return [];
-    }
+    return _getEventsBySession(sessionId);
   }
 }
 
 export const proctoringService = new ProctoringService();
+
+// Also export the new API for direct use
+export { proctoringApi };
 

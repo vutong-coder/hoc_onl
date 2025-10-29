@@ -65,6 +65,8 @@ export default function AppRoutes(): JSX.Element {
                 <Route path="compete/:contestId" element={<ContestDetailPage />} />
 				<Route path="exam" element={<ExamPage />} />
 				<Route path="reward" element={<RewardPage />} />
+				<Route path="rewards" element={<RewardPage />} />
+				<Route path="rewards/store" element={<RewardStorePage />} />
 				<Route path="copyright" element={<CopyrightPage />} />
 				<Route path="profile" element={<ProfilePage />} />
 				<Route path="settings" element={<SettingsPage />} />

@@ -327,20 +327,21 @@ export const mockRewardTransactions: RewardTransaction[] = [
 	}
 ]
 
-// Mock Token Info
+// Mock Token Info - DEPRECATED: Use real API data from token-reward-service
+// Creating a minimal mock for backward compatibility only
 export const mockTokenInfo: TokenInfo = {
 	symbol: 'LEARN',
 	name: 'Learning Ecosystem Token',
-	contractAddress: '0x9876543210fedcba9876543210fedcba98765432',
+	contractAddress: '0x0000000000000000000000000000000000000000',
 	decimals: 18,
-	totalSupply: '10000000000000000000000000', // 10M tokens
-	currentPrice: 0.15,
-	marketCap: 1500000,
-	holders: 3200,
-	transfers24h: 892,
-	rewardPool: 500000, // 500K tokens available for rewards
-	distributedToday: 1250,
-	distributedThisMonth: 15600
+	totalSupply: '0',
+	currentPrice: 0,
+	marketCap: 0,
+	holders: 0,
+	transfers24h: 0,
+	rewardPool: 0,
+	distributedToday: 0,
+	distributedThisMonth: 0
 }
 
 // Mock User Reward Summary
@@ -480,7 +481,7 @@ export const mockRewardDashboard: RewardDashboard = {
 	stats: mockRewardStats,
 	rules: mockRewardRules,
 	recentTransactions: mockRewardTransactions,
-	tokenInfo: mockTokenInfo,
+	tokenInfo: mockTokenInfo, // DEPRECATED: Replace with real API data
 	topUsers: mockUserRewardSummary,
 	rulePerformance: mockRulePerformance
 }

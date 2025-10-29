@@ -52,7 +52,11 @@ const WebAuthnRegistration: React.FC = () => {
                 throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
             }
 
-            const options = await response.json();
+            const apiResponse = await response.json();
+            console.log('WebAuthn API Response:', apiResponse);
+            
+            // Extract options from ApiResponse wrapper
+            const options = apiResponse.data || apiResponse;
 
             // Step 2: Create PublicKeyCredential with WebAuthn API
             const publicKeyCredentialCreationOptions = {
@@ -65,7 +69,8 @@ const WebAuthnRegistration: React.FC = () => {
                 },
                 pubKeyCredParams: options.pubKeyCredParams,
                 authenticatorSelection: options.authenticatorSelection,
-                attestation: options.attestation
+                attestation: options.attestation,
+                timeout: options.timeout
             };
 
             const credential = await navigator.credentials.create({

@@ -273,14 +273,13 @@ export interface TokenBalanceResponse {
 	balance: number
 	totalEarned: number
 	totalSpent: number
-	pendingWithdrawal: number
 	walletAddress?: string
 }
 
 export interface TransactionResponse {
 	id: string
 	userId: string
-	type: 'earn' | 'spend' | 'reward' | 'withdrawal' | 'transfer'
+	type: 'earn' | 'spend' | 'reward' | 'transfer'
 	amount: number
 	description: string
 	transactionHash?: string
@@ -350,24 +349,6 @@ export interface RedeemGiftResponse {
 	message: string
 }
 
-export interface WithdrawalRequest {
-	amount: number
-	bankCode: string
-	accountNumber: string
-	accountName: string
-	notes?: string
-}
-
-export interface WithdrawalResponse {
-	withdrawalId: string
-	amount: number
-	fee: number
-	netAmount: number
-	status: 'pending' | 'processing' | 'completed' | 'failed'
-	estimatedProcessTime: string
-	transactionHash?: string
-	message: string
-}
 
 export interface BankInfo {
 	code: string

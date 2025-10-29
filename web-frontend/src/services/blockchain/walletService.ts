@@ -9,10 +9,8 @@ const LEARN_TOKEN_ABI = [
 	"function transfer(address to, uint256 amount) returns (bool)",
 	"function approve(address spender, uint256 amount) returns (bool)",
 	"function allowance(address owner, address spender) view returns (uint256)",
-	"function requestWithdrawal(uint256 amount, string bankAccount)",
 	"event RewardIssued(address indexed user, uint256 amount, string reason)",
 	"event TokensSpent(address indexed user, uint256 amount, string purpose)",
-	"event TokensWithdrawn(address indexed user, uint256 amount, string bankAccount)",
 ]
 
 // Contract address (update after deployment)
@@ -38,7 +36,7 @@ export interface Transaction {
 	from: string
 	to: string
 	amount: string
-	type: 'earn' | 'spend' | 'reward' | 'transfer' | 'withdrawal'
+	type: 'earn' | 'spend' | 'reward' | 'transfer'
 	description: string
 	timestamp: number
 	status: 'pending' | 'confirmed' | 'failed'
@@ -170,14 +168,15 @@ export async function getUserTokenStats(address: string): Promise<TokenStats> {
  */
 export async function getWalletInfo(address: string): Promise<WalletInfo> {
 	try {
-		// For now, return mock data until contract is deployed
-		// TODO: Uncomment when contract is deployed
+		// Contract not deployed yet, return zero balance
+		// Token balance will be fetched from backend API (token-reward-service)
+		// TODO: Uncomment when contract is deployed and integrate with backend
 		// const stats = await getUserTokenStats(address)
 		return {
 			address,
-			balance: '1250', // Mock balance
-			totalEarned: '5000', // Mock earned
-			totalSpent: '500', // Mock spent
+			balance: '0',
+			totalEarned: '0',
+			totalSpent: '0',
 			isConnected: true
 		}
 	} catch (error) {
@@ -192,31 +191,6 @@ export async function getWalletInfo(address: string): Promise<WalletInfo> {
 	}
 }
 
-/**
- * Request withdrawal to bank account
- */
-export async function requestWithdrawal(
-	amount: string,
-	bankAccount: string
-): Promise<string> {
-	try {
-		const contract = await getLearnTokenContract()
-		const amountWei = ethers.parseEther(amount)
-
-		const tx = await contract.requestWithdrawal(amountWei, bankAccount)
-		await tx.wait()
-
-		return tx.hash
-	} catch (error: any) {
-		console.error('Error requesting withdrawal:', error)
-		if (error.message.includes('Insufficient balance')) {
-			throw new Error('Số dư không đủ để rút')
-		} else if (error.message.includes('Minimum withdrawal')) {
-			throw new Error('Số tiền rút tối thiểu là 100 token')
-		}
-		throw new Error('Không thể thực hiện giao dịch rút tiền')
-	}
-}
 
 /**
  * Transfer tokens to another address
@@ -258,7 +232,7 @@ export async function getTransactionHistory(
 		const fromBlock = Math.max(0, currentBlock - 10000) // Last ~10000 blocks
 
 		// Fetch all relevant events
-		const [rewardEvents, spentEvents, withdrawEvents] = await Promise.all([
+		const [rewardEvents, spentEvents] = await Promise.all([
 			contract.queryFilter(
 				contract.filters.RewardIssued(address),
 				fromBlock,
@@ -269,11 +243,6 @@ export async function getTransactionHistory(
 				fromBlock,
 				currentBlock
 			),
-			contract.queryFilter(
-				contract.filters.TokensWithdrawn(address),
-				fromBlock,
-				currentBlock
-			)
 		])
 
 		const transactions: Transaction[] = []
@@ -312,22 +281,6 @@ export async function getTransactionHistory(
 			}
 		}
 
-		// Process withdrawal events
-		for (const event of withdrawEvents) {
-			if ('args' in event) {
-				const block = await event.getBlock()
-				transactions.push({
-					hash: event.transactionHash,
-					from: address,
-					to: 'Bank',
-					amount: ethers.formatEther(event.args?.amount || 0),
-					type: 'withdrawal',
-					description: `Rút về ${event.args?.bankAccount || 'ngân hàng'}`,
-					timestamp: block.timestamp * 1000,
-					status: 'confirmed'
-				})
-			}
-		}
 
 		// Sort by timestamp descending and limit
 		return transactions
