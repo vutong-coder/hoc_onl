@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { X, BookOpen, Award, Clock, TrendingUp, CheckCircle, PlayCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import CourseCard from '../atoms/CourseCard'
+import courseApi from '../../services/api/courseApi'
+import { useAppSelector } from '../../store/hooks'
 
 interface Course {
     id: string
@@ -21,55 +23,75 @@ interface CourseProgressProps {
 }
 
 export default function CourseProgress({
-    courses = [
-        {
-            id: '1',
-            title: 'Lập trình Python toàn diện',
-            progress: 75,
-            totalLessons: 20,
-            completedLessons: 15,
-            duration: '8 giờ',
-            nextLesson: 'Lập trình hướng đối tượng',
-            certificate: true
-        },
-        {
-            id: '2',
-            title: 'Khóa học Phát triển Web',
-            progress: 45,
-            totalLessons: 30,
-            completedLessons: 13,
-            duration: '12 giờ',
-            nextLesson: 'Các thành phần React',
-            certificate: false
-        },
-        {
-            id: '3',
-            title: 'Khoa học dữ liệu cơ bản',
-            progress: 20,
-            totalLessons: 25,
-            completedLessons: 5,
-            duration: '10 giờ',
-            nextLesson: 'Cơ bản về Pandas',
-            certificate: false
-        },
-        {
-            id: '4',
-            title: 'JavaScript nâng cao',
-            progress: 90,
-            totalLessons: 15,
-            completedLessons: 14,
-            duration: '6 giờ',
-            nextLesson: 'JavaScript bất đồng bộ',
-            certificate: true
-        }
-    ],
+    courses: propCourses,
     onContinueCourse,
     onViewCourse
 }: CourseProgressProps): JSX.Element {
     const navigate = useNavigate()
+    const { user } = useAppSelector((state) => state.auth)
     const [showCourseDetailModal, setShowCourseDetailModal] = useState(false)
     const [showCompletionModal, setShowCompletionModal] = useState(false)
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
+    const [courses, setCourses] = useState<Course[]>(propCourses || [])
+    const [loading, setLoading] = useState(!propCourses)
+
+    useEffect(() => {
+        if (!propCourses && user?.id) {
+            fetchEnrolledCourses()
+        }
+    }, [propCourses, user])
+
+    const fetchEnrolledCourses = async () => {
+        if (!user?.id) return
+        
+        try {
+            setLoading(true)
+            // Fetch courses with progress
+            const coursesResponse = await courseApi.getAllCourses(0, 4)
+            const coursesData = coursesResponse.data.content
+            
+            // Fetch progress for each course and transform data
+            const coursesWithProgress = await Promise.all(
+                coursesData.slice(0, 4).map(async (course) => {
+                    try {
+                        const progressResponse = await courseApi.getStudentProgress(Number(user.id), course.id)
+                        const progress = progressResponse.data
+                        const materialsResponse = await courseApi.getCourseMaterials(course.id)
+                        const materials = materialsResponse.data
+                        
+                        return {
+                            id: course.id,
+                            title: course.title,
+                            progress: progress.progressPercentage || 0,
+                            totalLessons: materials.length,
+                            completedLessons: progress.completedMaterials?.length || 0,
+                            duration: `${course.duration} giờ`,
+                            certificate: course.certificateAvailable
+                        }
+                    } catch (err) {
+                        // If no progress, return with 0 progress
+                        return {
+                            id: course.id,
+                            title: course.title,
+                            progress: 0,
+                            totalLessons: 0,
+                            completedLessons: 0,
+                            duration: `${course.duration} giờ`,
+                            certificate: course.certificateAvailable
+                        }
+                    }
+                })
+            )
+            
+            setCourses(coursesWithProgress)
+        } catch (err) {
+            console.error('Error fetching enrolled courses:', err)
+            // Set empty courses on error
+            setCourses([])
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const handleContinueCourse = (courseId: string) => {
         const course = courses.find(c => c.id === courseId)
@@ -80,7 +102,7 @@ export default function CourseProgress({
                 setShowCompletionModal(true)
             } else {
                 // Navigate to continue course
-                navigate(`/user/course/${courseId}/learn`)
+                navigate(`/user/courses/${courseId}/learn`)
             }
             onContinueCourse?.(courseId)
         }
@@ -164,16 +186,42 @@ export default function CourseProgress({
                 </div>
 
                 <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {courses.map((course) => (
-                            <CourseCard
-                                key={course.id}
-                                course={course}
-                                onContinueCourse={handleContinueCourse}
-                                onViewCourse={handleViewCourse}
-                            />
-                        ))}
-                    </div>
+                    {loading ? (
+                        <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted-foreground)' }}>
+                            Đang tải...
+                        </div>
+                    ) : courses.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted-foreground)' }}>
+                            <BookOpen size={48} style={{ margin: '0 auto 16px', opacity: 0.5 }} />
+                            <p>Bạn chưa đăng ký khóa học nào</p>
+                            <button
+                                onClick={handleViewAllCourses}
+                                style={{
+                                    marginTop: '12px',
+                                    padding: '8px 16px',
+                                    background: 'var(--primary)',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: 'var(--radius-md)',
+                                    cursor: 'pointer',
+                                    fontWeight: 600
+                                }}
+                            >
+                                Khám phá khóa học
+                            </button>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            {courses.map((course) => (
+                                <CourseCard
+                                    key={course.id}
+                                    course={course}
+                                    onContinueCourse={handleContinueCourse}
+                                    onViewCourse={handleViewCourse}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 

@@ -106,42 +106,69 @@ export default function LoginPage(): JSX.Element {
 			})
 
 			if (!response.ok) {
-				const errorData = await response.json();
+					const errorData = await response.json();
 				throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
 			}
 
-			            const options = await response.json()
+			            const raw = await response.json()
+			            // Support both direct and wrapped shapes
+			            const options = (raw && (raw.publicKeyCredentialRequestOptions || raw.data?.publicKeyCredentialRequestOptions)) || raw
 			            console.log('Assertion options:', options)
 			
 			            // Step 2: Get assertion from authenticator
-			            const assertion = await navigator.credentials.get({
-			                publicKey: {
-			                    challenge: base64UrlToArrayBuffer(options.publicKey.challenge),
-			                    rpId: options.publicKey.rpId,
-			                    allowCredentials: options.publicKey.allowCredentials.map((cred: any) => ({
-			                        ...cred,
-			                        id: base64UrlToArrayBuffer(cred.id)
-			                    })),
-			                    userVerification: options.publicKey.userVerification || 'preferred',
-			                    timeout: options.publicKey.timeout || 60000
+            const allowCredentials = (options.allowCredentials || []).map((cred: any) => {
+			                const mapped: any = {
+			                    type: cred.type || 'public-key',
+			                    id: base64UrlToArrayBuffer(cred.id)
 			                }
-			            }) as PublicKeyCredential
+                // Force platform authenticator during login
+                mapped.transports = ['internal']
+			                return mapped
+			            })
+
+            const publicKeyOptions: any = {
+                challenge: base64UrlToArrayBuffer(options.challenge),
+                rpId: options.rpId,
+                userVerification: options.userVerification || 'required',
+                timeout: options.timeout || 60000
+            }
+            // Prefer discoverable credentials: omit allowCredentials so platform passkey can be found
+            if (allowCredentials.length > 0) {
+                publicKeyOptions.allowCredentials = allowCredentials
+            }
+
+            const assertion = await navigator.credentials.get({
+                publicKey: publicKeyOptions
+            }) as PublicKeyCredential
 			console.log('Got assertion:', assertion)
 
-			// Step 3: Send assertion to server for verification (qua API Gateway - localhost:8080)
+			// Step 3: Send assertion to server in Yubico's expected JSON format
+			const rawIdB64u = arrayBufferToBase64Url(assertion.rawId)
+			const assertionJSON = {
+				id: rawIdB64u,
+				rawId: rawIdB64u,
+				type: assertion.type,
+				response: {
+					clientDataJSON: arrayBufferToBase64Url((assertion.response as any).clientDataJSON),
+					authenticatorData: arrayBufferToBase64Url((assertion.response as any).authenticatorData),
+					signature: arrayBufferToBase64Url((assertion.response as any).signature),
+					userHandle: arrayBufferToBase64Url(new TextEncoder().encode(formData.email).buffer)
+				},
+				clientExtensionResults: (assertion as any).getClientExtensionResults ? (assertion as any).getClientExtensionResults() : {}
+			}
+
 			const response2 = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/identity/api/webauthn/assertion/result`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({
-					username: formData.email,
-					credentialId: arrayBufferToBase64Url(assertion.rawId),
-					clientDataJSON: arrayBufferToBase64Url(assertion.response.clientDataJSON),
-					authenticatorData: arrayBufferToBase64Url((assertion.response as any).authenticatorData),
-					signature: arrayBufferToBase64Url((assertion.response as any).signature)
-				})
+				body: JSON.stringify(assertionJSON)
 			})
+
+			if (!response2.ok) {
+				const msg = await response2.text()
+				throw new Error(`Finish assertion failed ${response2.status}: ${msg}`)
+			}
 
 			            const result = await response2.json()
 						console.log('Authentication result:', result)

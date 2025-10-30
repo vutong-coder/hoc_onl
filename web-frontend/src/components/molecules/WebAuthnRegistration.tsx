@@ -42,8 +42,8 @@ const WebAuthnRegistration: React.FC = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: user.email, // Use email as the username for WebAuthn
-                    displayName: user.name || user.email
+                    username: (user as any).username || user.email,
+                    displayName: user.name || (user as any).username || user.email
                 })
             });
 
@@ -68,7 +68,12 @@ const WebAuthnRegistration: React.FC = () => {
                     displayName: options.user.displayName
                 },
                 pubKeyCredParams: options.pubKeyCredParams,
-                authenticatorSelection: options.authenticatorSelection,
+                authenticatorSelection: {
+                    authenticatorAttachment: 'platform' as AuthenticatorAttachment,
+                    residentKey: 'required' as ResidentKeyRequirement,
+                    requireResidentKey: true,
+                    userVerification: 'required' as UserVerificationRequirement
+                },
                 attestation: options.attestation,
                 timeout: options.timeout
             };
@@ -77,18 +82,32 @@ const WebAuthnRegistration: React.FC = () => {
                 publicKey: publicKeyCredentialCreationOptions
             }) as PublicKeyCredential;
 
-            // Step 3: Send registration result to the server
-            const response2 = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/identity/api/webauthn/registration/result/${user.email}`, {
+            // Step 3: Send registration result to the server in Yubico's expected JSON format
+            const rawIdB64u = arrayBufferToBase64Url(credential.rawId);
+            const credentialJSON = {
+                id: rawIdB64u, // ensure id matches base64url(rawId)
+                rawId: rawIdB64u,
+                type: credential.type,
+                response: {
+                    clientDataJSON: arrayBufferToBase64Url((credential.response as any).clientDataJSON),
+                    attestationObject: arrayBufferToBase64Url((credential.response as any).attestationObject),
+                },
+                clientExtensionResults: (credential as any).getClientExtensionResults ? (credential as any).getClientExtensionResults() : {}
+            };
+
+            const regUsername = (user as any).username || user.email;
+            const response2 = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/identity/api/webauthn/registration/result/${regUsername}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    credentialId: arrayBufferToBase64Url(credential.rawId),
-                    clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON),
-                    attestationObject: arrayBufferToBase64Url((credential.response as any).attestationObject),
-                })
+                body: JSON.stringify(credentialJSON)
             });
+
+            if (!response2.ok) {
+                const msg = await response2.text();
+                throw new Error(`Finish registration failed ${response2.status}: ${msg}`);
+            }
 
             const result = await response2.json();
 

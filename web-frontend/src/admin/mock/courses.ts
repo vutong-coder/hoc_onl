@@ -1,3 +1,7 @@
+// ⚠️ DEPRECATED: Mock data for Course Management
+// Use real API from course-service (port 9001) via src/admin/services/courseApi.ts
+// This file is kept for backward compatibility with categories and instructors only
+
 import { 
 	Course, 
 	CourseCategory, 
@@ -157,6 +161,7 @@ export const mockInstructors: Instructor[] = [
 ]
 
 // Mock Courses
+// ⚠️ DEPRECATED: Use adminCourseApi.getAllCourses() instead
 export const mockCourses: Course[] = [
 	{
 		id: 'course-1',
@@ -514,6 +519,7 @@ export const mockCourseStats: CourseStats = {
 }
 
 // Complete Course Dashboard
+// ⚠️ DEPRECATED: Dashboard now loaded from real API in useCourses hook
 export const mockCourseDashboard: CourseDashboard = {
 	stats: mockCourseStats,
 	recentCourses: mockCourses.slice(0, 3),

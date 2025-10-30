@@ -10,14 +10,32 @@ import {
 	CourseLevel
 } from '../types/course'
 import { 
-	mockCourseDashboard,
-	mockCourses,
 	mockCourseCategories,
 	mockInstructors
 } from '../mock/courses'
+import adminCourseApi, { getCourseStatistics, getTopCourses } from '../services/courseApi'
+
+// Initial empty dashboard - will be loaded from API
+const initialDashboard: CourseDashboard = {
+	stats: {
+		totalCourses: 0,
+		publishedCourses: 0,
+		draftCourses: 0,
+		totalStudents: 0,
+		totalRevenue: 0,
+		averageRating: 0,
+		completionRate: 0,
+		totalInstructors: 0
+	},
+	courses: [],
+	topCourses: [],
+	recentCourses: [],
+	categories: mockCourseCategories,
+	instructors: mockInstructors
+}
 
 export default function useCourses() {
-	const [dashboard, setDashboard] = useState<CourseDashboard>(mockCourseDashboard)
+	const [dashboard, setDashboard] = useState<CourseDashboard>(initialDashboard)
 	const [filters, setFilters] = useState<CourseFilters>({
 		search: '',
 		category: 'all',
@@ -34,10 +52,54 @@ export default function useCourses() {
 	const [editingCourse, setEditingCourse] = useState<Course | null>(null)
 	const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
 	const [loading, setLoading] = useState(false)
+	const [allCourses, setAllCourses] = useState<Course[]>([])
+
+	// Load courses from API
+	const loadCourses = useCallback(async () => {
+		setLoading(true)
+		try {
+			// Load courses
+			const coursesResponse = await adminCourseApi.getAllCourses(0, 100)
+			const courses = coursesResponse.data.content
+			
+			// Load statistics
+			const stats = await getCourseStatistics()
+			
+			// Load top courses
+			const topCourses = await getTopCourses(5)
+			
+			setAllCourses(courses)
+			setDashboard(prev => ({
+				...prev,
+				stats: {
+					totalCourses: stats.totalCourses,
+					publishedCourses: stats.publishedCourses,
+					draftCourses: stats.draftCourses,
+					totalStudents: stats.totalEnrollments,
+					totalRevenue: 0, // TODO: Calculate from backend
+					averageRating: stats.averageRating,
+					completionRate: 0, // TODO: Get from backend
+					totalInstructors: mockInstructors.length
+				},
+				courses,
+				topCourses,
+				recentCourses: courses.slice(0, 5)
+			}))
+		} catch (error) {
+			console.error('❌ Error loading courses:', error)
+		} finally {
+			setLoading(false)
+		}
+	}, [])
+
+	// Load courses on mount
+	useEffect(() => {
+		loadCourses()
+	}, [loadCourses])
 
 	// Filter courses
 	const filteredCourses = useMemo(() => {
-		let result = [...mockCourses]
+		let result = [...allCourses]
 
 		// Search filter
 		if (filters.search) {
@@ -153,7 +215,34 @@ export default function useCourses() {
 	}, [])
 
 	// Course management
-	const addCourse = useCallback((courseForm: CourseForm) => {
+	const addCourse = useCallback(async (courseForm: CourseForm) => {
+		setLoading(true)
+		try {
+			const newCourseData = {
+				title: courseForm.title,
+				description: courseForm.description,
+				shortDescription: courseForm.shortDescription,
+				level: courseForm.level,
+				duration: courseForm.duration,
+				price: courseForm.price,
+				thumbnail: courseForm.thumbnail,
+				tags: courseForm.tags,
+				prerequisites: courseForm.prerequisites,
+				learningOutcomes: courseForm.learningOutcomes,
+				certificateAvailable: courseForm.certificateAvailable
+			}
+			
+			await adminCourseApi.createCourse(newCourseData)
+			await loadCourses() // Reload to get fresh data
+		} catch (error) {
+			console.error('Error adding course:', error)
+			throw error
+		} finally {
+			setLoading(false)
+		}
+	}, [loadCourses])
+
+	const addCourseOld = useCallback((courseForm: CourseForm) => {
 		const category = mockCourseCategories.find(cat => cat.id === courseForm.categoryId)
 		const instructor = mockInstructors.find(inst => inst.id === courseForm.instructorId)
 		
@@ -203,7 +292,33 @@ export default function useCourses() {
 		}))
 	}, [])
 
-	const updateCourse = useCallback((courseId: string, courseForm: CourseForm) => {
+	const updateCourse = useCallback(async (courseId: string, courseForm: CourseForm) => {
+		setLoading(true)
+		try {
+			const updateData = {
+				title: courseForm.title,
+				description: courseForm.description,
+				shortDescription: courseForm.shortDescription,
+				level: courseForm.level,
+				duration: courseForm.duration,
+				price: courseForm.price,
+				thumbnail: courseForm.thumbnail,
+				tags: courseForm.tags,
+				isPublished: courseForm.isPublished,
+				isFeatured: courseForm.isFeatured
+			}
+			
+			await adminCourseApi.updateCourse(courseId, updateData)
+			await loadCourses() // Reload to get fresh data
+		} catch (error) {
+			console.error('Error updating course:', error)
+			throw error
+		} finally {
+			setLoading(false)
+		}
+	}, [loadCourses])
+
+	const updateCourseOld = useCallback((courseId: string, courseForm: CourseForm) => {
 		const category = mockCourseCategories.find(cat => cat.id === courseForm.categoryId)
 		const instructor = mockInstructors.find(inst => inst.id === courseForm.instructorId)
 		
@@ -249,7 +364,20 @@ export default function useCourses() {
 		}))
 	}, [])
 
-	const deleteCourse = useCallback((courseId: string) => {
+	const deleteCourse = useCallback(async (courseId: string) => {
+		setLoading(true)
+		try {
+			await adminCourseApi.deleteCourse(courseId)
+			await loadCourses() // Reload to get fresh data
+		} catch (error) {
+			console.error('Error deleting course:', error)
+			throw error
+		} finally {
+			setLoading(false)
+		}
+	}, [loadCourses])
+
+	const deleteCourseOld = useCallback((courseId: string) => {
 		setDashboard(prev => {
 			const course = prev.recentCourses.find(c => c.id === courseId)
 			return {
@@ -266,7 +394,25 @@ export default function useCourses() {
 		})
 	}, [])
 
-	const toggleCourseStatus = useCallback((courseId: string) => {
+	const toggleCourseStatus = useCallback(async (courseId: string) => {
+		setLoading(true)
+		try {
+			const course = allCourses.find(c => c.id === courseId)
+			if (!course) return
+			
+			await adminCourseApi.updateCourse(courseId, {
+				isPublished: !course.isPublished
+			})
+			await loadCourses() // Reload to get fresh data
+		} catch (error) {
+			console.error('Error toggling course status:', error)
+			throw error
+		} finally {
+			setLoading(false)
+		}
+	}, [allCourses, loadCourses])
+
+	const toggleCourseStatusOld = useCallback((courseId: string) => {
 		setDashboard(prev => ({
 			...prev,
 			recentCourses: prev.recentCourses.map(course =>
@@ -318,87 +464,53 @@ export default function useCourses() {
 		closeCourseEditor()
 	}, [editingCourse, addCourse, updateCourse, closeCourseEditor])
 
-	// Simulate real-time updates
+	// Auto-refresh courses every 30 seconds
 	useEffect(() => {
 		const interval = setInterval(() => {
-			setDashboard(prev => {
-				// Simulate new enrollments occasionally
-				if (Math.random() < 0.1) { // 10% chance
-					const publishedCourses = prev.recentCourses.filter(course => course.isPublished)
-					if (publishedCourses.length > 0) {
-						const randomCourse = publishedCourses[Math.floor(Math.random() * publishedCourses.length)]
-						
-						const newEnrollment = {
-							id: `enroll-${Date.now()}`,
-							studentId: `student-${Math.floor(Math.random() * 1000)}`,
-							studentName: `Học viên ${Math.floor(Math.random() * 100)}`,
-							courseId: randomCourse.id,
-							courseTitle: randomCourse.title,
-							enrolledAt: new Date().toISOString(),
-							progress: Math.floor(Math.random() * 100),
-							status: 'active' as const
-						}
-
-						return {
-							...prev,
-							recentEnrollments: [newEnrollment, ...prev.recentEnrollments].slice(0, 10),
-							stats: {
-								...prev.stats,
-								totalEnrollments: prev.stats.totalEnrollments + 1
-							},
-							recentCourses: prev.recentCourses.map(course =>
-								course.id === randomCourse.id
-									? { ...course, enrollmentCount: course.enrollmentCount + 1 }
-									: course
-							)
-						}
-					}
-				}
-				return prev
-			})
-		}, 15000) // Update every 15 seconds
+			loadCourses()
+		}, 30000) // Refresh every 30 seconds
 
 		return () => clearInterval(interval)
-	}, [])
+	}, [loadCourses])
 
 	// Helper functions
 	const getCourseById = useCallback((id: string) => {
-		return mockCourses.find(course => course.id === id)
-	}, [])
+		return allCourses.find(course => course.id === id)
+	}, [allCourses])
 
 	const getCoursesByCategory = useCallback((categoryId: string) => {
-		return mockCourses.filter(course => course.category.id === categoryId)
-	}, [])
+		return allCourses.filter(course => course.category?.id === categoryId)
+	}, [allCourses])
 
 	const getCoursesByInstructor = useCallback((instructorId: string) => {
-		return mockCourses.filter(course => course.instructor.id === instructorId)
-	}, [])
+		return allCourses.filter(course => course.instructor?.id === instructorId)
+	}, [allCourses])
 
 	const getPublishedCourses = useCallback(() => {
-		return mockCourses.filter(course => course.isPublished)
-	}, [])
+		return allCourses.filter(course => course.isPublished)
+	}, [allCourses])
 
 	const getFeaturedCourses = useCallback(() => {
-		return mockCourses.filter(course => course.isFeatured)
-	}, [])
+		return allCourses.filter(course => course.isFeatured)
+	}, [allCourses])
 
 	const getCoursesByLevel = useCallback((level: CourseLevel) => {
-		return mockCourses.filter(course => course.level === level)
-	}, [])
+		return allCourses.filter(course => course.level === level)
+	}, [allCourses])
 
 	const getTopRatedCourses = useCallback((limit = 5) => {
-		return mockCourses
-			.filter(course => course.isPublished && course.rating > 0)
-			.sort((a, b) => b.rating - a.rating)
+		return allCourses
+			.filter(course => course.isPublished && (course.rating || 0) > 0)
+			.sort((a, b) => (b.rating || 0) - (a.rating || 0))
 			.slice(0, limit)
-	}, [])
+	}, [allCourses])
 
 	const getMostEnrolledCourses = useCallback((limit = 5) => {
-		return mockCourses
+		return allCourses
 			.filter(course => course.isPublished)
-			.sort((a, b) => b.enrollmentCount - a.enrollmentCount)
+			.sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))
 			.slice(0, limit)
-	}, [])
+	}, [allCourses])
 
 	return {
 		// Data
@@ -415,6 +527,7 @@ export default function useCourses() {
 		updateCourse,
 		deleteCourse,
 		toggleCourseStatus,
+		loadCourses,
 		
 		// Modal management
 		isCourseEditorOpen,
