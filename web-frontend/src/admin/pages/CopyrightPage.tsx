@@ -2,35 +2,12 @@
 
 import React, { useState } from 'react'
 import { 
-	Shield, 
-	FileText, 
-	BarChart3, 
-	Plus, 
-	Download, 
-	RefreshCw, 
-	Settings,
-	Eye,
-	EyeOff,
-	AlertTriangle,
-	CheckCircle,
-	Info,
-	Upload,
-	Hash,
-	Database,
-	Zap,
-	TrendingUp,
-	Filter,
-	Search,
-	X
+	Shield, FileText, BarChart3, Plus, Download, RefreshCw, Settings, Eye, EyeOff, AlertTriangle,
+	CheckCircle, Info, Upload, Hash, Database, Zap, TrendingUp, Filter, Search, X
 } from 'lucide-react'
 import Card from '../components/common/Card'
 import Badge from '../components/common/Badge'
 import { DocumentRegistrar } from '../components/copyright/DocumentRegistrar'
-import RegisterDocumentModal from '../modal/Copyright/RegisterDocumentModal'
-import DocumentDetailModal from '../modal/Copyright/DocumentDetailModal'
-import { EditDocumentModal } from '../modal/Copyright/EditDocumentModal'
-import ExportModal from '../modal/Copyright/ExportModal'
-import SettingsModal from '../modal/Copyright/SettingsModal'
 import { RegisteredDocsTable } from '../components/copyright/RegisteredDocsTable'
 import { CopyrightStatsComponent } from '../components/copyright/CopyrightStats'
 import { useCopyright, AdminDocument, DocumentForm, ExportOptions } from '../hooks/useCopyright'
@@ -38,6 +15,11 @@ import '../styles/copyright.scss'
 import '../styles/table.css'
 import '../styles/common.css'
 import '../styles/form.css'
+import RegisterDocumentModal from '../modal/Copyright/RegisterDocumentModal'
+import DocumentDetailModal from '../modal/Copyright/DocumentDetailModal'
+import ExportModal from '../modal/Copyright/ExportModal'
+import { EditDocumentModal } from '../modal/Copyright'
+import SettingsModal from '../modal/Copyright/SettingsModal'
 
 export const CopyrightPage: React.FC = () => {
 	const {

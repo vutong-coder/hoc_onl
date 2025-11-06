@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { proctoringService } from '../services/proctoringService';
+import { cameraManager } from '../services/cameraManager';
 import { useFrameStorage } from './useFrameStorage';
 
 export interface CheatingDetection {
@@ -53,6 +54,7 @@ export interface AICameraMonitorReturn {
 interface UseAICameraMonitorProps {
   examId?: string;
   studentId?: string;
+  sessionId?: string;
 }
 
 interface CameraState {
@@ -76,7 +78,7 @@ const initialState: CameraState = {
 };
 
 export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMonitorReturn => {
-  const { examId = 'default', studentId = '1' } = props || {};
+  const { examId = 'default', studentId = '1', sessionId } = props || {};
   const [state, setState] = useState<CameraState>(initialState);
   
   // Frame Storage Hook
@@ -96,11 +98,10 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
     setState(prev => ({ ...prev, ...updates }));
   }, []);
 
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
   const analysisIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastDetectionTimeRef = useRef<number>(0);
+  const cameraUsageRef = useRef(false);
+  const visibilityListenerRef = useRef<(() => void) | null>(null);
 
   // Tab switch detection (vẫn giữ vì dùng Browser API, không cần backend)
   const detectTabSwitch = useCallback((): CheatingDetection | null => {
@@ -117,85 +118,42 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
   }, []);
 
   const captureScreenshot = useCallback((): string | null => {
-    if (!videoRef.current || !canvasRef.current) {
-      console.error('captureScreenshot: Video or canvas ref not available');
+    const dataUrl = cameraManager.captureFrame();
+
+    if (!dataUrl) {
+      console.error('captureScreenshot: Unable to capture frame from shared camera');
       return null;
     }
 
-    try {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      
-      // Validate video is ready
-      if (video.videoWidth === 0 || video.videoHeight === 0) {
-        console.error('captureScreenshot: Video dimensions not ready:', video.videoWidth, 'x', video.videoHeight);
-        return null;
-      }
-      
-      if (video.readyState < 2) {
-        console.error('captureScreenshot: Video not ready, readyState:', video.readyState);
-        return null;
-      }
-      
-      const context = canvas.getContext('2d');
-      if (!context) {
-        console.error('captureScreenshot: Cannot get canvas context');
-        return null;
-      }
-
-      // Set canvas size to match video
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      
-      // Clear canvas first
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw video frame to canvas
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      // Convert to data URL with HIGHER quality (0.95 instead of 0.8)
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-      
-      // Validate captured image - Relaxed threshold for now
-      // Expected: 20KB+ for 640x480, 50KB+ for 1280x720
-      // But accept smaller sizes if browser doesn't support high quality
-      const minSize = 5000; // Accept if > 5KB (relaxed from calculated minimum)
-      if (!dataUrl || dataUrl.length < minSize) {
-        console.error('captureScreenshot: Captured image too small:', dataUrl.length, 'bytes, expected >', minSize);
-        return null;
-      }
-      
-      console.log('captureScreenshot: Success!', video.videoWidth, 'x', video.videoHeight, 'dataUrl:', dataUrl.length, 'bytes');
-      return dataUrl;
-    } catch (err) {
-      console.error('Error capturing screenshot:', err);
+    const minSize = 5000; // Accept if > 5KB (relaxed from calculated minimum)
+    if (dataUrl.length < minSize) {
+      console.error('captureScreenshot: Captured image too small:', dataUrl.length, 'bytes, expected >', minSize);
       return null;
     }
+
+    return dataUrl;
   }, []);
 
-  const updateCameraMetrics = useCallback((video: HTMLVideoElement) => {
-    // Mock metrics calculation
+  const updateCameraMetrics = useCallback(() => {
+    const dimensions = cameraManager.getVideoDimensions();
+    const fps = cameraManager.getFrameRate();
+
     const newMetrics: CameraMetrics = {
-      fps: 25 + Math.random() * 5, // Mock FPS
-      resolution: `${video.videoWidth}x${video.videoHeight}`,
-      brightness: 50 + Math.random() * 30, // Mock brightness
-      contrast: 60 + Math.random() * 20, // Mock contrast
-      isStable: Math.random() > 0.1 // 90% stable
+      fps: fps ?? 25 + Math.random() * 5,
+      resolution: dimensions ? `${dimensions.width}x${dimensions.height}` : 'Không xác định',
+      brightness: 50 + Math.random() * 30,
+      contrast: 60 + Math.random() * 20,
+      isStable: !!cameraManager.currentStream?.active,
     };
+
     updateState({ metrics: newMetrics });
   }, [updateState]);
 
   const analyzeFrame = useCallback(async () => {
-    console.log('analyzeFrame: Called with isActive =', isActiveRef.current, 'videoRef =', !!videoRef.current); // Debug log
-    
-    if (!videoRef.current || !isActiveRef.current) {
-      console.log('analyzeFrame: Skipped - video not ready or not active'); // Debug log
+    if (!isActiveRef.current) {
       return;
     }
 
-    console.log('analyzeFrame: Starting analysis...'); // Debug log
-
-    const video = videoRef.current;
     let newDetections: CheatingDetection[] = [];
     const startTime = Date.now();
 
@@ -203,20 +161,17 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
       // === GỌI AI BACKEND THẬT ===
       const screenshot = captureScreenshot();
       if (screenshot) {
-        console.log('analyzeFrame: Calling AI backend...'); // Debug log
-        
         // Lưu frame vào storage
         const frameId = frameStorage.addFrame(screenshot, examId, studentId);
-        console.log('analyzeFrame: Frame saved to storage, ID:', frameId);
         
         const response = await proctoringService.analyzeFrame({
           image: screenshot,
           examId,
           studentId,
+          sessionId,
         });
 
         const processingTime = Date.now() - startTime;
-        console.log('analyzeFrame: AI response:', response.detections.length, 'detections, processing time:', processingTime, 'ms'); // Debug log
 
         // Lưu response vào storage
         frameStorage.addResponse(frameId, response.detections.map(d => ({
@@ -250,21 +205,16 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
           lastDetection.type === newDetections[0].type; // Cùng loại vi phạm
         
         if (!shouldSkip) {
-          console.log('analyzeFrame: New violations detected:', newDetections.length, newDetections.map(d => d.type)); // Debug log
           setState(prev => ({ 
             ...prev,
             detections: [...prev.detections, ...newDetections].slice(-50) // Keep last 50 detections
           }));
           lastDetectionTimeRef.current = now;
-        } else {
-          console.log('analyzeFrame: Detection skipped due to cooldown for type:', newDetections[0].type); // Debug log
         }
-      } else {
-        console.log('analyzeFrame: No violations detected'); // Debug log
       }
 
       // Update camera metrics
-      updateCameraMetrics(video);
+      updateCameraMetrics();
 
     } catch (err) {
       console.error('Error analyzing frame:', err);
@@ -272,69 +222,29 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
   }, [examId, studentId, state.enabledDetections, detectTabSwitch, captureScreenshot, updateCameraMetrics]);
 
   const startMonitoring = useCallback(async () => {
+    if (isActiveRef.current) {
+      return;
+    }
+
     try {
       updateState({ error: null, isAnalyzing: true });
 
-      // Request camera and microphone access
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'user'
-        },
-        audio: true
-      });
-
-      streamRef.current = stream;
-
-      // Create video element
-      if (!videoRef.current) {
-        const video = document.createElement('video');
-        video.srcObject = stream;
-        video.autoplay = true;
-        video.muted = true;
-        video.style.display = 'none';
-        document.body.appendChild(video);
-        videoRef.current = video;
-      } else {
-        videoRef.current.srcObject = stream;
+      if (!cameraUsageRef.current) {
+        cameraManager.incrementUsage();
+        cameraUsageRef.current = true;
       }
 
-      // Create canvas for screenshots
-      if (!canvasRef.current) {
-        const canvas = document.createElement('canvas');
-        canvas.style.display = 'none';
-        document.body.appendChild(canvas);
-        canvasRef.current = canvas;
-      }
-
-      // Wait for video to be ready
-      await new Promise<void>((resolve) => {
-        if (videoRef.current) {
-          videoRef.current.onloadedmetadata = () => {
-            resolve();
-          };
-        }
-      });
+      await cameraManager.start();
 
       updateState({ isActive: true, isAnalyzing: false });
-      isActiveRef.current = true; // Update ref immediately
-      
-      console.log('startMonitoring: Camera is now ACTIVE!'); // Debug log
+      isActiveRef.current = true;
 
-      // Start analysis loop - reduced frequency
-      const analysisInterval = setInterval(analyzeFrame, 3000); // Analyze every 3 seconds instead of 1
-      analysisIntervalRef.current = analysisInterval;
-      
-      console.log('startMonitoring: Analysis interval created:', analysisInterval); // Debug log
-      
-      // Test analyzeFrame immediately
-      setTimeout(() => {
-        console.log('startMonitoring: Testing analyzeFrame after 3 seconds...'); // Debug log
-        analyzeFrame();
-      }, 3000);
+      if (!analysisIntervalRef.current) {
+        analysisIntervalRef.current = setInterval(analyzeFrame, 3000);
+      }
 
-      // Listen for visibility changes (tab switching)
+      analyzeFrame();
+
       const handleVisibilityChange = () => {
         if (state.enabledDetections.has('tab_switch')) {
           analyzeFrame();
@@ -342,11 +252,11 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
       };
 
       document.addEventListener('visibilitychange', handleVisibilityChange);
-
+      visibilityListenerRef.current = handleVisibilityChange;
     } catch (err) {
       console.error('Error starting camera monitoring:', err);
       let errorMessage = 'Không thể khởi động camera AI';
-      
+
       if (err instanceof Error) {
         if (err.name === 'NotAllowedError') {
           errorMessage = 'Bạn đã từ chối quyền truy cập camera. Vui lòng cho phép camera để tiếp tục.';
@@ -354,42 +264,44 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
           errorMessage = 'Không tìm thấy camera. Vui lòng kiểm tra camera của bạn.';
         } else if (err.name === 'NotReadableError') {
           errorMessage = 'Camera đang được sử dụng bởi ứng dụng khác.';
+        } else {
+          errorMessage = err.message || errorMessage;
         }
       }
-      
+
+      if (cameraUsageRef.current) {
+        cameraManager.decrementUsage();
+        cameraUsageRef.current = false;
+      }
+
       updateState({ error: errorMessage, isAnalyzing: false });
     }
-  }, [analyzeFrame, state.enabledDetections]);
+  }, [analyzeFrame, state.enabledDetections, updateState]);
 
   const stopMonitoring = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-
     if (analysisIntervalRef.current) {
       clearInterval(analysisIntervalRef.current);
       analysisIntervalRef.current = null;
     }
 
-    // Cleanup DOM elements
-    if (videoRef.current && videoRef.current.parentNode) {
-      document.body.removeChild(videoRef.current);
-      videoRef.current = null;
-    }
-    if (canvasRef.current && canvasRef.current.parentNode) {
-      document.body.removeChild(canvasRef.current);
-      canvasRef.current = null;
+    if (visibilityListenerRef.current) {
+      document.removeEventListener('visibilitychange', visibilityListenerRef.current);
+      visibilityListenerRef.current = null;
     }
 
-    updateState({ 
-      isActive: false, 
-      isAnalyzing: false, 
-      detections: [], 
-      metrics: null 
+    if (cameraUsageRef.current) {
+      cameraManager.decrementUsage();
+      cameraUsageRef.current = false;
+    }
+
+    updateState({
+      isActive: false,
+      isAnalyzing: false,
+      detections: [],
+      metrics: null,
     });
-    isActiveRef.current = false; // Update ref
-  }, []);
+    isActiveRef.current = false;
+  }, [updateState]);
 
   const handleSetDetectionSensitivity = useCallback((level: 'low' | 'medium' | 'high') => {
     updateState({ detectionSensitivity: level });

@@ -1,75 +1,134 @@
 import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Trophy, Award, Clock, CheckCircle, XCircle, Target, TrendingUp, Calendar, ArrowLeft, FileText, BarChart3 } from 'lucide-react';
 import Button from '../components/atoms/Button';
 import { RootState } from '../store';
+import { examService } from '../services/examService';
+
+interface ExamResultData {
+  examId: string;
+  examTitle?: string;
+  score: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  wrongAnswers: number;
+  timeSpent: number;
+  passed: boolean;
+  submittedAt: string;
+  percentile: number;
+}
 
 export const ExamResultPage: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [result, setResult] = React.useState<ExamResultData | null>(null);
 
-  const { currentExam, questions, answers, startTime } = useSelector((state: RootState) => state.exam);
+  // ❌ REMOVED: Don't calculate from Redux, always use backend data
+  // Redux state may have incorrect correctAnswer values since backend hides them during exam
 
-  // Calculate real results from exam data
-  const calculateResults = () => {
-    if (!questions || questions.length === 0) {
-      return null;
+  // Fetch result from API
+  const fetchResultFromAPI = async () => {
+    if (!examId) {
+      setError('Thiếu thông tin bài thi');
+      return;
     }
 
-    let correctAnswers = 0;
-    questions.forEach(question => {
-      const userAnswer = answers[question.id];
-      if (userAnswer && question.correctAnswer !== undefined) {
-        if (userAnswer.answer === question.correctAnswer) {
-          correctAnswers++;
+    try {
+      // ✅ NEW: Get submissionId from URL query (passed from submit handler)
+      const submissionIdFromUrl = searchParams.get('submissionId');
+      
+      let submissionId: string;
+      
+      if (submissionIdFromUrl) {
+        // Use submission ID from URL (immediate after submit)
+        submissionId = submissionIdFromUrl;
+      } else {
+        // Fallback: Find submission from list (when user returns to result page)
+        const submissions = await examService.getMySubmissions();
+        const submission = submissions.find((s: any) => s.quizId === examId);
+
+        if (!submission || !submission.submittedAt) {
+          // No submission found, redirect to detail page
+          navigate(`/exam/${examId}/detail`, { replace: true });
+          return;
         }
+        
+        submissionId = submission.id;
       }
-    });
 
-    const totalQuestions = questions.length;
-    const score = Math.round((correctAnswers / totalQuestions) * 100);
-    const wrongAnswers = totalQuestions - correctAnswers;
-    const timeSpent = startTime ? Math.round((Date.now() - startTime) / 60000) : 0;
-    const passed = score >= 70;
-    const percentile = score >= 90 ? 95 : score >= 80 ? 85 : score >= 70 ? 75 : score >= 60 ? 60 : 40;
+      // Fetch detailed result from backend
+      const apiResult = await examService.getExamResult(submissionId);
+      
+      // Use percentile from backend if available, otherwise calculate default
+      const percentile = apiResult.percentile ?? (
+        apiResult.score >= 90 ? 95 : 
+        apiResult.score >= 80 ? 85 : 
+        apiResult.score >= 70 ? 75 : 
+        apiResult.score >= 60 ? 60 : 40
+      );
 
-    return {
-      examId,
-      score,
-      totalQuestions,
-      correctAnswers,
-      wrongAnswers,
-      timeSpent,
-      passed,
-      submittedAt: new Date().toISOString(),
-      percentile
-    };
+      // ✅ Use data directly from backend (accurate grading)
+      const wrongAnswers = apiResult.wrongAnswers ?? (apiResult.totalQuestions - apiResult.correctAnswers);
+      
+      setResult({
+        examId: apiResult.examId,
+        examTitle: apiResult.quizTitle || apiResult.examTitle,
+        score: apiResult.score,
+        totalQuestions: apiResult.totalQuestions,
+        correctAnswers: apiResult.correctAnswers,
+        wrongAnswers,
+        timeSpent: apiResult.timeSpent || 0,
+        passed: apiResult.passed,
+        submittedAt: apiResult.submittedAt,
+        percentile
+      });
+    } catch (err: any) {
+      console.error('Error fetching exam result:', err);
+      // If error is 404, redirect to detail page
+      if (err.response?.status === 404) {
+        navigate(`/exam/${examId}/detail`, { replace: true });
+      } else {
+        // Other errors - show error message
+        const errorMessage = err.response?.data?.message || err.message || 'Không thể tải kết quả bài thi';
+        setError(errorMessage);
+      }
+    }
   };
 
-  const result = calculateResults();
-
+  // ✅ FIX: Add proper dependency array and prevent duplicate fetch
   useEffect(() => {
-    // Simulate loading delay
-    const timer = setTimeout(() => {
-      if (!result) {
-        setError('Không tìm thấy dữ liệu bài thi');
-      }
-      setLoading(false);
-    }, 1000);
+    const loadResult = async () => {
+      setLoading(true);
+      setError(null);
 
-    return () => clearTimeout(timer);
-  }, [result]);
+      // ALWAYS fetch from API to get accurate score from backend grading
+      // Don't trust client-side calculation in Redux
+      await fetchResultFromAPI();
+      setLoading(false);
+    };
+
+    loadResult();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [examId, searchParams]);
 
   const handleGoToDashboard = () => {
     navigate('/user/home');
   };
 
   const handleViewAnswers = () => {
-    navigate(`/exam/${examId}/detail`);
+    // ✅ CRITICAL: Pass submissionId from URL query to detail page
+    const submissionIdFromUrl = searchParams.get('submissionId');
+    if (submissionIdFromUrl) {
+      navigate(`/exam/${examId}/detail?submissionId=${submissionIdFromUrl}`);
+    } else {
+      // Fallback: navigate without submissionId (will try to find from list)
+      navigate(`/exam/${examId}/detail`);
+    }
   };
 
   const handleRetakeExam = () => {
@@ -175,7 +234,7 @@ export const ExamResultPage: React.FC = () => {
             color: 'var(--muted-foreground)',
             fontWeight: 500
           }}>
-            {currentExam?.title || 'JavaScript Advanced Concepts'}
+            {result.examTitle || currentExam?.title || 'Bài thi'}
           </p>
         </div>
 

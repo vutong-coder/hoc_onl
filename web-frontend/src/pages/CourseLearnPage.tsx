@@ -11,8 +11,7 @@ import {
   ChevronRight,
   Menu,
   X,
-  Award,
-  BookOpen
+  Award
 } from 'lucide-react'
 import courseApi, { Course, Material, Progress, Quiz } from '../services/api/courseApi'
 import { useAppSelector } from '../store/hooks'
@@ -33,13 +32,17 @@ export default function CourseLearnPage(): JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [quiz, setQuiz] = useState<Quiz | null>(null)
   const [completingMaterial, setCompletingMaterial] = useState(false)
+  const [hasFetched, setHasFetched] = useState(false)
 
+  // ✅ FIX: Add guard to prevent duplicate fetch
   useEffect(() => {
-    if (courseId) {
+    if (courseId && !hasFetched) {
       fetchCourseData()
+      setHasFetched(true)
     }
-  }, [courseId])
+  }, [courseId, hasFetched])
 
+  // ✅ FIX: Separate effect for material selection (doesn't re-fetch course data)
   useEffect(() => {
     const materialId = searchParams.get('material')
     if (materialId && materials.length > 0) {
@@ -53,30 +56,23 @@ export default function CourseLearnPage(): JSX.Element {
       setCurrentMaterial(materials[0])
       loadMaterialContent(materials[0])
     }
-  }, [searchParams, materials])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, materials.length])
 
   const fetchCourseData = async () => {
     if (!courseId) return
     
     try {
       setLoading(true)
-      console.log('Fetching course data for:', courseId)
       
       // Fetch course details
       const courseResponse = await courseApi.getCourseById(courseId)
-      console.log('Course data:', courseResponse.data)
       setCourse(courseResponse.data)
 
       // Fetch materials
-      try {
-        const materialsResponse = await courseApi.getCourseMaterials(courseId)
-        const sortedMaterials = materialsResponse.data.sort((a, b) => a.order - b.order)
-        console.log('Materials:', sortedMaterials)
-        setMaterials(sortedMaterials)
-      } catch (err) {
-        console.log('No materials found, setting empty array')
-        setMaterials([])
-      }
+      const materialsResponse = await courseApi.getCourseMaterials(courseId)
+      const sortedMaterials = materialsResponse.data.sort((a, b) => a.order - b.order)
+      setMaterials(sortedMaterials)
 
       // Fetch progress
       if (user?.id) {
@@ -84,7 +80,15 @@ export default function CourseLearnPage(): JSX.Element {
           const progressResponse = await courseApi.getStudentProgress(Number(user.id), courseId)
           setProgress(progressResponse.data)
         } catch (err) {
-          console.log('No progress found')
+          // Backend có thể trả 404/500 khi chưa có progress
+          setProgress({
+            id: 'temp',
+            studentId: Number(user.id),
+            courseId,
+            completedMaterials: [],
+            progressPercentage: 0,
+            lastAccessedAt: new Date().toISOString()
+          } as unknown as Progress)
         }
       }
 
@@ -168,7 +172,8 @@ export default function CourseLearnPage(): JSX.Element {
   }
 
   const isMaterialCompleted = (materialId: string) => {
-    return progress?.completedMaterials?.includes(materialId) || false
+    const completed = progress?.completedMaterials || []
+    return Array.isArray(completed) ? completed.includes(materialId) : false
   }
 
   const getCurrentMaterialIndex = () => {
@@ -178,120 +183,18 @@ export default function CourseLearnPage(): JSX.Element {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        gap: '24px',
-        background: 'var(--background)'
-      }}>
+      <div className="course-learn-loading">
         <div className="spinner"></div>
-        <p style={{ fontSize: '16px', color: 'var(--muted-foreground)' }}>
-          Đang tải bài học...
-        </p>
+        <p>Đang tải bài học...</p>
       </div>
     )
   }
 
-  if (error || !course) {
+  if (error || !course || !currentMaterial) {
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        gap: '24px',
-        background: 'var(--background)'
-      }}>
-        <p style={{ fontSize: '18px', color: 'var(--destructive)' }}>
-          {error || 'Không tìm thấy khóa học'}
-        </p>
-        <button 
-          onClick={() => navigate(`/user/courses/${courseId}`)} 
-          style={{
-            padding: '12px 24px',
-            background: 'var(--primary)',
-            color: 'white',
-            border: 'none',
-            borderRadius: 'var(--radius-md)',
-            fontWeight: 600,
-            cursor: 'pointer'
-          }}
-        >
-          Quay lại khóa học
-        </button>
-      </div>
-    )
-  }
-
-  // If no materials, show empty state
-  if (materials.length === 0) {
-    return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        gap: '24px',
-        padding: '40px',
-        background: 'var(--background)'
-      }}>
-        <BookOpen size={64} style={{ color: 'var(--muted-foreground)' }} />
-        <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 700 }}>
-          Khóa học chưa có tài liệu
-        </h2>
-        <p style={{ margin: 0, color: 'var(--muted-foreground)', textAlign: 'center' }}>
-          Khóa học "{course.title}" hiện chưa có tài liệu học tập nào.
-        </p>
-        <button 
-          onClick={() => navigate(`/user/courses/${courseId}`)} 
-          style={{
-            padding: '12px 24px',
-            background: 'var(--primary)',
-            color: 'white',
-            border: 'none',
-            borderRadius: 'var(--radius-md)',
-            fontWeight: 600,
-            cursor: 'pointer'
-          }}
-        >
-          Quay lại khóa học
-        </button>
-      </div>
-    )
-  }
-
-  // If no currentMaterial after materials loaded, show error
-  if (!currentMaterial) {
-    return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        gap: '24px',
-        background: 'var(--background)'
-      }}>
-        <p style={{ fontSize: '18px', color: 'var(--destructive)' }}>
-          Không thể tải tài liệu
-        </p>
-        <button 
-          onClick={() => navigate(`/user/courses/${courseId}`)} 
-          style={{
-            padding: '12px 24px',
-            background: 'var(--primary)',
-            color: 'white',
-            border: 'none',
-            borderRadius: 'var(--radius-md)',
-            fontWeight: 600,
-            cursor: 'pointer'
-          }}
-        >
+      <div className="course-learn-error">
+        <p>{error || 'Không tìm thấy bài học'}</p>
+        <button onClick={() => navigate(`/user/courses/${courseId}`)} className="btn-back">
           Quay lại khóa học
         </button>
       </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { cameraManager } from '../services/cameraManager';
 
 interface UseCameraReturn {
   stream: MediaStream | null;
@@ -11,68 +12,40 @@ interface UseCameraReturn {
 }
 
 export const useCamera = (): UseCameraReturn => {
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(cameraManager.currentStream);
   const [error, setError] = useState<string | null>(null);
-  const [isCameraOn, setIsCameraOn] = useState(false);
-  const [isPermissionGranted, setIsPermissionGranted] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [isCameraOn, setIsCameraOn] = useState<boolean>(!!cameraManager.currentStream);
+  const [isPermissionGranted, setIsPermissionGranted] = useState<boolean>(!!cameraManager.currentStream);
   const isStartingRef = useRef(false);
+  const hasClientRef = useRef(false);
 
   const startCamera = useCallback(async () => {
-    // Prevent multiple simultaneous calls
-    if (isStartingRef.current || stream) {
-      console.log('Camera already starting or started, skipping...');
+    if (isStartingRef.current) {
       return;
     }
-    
+
     isStartingRef.current = true;
-    
+
+    if (!hasClientRef.current) {
+      cameraManager.incrementUsage();
+      hasClientRef.current = true;
+    }
+
     try {
       setError(null);
-      console.log('Starting camera...');
-      
-      // Yêu cầu quyền truy cập camera và microphone
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'user'
-        },
-        audio: true
-      });
-
-      console.log('Camera stream obtained:', mediaStream);
+      const mediaStream = await cameraManager.start();
       setStream(mediaStream);
       setIsCameraOn(true);
       setIsPermissionGranted(true);
-      isStartingRef.current = false;
-
-      // Tạo video element ẩn để xử lý stream
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      } else {
-        const video = document.createElement('video');
-        video.srcObject = mediaStream;
-        video.autoplay = true;
-        video.muted = true;
-        video.style.display = 'none';
-        document.body.appendChild(video);
-        videoRef.current = video;
-      }
-
-      // Tạo canvas ẩn để chụp ảnh
-      if (!canvasRef.current) {
-        const canvas = document.createElement('canvas');
-        canvas.style.display = 'none';
-        document.body.appendChild(canvas);
-        canvasRef.current = canvas;
-      }
-
     } catch (err) {
+      if (hasClientRef.current) {
+        cameraManager.decrementUsage();
+        hasClientRef.current = false;
+      }
+
       console.error('Error accessing camera:', err);
       let errorMessage = 'Không thể truy cập camera';
-      
+
       if (err instanceof Error) {
         if (err.name === 'NotAllowedError') {
           errorMessage = 'Bạn đã từ chối quyền truy cập camera. Vui lòng cho phép camera để tiếp tục.';
@@ -86,67 +59,42 @@ export const useCamera = (): UseCameraReturn => {
           errorMessage = err.message || 'Lỗi không xác định khi truy cập camera';
         }
       }
-      
+
       setError(errorMessage);
+      setStream(cameraManager.currentStream);
       setIsCameraOn(false);
       setIsPermissionGranted(false);
+    } finally {
       isStartingRef.current = false;
     }
-  }, [stream]);
+  }, []);
 
   const stopCamera = useCallback(() => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
-      setIsCameraOn(false);
+    if (hasClientRef.current) {
+      cameraManager.decrementUsage();
+      hasClientRef.current = false;
     }
 
-    // Dọn dẹp các element ẩn
-    if (videoRef.current && videoRef.current.parentNode) {
-      document.body.removeChild(videoRef.current);
-      videoRef.current = null;
+    const currentStream = cameraManager.currentStream;
+    setStream(null);
+    setIsCameraOn(false);
+    if (!currentStream) {
+      setIsPermissionGranted(false);
     }
-    if (canvasRef.current && canvasRef.current.parentNode) {
-      document.body.removeChild(canvasRef.current);
-      canvasRef.current = null;
-    }
-    
-    isStartingRef.current = false;
-  }, [stream]);
+  }, []);
 
   const captureFrame = useCallback((): string | null => {
-    if (!videoRef.current || !canvasRef.current || !stream) {
-      return null;
-    }
+    return cameraManager.captureFrame();
+  }, []);
 
-    try {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      const context = canvas.getContext('2d');
-
-      if (!context) return null;
-
-      // Thiết lập kích thước canvas
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-
-      // Vẽ frame hiện tại từ video
-      context.drawImage(video, 0, 0);
-
-      // Chuyển đổi thành base64
-      return canvas.toDataURL('image/jpeg', 0.8);
-    } catch (err) {
-      console.error('Error capturing frame:', err);
-      return null;
-    }
-  }, [stream]);
-
-  // Dọn dẹp khi component unmount
   useEffect(() => {
     return () => {
-      stopCamera();
+      if (hasClientRef.current) {
+        cameraManager.decrementUsage();
+        hasClientRef.current = false;
+      }
     };
-  }, [stopCamera]);
+  }, []);
 
   return {
     stream,
@@ -155,7 +103,7 @@ export const useCamera = (): UseCameraReturn => {
     isPermissionGranted,
     startCamera,
     stopCamera,
-    captureFrame
+    captureFrame,
   };
 };
 

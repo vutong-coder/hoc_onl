@@ -9,10 +9,12 @@ import UserHomePage from '../pages/UserHomePage'
 import PreparePage from '../pages/PreparePage'
 import LandingPage from '../pages/LandingPage'
 import ExamPage from '../pages/ExamPage'
+import RecentExamsPage from '../pages/RecentExamsPage'
 import { ExamPreCheckPage } from '../pages/ExamPreCheckPage'
 import { ExamTakingPage } from '../pages/ExamTakingPage'
 import { ExamResultPage } from '../pages/ExamResultPage'
 import { ExamDetailPage } from '../pages/ExamDetailPage'
+import ExamSchedulePage from '../pages/ExamSchedulePage'
 import RewardPage from '../pages/RewardPage'
 import CertifyPage from '../pages/CertifyPage'
 import CertificationDetailPage from '../pages/CertificationDetailPage'
@@ -67,6 +69,8 @@ export default function AppRoutes(): JSX.Element {
                 <Route path="compete" element={<CompetePage />} />
                 <Route path="compete/:contestId" element={<ContestDetailPage />} />
 			<Route path="exam" element={<ExamPage />} />
+			<Route path="exams/recent" element={<RecentExamsPage />} />
+			<Route path="exams/schedule" element={<ExamSchedulePage />} />
 			<Route path="courses" element={<UserCoursesPage />} />
 			<Route path="courses/:courseId" element={<CourseDetailPage />} />
 			<Route path="reward" element={<RewardPage />} />

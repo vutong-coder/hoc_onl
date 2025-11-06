@@ -66,7 +66,8 @@ export default function SessionCard({ session, onClick }: SessionCardProps): JSX
 		const start = new Date(session.startTime)
 		const now = new Date()
 		const elapsed = Math.floor((now.getTime() - start.getTime()) / 1000 / 60) // minutes
-		return `${elapsed}/${session.duration} phút`
+		const duration = session.duration || 0
+		return duration > 0 ? `${elapsed}/${duration} phút` : `${elapsed} phút`
 	}
 
 	return (
@@ -137,7 +138,7 @@ export default function SessionCard({ session, onClick }: SessionCardProps): JSX
 							textOverflow: 'ellipsis',
 							whiteSpace: 'nowrap'
 						}}>
-							{session.userName}
+							{session.userName || `User ${session.userId}`}
 						</div>
 						<div style={{ 
 							fontSize: '13px', 
@@ -146,7 +147,7 @@ export default function SessionCard({ session, onClick }: SessionCardProps): JSX
 							textOverflow: 'ellipsis',
 							whiteSpace: 'nowrap'
 						}}>
-							{session.examTitle}
+							{session.examTitle || `Exam ${session.examId}`}
 						</div>
 					</div>
 				</div>
@@ -242,10 +243,10 @@ export default function SessionCard({ session, onClick }: SessionCardProps): JSX
 						display: 'flex', 
 						alignItems: 'center', 
 						gap: '4px',
-						color: session.totalViolations > 0 ? '#dc2626' : 'inherit'
+						color: (session.totalViolations || 0) > 0 ? '#dc2626' : 'inherit'
 					}}>
 						<AlertTriangle size={14} />
-						{session.totalViolations} lần
+							{session.totalViolations || 0} lần
 					</div>
 				</div>
 			</div>
@@ -256,16 +257,16 @@ export default function SessionCard({ session, onClick }: SessionCardProps): JSX
 				alignItems: 'center',
 				gap: '8px',
 				padding: '8px',
-				background: session.faceDetected ? '#f0fdf4' : '#fef2f2',
-				borderRadius: 'var(--radius-md)',
-				border: `1px solid ${session.faceDetected ? '#bbf7d0' : '#fecaca'}`
+			background: (session.faceDetected ?? true) ? '#f0fdf4' : '#fef2f2',
+			borderRadius: 'var(--radius-md)',
+			border: `1px solid ${(session.faceDetected ?? true) ? '#bbf7d0' : '#fecaca'}`
 			}}>
-				<Eye size={16} color={session.faceDetected ? '#10b981' : '#ef4444'} />
+				<Eye size={16} color={(session.faceDetected ?? true) ? '#10b981' : '#ef4444'} />
 				<span style={{ fontSize: '13px', fontWeight: 500 }}>
-					{session.faceDetected ? (
+					{(session.faceDetected ?? true) ? (
 						<>
 							✓ Phát hiện khuôn mặt 
-							{session.faceCount > 1 && <span style={{ color: '#ef4444' }}> ({session.faceCount} người)</span>}
+							{(session.faceCount || 1) > 1 && <span style={{ color: '#ef4444' }}> ({session.faceCount} người)</span>}
 						</>
 					) : (
 						<span style={{ color: '#ef4444' }}>✗ Không phát hiện khuôn mặt</span>

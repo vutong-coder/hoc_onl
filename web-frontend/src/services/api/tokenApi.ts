@@ -1,4 +1,4 @@
-import { api } from './examApi'
+import axios from 'axios'
 import tokenRewardApi, {
   grantTokens as grantTokensReward,
   spendTokens as spendTokensReward,
@@ -9,6 +9,41 @@ import tokenRewardApi, {
   type BalanceResponse,
   type HistoryResponse,
 } from './tokenRewardApi'
+
+const API_BASE_URL = import.meta.env.VITE_TOKEN_API_URL || 'http://localhost:9009'
+
+// Create axios instance with interceptors
+const api = axios.create({
+	baseURL: API_BASE_URL,
+	headers: {
+		'Content-Type': 'application/json',
+	},
+})
+
+// Request interceptor to add auth token
+api.interceptors.request.use(
+	(config) => {
+		const token = localStorage.getItem('accessToken')
+		if (token) {
+			config.headers.Authorization = `Bearer ${token}`
+		}
+		return config
+	},
+	(error) => {
+		return Promise.reject(error)
+	}
+)
+
+// Response interceptor for error handling
+api.interceptors.response.use(
+	(response) => response,
+	(error) => {
+		if (error.response?.status === 401) {
+			console.error('Unauthorized access - redirecting to login')
+		}
+		return Promise.reject(error)
+	}
+)
 
 // Re-export token reward API types
 export type {
@@ -237,4 +272,3 @@ export async function getTokenStats(): Promise<{
 	}>('/tokens/stats')
 	return res.data
 }
-

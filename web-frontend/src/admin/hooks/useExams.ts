@@ -1,9 +1,111 @@
-import { useState, useMemo, useCallback } from 'react'
-import { Exam, ExamFilters, RandomExamConfig } from '../types/exam'
-import { mockExams, mockQuestions } from '../mock/exams'
+import { useState, useMemo, useCallback, useEffect } from 'react'
+import { ExamFilters, RandomExamConfig } from '../types/exam'
+import adminExamApi, {
+	type Exam as ApiExam,
+	type ExamCreationRequest,
+	type Question as ApiQuestion,
+	type QuestionCreationRequest,
+	type GenerateQuestionsRequest,
+} from '../services/examApi'
+
+// Map backend ExamStatus to frontend status
+type FrontendExamStatus = 'draft' | 'published' | 'archived' | 'ongoing' | 'ended';
+
+function mapBackendStatusToFrontend(backendStatus: string): FrontendExamStatus {
+	switch (backendStatus) {
+		case 'DRAFT':
+			return 'draft';
+		case 'PUBLISHED': // ✨ NEW: Backend now uses PUBLISHED instead of SCHEDULED
+			return 'published';
+		case 'SCHEDULED': // Keep for backward compatibility
+			return 'published';
+		case 'ACTIVE':
+			return 'ongoing';
+		case 'COMPLETED':
+			return 'ended';
+		case 'CANCELLED':
+			return 'archived';
+		default:
+			return 'draft';
+	}
+}
+
+function mapFrontendStatusToBackend(frontendStatus: FrontendExamStatus): string {
+	switch (frontendStatus) {
+		case 'draft':
+			return 'DRAFT';
+		case 'published':
+			return 'SCHEDULED';
+		case 'ongoing':
+			return 'ACTIVE';
+		case 'ended':
+			return 'COMPLETED';
+		case 'archived':
+			return 'CANCELLED';
+		default:
+			return 'DRAFT';
+	}
+}
+
+// Adapter to convert API Exam to Frontend Exam type (compatible with existing frontend)
+interface FrontendExam {
+	id: string;
+	title: string;
+	description?: string;
+	subject: string;
+	duration: number;
+	totalQuestions: number;
+	totalPoints: number;
+	difficulty: 'easy' | 'medium' | 'hard';
+	status: FrontendExamStatus;
+	type: 'practice' | 'quiz' | 'midterm' | 'final' | 'assignment';
+	createdBy: string;
+	createdAt: string;
+	startDate?: string;
+	endDate?: string;
+	passingScore: number;
+	allowReview: boolean;
+	shuffleQuestions: boolean;
+	showResults: boolean;
+	maxAttempts: number;
+}
+
+function adaptApiExamToFrontend(apiExam: ApiExam): FrontendExam {
+	// ✨ Use first tag as subject, fallback to 'General'
+	const subject = (apiExam.tags && apiExam.tags.length > 0) ? apiExam.tags[0] : 'General';
+	
+	return {
+		id: apiExam.id,
+		title: apiExam.title,
+		description: apiExam.description,
+		subject: subject,
+		duration: apiExam.durationMinutes || 60,
+		totalQuestions: apiExam.totalQuestions || 0, // ✨ NOW: Use from API
+		totalPoints: 100, // Default
+		difficulty: 'medium', // Default
+		status: mapBackendStatusToFrontend(apiExam.status),
+		type: 'quiz', // Default
+		createdBy: apiExam.createdBy || 'Unknown',
+		createdAt: apiExam.createdAt,
+		startDate: apiExam.startAt,
+		endDate: apiExam.endAt,
+		passingScore: apiExam.passScore || 50,
+		allowReview: true,
+		shuffleQuestions: true,
+		showResults: true,
+		maxAttempts: apiExam.maxAttempts || 1,
+	};
+}
 
 export default function useExams() {
-	const [exams, setExams] = useState<Exam[]>(mockExams)
+	const [allExams, setAllExams] = useState<FrontendExam[]>([])
+	const [apiSubjects, setApiSubjects] = useState<string[]>([])
+	
+	// ✨ NEW: Enum options from API
+	const [examTypes, setExamTypes] = useState<import('../types/exam').EnumOption[]>([])
+	const [examDifficulties, setExamDifficulties] = useState<import('../types/exam').EnumOption[]>([])
+	const [examStatuses, setExamStatuses] = useState<import('../types/exam').EnumOption[]>([])
+	
 	const [filters, setFilters] = useState<ExamFilters>({
 		search: '',
 		subject: 'all',
@@ -15,10 +117,75 @@ export default function useExams() {
 	const [itemsPerPage] = useState(10)
 	const [sortKey, setSortKey] = useState<string>('createdAt')
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+	const [loading, setLoading] = useState(false)
+
+	// ✅ FIX: Convert useCallback to plain async functions to avoid re-triggering useEffect
+	const loadExams = async () => {
+		setLoading(true)
+		try {
+			const apiExams = await adminExamApi.getAllExams()
+			const frontendExams = apiExams.map(adaptApiExamToFrontend)
+			setAllExams(frontendExams)
+		} catch (error) {
+			console.error('❌ Error loading exams:', error)
+			// Fallback to empty array on error
+			setAllExams([])
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	// Load subjects from API
+	const loadSubjects = async () => {
+		try {
+			const subjects = await adminExamApi.getAllSubjects()
+			setApiSubjects(subjects)
+		} catch (error) {
+			console.error('❌ Error loading subjects:', error)
+			// Fallback to empty, component will use defaults
+			setApiSubjects([])
+		}
+	}
+
+	// ✨ NEW: Load enums from API
+	const loadEnums = async () => {
+		try {
+			const [types, difficulties, statuses] = await Promise.all([
+				adminExamApi.getAllExamTypes(),
+				adminExamApi.getAllExamDifficulties(),
+				adminExamApi.getAllExamStatuses(),
+			])
+			setExamTypes(types)
+			setExamDifficulties(difficulties)
+			setExamStatuses(statuses)
+		} catch (error) {
+			console.error('❌ Error loading enums:', error)
+			// Fallback handled in API functions
+		}
+	}
+
+	// ✅ FIX: Load exams on mount without dependencies to avoid re-trigger
+	useEffect(() => {
+		loadExams()
+		loadSubjects()
+		loadEnums() // ✨ NEW: Load enums
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+
+	// ✅ FIX: Auto-refresh every 30 seconds - stable interval
+	useEffect(() => {
+		const interval = setInterval(() => {
+			loadExams()
+			loadSubjects()
+			loadEnums() // ✨ NEW: Refresh enums
+		}, 30000)
+		return () => clearInterval(interval)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	// Lọc exams theo filters
 	const filteredExams = useMemo(() => {
-		let result = [...exams]
+		let result = [...allExams]
 
 		// Lọc theo search
 		if (filters.search) {
@@ -26,7 +193,7 @@ export default function useExams() {
 			result = result.filter(exam => 
 				exam.title.toLowerCase().includes(searchLower) ||
 				exam.subject.toLowerCase().includes(searchLower) ||
-				exam.description?.toLowerCase().includes(searchLower) ||
+				(exam.description || '').toLowerCase().includes(searchLower) ||
 				exam.createdBy.toLowerCase().includes(searchLower)
 			)
 		}
@@ -52,15 +219,15 @@ export default function useExams() {
 		}
 
 		return result
-	}, [exams, filters])
+	}, [allExams, filters])
 
 	// Sắp xếp exams
 	const sortedExams = useMemo(() => {
 		const result = [...filteredExams]
 
 		result.sort((a, b) => {
-			let aValue = a[sortKey as keyof Exam]
-			let bValue = b[sortKey as keyof Exam]
+			let aValue = a[sortKey as keyof FrontendExam]
+			let bValue = b[sortKey as keyof FrontendExam]
 
 			// Convert to string for comparison
 			if (aValue === undefined) aValue = ''
@@ -103,142 +270,262 @@ export default function useExams() {
 		}
 	}, [sortKey])
 
+	// ✅ FIX: Remove loadExams from dependency to use stable function reference
 	// Xóa exam
-	const deleteExam = useCallback((examId: string) => {
-		setExams(prev => prev.filter(exam => exam.id !== examId))
+	const deleteExam = useCallback(async (examId: string) => {
+		setLoading(true)
+		try {
+			await adminExamApi.deleteExam(examId)
+			await loadExams() // Reload after delete
+		} catch (error: any) {
+			const message = error?.message || 'Xóa đề thi thất bại. Vui lòng kiểm tra backend.'
+			alert(message)
+		} finally {
+			setLoading(false)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	// Cập nhật exam
-	const updateExam = useCallback((updatedExam: Exam) => {
-		setExams(prev => prev.map(exam => 
-			exam.id === updatedExam.id ? updatedExam : exam
-		))
+	const updateExam = useCallback(async (updatedExam: FrontendExam) => {
+		setLoading(true)
+		try {
+			await adminExamApi.updateExamConfig(updatedExam.id, {
+				durationMinutes: updatedExam.duration,
+				passScore: updatedExam.passingScore,
+				maxAttempts: updatedExam.maxAttempts,
+			})
+			await loadExams() // Reload after update
+		} catch (error) {
+			console.error('Error updating exam:', error)
+			throw error
+		} finally {
+			setLoading(false)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	// Thêm exam mới
-	const addExam = useCallback((newExam: Omit<Exam, 'id' | 'createdAt'>) => {
-		const exam: Exam = {
-			...newExam,
-			id: String(Date.now()),
-			createdAt: new Date().toISOString()
+	const addExam = useCallback(async (newExam: Omit<FrontendExam, 'id' | 'createdAt'>) => {
+		setLoading(true)
+		try {
+			// Get current user ID from localStorage (set during login)
+			const currentUserId = localStorage.getItem('userId') || '00000000-0000-0000-0000-000000000000'
+			const orgId = localStorage.getItem('orgId') || '00000000-0000-0000-0000-000000000000'
+			
+			console.log('Creating exam with data:', {
+				title: newExam.title,
+				duration: newExam.duration,
+				userId: currentUserId,
+				orgId
+			})
+			
+			const request: ExamCreationRequest = {
+				orgId,
+				title: newExam.title,
+				description: newExam.description || '',
+				startAt: newExam.startDate, // optional
+				endAt: newExam.endDate, // optional
+				durationMinutes: newExam.duration,
+				passScore: newExam.passingScore || 50,
+				maxAttempts: newExam.maxAttempts || 3,
+				totalQuestions: newExam.totalQuestions || 0, // ✨ NEW: Send to backend
+				createdBy: currentUserId,
+				tags: newExam.subject ? [newExam.subject] : undefined, // ✨ NEW: Send tags
+			}
+			
+			const createdExam = await adminExamApi.createExam(request)
+			console.log('Exam created successfully:', createdExam)
+			
+			await loadExams() // Reload after creation
+		} catch (error: any) {
+			console.error('Error adding exam:', error)
+			const errorMessage = error.response?.data?.message || error.message || 'Failed to create exam'
+			alert(`Lỗi khi tạo đề thi: ${errorMessage}`)
+			throw error
+		} finally {
+			setLoading(false)
 		}
-		setExams(prev => [exam, ...prev])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+
+	// Xuất bản exam (DRAFT -> PUBLISHED)
+	const publishExam = useCallback(async (examId: string) => {
+		setLoading(true)
+		try {
+			await adminExamApi.updateExamStatus(examId, 'PUBLISHED') // PUBLISHED = user can see
+			await loadExams() // Reload after publish
+		} catch (error: any) {
+			const message = error?.message || 'Xuất bản đề thi thất bại'
+			alert(message)
+		} finally {
+			setLoading(false)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+
+	// Gỡ xuất bản exam (PUBLISHED -> DRAFT)
+	const unpublishExam = useCallback(async (examId: string) => {
+		setLoading(true)
+		try {
+			await adminExamApi.updateExamStatus(examId, 'DRAFT')
+			await loadExams() // Reload after unpublish
+		} catch (error: any) {
+			const message = error?.message || 'Gỡ xuất bản đề thi thất bại'
+			alert(message)
+		} finally {
+			setLoading(false)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	// Sao chép exam
-	const duplicateExam = useCallback((examId: string) => {
-		const examToDuplicate = exams.find(e => e.id === examId)
+	const duplicateExam = useCallback(async (examId: string) => {
+		const examToDuplicate = allExams.find(e => e.id === examId)
 		if (examToDuplicate) {
-			const duplicated: Exam = {
+			// Create new exam with modified title
+			await addExam({
 				...examToDuplicate,
-				id: String(Date.now()),
 				title: `${examToDuplicate.title} (Bản sao)`,
 				status: 'draft',
-				createdAt: new Date().toISOString()
-			}
-			setExams(prev => [duplicated, ...prev])
+			})
 		}
-	}, [exams])
+	}, [allExams, addExam])
 
 	// Sinh đề thi ngẫu nhiên
-	const generateRandomExam = useCallback((config: RandomExamConfig) => {
-		const { subject, difficulty, totalQuestions, duration, easyCount, mediumCount, hardCount } = config
+	const generateRandomExam = useCallback(async (config: RandomExamConfig) => {
+		setLoading(true)
+		try {
+			const { subject, difficulty, totalQuestions, duration } = config
 
-		// Lấy questions theo config
-		let selectedQuestions = []
+			// Convert difficulty to backend range
+			let minDifficulty: number | undefined;
+			let maxDifficulty: number | undefined;
+			
+			if (difficulty === 'easy') {
+				minDifficulty = 1;
+				maxDifficulty = 3;
+			} else if (difficulty === 'medium') {
+				minDifficulty = 4;
+				maxDifficulty = 7;
+			} else if (difficulty === 'hard') {
+				minDifficulty = 8;
+				maxDifficulty = 10;
+			}
 
-		if (difficulty === 'mixed' && easyCount !== undefined && mediumCount !== undefined && hardCount !== undefined) {
-			// Custom distribution
-			const easyQuestions = mockQuestions
-				.filter(q => q.subject === subject && q.difficulty === 'easy')
-				.sort(() => Math.random() - 0.5)
-				.slice(0, easyCount)
-			
-			const mediumQuestions = mockQuestions
-				.filter(q => q.subject === subject && q.difficulty === 'medium')
-				.sort(() => Math.random() - 0.5)
-				.slice(0, mediumCount)
-			
-			const hardQuestions = mockQuestions
-				.filter(q => q.subject === subject && q.difficulty === 'hard')
-				.sort(() => Math.random() - 0.5)
-				.slice(0, hardCount)
-			
-			selectedQuestions = [...easyQuestions, ...mediumQuestions, ...hardQuestions]
-		} else if (difficulty === 'mixed') {
-			// Auto distribution: 40% easy, 40% medium, 20% hard
-			const easyCount = Math.floor(totalQuestions * 0.4)
-			const mediumCount = Math.floor(totalQuestions * 0.4)
-			const hardCount = totalQuestions - easyCount - mediumCount
+			// Create exam first
+			const currentUserId = localStorage.getItem('userId') || '00000000-0000-0000-0000-000000000000'
+			const orgId = localStorage.getItem('orgId') || '00000000-0000-0000-0000-000000000000'
 
-			const easyQuestions = mockQuestions
-				.filter(q => q.subject === subject && q.difficulty === 'easy')
-				.sort(() => Math.random() - 0.5)
-				.slice(0, easyCount)
-			
-			const mediumQuestions = mockQuestions
-				.filter(q => q.subject === subject && q.difficulty === 'medium')
-				.sort(() => Math.random() - 0.5)
-				.slice(0, mediumCount)
-			
-			const hardQuestions = mockQuestions
-				.filter(q => q.subject === subject && q.difficulty === 'hard')
-				.sort(() => Math.random() - 0.5)
-				.slice(0, hardCount)
-			
-			selectedQuestions = [...easyQuestions, ...mediumQuestions, ...hardQuestions]
-		} else {
-			// Single difficulty
-			selectedQuestions = mockQuestions
-				.filter(q => q.subject === subject && q.difficulty === difficulty)
-				.sort(() => Math.random() - 0.5)
-				.slice(0, totalQuestions)
+			const examRequest: ExamCreationRequest = {
+				orgId,
+				title: `Đề thi ${subject} - ${new Date().toLocaleDateString('vi-VN')}`,
+				description: `Đề thi được sinh tự động với ${totalQuestions} câu hỏi`,
+				durationMinutes: duration,
+				passScore: 50,
+				maxAttempts: 3,
+				createdBy: currentUserId,
+				tags: [subject], // ✨ NEW: Set tags for random exam
+			}
+
+			const newExam = await adminExamApi.createExam(examRequest)
+
+			// Generate questions for the exam
+			const generateRequest: GenerateQuestionsRequest = {
+				count: totalQuestions,
+				tags: [subject],
+				minDifficulty,
+				maxDifficulty,
+			}
+
+			await adminExamApi.generateExamQuestions(newExam.id, generateRequest)
+
+			// Reload exams
+			await loadExams()
+
+			return adaptApiExamToFrontend(newExam)
+		} catch (error) {
+			console.error('Error generating random exam:', error)
+			throw error
+		} finally {
+			setLoading(false)
 		}
-
-		// Tính tổng điểm
-		const totalPoints = selectedQuestions.reduce((sum, q) => sum + q.points, 0)
-
-		// Xác định độ khó của đề thi
-		const examDifficulty = difficulty === 'mixed' 
-			? (hardCount && hardCount > totalQuestions * 0.3 ? 'hard' : 'medium')
-			: difficulty as 'easy' | 'medium' | 'hard'
-
-		// Tạo exam mới
-		const newExam: Exam = {
-			id: String(Date.now()),
-			title: `Đề thi ${subject} - ${new Date().toLocaleDateString('vi-VN')}`,
-			description: `Đề thi được sinh tự động với ${totalQuestions} câu hỏi`,
-			subject,
-			duration,
-			totalQuestions: selectedQuestions.length,
-			totalPoints,
-			difficulty: examDifficulty,
-			status: 'draft',
-			type: 'practice',
-			createdBy: 'Hệ thống',
-			createdAt: new Date().toISOString(),
-			passingScore: Math.floor(totalPoints * 0.5),
-			allowReview: true,
-			shuffleQuestions: true,
-			showResults: true,
-			maxAttempts: 3
-		}
-
-		setExams(prev => [newExam, ...prev])
-		return newExam
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	// Lấy danh sách subjects unique
+	// Sinh câu hỏi ngẫu nhiên cho đề thi đang có
+	const generateQuestionsForExam = useCallback(async (examId: string, config: {
+		difficulty: 'easy' | 'medium' | 'hard' | 'mixed'
+		useCustomDistribution: boolean
+		easyCount?: number
+		mediumCount?: number
+		hardCount?: number
+	}) => {
+		setLoading(true)
+		try {
+			const exam = allExams.find(e => e.id === examId)
+			if (!exam) {
+				throw new Error('Exam not found')
+			}
+
+			const { difficulty, useCustomDistribution, easyCount, mediumCount, hardCount } = config
+
+			// Convert difficulty to backend range
+			let minDifficulty: number | undefined;
+			let maxDifficulty: number | undefined;
+			
+			if (difficulty === 'easy') {
+				minDifficulty = 1;
+				maxDifficulty = 3;
+			} else if (difficulty === 'medium') {
+				minDifficulty = 4;
+				maxDifficulty = 7;
+			} else if (difficulty === 'hard') {
+				minDifficulty = 8;
+				maxDifficulty = 10;
+			}
+			// For 'mixed', don't set min/max to allow all difficulties
+
+			// Generate questions for the exam
+			const generateRequest: GenerateQuestionsRequest = {
+				count: exam.totalQuestions,
+				tags: [exam.subject],
+				minDifficulty,
+				maxDifficulty,
+			}
+
+			await adminExamApi.generateExamQuestions(examId, generateRequest)
+
+			// Reload exams to get updated data
+			await loadExams()
+
+			return exam
+		} catch (error) {
+			console.error('Error generating questions for exam:', error)
+			throw error
+		} finally {
+			setLoading(false)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [allExams])
+
+	// Lấy danh sách subjects unique - ưu tiên từ API, fallback từ exams
 	const subjects = useMemo(() => {
-		const uniqueSubjects = Array.from(new Set(exams.map(e => e.subject)))
+		if (apiSubjects.length > 0) {
+			return apiSubjects
+		}
+		// Fallback: extract từ exams đã có
+		const uniqueSubjects = Array.from(new Set(allExams.map(e => e.subject)))
 		return uniqueSubjects.sort()
-	}, [exams])
+	}, [apiSubjects, allExams])
 
 	return {
 		exams: paginatedExams,
 		allExams: sortedExams,
 		filters,
 		updateFilter,
+		publishExam, // ✨ NEW
+		unpublishExam, // ✨ NEW
 		currentPage,
 		setCurrentPage,
 		totalPages,
@@ -252,7 +539,13 @@ export default function useExams() {
 		addExam,
 		duplicateExam,
 		generateRandomExam,
-		subjects
+		generateQuestionsForExam, // ✨ NEW: Generate questions for existing exam
+		subjects,
+		loading,
+		loadExams,
+		// ✨ NEW: Enum options
+		examTypes,
+		examDifficulties,
+		examStatuses,
 	}
 }
-

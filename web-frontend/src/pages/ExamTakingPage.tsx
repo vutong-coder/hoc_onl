@@ -9,17 +9,19 @@ import { AICameraMonitor } from '../components/molecules/AICameraMonitor';
 import { ExamViolationAlert } from '../components/molecules/ExamViolationAlert';
 import { useExamSession } from '../hooks/useExamSession';
 import { CheatingDetection } from '../hooks/useAICameraMonitor';
-import { mockExamService } from '../services/blockchain/examRecordService';
 import styles from '../assets/css/ExamTakingPage.module.css';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 export const ExamTakingPage: React.FC = () => {
-  const [examSessionId, setExamSessionId] = useState<number | null>(null);
   const [violations, setViolations] = useState<CheatingDetection[]>([]);
   const [cameraMetrics, setCameraMetrics] = useState<any>(null);
   const [isCameraAutoStarted, setIsCameraAutoStarted] = useState(false);
   const [currentViolation, setCurrentViolation] = useState<CheatingDetection | null>(null);
   const [showViolationAlert, setShowViolationAlert] = useState(false);
   const [examStopped, setExamStopped] = useState(false);
+
+  const authUser = useSelector((state: RootState) => state.auth.user);
 
   const { 
     currentExam, 
@@ -36,6 +38,7 @@ export const ExamTakingPage: React.FC = () => {
     answers,
     visitedQuestions,
     flaggedQuestions,
+    session,
     isProctoringMinimized,
     setIsProctoringMinimized,
     showSubmitModal,
@@ -53,25 +56,7 @@ export const ExamTakingPage: React.FC = () => {
     navigate
   } = useExamSession();
 
-  // Initialize exam session on blockchain
-  React.useEffect(() => {
-    const initializeExamSession = async () => {
-      if (currentExam && !examSessionId) {
-        try {
-          const sessionId = await mockExamService.startExamSessionOnChain(
-            parseInt(currentExam.id),
-            '0x1234567890123456789012345678901234567890', // Mock student address
-            currentExam.title
-          );
-          setExamSessionId(sessionId);
-        } catch (error) {
-          console.error('Failed to start exam session on blockchain:', error);
-        }
-      }
-    };
-
-    initializeExamSession();
-  }, [currentExam, examSessionId]);
+  // Note: Blockchain integration removed - using backend API instead
 
   // Auto-start camera when exam loads
   React.useEffect(() => {
@@ -84,53 +69,12 @@ export const ExamTakingPage: React.FC = () => {
   const handleViolationDetected = useCallback(async (detection: CheatingDetection) => {
     setViolations(prev => [...prev, detection]);
     
-    // Log detection with metadata
-    console.log('[ExamTakingPage] Violation detected:', {
-      type: detection.type,
-      severity: detection.severity,
-      confidence: detection.confidence,
-      description: detection.description,
-      metadata: detection.metadata,
-      timestamp: new Date(detection.timestamp).toISOString()
-    });
-    
     // Show alert for medium, high, and critical violations
     if (detection.severity === 'medium' || detection.severity === 'high' || detection.severity === 'critical') {
       setCurrentViolation(detection);
       setShowViolationAlert(true);
     }
-    
-    if (examSessionId) {
-      try {
-        const violationTypeMap = {
-          'FACE_NOT_DETECTED': 1,
-          'MULTIPLE_FACES': 3,
-          'MOBILE_PHONE_DETECTED': 7,
-          'CAMERA_TAMPERED': 8,
-          'LOOKING_AWAY': 9,
-          'tab_switch': 4
-        };
-
-        const severityMap = {
-          'low': 1,
-          'medium': 2,
-          'high': 3,
-          'critical': 4
-        };
-
-        await mockExamService.recordCheatingViolationOnChain(
-          examSessionId,
-          violationTypeMap[detection.type],
-          severityMap[detection.severity],
-          detection.confidence,
-          detection.description,
-          detection.screenshot || ''
-        );
-      } catch (error) {
-        console.error('Failed to record violation on blockchain:', error);
-      }
-    }
-  }, [examSessionId]);
+  }, [session?.id]);
 
   // Handle violation alert dismiss
   const handleViolationAlertDismiss = useCallback(() => {
@@ -143,53 +87,22 @@ export const ExamTakingPage: React.FC = () => {
     setExamStopped(true);
     setShowViolationAlert(false);
     
-    // Record exam termination on blockchain
-    if (examSessionId && currentExam) {
-      mockExamService.completeExamSessionOnChain(
-        examSessionId,
-        0, // Score 0 due to violation
-        100,
-        0,
-        `${currentExam.title} - Dừng do vi phạm`
-      ).catch(console.error);
-    }
-    
     // Navigate to result page or show stopped message
     setTimeout(() => {
       navigate('/exam/stopped');
     }, 2000);
-  }, [examSessionId, currentExam, navigate]);
+  }, [currentExam, navigate]);
 
   // Handle camera metrics update
   const handleMetricsUpdate = useCallback((metrics: any) => {
     setCameraMetrics(metrics);
   }, []);
 
-  // Enhanced submit exam with blockchain recording
-  const handleSubmitExamWithBlockchain = useCallback(async () => {
-    if (!examSessionId || !currentExam) return;
-
-    try {
-      // Calculate score and time spent
-      const answeredCount = Object.values(answers).filter(answer => answer?.answer).length;
-      const score = Math.round((answeredCount / totalQuestions) * 100); // Mock score based on answered questions
-      const timeSpent = Math.floor((Date.now() - Date.now()) / 1000); // Mock time calculation
-
-      // Record exam completion on blockchain
-      await mockExamService.completeExamSessionOnChain(
-        examSessionId,
-        score,
-        100, // maxScore
-        timeSpent,
-        currentExam.title
-      );
-    } catch (error) {
-      console.error('Failed to complete exam on blockchain:', error);
-    }
-
-    // Call original submit handler
+  // Submit exam using backend API
+  const handleSubmitExamWithBackend = useCallback(async () => {
+    // Call original submit handler which uses backend API
     handleSubmitExam();
-  }, [examSessionId, currentExam, answers, totalQuestions, handleSubmitExam]);
+  }, [currentExam, answers, totalQuestions, handleSubmitExam]);
 
   // Loading state
   if (status === 'loading') {
@@ -246,7 +159,7 @@ export const ExamTakingPage: React.FC = () => {
             totalQuestions={totalQuestions}
             onPrevious={handlePreviousQuestion}
             onNext={handleNextQuestion}
-            onSubmit={() => setShowSubmitModal(true)}
+            onSubmit={handleSubmitExamWithBackend}
           />
         </div>
 
@@ -266,7 +179,7 @@ export const ExamTakingPage: React.FC = () => {
           />
           
               {/* AI Camera Monitor - Hidden but functional */}
-              {currentExam && (
+              {currentExam && session && authUser && (
                 <div style={{ 
                   position: 'absolute', 
                   top: '-9999px', 
@@ -277,7 +190,8 @@ export const ExamTakingPage: React.FC = () => {
                 }}>
                   <AICameraMonitor
                     examId={currentExam.id}
-                    studentId="mock-student-id"
+                    studentId={authUser.id}
+                    sessionId={session.id}
                     onViolationDetected={handleViolationDetected}
                     onMetricsUpdate={handleMetricsUpdate}
                     className={styles.aiCameraMonitor}
@@ -293,7 +207,7 @@ export const ExamTakingPage: React.FC = () => {
         answeredQuestions={answeredQuestions}
         totalQuestions={totalQuestions}
         isSubmitting={isSubmitting}
-        onConfirm={handleSubmitExamWithBlockchain}
+        onConfirm={handleSubmitExamWithBackend}
         onCancel={() => setShowSubmitModal(false)}
       />
 

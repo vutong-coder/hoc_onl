@@ -10,6 +10,8 @@ interface ExamTableProps {
 	onDelete: (exam: Exam) => void
 	onView: (exam: Exam) => void
 	onDuplicate: (exam: Exam) => void
+	onPublish?: (exam: Exam) => void // ✨ NEW
+	onUnpublish?: (exam: Exam) => void // ✨ NEW
 	onSort?: (key: string) => void
 	sortKey?: string
 	sortOrder?: 'asc' | 'desc'
@@ -22,6 +24,8 @@ export default function ExamTable({
 	onDelete,
 	onView,
 	onDuplicate,
+	onPublish,
+	onUnpublish,
 	onSort,
 	sortKey,
 	sortOrder
@@ -93,6 +97,8 @@ export default function ExamTable({
 						onDelete={onDelete}
 						onView={onView}
 						onDuplicate={onDuplicate}
+						onPublish={onPublish} // ✨ NEW
+						onUnpublish={onUnpublish} // ✨ NEW
 					/>
 				))}
 			</tbody>

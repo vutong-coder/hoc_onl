@@ -140,14 +140,16 @@ export default function TransactionLog({
 						<tr key={transaction.id}>
 							<td>
 								<div className="user-info">
-									<div className="user-name">{transaction.userName}</div>
+									<div className="user-name">{transaction.userName || `User ${transaction.userId}`}</div>
 									<div className="user-id">ID: {transaction.userId}</div>
 								</div>
 							</td>
 							<td>
 								<div className="rule-info">
-									<div className="rule-name">{transaction.ruleName}</div>
-									<div className="rule-id">ID: {transaction.ruleId}</div>
+									<div className="rule-name">{transaction.ruleName || 'Custom Reward'}</div>
+									{transaction.ruleId && (
+										<div className="rule-id">ID: {transaction.ruleId}</div>
+									)}
 								</div>
 							</td>
 							<td>

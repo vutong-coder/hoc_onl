@@ -205,30 +205,30 @@ export default function UpcomingExams({
 			case 'registered':
 				return (
 					<button
-						onClick={() => handleViewExam(exam.id)}
+						onClick={() => handleStartExam(exam.id)}
 						style={{
+							background: 'linear-gradient(135deg, var(--accent), var(--primary))',
+							color: 'white',
 							padding: '8px 16px',
-							border: '1px solid var(--border)',
-							color: 'var(--foreground)',
 							borderRadius: 'var(--radius-md)',
 							fontSize: '14px',
 							fontWeight: 500,
-							background: 'var(--card)',
+							border: 'none',
 							cursor: 'pointer',
 							transition: 'all 0.2s ease',
 							minWidth: '120px',
 							textAlign: 'center'
 						}}
 						onMouseEnter={(e) => {
-							e.currentTarget.style.borderColor = 'var(--primary)'
-							e.currentTarget.style.background = 'var(--muted)'
+							e.currentTarget.style.transform = 'translateY(-2px)'
+							e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
 						}}
 						onMouseLeave={(e) => {
-							e.currentTarget.style.borderColor = 'var(--border)'
-							e.currentTarget.style.background = 'var(--card)'
+							e.currentTarget.style.transform = 'translateY(0)'
+							e.currentTarget.style.boxShadow = 'none'
 						}}
 					>
-						Xem chi tiết
+						Tiếp tục làm bài
 					</button>
 				)
 			case 'upcoming':

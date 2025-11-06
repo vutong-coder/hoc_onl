@@ -73,7 +73,7 @@ export default function ExamCard({ exam, onViewExam, onRetakeExam }: ExamCardPro
 					
 					<div style={{ display: 'flex', alignItems: 'center', fontSize: '12px', color: 'var(--muted-foreground)', marginBottom: '8px' }}>
 						<Clock style={{ width: '12px', height: '12px', marginRight: '4px' }} />
-						{exam.date} • {exam.duration}
+						{exam.date}
 					</div>
 
 					{exam.score !== undefined && (

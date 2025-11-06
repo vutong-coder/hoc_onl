@@ -1,10 +1,11 @@
 import React from 'react'
 import Modal from '../../components/common/Modal'
+import { type RewardTransaction } from '../../types/reward'
 
 interface TransactionDetailModalProps {
 	isOpen: boolean
 	onClose: () => void
-	transaction: any
+	transaction: RewardTransaction | null
 }
 
 const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
@@ -28,7 +29,7 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
 							Người dùng
 						</label>
 						<div style={{ fontSize: '16px', fontWeight: 600 }}>
-							{transaction.userName}
+							{transaction.userName || `User ${transaction.userId}`}
 						</div>
 						<div style={{ fontSize: '12px', color: 'var(--muted-foreground)', fontFamily: 'monospace' }}>
 							{transaction.userId}
@@ -40,11 +41,13 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
 							Luật thưởng
 						</label>
 						<div style={{ fontSize: '16px', fontWeight: 600 }}>
-							{transaction.ruleName}
+							{transaction.ruleName || 'Custom Reward'}
 						</div>
-						<div style={{ fontSize: '12px', color: 'var(--muted-foreground)', fontFamily: 'monospace' }}>
-							{transaction.ruleId}
-						</div>
+						{transaction.ruleId && (
+							<div style={{ fontSize: '12px', color: 'var(--muted-foreground)', fontFamily: 'monospace' }}>
+								{transaction.ruleId}
+							</div>
+						)}
 					</div>
 				</div>
 

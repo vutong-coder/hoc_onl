@@ -364,7 +364,6 @@ export function listenForExamEvents(
  */
 export const mockExamService = {
   async startExamSessionOnChain(examId: number, studentAddress: string, examTitle: string): Promise<number> {
-    console.log('Mock: Starting exam session', { examId, studentAddress, examTitle });
     return Math.floor(Math.random() * 1000) + 1;
   },
 
@@ -376,7 +375,6 @@ export const mockExamService = {
     description: string,
     screenshotHash: string = ''
   ): Promise<string> {
-    console.log('Recording violation to blockchain', { sessionId, violationType, severity, confidence, description });
     return '0x' + Math.random().toString(16).substr(2, 64);
   },
 
@@ -387,17 +385,14 @@ export const mockExamService = {
     timeSpent: number,
     examTitle: string
   ): Promise<string> {
-    console.log('Mock: Completing exam session', { sessionId, score, maxScore, timeSpent, examTitle });
     return '0x' + Math.random().toString(16).substr(2, 64);
   },
 
   async verifyExamResult(examId: number): Promise<boolean> {
-    console.log('Mock: Verifying exam result', examId);
     return true;
   },
 
   async getExamSession(sessionId: number): Promise<ExamSession | null> {
-    console.log('Mock: Getting exam session', sessionId);
     return {
       sessionId,
       examId: 1,
@@ -412,7 +407,6 @@ export const mockExamService = {
   },
 
   async getSessionViolations(sessionId: number): Promise<CheatingViolation[]> {
-    console.log('Mock: Getting session violations', sessionId);
     return [
       {
         examId: 1,
@@ -428,12 +422,10 @@ export const mockExamService = {
   },
 
   async getStudentExamResults(studentAddress: string): Promise<number[]> {
-    console.log('Mock: Getting student exam results', studentAddress);
     return [1, 2, 3];
   },
 
   async getExamStatistics(): Promise<ExamStatistics> {
-    console.log('Mock: Getting exam statistics');
     return {
       totalExams: 150,
       totalViolations: 25,

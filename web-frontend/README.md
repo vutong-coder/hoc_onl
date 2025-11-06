@@ -293,6 +293,93 @@ web-frontend/
 
 ## 🔗 API Integration
 
+### Backend Services Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      WEB FRONTEND                            │
+│                    (React + Redux)                           │
+└─────────────────────────────────────────────────────────────┘
+                        │
+        ┌───────────────┴───────────────┐
+        │                               │
+        ▼                               ▼
+┌──────────────────┐          ┌──────────────────┐
+│   exam-service   │          │online_exam_service│
+│  (Java Spring)   │          │   (Node.js)       │
+│   Port: 9005     │          │   Port: 3000      │
+└──────────────────┘          └──────────────────┘
+        │                               │
+        ▼                               ▼
+┌──────────────────┐          ┌──────────────────┐
+│   PostgreSQL     │          │   PostgreSQL     │
+│   Port: 5433     │          │   Port: 5432     │
+│   exam_db        │          │ online_exam_db   │
+└──────────────────┘          └──────────────────┘
+```
+
+### Exam Service Integration (Admin)
+
+**Backend:** `exam-service` (Java Spring Boot, port 9005)
+
+**API Endpoints:**
+- `POST /exams` - Create exam
+- `GET /exams/{id}` - Get exam
+- `PUT /exams/{id}/config` - Update exam config
+- `DELETE /exams/{id}` - Delete exam
+- `POST /exams/{id}/schedule` - Schedule exam
+- `POST /exams/{id}/generate-questions` - Generate questions
+- `GET /exams/schedules` - Get all exams
+
+**Files:**
+- `src/services/api/examApi.ts` - Main Exam API
+- `src/admin/services/examApi.ts` - Admin Exam API
+- `src/admin/hooks/useExams.ts` - Uses real API
+
+**Status:** ✅ **COMPLETE** - All CRUD operations integrated, mock data removed
+
+### Online Exam Service Integration (User)
+
+**Backend:** `online_exam_service` (Node.js Express, port 3000)
+
+**API Endpoints:**
+- `GET /api/quizzes` - Get all quizzes (published only)
+- `POST /api/quizzes/:quizId/start` - Start exam
+- `POST /api/submissions/:submissionId/submit` - Submit exam
+- `GET /api/quizzes/:quizId` - Get quiz details
+- `GET /api/submissions/:submissionId/result` - Get result
+
+**Files:**
+- `src/services/api/onlineExamApi.ts` - Online Exam API
+- `src/services/examService.ts` - Exam business logic
+- `src/pages/ExamPage.tsx` - Exam list page
+
+**Status:** ✅ **COMPLETE** - All user exam features integrated
+
+### Course Service Integration
+
+**Backend:** `course-service` (Java Spring Boot, port 9001)
+
+**API Endpoints:**
+- `GET /api/courses` - Get all courses
+- `POST /api/courses` - Create course
+- `GET /api/courses/{id}` - Get course details
+- `PUT /api/courses/{id}` - Update course
+
+**Status:** ✅ **COMPLETE**
+
+### Token Reward Service Integration
+
+**Backend:** `token-reward-service` (Node.js, port 3000)
+
+**API Endpoints:**
+- `POST /api/tokens/grant` - Grant tokens
+- `POST /api/tokens/spend` - Spend tokens
+- `GET /api/tokens/balance/:studentId` - Get balance
+- `GET /api/tokens/history/:studentId` - Get history
+
+**Status:** ✅ **COMPLETE**
+
 ### Proctoring API
 
 **Endpoints:**
@@ -427,6 +514,51 @@ npm run lint           # Lint code
 2. Quản lý users, exams, proctoring
 3. Giám sát real-time violations
 4. Quản lý blockchain modules
+
+## 🐛 Bug Fixes & Features
+
+### Bug Fixes
+
+#### 1. Exam Creation Button Not Working
+**Issue:** "Thêm đề thi" button không hoạt động khi click  
+**Fix:** Fixed form selection logic in `AddExamModal.tsx` - use `document.querySelector()` instead of `.closest()` to find form element  
+**Files:** `src/admin/modal/Exams/AddExamModal.tsx`, `src/admin/modal/Exams/EditExamModal.tsx`  
+**Status:** ✅ Fixed
+
+#### 2. Empty Options Array in Questions
+**Issue:** Questions imported from exam-service had empty options  
+**Fix:** Extract options from JSONB `content.options` in mapper  
+**Files:** `src/mappers/quiz.mapper.js`  
+**Status:** ✅ Fixed
+
+#### 3. Grading Returns 0 Points
+**Issue:** Students scored 0 even when answering correctly  
+**Fix:** Extract `correctAnswer` from JSONB `content.correctAnswer` in grading service  
+**Files:** `src/services/grading.service.js`  
+**Status:** ✅ Fixed
+
+### New Features
+
+#### 1. Generate Questions for Existing Exams
+**Feature:** Generate random questions for existing exams (not just new exams)  
+**Components:** `GenerateQuestionsModal.tsx`  
+**Features:**
+- Select exam from list with search/filter
+- Configure difficulty (easy/medium/hard/mixed)
+- Custom distribution for mixed difficulty
+- Validation for custom distribution
+**Status:** ✅ Complete
+
+#### 2. Exam Subjects from API
+**Feature:** Load subjects dynamically from question tags instead of hardcode  
+**Implementation:** `getAllSubjects()` function extracts unique tags from questions  
+**Fallback:** Default subjects list if API fails  
+**Status:** ✅ Complete
+
+#### 3. Published Exams Filter
+**Feature:** Only show exams with status = 'PUBLISHED' to students  
+**Implementation:** Backend filter in `online_exam_service`  
+**Status:** ✅ Complete
 
 ## 🔍 Troubleshooting
 

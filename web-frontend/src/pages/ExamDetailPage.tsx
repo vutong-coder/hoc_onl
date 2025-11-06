@@ -7,7 +7,17 @@ import { useExamDetails } from '../hooks/useExamDetails';
 import styles from '../assets/css/ExamDetailPage.module.css';
 
 export const ExamDetailPage: React.FC = () => {
-  const { examDetails, handleGoBack, getQuestionStyles } = useExamDetails();
+  const { examDetails, loading, handleGoBack, getQuestionStyles } = useExamDetails();
+
+  if (loading) {
+    return (
+      <div className={styles.noDataContainer}>
+        <div className={styles.noDataCard}>
+          <p className={styles.noDataText}>Đang tải dữ liệu bài thi...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!examDetails) {
     return (
@@ -41,7 +51,7 @@ export const ExamDetailPage: React.FC = () => {
 
         {/* Questions List */}
         <div className={styles.questionsList}>
-          {examDetails.questions.map((question, index) => (
+          {examDetails && examDetails?.questions.map((question, index) => (
             <QuestionReviewCard
               key={question.id}
               question={question}

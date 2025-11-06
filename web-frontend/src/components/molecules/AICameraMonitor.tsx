@@ -7,6 +7,7 @@ import styles from './AICameraMonitor.module.css';
 interface AICameraMonitorProps {
   examId: string;
   studentId: string;
+  sessionId?: string;
   onViolationDetected?: (detection: CheatingDetection) => void;
   onMetricsUpdate?: (metrics: any) => void;
   className?: string;
@@ -15,6 +16,7 @@ interface AICameraMonitorProps {
 export const AICameraMonitor: React.FC<AICameraMonitorProps> = ({
   examId,
   studentId,
+  sessionId,
   onViolationDetected,
   onMetricsUpdate,
   className = ''
@@ -31,7 +33,7 @@ export const AICameraMonitor: React.FC<AICameraMonitorProps> = ({
     setDetectionSensitivity,
     enableDetectionType,
     frameStorage
-  } = useAICameraMonitor({ examId, studentId });
+  } = useAICameraMonitor({ examId, studentId, sessionId });
 
   const [showSettings, setShowSettings] = useState(false);
   const [detectionTypes, setDetectionTypes] = useState({
@@ -48,12 +50,9 @@ export const AICameraMonitor: React.FC<AICameraMonitorProps> = ({
   // Auto-start camera when component mounts
   React.useEffect(() => {
     const autoStartCamera = async () => {
-      console.log('AICameraMonitor: Auto-start check', { isActive, isAnalyzing, error }); // Debug log
       if (!isActive && !isAnalyzing && !error) {
-        console.log('AICameraMonitor: Starting auto-start...'); // Debug log
         try {
           await startMonitoring();
-          console.log('AICameraMonitor: Auto-start completed!'); // Debug log
         } catch (err) {
           console.error('Failed to auto-start camera:', err);
         }
@@ -61,7 +60,6 @@ export const AICameraMonitor: React.FC<AICameraMonitorProps> = ({
     };
 
     // Small delay to ensure component is fully mounted
-    console.log('AICameraMonitor: Setting auto-start timer...'); // Debug log
     const timer = setTimeout(autoStartCamera, 2000); // Increased delay to let ProctoringView start first
     return () => {
       clearTimeout(timer);

@@ -2,9 +2,11 @@ import React, { useState } from 'react'
 import { X, CheckCircle, Award, TrendingUp, Clock, AlertCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import ExamCard from '../atoms/ExamCard'
+import { useRecentSubmissions } from '../../hooks/useRecentSubmissions'
 
 interface RecentExam {
 	id: string
+	quizId?: string
 	title: string
 	score?: number
 	maxScore: number
@@ -12,90 +14,50 @@ interface RecentExam {
 	date: string
 	duration: string
 	certificate?: boolean
+	submittedAt?: string
 }
 
 interface RecentExamsProps {
-	exams?: RecentExam[]
 	onViewExam?: (examId: string) => void
 	onRetakeExam?: (examId: string) => void
 }
 
 export default function RecentExams({
-	exams = [
-		{
-			id: '1',
-			title: 'Lập trình Python cơ bản',
-			score: 85,
-			maxScore: 100,
-			status: 'completed',
-			date: '2 giờ trước',
-			duration: '45 phút',
-			certificate: true
-		},
-		{
-			id: '2',
-			title: 'Cấu trúc dữ liệu & Thuật toán',
-			score: 72,
-			maxScore: 100,
-			status: 'completed',
-			date: '1 ngày trước',
-			duration: '60 phút',
-			certificate: false
-		},
-		{
-			id: '3',
-			title: 'Phát triển Web cơ bản',
-			score: undefined,
-			maxScore: 100,
-			status: 'in-progress',
-			date: 'Bắt đầu 30 phút trước',
-			duration: '90 phút',
-			certificate: false
-		},
-		{
-			id: '4',
-			title: 'Lập trình Python cơ bản',
-			score: 85,
-			maxScore: 100,
-			status: 'completed',
-			date: '2 giờ trước',
-			duration: '45 phút',
-			certificate: true
-		},
-	],
 	onViewExam,
 	onRetakeExam
 }: RecentExamsProps): JSX.Element {
 	const navigate = useNavigate()
+	const { exams, loading, error } = useRecentSubmissions()
 	const [showExamDetailModal, setShowExamDetailModal] = useState(false)
 	const [showCertificateModal, setShowCertificateModal] = useState(false)
 	const [selectedExam, setSelectedExam] = useState<RecentExam | null>(null)
 
-	const handleViewExam = (examId: string) => {
-		const exam = exams.find(e => e.id === examId)
+	const handleViewExam = (submissionId: string) => {
+		const exam = exams.find(e => e.id === submissionId)
 		if (exam) {
 			setSelectedExam(exam)
 			if (exam.status === 'in-progress') {
-				// Navigate to continue exam
-				navigate(`/user/exam/${examId}`)
+				// Navigate to continue exam (use quizId, not submissionId)
+				navigate(`/exam/${exam.quizId || submissionId}/take`)
 			} else {
-				// Show detail modal
-				setShowExamDetailModal(true)
+				// Navigate to result page for completed exams (use quizId)
+				navigate(`/exam/${exam.quizId || submissionId}/result`)
 			}
-			onViewExam?.(examId)
+			onViewExam?.(submissionId)
 		}
 	}
 
-	const handleRetakeExam = (examId: string) => {
-		const exam = exams.find(e => e.id === examId)
+	const handleRetakeExam = (submissionId: string) => {
+		const exam = exams.find(e => e.id === submissionId)
 		if (exam) {
-			navigate(`/user/exam/${examId}/retake`)
-			onRetakeExam?.(examId)
+			// Navigate to quiz detail page to retake (use quizId)
+			navigate(`/exam/${exam.quizId || submissionId}/pre-check`)
+			onRetakeExam?.(submissionId)
 		}
 	}
 
 	const handleViewAllExams = () => {
-		navigate('/user/exams')
+		navigate('/user/exams/recent')
 	}
 
 	const handleViewCertificate = () => {
@@ -155,16 +117,59 @@ export default function RecentExams({
 				</div>
 
 				<div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-					<div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-						{exams.map((exam) => (
-							<ExamCard
-								key={exam.id}
-								exam={exam}
-								onViewExam={handleViewExam}
-								onRetakeExam={handleRetakeExam}
-							/>
-						))}
-					</div>
+					{loading ? (
+						<div style={{ 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center', 
+							height: '300px',
+							color: 'var(--muted-foreground)'
+						}}>
+							<div style={{ textAlign: 'center' }}>
+								<Clock style={{ width: '48px', height: '48px', margin: '0 auto 16px', opacity: 0.5 }} />
+								<p>Đang tải bài thi gần đây...</p>
+							</div>
+						</div>
+					) : error ? (
+						<div style={{ 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center', 
+							height: '300px',
+							color: 'var(--destructive)'
+						}}>
+							<div style={{ textAlign: 'center' }}>
+								<AlertCircle style={{ width: '48px', height: '48px', margin: '0 auto 16px' }} />
+								<p>Lỗi tải dữ liệu</p>
+								<p style={{ fontSize: '14px', opacity: 0.7 }}>{error}</p>
+							</div>
+						</div>
+					) : exams.length === 0 ? (
+						<div style={{ 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center', 
+							height: '300px',
+							color: 'var(--muted-foreground)'
+						}}>
+							<div style={{ textAlign: 'center' }}>
+								<AlertCircle style={{ width: '48px', height: '48px', margin: '0 auto 16px', opacity: 0.5 }} />
+								<p>Chưa có bài thi nào</p>
+								<p style={{ fontSize: '14px', opacity: 0.7 }}>Hãy bắt đầu làm bài thi đầu tiên!</p>
+							</div>
+						</div>
+					) : (
+						<div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+							{exams.map((exam) => (
+								<ExamCard
+									key={exam.id}
+									exam={exam}
+									onViewExam={handleViewExam}
+									onRetakeExam={handleRetakeExam}
+								/>
+							))}
+						</div>
+					)}
 				</div>
 			</div>
 

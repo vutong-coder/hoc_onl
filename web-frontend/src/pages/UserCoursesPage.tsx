@@ -31,10 +31,15 @@ export default function UserCoursesPage(): JSX.Element {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
+  const [hasFetched, setHasFetched] = useState(false)
 
-  // Fetch courses from backend
+  // ✅ FIX: Add guard to prevent duplicate fetch in React StrictMode
   useEffect(() => {
-    fetchCourses()
+    if (!hasFetched || currentPage > 0) {
+      fetchCourses()
+      setHasFetched(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage])
 
   const fetchCourses = async () => {
@@ -279,14 +284,9 @@ export default function UserCoursesPage(): JSX.Element {
                     <div className="course-footer">
                       <div className="course-price">
                         {course.price === 0 ? (
-                          <>
-                            <span className="free">Miễn phí</span>
-                          </>
+                          <span className="free">Miễn phí</span>
                         ) : (
-                          <>
-                            <span className="price">{course.price}</span>
-                            <span className="token">{course.tokenSymbol || 'LEARN'}</span>
-                          </>
+                          <span className="price">{course.price} {course.tokenSymbol || 'LEARN'}</span>
                         )}
                       </div>
 
@@ -294,9 +294,9 @@ export default function UserCoursesPage(): JSX.Element {
                         className="btn-enroll"
                         onClick={(e) => handleEnrollCourse(course.id, e)}
                       >
-                        <Play size={18} />
+                        <Play size={16} />
                         <span>Học ngay</span>
-                        <ChevronRight size={18} />
+                        <ChevronRight size={16} />
                       </button>
                     </div>
                   </div>

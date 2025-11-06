@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { AlertTriangle, X, Clock, Shield, Eye, Users, Volume2, MousePointer, Activity } from 'lucide-react';
+import { AlertTriangle, X, Clock, Shield, Eye, Users, Volume2, MousePointer, Activity, Smartphone } from 'lucide-react';
 import { CheatingDetection } from '../../hooks/useAICameraMonitor';
 import styles from './ExamViolationAlert.module.css';
 
@@ -122,9 +122,18 @@ export const ExamViolationAlert: React.FC<ExamViolationAlertProps> = ({
 
   const getDetectionIcon = (type: CheatingDetection['type']) => {
     switch (type) {
-      case 'face_detection': return <Eye className="w-4 h-4" />;
-      case 'eye_tracking': return <Eye className="w-4 h-4" />;
-      case 'multiple_faces': return <Users className="w-4 h-4" />;
+      case 'FACE_NOT_DETECTED':
+      case 'face_detection':
+        return <Eye className="w-4 h-4" />;
+      case 'MULTIPLE_FACES':
+      case 'multiple_faces':
+        return <Users className="w-4 h-4" />;
+      case 'MOBILE_PHONE_DETECTED':
+        return <Smartphone className="w-4 h-4" />;
+      case 'CAMERA_TAMPERED':
+        return <AlertTriangle className="w-4 h-4" />;
+      case 'LOOKING_AWAY':
+        return <Eye className="w-4 h-4" />;
       case 'tab_switch': return <MousePointer className="w-4 h-4" />;
       case 'voice_detection': return <Volume2 className="w-4 h-4" />;
       case 'movement_anomaly': return <Activity className="w-4 h-4" />;
@@ -134,9 +143,19 @@ export const ExamViolationAlert: React.FC<ExamViolationAlertProps> = ({
 
   const getDetectionTitle = (type: CheatingDetection['type']) => {
     switch (type) {
-      case 'face_detection': return 'Phát hiện khuôn mặt';
+      case 'FACE_NOT_DETECTED':
+      case 'face_detection':
+        return 'Không phát hiện khuôn mặt';
       case 'eye_tracking': return 'Theo dõi mắt';
-      case 'multiple_faces': return 'Nhiều người';
+      case 'MULTIPLE_FACES':
+      case 'multiple_faces':
+        return 'Phát hiện nhiều khuôn mặt';
+      case 'MOBILE_PHONE_DETECTED':
+        return 'Phát hiện thiết bị di động';
+      case 'CAMERA_TAMPERED':
+        return 'Camera bị che khuất';
+      case 'LOOKING_AWAY':
+        return 'Nhìn ra ngoài màn hình';
       case 'tab_switch': return 'Chuyển tab';
       case 'voice_detection': return 'Giọng nói';
       case 'movement_anomaly': return 'Chuyển động';

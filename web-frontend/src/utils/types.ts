@@ -18,15 +18,22 @@ export type StatCardData = {
 // Question types
 export type QuestionType = 'multiple-choice' | 'code' | 'essay'
 
+// Option type for multiple choice questions
+export interface QuestionOption {
+	id: string // UUID from backend
+	text: string
+}
+
 // Backward compatible ExamQuestion (with optional fields)
 export interface ExamQuestion {
-	id: number
+	id: string // Changed: UUID from backend (was number)
 	type: QuestionType
 	question: string
 	points: number
+	explanation?: string // NEW: Explanation for the correct answer
 	// Multiple choice
-	options?: string[]
-	correctAnswer?: number
+	options?: QuestionOption[] // Changed from string[] to include optionId
+	correctAnswer?: number | number[] // Can be single index (single_choice) or array (multiple_choice)
 	// Code
 	codeTemplate?: string
 	testCases?: Array<{
@@ -61,8 +68,8 @@ export interface ExamDetails {
 
 // Answer types - Flexible for now
 export interface ExamAnswer {
-	questionId: number
-	answer: number | string // Can be index or string
+	questionId: string // Changed: UUID from backend (was number)
+	answer: string // Changed: optionId (UUID) from backend (was number index)
 	timeSpent: number // seconds
 	savedAt?: string
 }
@@ -79,15 +86,21 @@ export interface ExamSubmission {
 
 export interface ExamResult {
 	id?: string
+	submissionId: string // ✅ Backend returns this after submission
 	examId: string
 	sessionId: string
 	userId?: string
 	score: number // percentage (0-100)
 	totalQuestions: number
 	correctAnswers: number
+	wrongAnswers?: number // ✅ Add wrongAnswers field
 	timeSpent: number // minutes
 	submittedAt: string
 	passed: boolean
+	percentile?: number // NEW: Student percentile ranking (0-100)
+	quizTitle?: string // NEW: Quiz title for display
+	examTitle?: string // Alternative field name
+	questions?: any[] // NEW: Detailed question results
 	answers?: Array<{
 		questionId: number
 		userAnswer: number | string

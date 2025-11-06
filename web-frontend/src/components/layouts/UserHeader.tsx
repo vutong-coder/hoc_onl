@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { LogOut, Menu, X, Bell, Search, MessageCircle, Moon, Sun, Grid3X3, ChevronDown, User, Trophy, Settings, Bookmark, Users, FileText, Shield, Copyright } from 'lucide-react'
+import { LogOut, Menu, X, Bell, Search, MessageCircle, Moon, Sun, Grid3X3, ChevronDown, User, Trophy, Settings, Bookmark, Users, FileText, Shield, Copyright, Clock } from 'lucide-react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { logoutUser } from '../../store/slices/authSlice'
@@ -430,6 +430,7 @@ export default function UserHeader(): JSX.Element {
 										<div style={{ padding: '8px 0' }}>
 											{[
 												{ icon: <User style={{ width: '16px', height: '16px' }} />, label: 'Hồ sơ', onClick: () => navigate('/user/profile') },
+												{ icon: <Clock style={{ width: '16px', height: '16px' }} />, label: 'Bài thi gần đây', onClick: () => navigate('/user/exams/recent') },
 												{ icon: <Trophy style={{ width: '16px', height: '16px' }} />, label: 'Bảng xếp hạng', onClick: () => navigate('/user/leaderboard') },
 												{ icon: <Settings style={{ width: '16px', height: '16px' }} />, label: 'Cài đặt', onClick: () => navigate('/user/settings') },
 												{ icon: <Copyright style={{ width: '16px', height: '16px' }} />, label: 'Bản quyền', onClick: () => navigate('/user/copyright') },

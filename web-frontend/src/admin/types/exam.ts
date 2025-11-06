@@ -1,5 +1,14 @@
 // Types cho Exam trong hệ thống admin
 
+// ✨ NEW: Enum option from backend
+export interface EnumOption {
+	code: string;          // e.g., "practice", "easy", "draft"
+	label: string;         // English label
+	labelVi: string;       // Vietnamese label
+	description?: string;  // Optional description
+	displayOrder?: number; // Display order in UI
+}
+
 export interface Exam {
 	id: string
 	title: string

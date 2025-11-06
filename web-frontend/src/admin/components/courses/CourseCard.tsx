@@ -1,6 +1,7 @@
 import React from 'react'
-import { Course } from '../../types/course'
+import { type Course as ApiCourse } from '../../../services/api/courseApi'
 import Badge from '../common/Badge'
+import { extractCourseStatus, getCourseThumbnail, getCourseField } from '../../../utils/courseAdapter'
 import '../../styles/courses.css'
 import { 
 	Edit, 
@@ -20,9 +21,9 @@ import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
 
 interface CourseCardProps {
-	course: Course
-	onClick?: (course: Course) => void
-	onEdit?: (course: Course) => void
+	course: ApiCourse
+	onClick?: (course: ApiCourse) => void
+	onEdit?: (course: ApiCourse) => void
 	onDelete?: (courseId: string) => void
 	onToggleStatus?: (courseId: string) => void
 }
@@ -34,6 +35,20 @@ export default function CourseCard({
 	onDelete, 
 	onToggleStatus 
 }: CourseCardProps): JSX.Element {
+	// Extract status from backend visibility field
+	const { status, isPublished } = extractCourseStatus(course)
+	const thumbnail = getCourseThumbnail(course)
+	const level = getCourseField(course, 'level', 'beginner')
+	const duration = getCourseField(course, 'duration', 0)
+	const price = getCourseField(course, 'price', 0)
+	const tokenSymbol = getCourseField(course, 'tokenSymbol', 'LEARN')
+	const shortDescription = getCourseField(course, 'shortDescription', course.description || '')
+	const enrollmentCount = getCourseField(course, 'enrollmentCount', 0)
+	const rating = getCourseField(course, 'rating', 0)
+	const reviewCount = getCourseField(course, 'reviewCount', 0)
+	const tags = getCourseField(course, 'tags', [])
+	const isFeatured = getCourseField(course, 'isFeatured', false)
+	const certificateAvailable = getCourseField(course, 'certificateAvailable', false)
 	
 	const getLevelBadgeVariant = (level: string) => {
 		switch (level) {
@@ -75,9 +90,11 @@ export default function CourseCard({
 		}
 	}
 
-	const formatPrice = (price: number, tokenSymbol: string) => {
-		if (price === 0) return 'Miễn phí'
-		return `${price.toLocaleString()} ${tokenSymbol}`
+	const formatPrice = (price?: number | null, tokenSymbol?: string) => {
+		const safePrice = typeof price === 'number' && isFinite(price) ? price : 0
+		if (safePrice === 0) return 'Miễn phí'
+		const symbol = tokenSymbol && tokenSymbol.trim() ? tokenSymbol : 'LEARN'
+		return `${safePrice.toLocaleString()} ${symbol}`
 	}
 
 	const formatTime = (timestamp: string) => {
@@ -102,9 +119,7 @@ export default function CourseCard({
 
 	const handleDeleteClick = (e: React.MouseEvent) => {
 		e.stopPropagation()
-		if (confirm(`Bạn có chắc chắn muốn xóa khóa học "${course.title}"?`)) {
-			onDelete?.(course.id)
-		}
+		onDelete?.(course.id)
 	}
 
 	const handleToggleStatusClick = (e: React.MouseEvent) => {
@@ -114,11 +129,11 @@ export default function CourseCard({
 
 	return (
 		<div 
-			className={`course-card ${course.isFeatured ? 'featured' : ''}`}
+			className={`course-card ${isFeatured ? 'featured' : ''}`}
 			onClick={handleCardClick}
 		>
 			{/* Featured Badge */}
-			{course.isFeatured && (
+			{isFeatured && (
 				<div className="course-featured-badge">
 					<Award size={16} />
 					<span>Nổi bật</span>
@@ -128,7 +143,7 @@ export default function CourseCard({
 			{/* Thumbnail */}
 			<div className="course-thumbnail">
 				<img 
-					src={course.thumbnail} 
+					src={thumbnail || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200"><rect width="100%" height="100%" fill="%23e5e7eb"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="14" fill="%239ca3af">No Image</text></svg>'} 
 					alt={course.title}
 					loading="lazy"
 				/>
@@ -149,11 +164,11 @@ export default function CourseCard({
 							<Edit size={16} />
 						</button>
 						<button
-							className={`btn btn-icon btn-sm ${course.isPublished ? 'btn-warning' : 'btn-success'}`}
-							title={course.isPublished ? 'Tạm dừng' : 'Xuất bản'}
+							className={`btn btn-icon btn-sm ${isPublished ? 'btn-warning' : 'btn-success'}`}
+							title={isPublished ? 'Tạm dừng' : 'Xuất bản'}
 							onClick={handleToggleStatusClick}
 						>
-							{course.isPublished ? <Pause size={16} /> : <Play size={16} />}
+							{isPublished ? <Pause size={16} /> : <Play size={16} />}
 						</button>
 						<button
 							className="btn btn-icon btn-sm btn-danger"
@@ -169,14 +184,16 @@ export default function CourseCard({
 			{/* Content */}
 			<div className="course-content">
 				{/* Header */}
-				<div className="course-header">
-					<div className="course-category">
-						<span className="category-icon">{course.category.icon}</span>
-						<span className="category-name">{course.category.name}</span>
-					</div>
+                <div className="course-header">
+                    <div className="course-category">
+                        <span className="category-icon">
+                            { (course as any)?.category?.icon ? (course as any).category.icon : <BookOpen size={14} /> }
+                        </span>
+                        <span className="category-name">{(course as any)?.category?.name || 'Khác'}</span>
+                    </div>
 					<div className="course-status">
-						<Badge variant={getStatusBadgeVariant(course.status)}>
-							{getStatusLabel(course.status)}
+					<Badge variant={getStatusBadgeVariant(status)}>
+						{getStatusLabel(status)}
 						</Badge>
 					</div>
 				</div>
@@ -185,61 +202,61 @@ export default function CourseCard({
 				<h3 className="course-title">{course.title}</h3>
 
 				{/* Description */}
-				<p className="course-description">{course.shortDescription}</p>
+				<p className="course-description">{shortDescription}</p>
 
 				{/* Instructor */}
-				<div className="course-instructor">
-					<img 
-						src={course.instructor.avatar || 'https://via.placeholder.com/32'} 
-						alt={course.instructor.name}
-						className="instructor-avatar"
-					/>
-					<div className="instructor-info">
-						<span className="instructor-name">{course.instructor.name}</span>
-						{course.instructor.isVerified && (
-							<Badge variant="success" style={{ fontSize: '10px', padding: '2px 6px' }}>
-								Verified
-							</Badge>
-						)}
-					</div>
-				</div>
+                <div className="course-instructor">
+                    <img 
+                        src={(course as any)?.instructor?.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect width="100%" height="100%" fill="%23e5e7eb"/></svg>'} 
+                        alt={(course as any)?.instructor?.name || 'Instructor'}
+                        className="instructor-avatar"
+                    />
+                    <div className="instructor-info">
+                        <span className="instructor-name">{(course as any)?.instructor?.name || '—'}</span>
+                        {(course as any)?.instructor?.isVerified && (
+                            <Badge variant="success" style={{ fontSize: '10px', padding: '2px 6px' }}>
+                                Verified
+                            </Badge>
+                        )}
+                    </div>
+                </div>
 
 				{/* Meta Info */}
 				<div className="course-meta">
 					<div className="meta-item">
-						<Badge variant={getLevelBadgeVariant(course.level)}>
-							{getLevelLabel(course.level)}
+						<Badge variant={getLevelBadgeVariant(level)}>
+							{getLevelLabel(level)}
 						</Badge>
 					</div>
 					<div className="meta-item">
 						<Clock size={14} />
-						<span>{course.duration}h</span>
+						<span>{duration}h</span>
 					</div>
-					<div className="meta-item">
-						<Users size={14} />
-						<span>{course.enrollmentCount.toLocaleString()}</span>
-					</div>
-					{course.rating > 0 && (
+                    <div className="meta-item">
+                        <Users size={14} />
+                        <span>{enrollmentCount.toLocaleString()}</span>
+                    </div>
+					{rating > 0 && (
 						<div className="meta-item">
 							<Star size={14} className="text-warning" />
-							<span>{course.rating}</span>
-							<span className="review-count">({course.reviewCount})</span>
+							<span>{rating}</span>
+							<span className="review-count">({reviewCount})</span>
 						</div>
 					)}
 				</div>
 
 				{/* Tags */}
-				{course.tags.length > 0 && (
+                {tags.length > 0 && (
 					<div className="course-tags">
-						{course.tags.slice(0, 3).map(tag => (
+                        {tags.slice(0, 3).map(tag => (
 							<span key={tag} className="course-tag">
 								<Tag size={12} />
 								{tag}
 							</span>
 						))}
-						{course.tags.length > 3 && (
+                        {tags.length > 3 && (
 							<span className="course-tag-more">
-								+{course.tags.length - 3} khác
+                                +{tags.length - 3} khác
 							</span>
 						)}
 					</div>
@@ -249,9 +266,9 @@ export default function CourseCard({
 				<div className="course-footer">
 					<div className="course-price">
 						<span className="price-amount">
-							{formatPrice(course.price, course.tokenSymbol)}
+							{formatPrice(price, tokenSymbol)}
 						</span>
-						{course.certificateAvailable && (
+						{certificateAvailable && (
 							<div className="certificate-badge">
 								<Award size={14} />
 								<span>Chứng chỉ</span>

@@ -1,11 +1,12 @@
 import React from 'react'
 import Modal from '../../components/common/Modal'
 import SessionDetailView from '../../components/proctoring/SessionDetailView'
+import { type ProctoringSession } from '../../types/proctoring'
 
 interface SessionDetailModalProps {
 	isOpen: boolean
 	onClose: () => void
-	session: any
+	session: ProctoringSession | null
 	onResolveViolation: (violationId: string) => void
 	onTerminate: (sessionId: string) => void
 	onSendWarning: (sessionId: string) => void

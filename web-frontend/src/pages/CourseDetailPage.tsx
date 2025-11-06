@@ -32,12 +32,15 @@ export default function CourseDetailPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'curriculum' | 'instructor'>('overview')
   const [isEnrolled, setIsEnrolled] = useState(false)
+  const [hasFetched, setHasFetched] = useState(false)
 
+  // ✅ FIX: Add guard to prevent duplicate fetch in React StrictMode
   useEffect(() => {
-    if (courseId) {
+    if (courseId && !hasFetched) {
       fetchCourseData()
+      setHasFetched(true)
     }
-  }, [courseId])
+  }, [courseId, hasFetched])
 
   const fetchCourseData = async () => {
     if (!courseId) return
@@ -118,7 +121,7 @@ export default function CourseDetailPage(): JSX.Element {
   }
 
   const isMaterialCompleted = (materialId: string) => {
-    return progress?.completedMaterials?.includes(materialId) || false
+    return progress?.completedMaterials.includes(materialId) || false
   }
 
   if (loading) {
@@ -271,7 +274,7 @@ export default function CourseDetailPage(): JSX.Element {
                   ></div>
                 </div>
                 <p className="progress-text">
-                  {progress.completedMaterials?.length || 0} / {materials.length} tài liệu hoàn thành
+                  {progress.completedMaterials.length} / {materials.length} tài liệu hoàn thành
                 </p>
               </div>
             )}

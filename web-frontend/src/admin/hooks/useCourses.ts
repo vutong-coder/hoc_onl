@@ -1,41 +1,59 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
-import { 
-	Course, 
-	CourseFilters, 
-	CourseDashboard,
-	CourseForm,
-	CourseCategory,
-	Instructor,
-	CourseStatus,
-	CourseLevel
+import {
+    CourseFilters,
+    CourseForm,
+    CourseCategory,
+    Instructor,
+    CourseStatus,
+    CourseLevel,
 } from '../types/course'
-import { 
-	mockCourseCategories,
-	mockInstructors
-} from '../mock/courses'
-import adminCourseApi, { getCourseStatistics, getTopCourses } from '../services/courseApi'
+// Use API Course type and real service path
+import courseApi, { type Course as ApiCourse, PageResponse } from '../../services/api/courseApi'
+// Import adapter để convert giữa backend và frontend
+import { backendToAdminCourse, courseFormToBackendCreateRequest, courseFormToBackendUpdateRequest } from '../../utils/courseAdapter'
+
+// Local dashboard state using API Course type to avoid type conflicts
+type DashboardState = {
+    stats: {
+        totalCourses: number
+        publishedCourses: number
+        draftCourses: number
+        archivedCourses: number
+        totalEnrollments: number
+        averageRating: number
+        totalRevenue: number
+        activeInstructors: number
+        featuredCourses: number
+    }
+    recentCourses: ApiCourse[]
+    topCourses: ApiCourse[]
+    topInstructors: Instructor[]
+    categories: CourseCategory[]
+    recentEnrollments: any[]
+}
 
 // Initial empty dashboard - will be loaded from API
-const initialDashboard: CourseDashboard = {
-	stats: {
-		totalCourses: 0,
-		publishedCourses: 0,
-		draftCourses: 0,
-		totalStudents: 0,
-		totalRevenue: 0,
-		averageRating: 0,
-		completionRate: 0,
-		totalInstructors: 0
-	},
-	courses: [],
-	topCourses: [],
-	recentCourses: [],
-	categories: mockCourseCategories,
-	instructors: mockInstructors
+const initialDashboard: DashboardState = {
+    stats: {
+        totalCourses: 0,
+        publishedCourses: 0,
+        draftCourses: 0,
+        archivedCourses: 0,
+        totalEnrollments: 0,
+        averageRating: 0,
+        totalRevenue: 0,
+        activeInstructors: 0,
+        featuredCourses: 0
+    },
+    recentCourses: [],
+    topCourses: [],
+    topInstructors: [],
+    categories: [],
+    recentEnrollments: []
 }
 
 export default function useCourses() {
-	const [dashboard, setDashboard] = useState<CourseDashboard>(initialDashboard)
+	const [dashboard, setDashboard] = useState<DashboardState>(initialDashboard)
 	const [filters, setFilters] = useState<CourseFilters>({
 		search: '',
 		category: 'all',
@@ -49,104 +67,151 @@ export default function useCourses() {
 		sortOrder: 'asc'
 	})
 	const [isCourseEditorOpen, setIsCourseEditorOpen] = useState(false)
-	const [editingCourse, setEditingCourse] = useState<Course | null>(null)
-	const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
+	const [editingCourse, setEditingCourse] = useState<ApiCourse | null>(null)
+	const [selectedCourse, setSelectedCourse] = useState<ApiCourse | null>(null)
 	const [loading, setLoading] = useState(false)
-	const [allCourses, setAllCourses] = useState<Course[]>([])
+	    const [allCourses, setAllCourses] = useState<ApiCourse[]>([])
+    const [categories, setCategories] = useState<CourseCategory[]>([])
+    const [instructors, setInstructors] = useState<Instructor[]>([])
 
-	// Load courses from API
-	const loadCourses = useCallback(async () => {
+	// ✅ FIX: Remove useCallback to prevent useEffect re-trigger
+	const loadCourses = async () => {
 		setLoading(true)
 		try {
 			// Load courses
-			const coursesResponse = await adminCourseApi.getAllCourses(0, 100)
-			const courses = coursesResponse.data.content
-			
-			// Load statistics
-			const stats = await getCourseStatistics()
-			
-			// Load top courses
-			const topCourses = await getTopCourses(5)
-			
-			setAllCourses(courses)
-			setDashboard(prev => ({
-				...prev,
-				stats: {
-					totalCourses: stats.totalCourses,
-					publishedCourses: stats.publishedCourses,
-					draftCourses: stats.draftCourses,
-					totalStudents: stats.totalEnrollments,
-					totalRevenue: 0, // TODO: Calculate from backend
-					averageRating: stats.averageRating,
-					completionRate: 0, // TODO: Get from backend
-					totalInstructors: mockInstructors.length
-				},
-				courses,
-				topCourses,
-				recentCourses: courses.slice(0, 5)
-			}))
+			const coursesResponse = await courseApi.getAllCourses(0, 100)
+			const courses = (coursesResponse.data as PageResponse<ApiCourse>).content
+			// Store API courses (original backend format)
+			setAllCourses(courses as ApiCourse[])
+
+	            // Build categories/instructors from backend data if present
+            const uniqueCategories: Record<string, CourseCategory> = {}
+            const uniqueInstructors: Record<string, Instructor> = {}
+            for (const c of courses as ApiCourse[]) {
+                if (c.category?.id && c.category?.name) {
+                    uniqueCategories[c.category.id] = {
+                        id: c.category.id,
+                        name: c.category.name,
+                        description: c.category.description || '',
+                        icon: '',
+                        color: '#999999',
+                        isActive: true,
+                        courseCount: 0
+                    }
+                }
+                if (c.instructor?.id && c.instructor?.name) {
+                    uniqueInstructors[c.instructor.id] = {
+                        id: c.instructor.id,
+                        name: c.instructor.name,
+                        email: c.instructor.email || '',
+                        bio: c.instructor.bio || '',
+                        specialties: [],
+                        experience: 0,
+                        rating: c.rating || 0,
+                        studentCount: c.enrollmentCount || 0,
+                        courseCount: 0,
+                        isVerified: true,
+                        socialLinks: []
+                    }
+                }
+            }
+            setCategories(Object.values(uniqueCategories))
+            setInstructors(Object.values(uniqueInstructors))
+            // Compute dashboard stats locally
+            const totalEnrollments = (courses as ApiCourse[]).reduce((sum, c) => sum + (c.enrollmentCount || 0), 0)
+            const averageRatingRaw = (courses as ApiCourse[]).reduce((sum, c) => sum + (c.rating || 0), 0)
+            const averageRating = courses.length ? averageRatingRaw / courses.length : 0
+            const totalRevenue = (courses as ApiCourse[]).reduce((sum, c) => sum + (c.price || 0) * (c.enrollmentCount || 0), 0)
+            const publishedCourses = (courses as ApiCourse[]).filter(c => c.isPublished).length
+            const draftCourses = (courses as ApiCourse[]).length - publishedCourses
+
+            const topCourses = [...(courses as ApiCourse[])]
+                .filter(c => c.isPublished)
+                .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+                .slice(0, 5)
+
+            setDashboard(prev => ({
+                ...prev,
+                stats: {
+                    totalCourses: courses.length,
+                    publishedCourses,
+                    draftCourses,
+                    archivedCourses: 0,
+                    totalEnrollments,
+                    averageRating,
+                    totalRevenue,
+                    activeInstructors: Object.keys(uniqueInstructors).length,
+                    featuredCourses: (courses as ApiCourse[]).filter(c => c.isFeatured).length,
+                },
+                recentCourses: (courses as ApiCourse[]).slice(0, 5),
+                topCourses,
+                topInstructors: Object.values(uniqueInstructors),
+                categories: Object.values(uniqueCategories),
+                recentEnrollments: [],
+            }))
 		} catch (error) {
 			console.error('❌ Error loading courses:', error)
 		} finally {
 			setLoading(false)
 		}
-	}, [])
+	}
 
-	// Load courses on mount
+	// ✅ FIX: Load courses on mount only once
 	useEffect(() => {
 		loadCourses()
-	}, [loadCourses])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	// Filter courses
 	const filteredCourses = useMemo(() => {
-		let result = [...allCourses]
+        let result = [...allCourses]
 
 		// Search filter
 		if (filters.search) {
 			const searchLower = filters.search.toLowerCase()
 			result = result.filter(course =>
-				course.title.toLowerCase().includes(searchLower) ||
-				course.description.toLowerCase().includes(searchLower) ||
-				course.instructor.name.toLowerCase().includes(searchLower) ||
-				course.tags.some(tag => tag.toLowerCase().includes(searchLower))
+                course.title?.toLowerCase().includes(searchLower) ||
+                (course.description || '').toLowerCase().includes(searchLower) ||
+                (course.instructor?.name || '').toLowerCase().includes(searchLower) ||
+                (course.tags || []).some(tag => tag.toLowerCase().includes(searchLower))
 			)
 		}
 
 		// Category filter
 		if (filters.category !== 'all') {
-			result = result.filter(course => course.category.id === filters.category)
+            result = result.filter(course => course.category?.id === filters.category)
 		}
 
 		// Level filter
 		if (filters.level !== 'all') {
-			result = result.filter(course => course.level === filters.level)
+            result = result.filter(course => course.level === filters.level)
 		}
 
 		// Status filter
 		if (filters.status !== 'all') {
-			result = result.filter(course => course.status === filters.status)
+            result = result.filter(course => (course.status as any) === filters.status)
 		}
 
 		// Instructor filter
 		if (filters.instructor !== 'all') {
-			result = result.filter(course => course.instructor.id === filters.instructor)
+            result = result.filter(course => course.instructor?.id === filters.instructor)
 		}
 
 		// Price range filter
 		if (filters.priceRange === 'free') {
-			result = result.filter(course => course.price === 0)
+            result = result.filter(course => (course.price || 0) === 0)
 		} else if (filters.priceRange === 'paid') {
-			result = result.filter(course => course.price > 0)
+            result = result.filter(course => (course.price || 0) > 0)
 		}
 
 		// Published filter
 		if (filters.isPublished !== 'all') {
-			result = result.filter(course => course.isPublished === filters.isPublished)
+            result = result.filter(course => course.isPublished === filters.isPublished)
 		}
 
 		// Featured filter
 		if (filters.isFeatured !== 'all') {
-			result = result.filter(course => course.isFeatured === filters.isFeatured)
+            result = result.filter(course => course.isFeatured === filters.isFeatured)
 		}
 
 		// Sort
@@ -155,32 +220,32 @@ export default function useCourses() {
 
 			switch (filters.sortBy) {
 				case 'title':
-					aValue = a.title.toLowerCase()
-					bValue = b.title.toLowerCase()
+                    aValue = (a.title || '').toLowerCase()
+                    bValue = (b.title || '').toLowerCase()
 					break
 				case 'createdAt':
-					aValue = new Date(a.createdAt).getTime()
-					bValue = new Date(b.createdAt).getTime()
+                    aValue = new Date(a.createdAt || 0).getTime()
+                    bValue = new Date(b.createdAt || 0).getTime()
 					break
 				case 'updatedAt':
-					aValue = new Date(a.updatedAt).getTime()
-					bValue = new Date(b.updatedAt).getTime()
+                    aValue = new Date(a.updatedAt || 0).getTime()
+                    bValue = new Date(b.updatedAt || 0).getTime()
 					break
 				case 'enrollmentCount':
-					aValue = a.enrollmentCount
-					bValue = b.enrollmentCount
+                    aValue = a.enrollmentCount || 0
+                    bValue = b.enrollmentCount || 0
 					break
 				case 'rating':
-					aValue = a.rating
-					bValue = b.rating
+                    aValue = a.rating || 0
+                    bValue = b.rating || 0
 					break
 				case 'price':
-					aValue = a.price
-					bValue = b.price
+                    aValue = a.price || 0
+                    bValue = b.price || 0
 					break
 				default:
-					aValue = a.title.toLowerCase()
-					bValue = b.title.toLowerCase()
+                    aValue = (a.title || '').toLowerCase()
+                    bValue = (b.title || '').toLowerCase()
 			}
 
 			if (filters.sortOrder === 'asc') {
@@ -190,8 +255,8 @@ export default function useCourses() {
 			}
 		})
 
-		return result
-	}, [filters])
+        return result
+    }, [filters, allCourses])
 
 	// Update filter
 	const updateFilter = useCallback((key: keyof CourseFilters, value: any) => {
@@ -215,24 +280,22 @@ export default function useCourses() {
 	}, [])
 
 	// Course management
-	const addCourse = useCallback(async (courseForm: CourseForm) => {
+	// ✅ FIX: Remove useCallback dependency on loadCourses
+    const addCourse = useCallback(async (courseForm: CourseForm) => {
 		setLoading(true)
 		try {
-			const newCourseData = {
+			// Convert CourseForm → Backend CreateCourseRequest (chỉ gửi field backend hỗ trợ)
+			const backendRequest = courseFormToBackendCreateRequest({
 				title: courseForm.title,
 				description: courseForm.description,
 				shortDescription: courseForm.shortDescription,
-				level: courseForm.level,
-				duration: courseForm.duration,
-				price: courseForm.price,
+				instructorId: courseForm.instructorId,
 				thumbnail: courseForm.thumbnail,
-				tags: courseForm.tags,
-				prerequisites: courseForm.prerequisites,
-				learningOutcomes: courseForm.learningOutcomes,
-				certificateAvailable: courseForm.certificateAvailable
-			}
+				isPublished: courseForm.isPublished,
+				status: courseForm.status
+			})
 			
-			await adminCourseApi.createCourse(newCourseData)
+			await courseApi.createCourse(backendRequest)
 			await loadCourses() // Reload to get fresh data
 		} catch (error) {
 			console.error('Error adding course:', error)
@@ -240,75 +303,25 @@ export default function useCourses() {
 		} finally {
 			setLoading(false)
 		}
-	}, [loadCourses])
-
-	const addCourseOld = useCallback((courseForm: CourseForm) => {
-		const category = mockCourseCategories.find(cat => cat.id === courseForm.categoryId)
-		const instructor = mockInstructors.find(inst => inst.id === courseForm.instructorId)
-		
-		if (!category || !instructor) return
-
-		const newCourse: Course = {
-			id: `course-${Date.now()}`,
-			title: courseForm.title,
-			description: courseForm.description,
-			shortDescription: courseForm.shortDescription,
-			category,
-			instructor,
-			level: courseForm.level,
-			duration: courseForm.duration,
-			price: courseForm.price,
-			tokenSymbol: courseForm.tokenSymbol,
-			thumbnail: courseForm.thumbnail,
-			videoUrl: courseForm.videoUrl,
-			tags: courseForm.tags,
-			status: courseForm.status,
-			isPublished: courseForm.isPublished,
-			isFeatured: courseForm.isFeatured,
-			enrollmentCount: 0,
-			maxEnrollments: courseForm.maxEnrollments,
-			rating: 0,
-			reviewCount: 0,
-			createdAt: new Date().toISOString(),
-			updatedAt: new Date().toISOString(),
-			publishedAt: courseForm.isPublished ? new Date().toISOString() : undefined,
-			lessons: [],
-			prerequisites: courseForm.prerequisites,
-			learningOutcomes: courseForm.learningOutcomes,
-			certificateAvailable: courseForm.certificateAvailable,
-			certificateTemplate: courseForm.certificateTemplate
-		}
-
-		setDashboard(prev => ({
-			...prev,
-			recentCourses: [newCourse, ...prev.recentCourses].slice(0, 5),
-			stats: {
-				...prev.stats,
-				totalCourses: prev.stats.totalCourses + 1,
-				publishedCourses: prev.stats.publishedCourses + (courseForm.isPublished ? 1 : 0),
-				draftCourses: prev.stats.draftCourses + (courseForm.isPublished ? 0 : 1),
-				featuredCourses: prev.stats.featuredCourses + (courseForm.isFeatured ? 1 : 0)
-			}
-		}))
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+
+    // removed legacy mock-based addCourseOld
 
 	const updateCourse = useCallback(async (courseId: string, courseForm: CourseForm) => {
 		setLoading(true)
 		try {
-			const updateData = {
+			// Convert CourseForm → Backend UpdateCourseRequest (chỉ gửi field backend hỗ trợ)
+			const backendRequest = courseFormToBackendUpdateRequest({
 				title: courseForm.title,
 				description: courseForm.description,
 				shortDescription: courseForm.shortDescription,
-				level: courseForm.level,
-				duration: courseForm.duration,
-				price: courseForm.price,
 				thumbnail: courseForm.thumbnail,
-				tags: courseForm.tags,
 				isPublished: courseForm.isPublished,
-				isFeatured: courseForm.isFeatured
-			}
+				status: courseForm.status
+			})
 			
-			await adminCourseApi.updateCourse(courseId, updateData)
+			await courseApi.updateCourse(courseId, backendRequest)
 			await loadCourses() // Reload to get fresh data
 		} catch (error) {
 			console.error('Error updating course:', error)
@@ -316,91 +329,34 @@ export default function useCourses() {
 		} finally {
 			setLoading(false)
 		}
-	}, [loadCourses])
-
-	const updateCourseOld = useCallback((courseId: string, courseForm: CourseForm) => {
-		const category = mockCourseCategories.find(cat => cat.id === courseForm.categoryId)
-		const instructor = mockInstructors.find(inst => inst.id === courseForm.instructorId)
-		
-		if (!category || !instructor) return
-
-		setDashboard(prev => ({
-			...prev,
-			recentCourses: prev.recentCourses.map(course =>
-				course.id === courseId
-					? {
-						...course,
-						title: courseForm.title,
-						description: courseForm.description,
-						shortDescription: courseForm.shortDescription,
-						category,
-						instructor,
-						level: courseForm.level,
-						duration: courseForm.duration,
-						price: courseForm.price,
-						tokenSymbol: courseForm.tokenSymbol,
-						thumbnail: courseForm.thumbnail,
-						videoUrl: courseForm.videoUrl,
-						tags: courseForm.tags,
-						status: courseForm.status,
-						isPublished: courseForm.isPublished,
-						isFeatured: courseForm.isFeatured,
-						maxEnrollments: courseForm.maxEnrollments,
-						prerequisites: courseForm.prerequisites,
-						learningOutcomes: courseForm.learningOutcomes,
-						certificateAvailable: courseForm.certificateAvailable,
-						certificateTemplate: courseForm.certificateTemplate,
-						updatedAt: new Date().toISOString(),
-						publishedAt: courseForm.isPublished && !course.isPublished ? new Date().toISOString() : course.publishedAt
-					}
-					: course
-			),
-			stats: {
-				...prev.stats,
-				publishedCourses: prev.stats.publishedCourses + (courseForm.isPublished ? 1 : 0),
-				draftCourses: prev.stats.draftCourses + (courseForm.isPublished ? 0 : 1),
-				featuredCourses: prev.stats.featuredCourses + (courseForm.isFeatured ? 1 : 0)
-			}
-		}))
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+
+    // removed legacy mock-based updateCourseOld
 
 	const deleteCourse = useCallback(async (courseId: string) => {
 		setLoading(true)
 		try {
-			await adminCourseApi.deleteCourse(courseId)
+			await courseApi.deleteCourse(courseId)
 			await loadCourses() // Reload to get fresh data
-		} catch (error) {
-			console.error('Error deleting course:', error)
-			throw error
+		} catch (error: any) {
+			const message = error?.message || 'Xóa khóa học thất bại. Vui lòng kiểm tra backend.'
+			alert(message)
 		} finally {
 			setLoading(false)
 		}
-	}, [loadCourses])
-
-	const deleteCourseOld = useCallback((courseId: string) => {
-		setDashboard(prev => {
-			const course = prev.recentCourses.find(c => c.id === courseId)
-			return {
-				...prev,
-				recentCourses: prev.recentCourses.filter(c => c.id !== courseId),
-				stats: {
-					...prev.stats,
-					totalCourses: prev.stats.totalCourses - 1,
-					publishedCourses: prev.stats.publishedCourses - (course?.isPublished ? 1 : 0),
-					draftCourses: prev.stats.draftCourses - (course?.isPublished ? 0 : 1),
-					featuredCourses: prev.stats.featuredCourses - (course?.isFeatured ? 1 : 0)
-				}
-			}
-		})
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+
+    // removed legacy mock-based deleteCourseOld
 
 	const toggleCourseStatus = useCallback(async (courseId: string) => {
 		setLoading(true)
 		try {
-			const course = allCourses.find(c => c.id === courseId)
+            const course = allCourses.find(c => c.id === courseId)
 			if (!course) return
 			
-			await adminCourseApi.updateCourse(courseId, {
+			await courseApi.updateCourse(courseId, {
 				isPublished: !course.isPublished
 			})
 			await loadCourses() // Reload to get fresh data
@@ -410,42 +366,13 @@ export default function useCourses() {
 		} finally {
 			setLoading(false)
 		}
-	}, [allCourses, loadCourses])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [allCourses])
 
-	const toggleCourseStatusOld = useCallback((courseId: string) => {
-		setDashboard(prev => ({
-			...prev,
-			recentCourses: prev.recentCourses.map(course =>
-				course.id === courseId
-					? { 
-						...course, 
-						isPublished: !course.isPublished,
-						status: !course.isPublished ? 'published' as CourseStatus : 'draft' as CourseStatus,
-						publishedAt: !course.isPublished ? new Date().toISOString() : undefined,
-						updatedAt: new Date().toISOString()
-					}
-					: course
-			),
-			stats: {
-				...prev.stats,
-				publishedCourses: prev.recentCourses.reduce((count, course) => {
-					if (course.id === courseId) {
-						return count + (course.isPublished ? 0 : 1) // If currently published, decrease by 1, else increase by 1
-					}
-					return count + (course.isPublished ? 1 : 0)
-				}, 0),
-				draftCourses: prev.recentCourses.reduce((count, course) => {
-					if (course.id === courseId) {
-						return count + (course.isPublished ? 1 : 0) // If currently published, increase by 1, else decrease by 1
-					}
-					return count + (course.isPublished ? 0 : 1)
-				}, 0)
-			}
-		}))
-	}, [])
+    // removed legacy mock-based toggleCourseStatusOld
 
 	// Modal management
-	const openCourseEditor = useCallback((course?: Course) => {
+	const openCourseEditor = useCallback((course?: ApiCourse) => {
 		setEditingCourse(course || null)
 		setIsCourseEditorOpen(true)
 	}, [])
@@ -464,14 +391,15 @@ export default function useCourses() {
 		closeCourseEditor()
 	}, [editingCourse, addCourse, updateCourse, closeCourseEditor])
 
-	// Auto-refresh courses every 30 seconds
+	// ✅ FIX: Auto-refresh with proper cleanup and no dependency on loadCourses
 	useEffect(() => {
 		const interval = setInterval(() => {
 			loadCourses()
 		}, 30000) // Refresh every 30 seconds
 
 		return () => clearInterval(interval)
-	}, [loadCourses])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	// Helper functions
 	const getCourseById = useCallback((id: string) => {
@@ -516,8 +444,8 @@ export default function useCourses() {
 		// Data
 		dashboard,
 		courses: filteredCourses,
-		categories: mockCourseCategories,
-		instructors: mockInstructors,
+        categories,
+        instructors,
 		filters,
 		
 		// Actions

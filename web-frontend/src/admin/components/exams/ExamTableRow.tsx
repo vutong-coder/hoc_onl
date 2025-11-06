@@ -12,6 +12,8 @@ interface ExamTableRowProps {
 	onDelete: (exam: Exam) => void
 	onView: (exam: Exam) => void
 	onDuplicate: (exam: Exam) => void
+	onPublish?: (exam: Exam) => void // ✨ NEW
+	onUnpublish?: (exam: Exam) => void // ✨ NEW
 }
 
 export default function ExamTableRow({
@@ -19,7 +21,9 @@ export default function ExamTableRow({
 	onEdit,
 	onDelete,
 	onView,
-	onDuplicate
+	onDuplicate,
+	onPublish,
+	onUnpublish
 }: ExamTableRowProps): JSX.Element {
 	
 	const getDifficultyBadgeVariant = (difficulty: string) => {
@@ -96,11 +100,50 @@ export default function ExamTableRow({
 		}
 	}
 
+	// ✨ Visual feedback: different style for draft vs published
+	const isDraft = exam.status === 'draft'
+	const isPublished = exam.status === 'published'
+	
 	return (
-		<tr>
+		<tr style={{ 
+			opacity: isDraft ? 0.7 : 1,
+			background: isPublished ? 'var(--success-bg, rgba(34, 197, 94, 0.05))' : 'transparent'
+		}}>
 			<td>
 				<div>
-					<div style={{ fontWeight: 500, marginBottom: '4px' }}>{exam.title}</div>
+					<div style={{ 
+						fontWeight: 500, 
+						marginBottom: '4px',
+						display: 'flex',
+						alignItems: 'center',
+						gap: '8px'
+					}}>
+						{exam.title}
+						{isDraft && (
+							<span style={{
+								fontSize: '11px',
+								padding: '2px 6px',
+								borderRadius: '4px',
+								background: 'var(--muted)',
+								color: 'var(--muted-foreground)',
+								fontWeight: 600
+							}}>
+								NHÁP
+							</span>
+						)}
+						{isPublished && (
+							<span style={{
+								fontSize: '11px',
+								padding: '2px 6px',
+								borderRadius: '4px',
+								background: 'var(--success)',
+								color: 'white',
+								fontWeight: 600
+							}}>
+								CÔNG KHAI
+							</span>
+						)}
+					</div>
 					<div style={{ fontSize: '13px', color: 'var(--muted-foreground)' }}>
 						{exam.subject}
 					</div>
@@ -149,6 +192,8 @@ export default function ExamTableRow({
 					onDelete={onDelete}
 					onView={onView}
 					onDuplicate={onDuplicate}
+					onPublish={onPublish} // ✨ NEW
+					onUnpublish={onUnpublish} // ✨ NEW
 				/>
 			</td>
 		</tr>

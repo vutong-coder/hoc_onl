@@ -1,5 +1,5 @@
 import React from 'react'
-import { Edit2, Trash2, Eye, Copy, Play } from 'lucide-react'
+import { Edit2, Trash2, Eye, Copy, Play, Upload, Archive } from 'lucide-react'
 import { Exam } from '../../types/exam'
 
 interface ExamActionsProps {
@@ -8,6 +8,8 @@ interface ExamActionsProps {
 	onDelete: (exam: Exam) => void
 	onView: (exam: Exam) => void
 	onDuplicate: (exam: Exam) => void
+	onPublish?: (exam: Exam) => void // ✨ NEW
+	onUnpublish?: (exam: Exam) => void // ✨ NEW
 }
 
 export default function ExamActions({
@@ -15,8 +17,13 @@ export default function ExamActions({
 	onEdit,
 	onDelete,
 	onView,
-	onDuplicate
+	onDuplicate,
+	onPublish,
+	onUnpublish
 }: ExamActionsProps): JSX.Element {
+	
+	const isDraft = exam.status === 'draft'
+	const isPublished = exam.status === 'published'
 	
 	return (
 		<div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
@@ -28,6 +35,69 @@ export default function ExamActions({
 			>
 				<Eye size={16} />
 			</button>
+
+		{/* Nút xuất bản / Gỡ xuất bản */}
+		{isDraft && onPublish && (
+			<button
+				className="btn btn-sm"
+				onClick={() => onPublish(exam)}
+				title="Xuất bản đề thi"
+				style={{ 
+					backgroundColor: '#22c55e',
+					color: 'white',
+					border: 'none',
+					padding: '6px 12px',
+					borderRadius: '6px',
+					cursor: 'pointer',
+					display: 'inline-flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					transition: 'all 0.2s',
+					opacity: 1
+				}}
+				onMouseEnter={(e) => {
+					e.currentTarget.style.backgroundColor = '#16a34a'
+					e.currentTarget.style.transform = 'scale(1.05)'
+				}}
+				onMouseLeave={(e) => {
+					e.currentTarget.style.backgroundColor = '#22c55e'
+					e.currentTarget.style.transform = 'scale(1)'
+				}}
+			>
+				<Upload size={16} />
+			</button>
+		)}
+		
+		{isPublished && onUnpublish && (
+			<button
+				className="btn btn-sm"
+				onClick={() => onUnpublish(exam)}
+				title="Gỡ xuất bản"
+				style={{ 
+					backgroundColor: '#f59e0b',
+					color: 'white',
+					border: 'none',
+					padding: '6px 12px',
+					borderRadius: '6px',
+					cursor: 'pointer',
+					display: 'inline-flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					transition: 'all 0.2s',
+					opacity: 1
+				}}
+				onMouseEnter={(e) => {
+					e.currentTarget.style.backgroundColor = '#d97706'
+					e.currentTarget.style.transform = 'scale(1.05)'
+				}}
+				onMouseLeave={(e) => {
+					e.currentTarget.style.backgroundColor = '#f59e0b'
+					e.currentTarget.style.transform = 'scale(1)'
+				}}
+			>
+				<Archive size={16} />
+			</button>
+		)}
 
 			{/* Nút sao chép */}
 			<button

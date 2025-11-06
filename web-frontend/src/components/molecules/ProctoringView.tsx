@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { Camera, CameraOff, Minimize2, AlertTriangle, RefreshCw, Loader } from 'lucide-react';
+import { Camera, AlertTriangle, RefreshCw, Loader } from 'lucide-react';
 import { useCamera } from '../../hooks/useCamera';
+import { cameraManager } from '../../services/cameraManager';
 
 interface ProctoringViewProps {
   width?: number;
@@ -33,16 +34,21 @@ export const ProctoringView: React.FC<ProctoringViewProps> = ({
 
   useEffect(() => {
     const video = videoRef.current;
-    if (video && stream) {
-      console.log('Setting video srcObject:', stream);
-      video.srcObject = stream;
-      
-      // Call onStreamReady only once
-      if (!streamReadyCalledRef.current && stream) {
-        console.log('Calling onStreamReady');
-        onStreamReady?.(stream);
+    if (!video) {
+      return;
+    }
+
+    if (stream) {
+      cameraManager.attachToElement(video);
+
+      if (!streamReadyCalledRef.current && cameraManager.currentStream) {
+        onStreamReady?.(cameraManager.currentStream);
         streamReadyCalledRef.current = true;
       }
+    } else {
+      video.pause();
+      video.srcObject = null;
+      streamReadyCalledRef.current = false;
     }
   }, [stream, onStreamReady]);
 
@@ -260,7 +266,6 @@ export const ProctoringView: React.FC<ProctoringViewProps> = ({
               background: '#000'
             }}
             onLoadedMetadata={(e) => {
-              console.log('Video metadata loaded');
               const video = e.currentTarget;
               video.play().catch(err => console.error('Play error:', err));
             }}

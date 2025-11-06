@@ -96,14 +96,18 @@ export interface Course {
 }
 
 export interface CreateCourseRequest {
+  id?: string; // UUID required by backend
   title: string;
-  description: string;
+  instructorId?: number;
+  description?: string;
+  thumbnailUrl?: string;
+  visibility?: string; // 'published' | 'draft' | etc.
+  // Legacy fields (kept for backward compatibility but backend doesn't support)
   shortDescription?: string;
   categoryId?: string;
-  instructorId?: string;
-  level: 'beginner' | 'intermediate' | 'advanced';
-  duration: number;
-  price: number;
+  level?: 'beginner' | 'intermediate' | 'advanced';
+  duration?: number;
+  price?: number;
   thumbnail?: string;
   tags?: string[];
   prerequisites?: string[];
@@ -114,6 +118,9 @@ export interface CreateCourseRequest {
 export interface UpdateCourseRequest {
   title?: string;
   description?: string;
+  thumbnailUrl?: string;
+  visibility?: string; // 'published' | 'draft' | etc.
+  // Legacy fields (kept for backward compatibility but backend doesn't support)
   shortDescription?: string;
   level?: 'beginner' | 'intermediate' | 'advanced';
   duration?: number;
@@ -291,13 +298,22 @@ export const updateCourse = async (courseId: string, courseData: UpdateCourseReq
 /**
  * Delete course
  */
-export const deleteCourse = async (courseId: string): Promise<ApiResponse<void>> => {
+export const deleteCourse = async (
+  courseId: string,
+  options?: { force?: boolean }
+): Promise<ApiResponse<void>> => {
   try {
-    const response = await courseAxios.delete(`/courses/${courseId}`);
-    return response.data;
+    const response = await courseAxios.delete(`/courses/${courseId}`),
+      // If backend supports force flag via query param, use this instead:
+      // await courseAxios.delete(`/courses/${courseId}`,{ params: options?.force ? { force: true } : undefined });
+      data = response.data
+    return data
   } catch (error: any) {
-    console.error('Error deleting course:', error);
-    throw new Error(error.response?.data?.message || 'Failed to delete course');
+    const status = error?.response?.status
+    const serverMessage = error?.response?.data?.message || error?.response?.data?.error || error?.response?.data
+    const msg = serverMessage ? `Failed to delete course (${status}): ${serverMessage}` : `Failed to delete course (${status || 'unknown'})`
+    console.error('Error deleting course:', { status, serverMessage, url: `/courses/${courseId}` })
+    throw new Error(msg)
   }
 };
 
@@ -401,6 +417,22 @@ export const getStudentProgress = async (studentId: number, courseId: string): P
     );
     return response.data;
   } catch (error: any) {
+    // Trả về tiến độ mặc định khi backend chưa có bản ghi hoặc tạm thời lỗi
+    const status = error?.response?.status;
+    if (status === 404 || status === 500) {
+      return {
+        code: status || 500,
+        message: 'No progress yet',
+        data: {
+          id: 'temp',
+          studentId,
+          courseId,
+          completedMaterials: [],
+          progressPercentage: 0,
+          lastAccessedAt: new Date().toISOString(),
+        } as unknown as Progress,
+      };
+    }
     console.error('Error getting progress:', error);
     throw new Error(error.response?.data?.message || 'Failed to get progress');
   }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import Modal from '../common/Modal'
 import { Shuffle, AlertCircle } from 'lucide-react'
 import { RandomExamConfig } from '../../types/exam'
@@ -8,9 +8,12 @@ interface RandomExamModalProps {
 	isOpen: boolean
 	onClose: () => void
 	onGenerate: (config: RandomExamConfig) => void
+	subjects?: string[] // Subjects từ API
+	difficulties?: import('../../types/exam').EnumOption[]  // ✨ NEW: Dynamic difficulties
 }
 
-const subjects = [
+// Fallback options if API fails
+const DEFAULT_SUBJECTS = [
 	'Lập trình Web',
 	'Cơ sở dữ liệu',
 	'Thuật toán',
@@ -23,13 +26,39 @@ const subjects = [
 	'Học máy'
 ]
 
+const DEFAULT_DIFFICULTIES = [
+	{ code: 'easy', labelVi: 'Chỉ câu dễ' },
+	{ code: 'medium', labelVi: 'Chỉ câu trung bình' },
+	{ code: 'hard', labelVi: 'Chỉ câu khó' },
+	{ code: 'mixed', labelVi: 'Trộn lẫn (Dễ + TB + Khó)' },
+]
+
 export default function RandomExamModal({
 	isOpen,
 	onClose,
-	onGenerate
+	onGenerate,
+	subjects: propSubjects,
+	difficulties: propDifficulties
 }: RandomExamModalProps): JSX.Element {
 	
-	const [subject, setSubject] = useState(subjects[0])
+	// Sử dụng subjects từ API hoặc fallback
+	const availableSubjects = useMemo(() => {
+		return (propSubjects && propSubjects.length > 0) ? propSubjects : DEFAULT_SUBJECTS
+	}, [propSubjects])
+	
+	// ✨ NEW: Use API difficulties or fallback
+	const availableDifficulties = useMemo(() => {
+		if (propDifficulties && propDifficulties.length > 0) {
+			// Add "mixed" option to API difficulties
+			return [
+				{ code: 'mixed', labelVi: 'Trộn lẫn (Dễ + TB + Khó)' },
+				...propDifficulties.map(d => ({ code: d.code, labelVi: `Chỉ ${d.labelVi.toLowerCase()}` }))
+			]
+		}
+		return DEFAULT_DIFFICULTIES
+	}, [propDifficulties])
+	
+	const [subject, setSubject] = useState(availableSubjects[0])
 	const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | 'mixed'>('mixed')
 	const [totalQuestions, setTotalQuestions] = useState(30)
 	const [duration, setDuration] = useState(60)
@@ -56,7 +85,7 @@ export default function RandomExamModal({
 	}
 
 	const resetForm = () => {
-		setSubject(subjects[0])
+		setSubject(availableSubjects[0])
 		setDifficulty('mixed')
 		setTotalQuestions(30)
 		setDuration(60)
@@ -110,10 +139,20 @@ export default function RandomExamModal({
 						value={subject}
 						onChange={(e) => setSubject(e.target.value)}
 					>
-						{subjects.map(s => (
+						{availableSubjects.map(s => (
 							<option key={s} value={s}>{s}</option>
 						))}
 					</select>
+					{propSubjects && propSubjects.length > 0 && (
+						<small style={{ color: 'var(--muted-foreground)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+							📊 {availableSubjects.length} môn học từ hệ thống
+						</small>
+					)}
+					{(!propSubjects || propSubjects.length === 0) && (
+						<small style={{ color: 'var(--warning)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+							⚠️ Sử dụng danh sách mặc định (chưa có dữ liệu từ API)
+						</small>
+					)}
 				</div>
 
 				<div className="form-row">
@@ -149,10 +188,9 @@ export default function RandomExamModal({
 						value={difficulty}
 						onChange={(e) => setDifficulty(e.target.value as any)}
 					>
-						<option value="mixed">Trộn lẫn (Dễ + TB + Khó)</option>
-						<option value="easy">Chỉ câu dễ</option>
-						<option value="medium">Chỉ câu trung bình</option>
-						<option value="hard">Chỉ câu khó</option>
+						{availableDifficulties.map(d => (
+							<option key={d.code} value={d.code}>{d.labelVi}</option>
+						))}
 					</select>
 				</div>
 

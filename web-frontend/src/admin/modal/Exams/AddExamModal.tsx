@@ -7,48 +7,90 @@ interface AddExamModalProps {
 	onClose: () => void
 	onAddExam: (examData: Partial<any>) => void
 	subjects: string[]
+	types?: import('../../types/exam').EnumOption[]  // ✨ NEW: Dynamic exam types
+	difficulties?: import('../../types/exam').EnumOption[]  // ✨ NEW: Dynamic difficulties
 }
+
+// Fallback options if API fails
+const DEFAULT_TYPES = [
+	{ code: 'practice', labelVi: 'Luyện tập' },
+	{ code: 'quiz', labelVi: 'Kiểm tra' },
+	{ code: 'midterm', labelVi: 'Giữa kỳ' },
+	{ code: 'final', labelVi: 'Cuối kỳ' },
+	{ code: 'assignment', labelVi: 'Bài tập' },
+]
+
+const DEFAULT_DIFFICULTIES = [
+	{ code: 'easy', labelVi: 'Dễ' },
+	{ code: 'medium', labelVi: 'Trung bình' },
+	{ code: 'hard', labelVi: 'Khó' },
+]
 
 const AddExamModal: React.FC<AddExamModalProps> = ({
 	isOpen,
 	onClose,
 	onAddExam,
-	subjects
+	subjects,
+	types,
+	difficulties
 }) => {
+	// Use API options or fallback to defaults
+	const availableTypes = types && types.length > 0 ? types : DEFAULT_TYPES
+	const availableDifficulties = difficulties && difficulties.length > 0 ? difficulties : DEFAULT_DIFFICULTIES
 	const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
-		const form = (e.target as HTMLButtonElement).closest('.modal-content-modern')?.querySelector('form')
+		e.preventDefault()
+		// Find form by looking up to modal container then down to form
+		const modalContainer = document.querySelector('.modal-container-modern')
+		const form = modalContainer?.querySelector('form') as HTMLFormElement | null
 		if (form) {
 			const formData = new FormData(form)
+			const title = formData.get('title') as string
+			const duration = parseInt(formData.get('duration') as string) || 0
+			
+			// Validation
+			if (!title || !duration) {
+				alert('Vui lòng điền đầy đủ các trường bắt buộc (*)')
+				return
+			}
+			
+			const passingScore = parseInt(formData.get('passingScore') as string) || 50
+			const maxAttempts = parseInt(formData.get('maxAttempts') as string) || 3
+			
+			// Validation
+			if (duration <= 0) {
+				alert('Thời gian thi phải lớn hơn 0')
+				return
+			}
+			if (passingScore < 0 || passingScore > 100) {
+				alert('Điểm đạt phải từ 0-100')
+				return
+			}
+			if (maxAttempts < 1) {
+				alert('Số lần thi tối đa phải >= 1')
+				return
+			}
+			
 			const examData = {
-				title: formData.get('title') as string,
-				description: formData.get('description') as string,
+				title,
+				description: formData.get('description') as string || '',
 				subject: formData.get('subject') as string,
 				type: formData.get('type') as any,
-				totalQuestions: parseInt(formData.get('totalQuestions') as string) || 0,
-				duration: parseInt(formData.get('duration') as string) || 0,
-				totalPoints: parseInt(formData.get('totalPoints') as string) || 0,
-				passingScore: parseInt(formData.get('passingScore') as string) || 0,
 				difficulty: formData.get('difficulty') as any,
-				maxAttempts: parseInt(formData.get('maxAttempts') as string) || 1,
+				duration, // durationMinutes
+				passingScore,
+				maxAttempts,
+				// Frontend-only fields for display/config (not sent to backend directly)
+				totalQuestions: parseInt(formData.get('totalQuestions') as string) || 0,
 				allowReview: formData.get('allowReview') === 'on',
 				shuffleQuestions: formData.get('shuffleQuestions') === 'on',
 				showResults: formData.get('showResults') === 'on',
 				status: 'draft' as const,
-				createdBy: 'Admin'
+				startDate: undefined, // Will be set when scheduling
+				endDate: undefined,
 			}
 			
-			if (examData.title && examData.subject && examData.totalQuestions && examData.duration) {
-				// Auto-calculate if not provided
-				if (!examData.totalPoints) {
-					examData.totalPoints = examData.totalQuestions * 2
-				}
-				if (!examData.passingScore) {
-					examData.passingScore = Math.floor(examData.totalPoints * 0.5)
-				}
-				onAddExam(examData)
-			} else {
-				alert('Vui lòng điền đầy đủ các trường bắt buộc (*)')
-			}
+			onAddExam(examData)
+			// Note: Modal will be closed by parent component (ExamsPage) after successful creation
 		}
 	}
 
@@ -113,12 +155,10 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 
 					<div className="modal-form-group">
 						<label className="form-label">Loại bài thi</label>
-						<select name="type" className="form-select" defaultValue="practice">
-							<option value="practice">Luyện tập</option>
-							<option value="quiz">Kiểm tra</option>
-							<option value="midterm">Giữa kỳ</option>
-							<option value="final">Cuối kỳ</option>
-							<option value="assignment">Bài tập</option>
+						<select name="type" className="form-select" defaultValue={availableTypes[0]?.code || 'practice'}>
+							{availableTypes.map(type => (
+								<option key={type.code} value={type.code}>{type.labelVi}</option>
+							))}
 						</select>
 					</div>
 				</div>
@@ -150,10 +190,10 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 
 					<div className="modal-form-group">
 						<label className="form-label">Độ khó</label>
-						<select name="difficulty" className="form-select" defaultValue="medium">
-							<option value="easy">Dễ</option>
-							<option value="medium">Trung bình</option>
-							<option value="hard">Khó</option>
+						<select name="difficulty" className="form-select" defaultValue={availableDifficulties[1]?.code || 'medium'}>
+							{availableDifficulties.map(difficulty => (
+								<option key={difficulty.code} value={difficulty.code}>{difficulty.labelVi}</option>
+							))}
 						</select>
 					</div>
 				</div>

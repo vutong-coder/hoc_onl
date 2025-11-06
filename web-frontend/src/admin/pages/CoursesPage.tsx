@@ -130,15 +130,17 @@ export default function CoursesPage(): JSX.Element {
 		generateExcelTemplate()
 	}
 
-	const formatNumber = (num: number) => {
-		if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
-		if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
-		return num.toString()
-	}
+    const formatNumber = (num?: number | null) => {
+        const value = typeof num === 'number' && isFinite(num) ? num : 0
+        if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`
+        if (value >= 1000) return `${(value / 1000).toFixed(1)}K`
+        return String(value)
+    }
 
-	const formatCurrency = (amount: number) => {
-		return `${amount.toLocaleString()} LEARN`
-	}
+    const formatCurrency = (amount?: number | null) => {
+        const value = typeof amount === 'number' && isFinite(amount) ? amount : 0
+        return `${value.toLocaleString()} LEARN`
+    }
 
 	return (
 		<div style={{ padding: '24px' }}>

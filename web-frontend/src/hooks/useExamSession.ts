@@ -142,8 +142,14 @@ export const useExamSession = () => {
   const handleSubmitExam = useCallback(async () => {
     setIsSubmitting(true);
     try {
-      await dispatch(submitExam());
-      navigate(`/exam/${examId}/result`);
+      const result = await dispatch(submitExam()).unwrap();
+      // ✅ Wait for backend to return submissionId
+      if (result.submissionId) {
+        // Navigate to result page with submission ID
+        navigate(`/exam/${examId}/result?submissionId=${result.submissionId}`);
+      } else {
+        throw new Error('Không nhận được submission ID từ server');
+      }
     } catch (error) {
       console.error('Error submitting exam:', error);
       setIsSubmitting(false);
@@ -182,6 +188,7 @@ export const useExamSession = () => {
     error,
     visitedQuestions,
     flaggedQuestions,
+    session,
     totalQuestions,
     answeredQuestions,
     progress,

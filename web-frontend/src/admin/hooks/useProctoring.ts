@@ -1,6 +1,11 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { ProctoringSession, ProctoringFilters, SessionStats } from '../types/proctoring'
 import { proctoringApi } from '../services/proctoringApi'
+// Import adapter để convert giữa backend và frontend
+import { 
+	backendSessionToProctoringSession,
+	mapBackendSessionsToProctoringSessions 
+} from '../../utils/proctoringAdapter'
 
 export default function useProctoring() {
 	const [sessions, setSessions] = useState<ProctoringSession[]>([])
@@ -83,70 +88,12 @@ export default function useProctoring() {
 		return uniqueExams
 	}, [sessions])
 
-	// Transform backend data to frontend format
-	const transformSession = useCallback((s: any): ProctoringSession => {
+	// ✅ FIX: Make transformSession a plain function to avoid re-triggering useEffect
+	const transformSession = (s: any): ProctoringSession => {
 		const events = s.events || []
-		const totalViolations = events.length
-		const highSeverityViolations = events.filter((e: any) => e.severity === 'high').length
-		const criticalViolations = events.filter((e: any) => e.severity === 'critical').length
-		
-		// Calculate risk level based on actual violations
-		let riskLevel: 'low' | 'medium' | 'high' | 'critical' = 'low'
-		if (criticalViolations > 0 || highSeverityViolations > 5) {
-			riskLevel = 'critical'
-		} else if (highSeverityViolations > 2) {
-			riskLevel = 'high'
-		} else if (highSeverityViolations > 0 || totalViolations > 3) {
-			riskLevel = 'medium'
-		}
-		
-		// Calculate duration
-		const startTime = new Date(s.startTime)
-		const endTime = s.endTime ? new Date(s.endTime) : new Date()
-		const duration = Math.floor((endTime.getTime() - startTime.getTime()) / 60000)
-		
-		// Check if face detected from events
-		const hasFaceDetectionEvents = events.some((e: any) => 
-			e.eventType === 'FACE_NOT_DETECTED' || e.eventType === 'MULTIPLE_FACES'
-		)
-		const faceDetected = !events.some((e: any) => e.eventType === 'FACE_NOT_DETECTED')
-		const faceCount = events.some((e: any) => e.eventType === 'MULTIPLE_FACES') ? 2 : 1
-		
-		return {
-			id: s.id,
-			examId: s.examId,
-			examTitle: s.examId, // You may want to fetch exam title from another API
-			userId: s.userId?.toString() || '',
-			userName: `User ${s.userId}`,
-			startTime: s.startTime,
-			endTime: s.endTime,
-			duration,
-			status: s.status === 'in_progress' ? 'active' : s.status === 'terminated' ? 'terminated' : 'completed',
-			riskLevel,
-			cameraEnabled: true,
-			audioEnabled: true,
-			faceDetected,
-			faceCount: faceDetected ? faceCount : 0,
-			gazeDirection: events.some((e: any) => e.eventType === 'LOOKING_AWAY') ? 'left' : 'center',
-			audioDetected: true,
-			totalViolations,
-			violations: events.map((e: any) => ({
-				id: e.id,
-				sessionId: e.sessionId,
-				timestamp: e.timestamp,
-				type: e.eventType.toLowerCase().replace(/_/g, '_') as any,
-				severity: e.severity,
-				description: e.metadata?.description || e.eventType,
-				evidenceUrl: e.metadata?.storagePath ? proctoringApi.getMediaUrl(e.metadata.storagePath) : undefined,
-				resolved: e.isReviewed || false
-			})),
-			tabSwitches: 0, // Not tracked in backend yet
-			fullscreenExited: 0, // Not tracked in backend yet
-			browserChanged: false, // Not tracked in backend yet
-			connectionStatus: s.status === 'in_progress' ? 'online' : 'offline',
-			lastPing: new Date().toISOString()
-		}
-	}, [])
+		// Use adapter to convert backend session to frontend format
+		return backendSessionToProctoringSession(s, events)
+	}
 
 	// Fetch sessions from API
 	useEffect(() => {
@@ -185,14 +132,15 @@ export default function useProctoring() {
 		}
 
 		fetchSessions()
-	}, [transformSession])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	// Update filter
 	const updateFilter = useCallback((key: keyof ProctoringFilters, value: any) => {
 		setFilters(prev => ({ ...prev, [key]: value }))
 	}, [])
 
-	// Auto refresh
+	// ✅ FIX: Auto refresh without transformSession in dependency to avoid re-creating interval
 	useEffect(() => {
 		if (!autoRefresh) return
 
@@ -226,7 +174,8 @@ export default function useProctoring() {
 		}, 5000) // Update every 5 seconds
 
 		return () => clearInterval(interval)
-	}, [autoRefresh, transformSession])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [autoRefresh])
 
 	// Terminate session
 	const terminateSession = useCallback(async (sessionId: string) => {

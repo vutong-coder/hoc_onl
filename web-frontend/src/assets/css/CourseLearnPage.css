@@ -4,18 +4,17 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--gradient-background);
+  background: var(--background);
 }
 
 /* Header */
 .learn-header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 14px 20px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--glass-border);
+  gap: 20px;
+  padding: 16px 24px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -27,20 +26,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--glass-bg-light);
-  border: 1px solid var(--glass-border-light);
-  border-radius: 12px;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   color: var(--foreground);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
 .btn-back-nav:hover {
-  background: var(--primary-light);
-  border-color: var(--primary);
-  transform: translateX(-2px);
-  box-shadow: var(--shadow-md);
+  background: var(--border);
+  transform: scale(1.05);
 }
 
 .header-info {
@@ -73,7 +70,7 @@
 
 .header-progress .progress-bar {
   flex: 1;
-  height: 10px;
+  height: 8px;
   background: var(--muted);
   border-radius: 999px;
   overflow: hidden;
@@ -83,8 +80,7 @@
   height: 100%;
   background: linear-gradient(90deg, var(--primary), var(--accent));
   border-radius: 999px;
-  transition: width 0.4s ease;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  transition: width 0.3s ease;
 }
 
 .progress-text {
@@ -133,10 +129,9 @@
 
 /* Material Content */
 .material-content {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
@@ -235,9 +230,8 @@
   gap: 32px;
   margin-bottom: 32px;
   padding: 24px;
-  background: var(--glass-bg-light);
-  border: 1px solid var(--glass-border-light);
-  border-radius: 16px;
+  background: var(--muted);
+  border-radius: var(--radius-lg);
 }
 
 .quiz-info-item {
@@ -257,7 +251,7 @@
   background: linear-gradient(135deg, var(--primary), var(--accent));
   color: white;
   border: none;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   font-size: 18px;
   font-weight: 700;
   cursor: pointer;
@@ -278,10 +272,9 @@
 
 /* Material Info Section */
 .material-info-section {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -302,9 +295,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--glass-bg-light);
-  border: 1px solid var(--glass-border-light);
-  border-radius: 12px;
+  background: var(--muted);
+  border-radius: var(--radius-md);
   color: var(--primary);
   flex-shrink: 0;
 }
@@ -342,13 +334,13 @@
   justify-content: center;
   gap: 8px;
   padding: 12px;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: var(--primary);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-complete:hover:not(:disabled) {
@@ -385,13 +377,13 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: var(--glass-bg-light);
-  border: 1px solid var(--glass-border-light);
-  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   color: var(--foreground);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-nav:hover:not(:disabled) {
@@ -416,9 +408,8 @@
 /* Sidebar */
 .materials-sidebar {
   width: 400px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border-left: 1px solid var(--glass-border);
+  background: var(--card);
+  border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
@@ -432,7 +423,7 @@
 
 .sidebar-header {
   padding: 24px;
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--border);
 }
 
 .sidebar-header h3 {

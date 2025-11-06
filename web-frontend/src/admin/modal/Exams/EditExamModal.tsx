@@ -8,25 +8,61 @@ interface EditExamModalProps {
 	onUpdateExam: (examData: Partial<any>) => void
 	exam: any
 	subjects: string[]
+	types?: import('../../types/exam').EnumOption[]  // ✨ NEW: Dynamic exam types
+	difficulties?: import('../../types/exam').EnumOption[]  // ✨ NEW: Dynamic difficulties
 }
+
+// Fallback options if API fails
+const DEFAULT_TYPES = [
+	{ code: 'practice', labelVi: 'Luyện tập' },
+	{ code: 'quiz', labelVi: 'Kiểm tra' },
+	{ code: 'midterm', labelVi: 'Giữa kỳ' },
+	{ code: 'final', labelVi: 'Cuối kỳ' },
+	{ code: 'assignment', labelVi: 'Bài tập' },
+]
+
+const DEFAULT_DIFFICULTIES = [
+	{ code: 'easy', labelVi: 'Dễ' },
+	{ code: 'medium', labelVi: 'Trung bình' },
+	{ code: 'hard', labelVi: 'Khó' },
+]
 
 const EditExamModal: React.FC<EditExamModalProps> = ({
 	isOpen,
 	onClose,
 	onUpdateExam,
 	exam,
-	subjects
+	subjects,
+	types,
+	difficulties
 }) => {
+	// Use API options or fallback to defaults
+	const availableTypes = types && types.length > 0 ? types : DEFAULT_TYPES
+	const availableDifficulties = difficulties && difficulties.length > 0 ? difficulties : DEFAULT_DIFFICULTIES
+	
 	if (!exam) return null
 
+	const isPublished = exam.status === 'published'
+	const isSubjectLocked = (exam.totalQuestions ?? 0) > 0
+
 	const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
-		const form = (e.target as HTMLButtonElement).closest('.modal-content-modern')?.querySelector('form')
+		e.preventDefault()
+
+		if (isPublished) {
+			alert('Đề thi đã xuất bản không thể chỉnh sửa. Vui lòng gỡ xuất bản trước khi cập nhật.')
+			return
+		}
+		// Find form by looking up to modal container then down to form
+		const modalContainer = document.querySelector('.modal-container-modern')
+		const form = modalContainer?.querySelector('form') as HTMLFormElement | null
 		if (form) {
 			const formData = new FormData(form)
+			const subjectField = formData.get('subject')
+			const subjectValue = typeof subjectField === 'string' ? subjectField : exam.subject
 			const examData = {
 				title: formData.get('title') as string,
 				description: formData.get('description') as string,
-				subject: formData.get('subject') as string,
+				subject: subjectValue,
 				type: formData.get('type') as any,
 				totalQuestions: parseInt(formData.get('totalQuestions') as string) || 0,
 				duration: parseInt(formData.get('duration') as string) || 0,
@@ -71,13 +107,29 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 					<button
 						className="btn btn-primary"
 						onClick={handleSubmit}
+						disabled={isPublished}
 					>
-						Cập nhật
+						{isPublished ? 'Đã xuất bản' : 'Cập nhật'}
 					</button>
 				</>
 			}
 		>
 			<div className="modal-content-wrapper">
+				{isPublished && (
+					<div
+						style={{
+							marginBottom: '16px',
+							padding: '12px 16px',
+							borderRadius: '10px',
+							background: 'rgba(234, 179, 8, 0.15)',
+							color: '#92400e',
+							fontSize: '14px',
+							fontWeight: 500,
+						}}
+					>
+						Đề thi đã được xuất bản nên không thể chỉnh sửa. Vui lòng gỡ xuất bản trước khi cập nhật.
+					</div>
+				)}
 				<form>
 					<div className="modal-form-section">
 						<div className="section-title">
@@ -90,10 +142,11 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 								<FileText />
 								Tiêu đề đề thi <span className="required">*</span>
 							</label>
-							<input 
-								type="text" 
-								name="title" 
-								className="form-input" 
+						<input 
+							type="text" 
+							name="title" 
+							className="form-input" 
+							disabled={isPublished}
 								defaultValue={exam.title}
 								placeholder="VD: Kiểm tra giữa kỳ - Lập trình Web" 
 								required 
@@ -105,9 +158,10 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 								<FileText />
 								Mô tả
 							</label>
-							<textarea 
-								name="description" 
-								className="form-textarea" 
+						<textarea 
+							name="description" 
+							className="form-textarea" 
+							disabled={isPublished}
 								defaultValue={exam.description || ''}
 								placeholder="Mô tả ngắn về đề thi..."
 								rows={3}
@@ -120,9 +174,10 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<BookOpen />
 									Môn học <span className="required">*</span>
 								</label>
-								<select 
-									name="subject" 
-									className="form-select" 
+						<select 
+							name="subject" 
+							className="form-select" 
+							disabled={isPublished || isSubjectLocked}
 									defaultValue={exam.subject}
 									required
 								>
@@ -130,6 +185,13 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 										<option key={s} value={s}>{s}</option>
 									))}
 								</select>
+						{isSubjectLocked && !isPublished && (
+							<small
+								style={{ color: '#a16207', fontSize: '12px', marginTop: '6px', display: 'block' }}
+							>
+								Không thể thay đổi môn học khi đề thi đã có câu hỏi.
+							</small>
+						)}
 							</div>
 
 							<div className="modal-form-group">
@@ -137,16 +199,15 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<Settings />
 									Loại bài thi
 								</label>
-								<select 
-									name="type" 
-									className="form-select" 
+						<select 
+							name="type" 
+							className="form-select" 
+							disabled={isPublished}
 									defaultValue={exam.type}
 								>
-									<option value="practice">Luyện tập</option>
-									<option value="quiz">Kiểm tra</option>
-									<option value="midterm">Giữa kỳ</option>
-									<option value="final">Cuối kỳ</option>
-									<option value="assignment">Bài tập</option>
+									{availableTypes.map(type => (
+										<option key={type.code} value={type.code}>{type.labelVi}</option>
+									))}
 								</select>
 							</div>
 						</div>
@@ -164,10 +225,11 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<CheckSquare />
 									Số câu hỏi <span className="required">*</span>
 								</label>
-								<input 
-									type="number" 
-									name="totalQuestions" 
-									className="form-input" 
+						<input 
+							type="number" 
+							name="totalQuestions" 
+							className="form-input" 
+							disabled={isPublished}
 									defaultValue={exam.totalQuestions}
 									placeholder="30" 
 									min="1"
@@ -180,10 +242,11 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<Clock />
 									Thời gian (phút) <span className="required">*</span>
 								</label>
-								<input 
-									type="number" 
-									name="duration" 
-									className="form-input" 
+						<input 
+							type="number" 
+							name="duration" 
+							className="form-input" 
+							disabled={isPublished}
 									defaultValue={exam.duration}
 									placeholder="60" 
 									min="1"
@@ -196,14 +259,15 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<Target />
 									Độ khó
 								</label>
-								<select 
-									name="difficulty" 
-									className="form-select" 
+						<select 
+							name="difficulty" 
+							className="form-select" 
+							disabled={isPublished}
 									defaultValue={exam.difficulty}
 								>
-									<option value="easy">Dễ</option>
-									<option value="medium">Trung bình</option>
-									<option value="hard">Khó</option>
+									{availableDifficulties.map(difficulty => (
+										<option key={difficulty.code} value={difficulty.code}>{difficulty.labelVi}</option>
+									))}
 								</select>
 							</div>
 						</div>
@@ -221,10 +285,11 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<Target />
 									Tổng điểm
 								</label>
-								<input 
-									type="number" 
-									name="totalPoints" 
-									className="form-input" 
+						<input 
+							type="number" 
+							name="totalPoints" 
+							className="form-input" 
+							disabled={isPublished}
 									defaultValue={exam.totalPoints}
 									placeholder="Auto = Số câu × 2" 
 									min="0"
@@ -237,10 +302,11 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<Target />
 									Điểm đạt
 								</label>
-								<input 
-									type="number" 
-									name="passingScore" 
-									className="form-input" 
+						<input 
+							type="number" 
+							name="passingScore" 
+							className="form-input" 
+							disabled={isPublished}
 									defaultValue={exam.passingScore}
 									placeholder="Auto = 50% tổng điểm" 
 									min="0"
@@ -253,10 +319,11 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<Hash />
 									Số lần thi tối đa
 								</label>
-								<input 
-									type="number" 
-									name="maxAttempts" 
-									className="form-input" 
+						<input 
+							type="number" 
+							name="maxAttempts" 
+							className="form-input" 
+							disabled={isPublished}
 									defaultValue={exam.maxAttempts}
 									min="1"
 								/>
@@ -272,28 +339,31 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 						
 						<div className="modal-checkbox-group">
 							<div className="checkbox-item">
-								<input 
-									type="checkbox" 
-									name="allowReview" 
-									defaultChecked={exam.allowReview}
+						<input 
+							type="checkbox" 
+							name="allowReview" 
+							defaultChecked={exam.allowReview}
+							disabled={isPublished}
 								/>
 								<label>Cho phép xem lại câu hỏi</label>
 							</div>
 
 							<div className="checkbox-item">
-								<input 
-									type="checkbox" 
-									name="shuffleQuestions" 
-									defaultChecked={exam.shuffleQuestions}
+						<input 
+							type="checkbox" 
+							name="shuffleQuestions" 
+							defaultChecked={exam.shuffleQuestions}
+							disabled={isPublished}
 								/>
 								<label>Trộn câu hỏi</label>
 							</div>
 
 							<div className="checkbox-item">
-								<input 
-									type="checkbox" 
-									name="showResults" 
-									defaultChecked={exam.showResults}
+						<input 
+							type="checkbox" 
+							name="showResults" 
+							defaultChecked={exam.showResults}
+							disabled={isPublished}
 								/>
 								<label>Hiển thị kết quả</label>
 							</div>

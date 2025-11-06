@@ -1,17 +1,19 @@
-import React, { useState, useRef } from 'react'
-import { Plus, Download, Upload, Shuffle, FileDown } from 'lucide-react'
+import React, { useState } from 'react'
+import { Plus, Download, Shuffle, FileSpreadsheet } from 'lucide-react'
 import SearchBar from '../components/common/SearchBar'
 import Pagination from '../components/common/Pagination'
 import ExamTable from '../components/exams/ExamTable'
 import RandomExamModal from '../components/exams/RandomExamModal'
+import GenerateQuestionsModal from '../components/exams/GenerateQuestionsModal'
 import AddExamModal from '../modal/Exams/AddExamModal'
 import EditExamModal from '../modal/Exams/EditExamModal'
-import ImportExamModal from '../modal/Exams/ImportExamModal'
+import ImportQuestionsModal from '../modal/Exams/ImportQuestionsModal'
 import DeleteExamModal from '../modal/Exams/DeleteExamModal'
 import ViewExamModal from '../modal/Exams/ViewExamModal'
 import useExams from '../hooks/useExams'
 import { Exam, RandomExamConfig } from '../types/exam'
-import { exportExamsToExcel, importExamsFromExcel, downloadExamTemplate } from '../utils/examExcelHelpers'
+import { exportExamsToExcel } from '../utils/examExcelHelpers'
+import { importQuestionsFromExcel } from '../services/examApi'
 import '../styles/common.css'
 import '../styles/form.css'
 
@@ -33,8 +35,15 @@ export default function ExamsPage(): JSX.Element {
 		updateExam,
 		duplicateExam,
 		generateRandomExam,
+		generateQuestionsForExam, // ✨ NEW: Generate questions for existing exam
 		addExam,
-		subjects
+		subjects,
+		publishExam, // ✨ NEW: Publish exam
+		unpublishExam, // ✨ NEW: Unpublish exam
+		// ✨ NEW: Enum options from API
+		examTypes,
+		examDifficulties,
+		examStatuses
 	} = useExams()
 
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -42,13 +51,11 @@ export default function ExamsPage(): JSX.Element {
 	const [isViewModalOpen, setIsViewModalOpen] = useState(false)
 	const [examToView, setExamToView] = useState<Exam | null>(null)
 	const [isRandomModalOpen, setIsRandomModalOpen] = useState(false)
+	const [isGenerateQuestionsModalOpen, setIsGenerateQuestionsModalOpen] = useState(false) // ✨ NEW
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 	const [examToEdit, setExamToEdit] = useState<Exam | null>(null)
-	const [isImportModalOpen, setIsImportModalOpen] = useState(false)
-	const [importFile, setImportFile] = useState<File | null>(null)
-	const [importPreview, setImportPreview] = useState<Partial<Exam>[]>([])
-	const fileInputRef = useRef<HTMLInputElement>(null)
+	const [isImportQuestionsModalOpen, setIsImportQuestionsModalOpen] = useState(false)
 
 	// Xử lý xem chi tiết
 	const handleView = (exam: Exam) => {
@@ -76,6 +83,20 @@ export default function ExamsPage(): JSX.Element {
 		duplicateExam(exam.id)
 	}
 
+	// Xử lý xuất bản
+	const handlePublish = (exam: Exam) => {
+		if (confirm(`Bạn có chắc chắn muốn xuất bản đề thi "${exam.title}"? Đề thi sẽ hiển thị cho user.`)) {
+			publishExam(exam.id)
+		}
+	}
+
+	// Xử lý gỡ xuất bản
+	const handleUnpublish = (exam: Exam) => {
+		if (confirm(`Bạn có chắc chắn muốn gỡ xuất bản đề thi "${exam.title}"? Đề thi sẽ không còn hiển thị cho user.`)) {
+			unpublishExam(exam.id)
+		}
+	}
+
 	// Xử lý chỉnh sửa
 	const handleEdit = (exam: Exam) => {
 		setExamToEdit(exam)
@@ -95,57 +116,61 @@ export default function ExamsPage(): JSX.Element {
 		}
 	}
 
-	// Xử lý sinh đề ngẫu nhiên
-	const handleGenerateRandom = (config: RandomExamConfig) => {
-		const newExam = generateRandomExam(config)
-		setIsRandomModalOpen(false)
-		alert(`Đã sinh thành công đề thi: "${newExam.title}"`)
+	// Xử lý sinh đề ngẫu nhiên (tạo đề mới)
+	const handleGenerateRandom = async (config: RandomExamConfig) => {
+		try {
+			const newExam = await generateRandomExam(config)
+			setIsRandomModalOpen(false)
+			alert(`Đã sinh thành công đề thi: "${newExam.title}"`)
+		} catch (error: any) {
+			console.error('Failed to generate random exam:', error)
+			alert(`❌ Lỗi khi sinh đề thi: ${error.message || 'Unknown error'}`)
+		}
+	}
+
+	// ✨ NEW: Xử lý sinh câu hỏi cho đề thi đang có
+	const handleGenerateQuestionsForExam = async (examId: string, config: {
+		difficulty: 'easy' | 'medium' | 'hard' | 'mixed'
+		useCustomDistribution: boolean
+		easyCount?: number
+		mediumCount?: number
+		hardCount?: number
+	}) => {
+		try {
+			const exam = await generateQuestionsForExam(examId, config)
+			setIsGenerateQuestionsModalOpen(false)
+			alert(`✅ Đã sinh ${exam.totalQuestions} câu hỏi ngẫu nhiên cho đề thi "${exam.title}" thành công!`)
+		} catch (error: any) {
+			console.error('Failed to generate questions:', error)
+			alert(`❌ Lỗi khi sinh câu hỏi: ${error.message || 'Unknown error'}`)
+		}
 	}
 
 	// Xử lý thêm đề thi mới
-	const handleAddExam = (examData: Partial<Exam>) => {
-		addExam(examData as Omit<Exam, 'id' | 'createdAt'>)
-		setIsAddModalOpen(false)
+	const handleAddExam = async (examData: Partial<Exam>) => {
+		try {
+			await addExam(examData as Omit<Exam, 'id' | 'createdAt'>)
+			setIsAddModalOpen(false)
+			// Success message will be shown by useExams hook
+			alert('✅ Đã tạo đề thi thành công!')
+		} catch (error) {
+			// Error already handled in useExams hook
+			console.error('Failed to add exam:', error)
+		}
 	}
 
 	// Xử lý export Excel
 	const handleExportExcel = () => {
+		const allExams = exams.map(exam => ({
+			...exam,
+			createdAt: exam.createdAt || new Date().toISOString()
+		}))
 		exportExamsToExcel(allExams)
 	}
 
-	// Xử lý import Excel
-	const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0]
-		if (!file) return
-
-		setImportFile(file)
-
-		try {
-			const exams = await importExamsFromExcel(file)
-			setImportPreview(exams)
-			setIsImportModalOpen(true)
-		} catch (error) {
-			alert('Lỗi khi đọc file Excel. Vui lòng kiểm tra lại file.')
-			console.error(error)
-		}
-	}
-
-	// Xác nhận import
-	const confirmImport = () => {
-		importPreview.forEach(examData => {
-			addExam(examData as Omit<Exam, 'id' | 'createdAt'>)
-		})
-		setIsImportModalOpen(false)
-		setImportFile(null)
-		setImportPreview([])
-		if (fileInputRef.current) {
-			fileInputRef.current.value = ''
-		}
-	}
-
-	// Download template
-	const handleDownloadTemplate = () => {
-		downloadExamTemplate()
+	// Handle import questions from Excel
+	const handleImportQuestions = async (file: File, subject: string, tags: string) => {
+		return await importQuestionsFromExcel(file, subject, tags)
 	}
 
 	// Helper functions moved to modal components
@@ -177,43 +202,37 @@ export default function ExamsPage(): JSX.Element {
 					placeholder="Tìm kiếm theo tiêu đề, môn học..."
 				/>
 
-				<div style={{ display: 'flex', gap: '12px' }}>
-					<input
-						ref={fileInputRef}
-						type="file"
-						accept=".xlsx,.xls"
-						style={{ display: 'none' }}
-						onChange={handleImportFile}
-					/>
-					<button 
-						className="btn btn-secondary"
-						onClick={() => setIsRandomModalOpen(true)}
-					>
-						<Shuffle size={18} />
-						Sinh đề ngẫu nhiên
-					</button>
-					<button 
-						className="btn btn-secondary"
-						onClick={() => fileInputRef.current?.click()}
-					>
-						<Upload size={18} />
-						Nhập đề thi
-					</button>
-					<button 
-						className="btn btn-secondary"
-						onClick={handleExportExcel}
-					>
-						<Download size={18} />
-						Xuất Excel
-					</button>
-					<button 
-						className="btn btn-primary"
-						onClick={() => setIsAddModalOpen(true)}
-					>
-						<Plus size={18} />
-						Thêm đề thi
-					</button>
-				</div>
+			<div style={{ display: 'flex', gap: '12px' }}>
+				<button 
+					className="btn btn-secondary"
+					onClick={() => setIsImportQuestionsModalOpen(true)}
+					title="Import câu hỏi từ file Excel vào ngân hàng câu hỏi"
+				>
+					<FileSpreadsheet size={18} />
+					Nhập câu hỏi
+				</button>
+				<button 
+					className="btn btn-secondary"
+					onClick={() => setIsGenerateQuestionsModalOpen(true)}
+				>
+					<Shuffle size={18} />
+					Sinh câu hỏi ngẫu nhiên
+				</button>
+				<button 
+					className="btn btn-secondary"
+					onClick={handleExportExcel}
+				>
+					<Download size={18} />
+					Xuất Excel
+				</button>
+				<button 
+					className="btn btn-primary"
+					onClick={() => setIsAddModalOpen(true)}
+				>
+					<Plus size={18} />
+					Thêm đề thi
+				</button>
+			</div>
 			</div>
 
 			{/* Filters */}
@@ -305,6 +324,8 @@ export default function ExamsPage(): JSX.Element {
 					onDelete={handleDelete}
 					onView={handleView}
 					onDuplicate={handleDuplicate}
+					onPublish={handlePublish} // ✨ NEW
+					onUnpublish={handleUnpublish} // ✨ NEW
 					onSort={handleSort}
 					sortKey={sortKey}
 					sortOrder={sortOrder}
@@ -322,11 +343,23 @@ export default function ExamsPage(): JSX.Element {
 				/>
 			)}
 
-			{/* Random Exam Modal */}
+			{/* Random Exam Modal (create new exam with questions) */}
 			<RandomExamModal
 				isOpen={isRandomModalOpen}
 				onClose={() => setIsRandomModalOpen(false)}
 				onGenerate={handleGenerateRandom}
+				subjects={subjects}
+				difficulties={examDifficulties}
+			/>
+
+			{/* ✨ NEW: Generate Questions Modal (generate questions for existing exam) */}
+			<GenerateQuestionsModal
+				isOpen={isGenerateQuestionsModalOpen}
+				onClose={() => setIsGenerateQuestionsModalOpen(false)}
+				onGenerate={handleGenerateQuestionsForExam}
+				exams={allExams}
+				subjects={subjects}
+				difficulties={examDifficulties}
 			/>
 
 			{/* Add Exam Modal */}
@@ -335,6 +368,8 @@ export default function ExamsPage(): JSX.Element {
 				onClose={() => setIsAddModalOpen(false)}
 				onAddExam={handleAddExam}
 				subjects={subjects}
+				types={examTypes}
+				difficulties={examDifficulties}
 			/>
 
 			{/* Edit Exam Modal */}
@@ -347,20 +382,15 @@ export default function ExamsPage(): JSX.Element {
 				onUpdateExam={handleUpdateExam}
 				exam={examToEdit}
 				subjects={subjects}
+				types={examTypes}
+				difficulties={examDifficulties}
 			/>
 
-			{/* Import Preview Modal */}
-			<ImportExamModal
-				isOpen={isImportModalOpen}
-				onClose={() => {
-					setIsImportModalOpen(false)
-					setImportPreview([])
-					setImportFile(null)
-				}}
-				onConfirmImport={confirmImport}
-				onDownloadTemplate={handleDownloadTemplate}
-				importFile={importFile}
-				importPreview={importPreview}
+			{/* Import Questions Modal */}
+			<ImportQuestionsModal
+				isOpen={isImportQuestionsModalOpen}
+				onClose={() => setIsImportQuestionsModalOpen(false)}
+				onImport={handleImportQuestions}
 			/>
 
 			{/* Delete Modal */}

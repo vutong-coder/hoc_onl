@@ -55,14 +55,16 @@ export default function SessionDetailView({
 		const start = new Date(session.startTime)
 		const now = new Date()
 		const elapsed = Math.floor((now.getTime() - start.getTime()) / 1000 / 60)
-		return `${elapsed}/${session.duration} phút`
+		const duration = session.duration || 0
+		return duration > 0 ? `${elapsed}/${duration} phút` : `${elapsed} phút`
 	}
 
 	const getProgress = () => {
 		const start = new Date(session.startTime)
 		const now = new Date()
 		const elapsed = Math.floor((now.getTime() - start.getTime()) / 1000 / 60)
-		return Math.min((elapsed / session.duration) * 100, 100)
+		const duration = session.duration || 0
+		return duration > 0 ? Math.min((elapsed / duration) * 100, 100) : 0
 	}
 
 	return (
@@ -73,7 +75,7 @@ export default function SessionDetailView({
 					{session.userAvatar ? (
 						<img 
 							src={session.userAvatar} 
-							alt={session.userName}
+							alt={session.userName || `User ${session.userId}`}
 							style={{ 
 								width: '40px', 
 								height: '40px', 
@@ -94,12 +96,12 @@ export default function SessionDetailView({
 							fontSize: '18px',
 							fontWeight: 700
 						}}>
-							{session.userName.charAt(0)}
+							{(session.userName || `User ${session.userId}`).charAt(0)}
 						</div>
 					)}
 				</div>
-				<div className="card-title">{session.userName}</div>
-				<div className="card-description">{session.examTitle}</div>
+				<div className="card-title">{session.userName || `User ${session.userId}`}</div>
+				<div className="card-description">{session.examTitle || `Exam ${session.examId}`}</div>
 				<div className="card-value">
 					<span className={`modal-status-badge ${getRiskBadgeVariant(session.riskLevel)}`}>
 						{getRiskLabel(session.riskLevel)}
@@ -234,28 +236,28 @@ export default function SessionDetailView({
 				<StatCard
 					icon={<Eye size={20} />}
 					label="Khuôn mặt"
-					value={session.faceDetected ? `${session.faceCount} người` : 'Không phát hiện'}
-					color={session.faceDetected && session.faceCount === 1 ? '#10b981' : '#ef4444'}
+					value={(session.faceDetected ?? true) ? `${session.faceCount || 1} người` : 'Không phát hiện'}
+					color={(session.faceDetected ?? true) && (session.faceCount || 1) === 1 ? '#10b981' : '#ef4444'}
 				/>
 				<StatCard
 					icon={<Wifi size={20} />}
 					label="Kết nối"
-					value={session.connectionStatus === 'online' ? 'Ổn định' : 
-						   session.connectionStatus === 'unstable' ? 'Không ổn định' : 'Mất kết nối'}
-					color={session.connectionStatus === 'online' ? '#10b981' : 
-						   session.connectionStatus === 'unstable' ? '#f59e0b' : '#ef4444'}
+					value={(session.connectionStatus || 'offline') === 'online' ? 'Ổn định' : 
+						   (session.connectionStatus || 'offline') === 'unstable' ? 'Không ổn định' : 'Mất kết nối'}
+					color={(session.connectionStatus || 'offline') === 'online' ? '#10b981' : 
+						   (session.connectionStatus || 'offline') === 'unstable' ? '#f59e0b' : '#ef4444'}
 				/>
 				<StatCard
 					icon={<AlertTriangle size={20} />}
 					label="Vi phạm"
-					value={`${session.totalViolations} lần`}
-					color={session.totalViolations > 0 ? '#ef4444' : '#10b981'}
+					value={`${session.totalViolations || 0} lần`}
+					color={(session.totalViolations || 0) > 0 ? '#ef4444' : '#10b981'}
 				/>
 				<StatCard
 					icon={<FileText size={20} />}
 					label="Chuyển tab"
-					value={`${session.tabSwitches} lần`}
-					color={session.tabSwitches > 0 ? '#f59e0b' : '#10b981'}
+					value={`${session.tabSwitches || 0} lần`}
+					color={(session.tabSwitches || 0) > 0 ? '#f59e0b' : '#10b981'}
 				/>
 			</div>
 
@@ -263,10 +265,10 @@ export default function SessionDetailView({
 			<div className="modal-detail-section">
 				<div className="section-title">
 					<AlertTriangle />
-					<h4>Nhật ký sự kiện ({session.violations.length})</h4>
+					<h4>Nhật ký sự kiện ({(session.violations || []).length})</h4>
 				</div>
 				<EventLog 
-					violations={session.violations}
+					violations={session.violations || []}
 					onResolve={onResolveViolation}
 				/>
 			</div>

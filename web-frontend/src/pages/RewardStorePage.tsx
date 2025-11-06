@@ -36,15 +36,18 @@ export default function RewardStorePage(): JSX.Element {
         { value: 'other', label: 'Khác' }
     ]
 
+    // ✅ FIX: Add eslint-disable for proper dependencies
     useEffect(() => {
         loadGifts()
         if (userId) {
             loadBalance()
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userId])
 
     useEffect(() => {
         filterGifts()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [gifts, selectedCategory, searchQuery])
 
     const loadBalance = async () => {

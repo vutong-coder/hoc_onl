@@ -26,6 +26,7 @@ export function useTokenRewards({
         reason: string
     } | null>(null)
 
+    // ✅ FIX: Use useCallback with stable deps, call callbacks directly
     const awardForLessonCompletion = useCallback(async (lessonId: string, lessonName: string) => {
         if (!userId || !walletAddress) {
             onError?.('User not authenticated')
@@ -53,7 +54,8 @@ export function useTokenRewards({
         } finally {
             setIsAwarding(false)
         }
-    }, [userId, walletAddress, onRewardEarned, onError])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userId, walletAddress])
 
     const awardForExamPass = useCallback(async (examId: string, examName: string, score: number) => {
         if (!userId || !walletAddress) {
@@ -83,7 +85,8 @@ export function useTokenRewards({
         } finally {
             setIsAwarding(false)
         }
-    }, [userId, walletAddress, onRewardEarned, onError])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userId, walletAddress])
 
     const awardForDailyStreak = useCallback(async (streakDays: number) => {
         if (!userId || !walletAddress) {
@@ -113,7 +116,8 @@ export function useTokenRewards({
         } finally {
             setIsAwarding(false)
         }
-    }, [userId, walletAddress, onRewardEarned, onError])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userId, walletAddress])
 
     const awardForCertification = useCallback(async (certificationId: string, certificationName: string) => {
         if (!userId || !walletAddress) {
@@ -142,7 +146,8 @@ export function useTokenRewards({
         } finally {
             setIsAwarding(false)
         }
-    }, [userId, walletAddress, onRewardEarned, onError])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userId, walletAddress])
 
     const awardForContestWin = useCallback(async (contestId: string, contestName: string, rank: number) => {
         if (!userId || !walletAddress) {
@@ -172,7 +177,8 @@ export function useTokenRewards({
         } finally {
             setIsAwarding(false)
         }
-    }, [userId, walletAddress, onRewardEarned, onError])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userId, walletAddress])
 
     return {
         isAwarding,

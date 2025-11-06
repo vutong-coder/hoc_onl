@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAppSelector } from '../store/hooks'
+import { useQuizzes } from '../hooks/useQuizzes'
 import WelcomeBanner from '../components/sections/WelcomeBanner'
 import MockInterviews from '../components/sections/MockInterviews'
 import PracticeSkills from '../components/sections/PracticeSkills'
@@ -13,6 +14,7 @@ import styles from '../assets/css/UserHomePage.module.css'
 
 export default function UserHomePage(): JSX.Element {
 	const { user } = useAppSelector((state) => state.auth)
+	const { quizzes, loading: quizzesLoading } = useQuizzes()
 	const [showRewardStore, setShowRewardStore] = useState(false)
 	const handleStartInterview = (interviewId: string) => {
 		console.log(`Start interview ${interviewId}`)
@@ -146,7 +148,7 @@ export default function UserHomePage(): JSX.Element {
 								minHeight: '280px'
 							}}>
 								{/* Upcoming Exams */}
-								<UpcomingExams />
+							<UpcomingExams exams={quizzes} />
 							</div>
 						</div>
 

@@ -1,6 +1,7 @@
 import React from 'react'
-import { Course } from '../../types/course'
+import { type Course as ApiCourse } from '../../../services/api/courseApi'
 import Badge from '../common/Badge'
+import { extractCourseStatus, getCourseThumbnail, getCourseField } from '../../../utils/courseAdapter'
 import { 
 	Edit, 
 	Trash2, 
@@ -19,9 +20,9 @@ import { vi } from 'date-fns/locale'
 import '../../styles/table.css'
 
 interface CourseListTableProps {
-	courses: Course[]
-	onCourseClick?: (course: Course) => void
-	onEditCourse?: (course: Course) => void
+	courses: ApiCourse[]
+	onCourseClick?: (course: ApiCourse) => void
+	onEditCourse?: (course: ApiCourse) => void
 	onDeleteCourse?: (courseId: string) => void
 	onToggleStatus?: (courseId: string) => void
 	loading?: boolean
@@ -78,9 +79,11 @@ export default function CourseListTable({
 		}
 	}
 
-	const formatPrice = (price: number, tokenSymbol: string) => {
-		if (price === 0) return 'Miễn phí'
-		return `${price.toLocaleString()} ${tokenSymbol}`
+const formatPrice = (price?: number | null, tokenSymbol?: string) => {
+		const safePrice = typeof price === 'number' && isFinite(price) ? price : 0
+		if (safePrice === 0) return 'Miễn phí'
+		const symbol = tokenSymbol && tokenSymbol.trim() ? tokenSymbol : 'LEARN'
+		return `${safePrice.toLocaleString()} ${symbol}`
 	}
 
 	const formatTime = (timestamp: string) => {
@@ -168,26 +171,42 @@ export default function CourseListTable({
 					</tr>
 				</thead>
 				<tbody>
-					{courses.map(course => (
+					{courses.map(course => {
+						// Extract fields using adapter
+						const { status, isPublished } = extractCourseStatus(course)
+						const thumbnail = getCourseThumbnail(course)
+						const level = getCourseField(course, 'level', 'beginner')
+						const duration = getCourseField(course, 'duration', 0)
+						const price = getCourseField(course, 'price', 0)
+						const tokenSymbol = getCourseField(course, 'tokenSymbol', 'LEARN')
+						const shortDescription = getCourseField(course, 'shortDescription', course.description || '')
+						const enrollmentCount = getCourseField(course, 'enrollmentCount', 0)
+						const maxEnrollments = getCourseField(course, 'maxEnrollments', 0)
+						const rating = getCourseField(course, 'rating', 0)
+						const reviewCount = getCourseField(course, 'reviewCount', 0)
+						const isFeatured = getCourseField(course, 'isFeatured', false)
+						const certificateAvailable = getCourseField(course, 'certificateAvailable', false)
+						
+						return (
 						<tr key={course.id}>
 							<td>
 								<div className="course-info">
 									<img 
-										src={course.thumbnail} 
+										src={thumbnail || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="%23e5e7eb"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="10" fill="%239ca3af">No Image</text></svg>'} 
 										alt={course.title}
 										className="course-thumbnail-small"
 									/>
 									<div className="course-details">
 										<div className="course-title">{course.title}</div>
-										<div className="course-description">{course.shortDescription}</div>
+										<div className="course-description">{shortDescription}</div>
 										<div className="course-meta">
-											{course.isFeatured && (
+											{isFeatured && (
 												<Badge variant="warning" style={{ fontSize: '10px', padding: '2px 6px' }}>
 													<Award size={10} />
 													Nổi bật
 												</Badge>
 											)}
-											{course.certificateAvailable && (
+											{certificateAvailable && (
 												<Badge variant="info" style={{ fontSize: '10px', padding: '2px 6px' }}>
 													<BookOpen size={10} />
 													Chứng chỉ
@@ -195,7 +214,7 @@ export default function CourseListTable({
 											)}
 											<div className="course-duration">
 												<Clock size={12} />
-												{course.duration}h
+												{duration}h
 											</div>
 										</div>
 									</div>
@@ -203,20 +222,20 @@ export default function CourseListTable({
 							</td>
 							<td>
 								<div className="category-info">
-									<span className="category-icon">{course.category.icon}</span>
-									<span className="category-name">{course.category.name}</span>
+                                    <span className="category-icon"><BookOpen size={12} /></span>
+                                    <span className="category-name">{(course as any)?.category?.name || 'Khác'}</span>
 								</div>
 							</td>
 							<td>
 								<div className="instructor-info">
-									<img 
-										src={course.instructor.avatar || 'https://via.placeholder.com/32'} 
-										alt={course.instructor.name}
+                                    <img 
+                                        src={(course as any)?.instructor?.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect width="100%" height="100%" fill="%23e5e7eb"/></svg>'} 
+                                        alt={(course as any)?.instructor?.name || 'Instructor'}
 										className="instructor-avatar-small"
 									/>
 									<div className="instructor-details">
-										<div className="instructor-name">{course.instructor.name}</div>
-										{course.instructor.isVerified && (
+                                        <div className="instructor-name">{(course as any)?.instructor?.name || '—'}</div>
+                                        {(course as any)?.instructor?.isVerified && (
 											<Badge variant="success" style={{ fontSize: '10px', padding: '2px 6px' }}>
 												Verified
 											</Badge>
@@ -225,44 +244,44 @@ export default function CourseListTable({
 								</div>
 							</td>
 							<td>
-								<Badge variant={getLevelBadgeVariant(course.level)}>
-									{getLevelLabel(course.level)}
+								<Badge variant={getLevelBadgeVariant(level)}>
+									{getLevelLabel(level)}
 								</Badge>
 							</td>
 							<td>
 								<div className="price-info">
-									<div className="price-amount">
-										{formatPrice(course.price, course.tokenSymbol)}
-									</div>
-									<div className="price-symbol">{course.tokenSymbol}</div>
+                                    <div className="price-amount">
+                                        {formatPrice(price, tokenSymbol)}
+                                    </div>
+                                    <div className="price-symbol">{tokenSymbol}</div>
 								</div>
 							</td>
 							<td>
-								<Badge variant={getStatusBadgeVariant(course.status)}>
-									{getStatusLabel(course.status)}
+							<Badge variant={getStatusBadgeVariant(status)}>
+								{getStatusLabel(status)}
 								</Badge>
 							</td>
 							<td>
 								<div className="enrollment-info">
-									<div className="enrollment-count">
-										<Users size={14} />
-										{course.enrollmentCount.toLocaleString()}
-									</div>
-									{course.maxEnrollments && (
+                                        <div className="enrollment-count">
+                                            <Users size={14} />
+                                            {enrollmentCount.toLocaleString()}
+                                        </div>
+                                        {maxEnrollments > 0 && (
 										<div className="max-enrollment">
-											/ {course.maxEnrollments.toLocaleString()}
+                                                / {maxEnrollments.toLocaleString()}
 										</div>
 									)}
 								</div>
 							</td>
 							<td>
-								{course.rating > 0 ? (
+                                {rating > 0 ? (
 									<div className="rating-info">
 										<div className="rating-stars">
 											<Star size={14} className="text-warning" />
-											<span>{course.rating}</span>
+                                            <span>{rating}</span>
 										</div>
-										<div className="rating-count">({course.reviewCount})</div>
+                                        <div className="rating-count">({reviewCount})</div>
 									</div>
 								) : (
 									<span className="no-rating">Chưa có đánh giá</span>
@@ -297,11 +316,11 @@ export default function CourseListTable({
 									</button>
 									
 									<button
-										className={`btn btn-icon btn-sm ${course.isPublished ? 'btn-warning' : 'btn-success'}`}
-										title={course.isPublished ? 'Tạm dừng' : 'Xuất bản'}
+										className={`btn btn-icon btn-sm ${isPublished ? 'btn-warning' : 'btn-success'}`}
+										title={isPublished ? 'Tạm dừng' : 'Xuất bản'}
 										onClick={() => onToggleStatus?.(course.id)}
 									>
-										{course.isPublished ? <Pause size={16} /> : <Play size={16} />}
+										{isPublished ? <Pause size={16} /> : <Play size={16} />}
 									</button>
 									
 									<button
@@ -314,7 +333,8 @@ export default function CourseListTable({
 								</div>
 							</td>
 						</tr>
-					))}
+						)
+					})}
 				</tbody>
 			</table>
 		</div>

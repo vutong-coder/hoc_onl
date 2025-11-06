@@ -1,11 +1,11 @@
 import React from 'react'
-import { Course } from '../../types/course'
+import { type Course as ApiCourse } from '../../../services/api/courseApi'
 import CourseCard from './CourseCard'
 
 interface CourseGridProps {
-	courses: Course[]
-	onCourseClick?: (course: Course) => void
-	onEditCourse?: (course: Course) => void
+	courses: ApiCourse[]
+	onCourseClick?: (course: ApiCourse) => void
+	onEditCourse?: (course: ApiCourse) => void
 	onDeleteCourse?: (courseId: string) => void
 	onToggleStatus?: (courseId: string) => void
 	loading?: boolean

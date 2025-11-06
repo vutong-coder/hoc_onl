@@ -62,9 +62,9 @@ export default function CourseProgress({
                         return {
                             id: course.id,
                             title: course.title,
-                            progress: progress.progressPercentage || 0,
+                            progress: progress.progressPercentage,
                             totalLessons: materials.length,
-                            completedLessons: progress.completedMaterials?.length || 0,
+                            completedLessons: progress.completedMaterials.length,
                             duration: `${course.duration} giờ`,
                             certificate: course.certificateAvailable
                         }

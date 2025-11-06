@@ -8,10 +8,12 @@ import {
 	TransactionStatus,
 	RewardType
 } from '../types/reward'
-import { 
-	mockRewardRules,
-} from '../mock/rewards'
 import adminTokenRewardApi, { getUserRewardSummary, getAdminStats, getAllTransactions, getTopUsers, getRulePerformance } from '../services/tokenRewardApi'
+// Import adapter để convert giữa backend và frontend
+import { 
+	mapBackendRewardsToTransactions, 
+	createTokenInfoFromStats 
+} from '../../utils/rewardAdapter'
 
 // Initial dashboard state - Empty data, will be loaded from API
 const initialDashboard: RewardDashboard = {
@@ -28,7 +30,7 @@ const initialDashboard: RewardDashboard = {
 		pendingTransactions: 0,
 		failedTransactions: 0
 	},
-	rules: mockRewardRules, // Rules management not implemented in API yet
+	rules: [], // Rules management not implemented in API yet
 	recentTransactions: [],
 	tokenInfo: {
 		symbol: 'LEARN',
@@ -349,25 +351,10 @@ export default function useRewards() {
 				averageTokensPerUse: rule.averageReward
 			}))
 			
-			// Transform transactions to match RewardTransaction format
-			const transformedTransactions: RewardTransaction[] = transactionsData.transactions.map((tx: any) => ({
-				id: tx.id,
-				userId: tx.studentId,
-				userName: `User ${tx.studentId}`,
-				ruleId: tx.relatedId || '',
-				ruleName: tx.reasonCode?.replace(/_/g, ' ') || 'Custom',
-				type: tx.reasonCode || 'custom',
-				tokenAmount: tx.tokensAwarded,
-				tokenSymbol: 'LEARN',
-				status: 'completed' as TransactionStatus,
-				transactionHash: tx.relatedId || '',
-				createdAt: tx.awardedAt,
-				processedAt: tx.awardedAt,
-				metadata: {
-					reasonCode: tx.reasonCode,
-					transactionType: tx.transaction_type
-				}
-			}))
+			// Transform transactions to match RewardTransaction format using adapter
+			const transformedTransactions: RewardTransaction[] = mapBackendRewardsToTransactions(
+				transactionsData.transactions || []
+			)
 			
 			// Transform top users to match UserRewardSummary format
 			const transformedTopUsers = topUsersData.map((user: any) => ({
@@ -412,21 +399,14 @@ export default function useRewards() {
 				recentTransactions: transformedTransactions,
 				topUsers: transformedTopUsers,
 				rulePerformance: transformedRulePerformance,
-				tokenInfo: {
-					symbol: 'LEARN',
-					name: 'LearnToken',
-					contractAddress: '0x0000000000000000000000000000000000000000',
-					decimals: 18,
-					totalSupply: stats.totalTokensIssued.toString(),
-					currentPrice: 0,
-					marketCap: 0,
-					holders: stats.totalUsers,
-					transfers24h: stats.todayTransactions || 0,
-					circulatingSupply: stats.currentBalance,
-					rewardPool: stats.currentBalance,
+				tokenInfo: createTokenInfoFromStats({
+					...stats,
+					totalTokensIssued: stats.totalTokensIssued || 0,
+					totalTokensDistributed: stats.totalTokensSpent || 0,
 					distributedToday: stats.todayTokensDistributed || 0,
-					distributedThisMonth: stats.totalTokensIssued
-				}
+					distributedThisMonth: stats.totalTokensIssued || 0,
+					totalUsers: stats.totalUsers || 0
+				})
 			}))
 		} catch (error) {
 			console.error('❌ Error loading token data:', error)

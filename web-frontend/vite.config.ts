@@ -11,7 +11,7 @@ export default defineConfig({
 		proxy: {
 			// Proxy API requests to avoid CORS issues
 			'/api': {
-				target: 'http://localhost:8080',
+				target: 'http://localhost:3000',
 				changeOrigin: true,
 				secure: false
 				// Removed rewrite since backend uses /api/v1/auth paths
@@ -22,5 +22,13 @@ export default defineConfig({
 		port: 4173,
 		host: true,
 		strictPort: true,
+		proxy: {
+			// Proxy API requests to avoid CORS issues
+			'/api': {
+				target: 'http://localhost:3000',
+				changeOrigin: true,
+				secure: false
+			}
+		}
 	},
 })

@@ -12,10 +12,11 @@ export interface ExamState {
 
 	// Session info
 	session: ExamSession | null
+	submissionId: string | null // ✅ Store submission ID after submit
 
 	// Current state
 	currentQuestionIndex: number
-	answers: Record<number, ExamAnswer>
+	answers: Record<string, ExamAnswer> // Changed: key is questionId (UUID string)
 	timeRemaining: number // seconds
 	startTime: number | null
 
@@ -36,6 +37,7 @@ const initialState: ExamState = {
 	currentExam: null,
 	questions: [],
 	session: null,
+	submissionId: null,
 	currentQuestionIndex: 0,
 	answers: {},
 	timeRemaining: 0,
@@ -322,6 +324,7 @@ const examSlice = createSlice({
       .addCase(submitExam.fulfilled, (state, action) => {
         state.status = 'finished';
         state.session = state.session ? { ...state.session, status: 'completed' } : null;
+        state.submissionId = action.payload.submissionId; // ✅ Store submission ID
       })
       .addCase(submitExam.rejected, (state, action) => {
         state.status = 'error';

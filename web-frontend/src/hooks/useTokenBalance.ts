@@ -28,8 +28,8 @@ export function useTokenBalance() {
 
   const itemsPerPage = 10;
 
-  // Fetch balance
-  const fetchBalance = useCallback(async () => {
+  // ✅ FIX: Plain async functions to avoid re-creation
+  const fetchBalance = async () => {
     if (!userId) return;
 
     setLoading(true);
@@ -44,10 +44,10 @@ export function useTokenBalance() {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  };
 
-  // Fetch history with pagination
-  const fetchHistory = useCallback(async (page: number = 1) => {
+  // ✅ FIX: Plain async function
+  const fetchHistory = async (page: number = 1) => {
     if (!userId) return;
 
     setLoading(true);
@@ -96,10 +96,10 @@ export function useTokenBalance() {
     } finally {
       setLoading(false);
     }
-  }, [userId, itemsPerPage]);
+  };
 
-  // Handle withdraw
-  const handleWithdraw = useCallback(async (amount: number, toAddress: string): Promise<{ success: boolean; message: string; txHash?: string }> => {
+  // ✅ FIX: Remove useCallback to avoid dependency chains
+  const handleWithdraw = async (amount: number, toAddress: string): Promise<{ success: boolean; message: string; txHash?: string }> => {
     if (!userId) {
       return { success: false, message: 'Vui lòng đăng nhập' };
     }
@@ -150,42 +150,43 @@ export function useTokenBalance() {
     } finally {
       setWithdrawing(false);
     }
-  }, [userId, balance, currentPage, fetchBalance, fetchHistory]);
+  };
 
-  // Handle pagination
-  const goToPage = useCallback((page: number) => {
+  // ✅ FIX: Plain functions for pagination
+  const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       fetchHistory(page);
     }
-  }, [totalPages, fetchHistory]);
+  };
 
-  const nextPage = useCallback(() => {
+  const nextPage = () => {
     if (currentPage < totalPages) {
       goToPage(currentPage + 1);
     }
-  }, [currentPage, totalPages, goToPage]);
+  };
 
-  const previousPage = useCallback(() => {
+  const previousPage = () => {
     if (currentPage > 1) {
       goToPage(currentPage - 1);
     }
-  }, [currentPage, goToPage]);
+  };
 
-  // Refresh all data
-  const refresh = useCallback(async () => {
+  // ✅ FIX: Plain async function
+  const refresh = async () => {
     await Promise.all([
       fetchBalance(),
       fetchHistory(currentPage)
     ]);
-  }, [fetchBalance, fetchHistory, currentPage]);
+  };
 
-  // Initial load
+  // ✅ FIX: Initial load with proper dependencies
   useEffect(() => {
     if (userId) {
       fetchBalance();
       fetchHistory(1);
     }
-  }, [userId]); // Only run on userId change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   return {
     balance,

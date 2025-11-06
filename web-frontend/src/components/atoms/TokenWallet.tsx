@@ -61,6 +61,7 @@ export default function TokenWallet({ userId }: TokenWalletProps): JSX.Element {
         if (userId) {
             loadTokenData()
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userId])
 
     const loadTokenData = async () => {

@@ -26,11 +26,12 @@ export const ExamPreCheckPage: React.FC = () => {
     cameraError 
   } = useSelector((state: RootState) => state.exam);
 
+  // ✅ FIX: Add guard to prevent duplicate fetch when dispatch changes
   useEffect(() => {
-    if (examId) {
+    if (examId && status !== 'loading' && !currentExam) {
       dispatch(fetchExamDetails(examId));
     }
-  }, [examId, dispatch]);
+  }, [examId, status, currentExam, dispatch]);
 
   useEffect(() => {
     if (status === 'idle' && currentExam) {
@@ -43,7 +44,6 @@ export const ExamPreCheckPage: React.FC = () => {
   };
 
   const handleCameraReady = (stream: MediaStream) => {
-    console.log('Camera ready with stream:', stream);
     setIsCameraWorking(true);
     dispatch(setCameraReady(true));
     dispatch(setCameraError(null));

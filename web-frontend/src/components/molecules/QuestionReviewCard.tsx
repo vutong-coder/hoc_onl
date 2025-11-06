@@ -6,10 +6,10 @@ import styles from '../../assets/css/QuestionReviewCard.module.css';
 interface QuestionReviewCardProps {
   question: {
     id: number;
-    type: 'multiple-choice' | 'code' | 'essay';
+    type: 'multiple-choice' | 'code' | 'essay' | 'single_choice' | 'multiple_choice';
     question: string;
     options?: string[];
-    correctAnswer?: number;
+    correctAnswer?: number | number[]; // Can be single index or array of indices
     points: number;
     yourAnswer?: any;
     isCorrect: boolean;
@@ -105,15 +105,27 @@ export const QuestionReviewCard: React.FC<QuestionReviewCardProps> = ({
             )}
             
             <div className={styles.optionsList}>
-              {question.options.map((option: string, optIndex: number) => (
-                <AnswerOption
-                  key={optIndex}
-                  option={option}
-                  isYourAnswer={hasUserAnswered && question.yourAnswer === optIndex}
-                  isCorrectAnswer={question.correctAnswer === optIndex}
-                  hasUserAnswered={hasUserAnswered}
-                />
-              ))}
+              {question.options.map((option: any, optIndex: number) => {
+                // ✨ DEFENSIVE: Ensure option is always a string
+                const optionText = typeof option === 'string' 
+                  ? option 
+                  : (option?.text || option?.optionText || option?.content || String(option?.id || ''));
+                
+                // Check if this option is correct (handle both single number and array)
+                const isCorrect = Array.isArray(question.correctAnswer)
+                  ? question.correctAnswer.includes(optIndex)
+                  : question.correctAnswer === optIndex;
+                
+                return (
+                  <AnswerOption
+                    key={optIndex}
+                    option={optionText}
+                    isYourAnswer={hasUserAnswered && question.yourAnswer === optIndex}
+                    isCorrectAnswer={isCorrect}
+                    hasUserAnswered={hasUserAnswered}
+                  />
+                );
+              })}
             </div>
           </>
         )}

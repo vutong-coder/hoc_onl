@@ -46,10 +46,10 @@ const ExamQuestionComponent: React.FC<ExamQuestionProps> = ({
   const renderMultipleChoice = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
       {question.options?.map((option, index) => {
-        const isSelected = answer === index;
+        const isSelected = answer === option.id; // Changed: compare with optionId
         return (
           <label
-            key={index}
+            key={option.id} // Changed: use optionId as key
             style={{
               display: 'flex',
               alignItems: 'flex-start',
@@ -78,9 +78,9 @@ const ExamQuestionComponent: React.FC<ExamQuestionProps> = ({
             <input
               type="radio"
               name={`question-${question.id}`}
-              value={index}
-              checked={answer === index}
-              onChange={() => handleAnswerChange(index)}
+              value={option.id} // Changed: use optionId
+              checked={answer === option.id} // Changed: compare with optionId
+              onChange={() => handleAnswerChange(option.id)} // Changed: pass optionId
               style={{
                 marginTop: '2px',
                 width: '18px',
@@ -104,7 +104,7 @@ const ExamQuestionComponent: React.FC<ExamQuestionProps> = ({
                   fontSize: '15px',
                   lineHeight: 1.6
                 }}>
-                  {option}
+                  {option.text}
                 </span>
               </div>
             </div>
@@ -430,7 +430,8 @@ const ExamQuestionComponent: React.FC<ExamQuestionProps> = ({
           lineHeight: 1.8,
           letterSpacing: '-0.01em'
         }}>
-          {question.question}
+          {/* ✨ DEFENSIVE: Ensure question is rendered as string */}
+          {typeof question.question === 'string' ? question.question : JSON.stringify(question.question)}
         </h3>
         {renderQuestionContent()}
       </div>

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Course, CourseForm, CourseCategory, Instructor, CourseLevel, CourseStatus } from '../../types/course'
+import { CourseForm, CourseCategory, Instructor, CourseLevel, CourseStatus } from '../../types/course'
+import { type Course as ApiCourse } from '../../../services/api/courseApi'
+import { extractCourseStatus, getCourseThumbnail, getCourseField } from '../../../utils/courseAdapter'
 import Modal from '../common/Modal'
 import Dropdown from '../common/Dropdown'
 import { X, Save, Plus, Trash2, BookOpen, Settings, DollarSign, Tag, CheckCircle, Award, Target, Users } from 'lucide-react'
@@ -8,7 +10,7 @@ interface CourseEditorModalProps {
 	isOpen: boolean
 	onClose: () => void
 	onSave: (course: CourseForm) => void
-	editingCourse?: Course | null
+    editingCourse?: ApiCourse | null
 	categories: CourseCategory[]
 	instructors: Instructor[]
 	title?: string
@@ -52,29 +54,33 @@ export default function CourseEditorModal({
 	const [newPrerequisite, setNewPrerequisite] = useState('')
 	const [newOutcome, setNewOutcome] = useState('')
 
-	useEffect(() => {
+    useEffect(() => {
 		if (editingCourse) {
+			// Use adapter helpers to safely extract fields
+			const { status, isPublished } = extractCourseStatus(editingCourse)
+			const thumbnail = getCourseThumbnail(editingCourse)
+			
 			setForm({
-				title: editingCourse.title,
-				description: editingCourse.description,
-				shortDescription: editingCourse.shortDescription,
-				categoryId: editingCourse.category.id,
-				instructorId: editingCourse.instructor.id,
-				level: editingCourse.level,
-				duration: editingCourse.duration,
-				price: editingCourse.price,
-				tokenSymbol: editingCourse.tokenSymbol,
-				thumbnail: editingCourse.thumbnail,
-				videoUrl: editingCourse.videoUrl || '',
-				tags: editingCourse.tags,
-				status: editingCourse.status,
-				isPublished: editingCourse.isPublished,
-				isFeatured: editingCourse.isFeatured,
-				maxEnrollments: editingCourse.maxEnrollments,
-				prerequisites: editingCourse.prerequisites,
-				learningOutcomes: editingCourse.learningOutcomes,
-				certificateAvailable: editingCourse.certificateAvailable,
-				certificateTemplate: editingCourse.certificateTemplate || ''
+                title: editingCourse.title || '',
+                description: editingCourse.description || '',
+                shortDescription: getCourseField(editingCourse, 'shortDescription', editingCourse.description?.substring(0, 150) || ''),
+                categoryId: (editingCourse as any)?.category?.id || '',
+                instructorId: (editingCourse as any)?.instructor?.id || (editingCourse as any)?.instructorId?.toString() || '',
+                level: (getCourseField(editingCourse, 'level', 'beginner') as CourseLevel),
+                duration: getCourseField(editingCourse, 'duration', 0),
+                price: getCourseField(editingCourse, 'price', 0),
+                tokenSymbol: getCourseField(editingCourse, 'tokenSymbol', 'LEARN'),
+                thumbnail: thumbnail,
+                videoUrl: getCourseField(editingCourse, 'videoUrl', ''),
+                tags: getCourseField(editingCourse, 'tags', []),
+                status: status as CourseStatus,
+                isPublished: isPublished,
+                isFeatured: getCourseField(editingCourse, 'isFeatured', false),
+                maxEnrollments: getCourseField(editingCourse, 'maxEnrollments', undefined),
+                prerequisites: getCourseField(editingCourse, 'prerequisites', []),
+                learningOutcomes: getCourseField(editingCourse, 'learningOutcomes', []),
+                certificateAvailable: getCourseField(editingCourse, 'certificateAvailable', false),
+                certificateTemplate: getCourseField(editingCourse, 'certificateTemplate', '')
 			})
 		} else {
 			setForm({
