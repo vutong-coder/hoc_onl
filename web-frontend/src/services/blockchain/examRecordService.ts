@@ -113,7 +113,7 @@ export async function startExamSessionOnChain(
     
     // Get session ID from event
     const receipt = await tx.wait();
-    const event = receipt.logs.find((log: any) => {
+    const event = receipt.logs.find((log: ethers.Log) => {
       try {
         const parsed = contract.interface.parseLog(log);
         return parsed?.name === 'ExamSessionStarted';

@@ -83,9 +83,9 @@ class CopyrightService {
   private async initializeProvider() {
     try {
       // Check if MetaMask is available
-      if (typeof window !== 'undefined' && (window as any).ethereum) {
-        this.provider = new ethers.BrowserProvider((window as any).ethereum);
-        this.signer = await this.provider.getSigner();
+      if (typeof window !== 'undefined' && window.ethereum) {
+        this.provider = new ethers.BrowserProvider(window.ethereum as any);
+        this.signer = await this.provider.getSigner() as ethers.JsonRpcSigner;
         
         const contractAddress = import.meta.env.VITE_COPYRIGHT_REGISTRY_ADDRESS;
         if (contractAddress) {
@@ -106,12 +106,12 @@ class CopyrightService {
    */
   async connectWallet(): Promise<boolean> {
     try {
-      if (!(window as any).ethereum) {
+      if (!window.ethereum) {
         throw new Error('MetaMask not detected');
       }
 
       // Request account access
-      await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
       
       // Re-initialize provider and contract
       await this.initializeProvider();

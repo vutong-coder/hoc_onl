@@ -35,7 +35,7 @@ class ExamService {
       duration, // ✨ Use validated duration
       totalQuestions: quiz.questions?.length || 0,
       totalPoints,
-      subject: quiz.subject || 'General', // Use backend subject or default
+      category: quiz.subject || quiz.category || 'General', // Use backend subject/category or default
       difficulty: quiz.difficulty || 'medium', // Use backend difficulty or default
       isProctored: quiz.isProctored || false, // Use backend isProctored or default
       instructions: quiz.instructions || defaultInstructions, // Use backend instructions or default
