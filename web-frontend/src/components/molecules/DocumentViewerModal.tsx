@@ -267,7 +267,6 @@ export default function DocumentViewerModal({
                   src={fileUrl!}
                   className={styles.viewer}
                   title={documentTitle}
-                  type="application/pdf"
                 />
               )}
 

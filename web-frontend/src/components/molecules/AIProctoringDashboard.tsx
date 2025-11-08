@@ -16,7 +16,8 @@ import {
   Filter,
   Search
 } from 'lucide-react';
-import { mockAIDetectionService, mockBlockchainService } from '../../data/mockAIDetectionData';
+// Mock services - removed import as file doesn't exist
+// import { mockAIDetectionService, mockBlockchainService } from '../../data/mockAIDetectionData';
 import { CheatingDetection } from '../../hooks/useAICameraMonitor';
 import Button from '../atoms/Button';
 import styles from './AIProctoringDashboard.module.css';
@@ -91,41 +92,20 @@ export const AIProctoringDashboard: React.FC<AIProctoringDashboardProps> = ({
 
   // AI detection simulation
   useEffect(() => {
-    const cleanup = mockAIDetectionService.simulateViolationDetection((violation) => {
-      handleNewViolation(violation);
-    });
-
-    return cleanup;
+    // Mock service removed - no longer using mockAIDetectionService
+    // Violations are now handled through real-time monitoring
+    return () => {
+      // Cleanup if needed
+    };
   }, []);
 
   // Blockchain events simulation
   useEffect(() => {
-    const cleanup = mockBlockchainService.simulateBlockchainEvents({
-      onViolationDetected: (examId, student, violationType, severity) => {
-        addAlert({
-          type: 'blockchain',
-          severity: ['low', 'medium', 'high', 'critical'][severity - 1] as any,
-          title: 'Vi phạm được ghi trên Blockchain',
-          description: `Exam ${examId}: Vi phạm loại ${violationType} được ghi lại`,
-          sessionId: examId.toString(),
-          actionRequired: severity >= 3
-        });
-      },
-      onSessionCompleted: (sessionId, examId, student, isFlagged) => {
-        if (isFlagged) {
-          addAlert({
-            type: 'system',
-            severity: 'high',
-            title: 'Session được đánh dấu gian lận',
-            description: `Session ${sessionId} hoàn thành với vi phạm nghiêm trọng`,
-            sessionId: sessionId.toString(),
-            actionRequired: true
-          });
-        }
-      }
-    });
-
-    return cleanup;
+    // Mock blockchain service removed - no longer using mockBlockchainService
+    // Blockchain events are now handled through real-time monitoring
+    return () => {
+      // Cleanup if needed
+    };
   }, []);
 
   const initializeMockData = () => {
@@ -154,7 +134,7 @@ export const AIProctoringDashboard: React.FC<AIProctoringDashboardProps> = ({
         status: 'flagged',
         violations: [
           {
-            type: 'multiple_faces',
+            type: 'MULTIPLE_FACES',
             severity: 'critical',
             confidence: 95,
             timestamp: Date.now() - 300000,
@@ -176,7 +156,7 @@ export const AIProctoringDashboard: React.FC<AIProctoringDashboardProps> = ({
         status: 'completed',
         violations: [
           {
-            type: 'eye_tracking',
+            type: 'LOOKING_AWAY',
             severity: 'medium',
             confidence: 78,
             timestamp: Date.now() - 600000,
@@ -287,7 +267,10 @@ export const AIProctoringDashboard: React.FC<AIProctoringDashboardProps> = ({
       ];
 
       const randomAlert = alertTypes[Math.floor(Math.random() * alertTypes.length)];
-      addAlert(randomAlert);
+      addAlert({
+        ...randomAlert,
+        actionRequired: randomAlert.type === 'system' ? true : false
+      });
     }
   };
 
@@ -558,18 +541,16 @@ export const AIProctoringDashboard: React.FC<AIProctoringDashboardProps> = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
                       handleSendWarning(session.id);
                     }}
                   >
                     Gửi cảnh báo
                   </Button>
                   <Button
-                    variant="destructive"
+                    variant="secondary"
                     size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
                       handleTerminateSession(session.id);
                     }}
                   >

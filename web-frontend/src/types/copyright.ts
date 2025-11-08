@@ -158,13 +158,50 @@ export interface CopyrightValidation {
   maxTagLength: number;
 }
 
+// Similarity check document
+export interface SimilarDocument {
+  id: number | string;
+  filename: string;
+  similarityScore: number;
+  similarityPercentage?: string;
+  owner?: string;
+  ownerUsername?: string;
+  ownerEmail?: string;
+  ownerAddress?: string;
+  createdAt?: string | null;
+  matchedSections?: string[];
+  matchedSectionsCount?: number;
+  details?: {
+    plagiarismRisk?: string;
+    [key: string]: any;
+  };
+}
+
+// Similarity information
+export interface SimilarityInfo {
+  isSimilar: boolean;
+  similarityScore: number;
+  plagiarismLevel?: string;
+  plagiarismDescription?: string;
+  similarDocuments: SimilarDocument[];
+  threshold?: number;
+  warnThreshold?: number;
+  totalDocumentsChecked?: number;
+  totalSimilarFound?: number;
+  message: string;
+}
+
 // Copyright API response
 export interface CopyrightApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
   message?: string;
-  timestamp: string;
+  timestamp?: string;
+  // Similarity check specific fields
+  similarityInfo?: SimilarityInfo;
+  isSimilar?: boolean;
+  filePath?: string;
 }
 
 // Copyright batch operations

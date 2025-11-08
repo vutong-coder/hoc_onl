@@ -14,7 +14,7 @@ import { useCopyright } from '../hooks/useCopyright';
 import styles from '../assets/css/CheckDuplicatePage.module.css';
 
 interface SimilarDocument {
-  id: number;
+  id: number | string;
   filename: string;
   similarityScore: number;
   matchedSections?: string[];
@@ -61,7 +61,22 @@ export default function CheckDuplicatePage(): JSX.Element {
       const response = await checkSimilarity(selectedFile);
       
       if (response.similarityInfo) {
-        setResult(response.similarityInfo);
+        // Map SimilarityInfo to SimilarityResult format
+        const mappedResult: SimilarityResult = {
+          isSimilar: response.similarityInfo.isSimilar || false,
+          similarityScore: response.similarityInfo.similarityScore || 0,
+          similarDocuments: (response.similarityInfo.similarDocuments || []).map(doc => ({
+            id: typeof doc.id === 'string' ? parseInt(doc.id) || 0 : doc.id,
+            filename: doc.filename,
+            similarityScore: doc.similarityScore || 0,
+            matchedSections: doc.matchedSections,
+            details: doc.details
+          })),
+          threshold: response.similarityInfo.threshold || 0.7,
+          totalDocumentsChecked: response.similarityInfo.totalDocumentsChecked || 0,
+          message: response.similarityInfo.message || ''
+        };
+        setResult(mappedResult);
       } else {
         setError('Không thể kiểm tra tương đồng. Vui lòng thử lại.');
       }
