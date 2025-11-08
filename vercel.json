@@ -1,7 +1,4 @@
 {
-  "buildCommand": "cd web-frontend && npm ci && npm run build",
-  "outputDirectory": "web-frontend/dist",
-  "installCommand": "cd web-frontend && npm ci",
   "framework": "vite",
   "rewrites": [
     {
