@@ -26,6 +26,7 @@ import LeaderboardPage from '../pages/LeaderboardPage'
 import RewardStorePage from '../pages/RewardStorePage'
 import TokenTransferPage from '../pages/TokenTransferPage'
 import CopyrightPage from '../pages/CopyrightPage'
+import CheckDuplicatePage from '../pages/CheckDuplicatePage'
 import UserCoursesPage from '../pages/UserCoursesPage'
 import CourseDetailPage from '../pages/CourseDetailPage'
 import CourseLearnPage from '../pages/CourseLearnPage'
@@ -77,6 +78,7 @@ export default function AppRoutes(): JSX.Element {
 			<Route path="rewards" element={<RewardPage />} />
 			<Route path="rewards/store" element={<RewardStorePage />} />
 			<Route path="copyright" element={<CopyrightPage />} />
+			<Route path="check-duplicate" element={<CheckDuplicatePage />} />
 			<Route path="profile" element={<ProfilePage />} />
 			<Route path="settings" element={<SettingsPage />} />
 			<Route path="leaderboard" element={<LeaderboardPage />} />

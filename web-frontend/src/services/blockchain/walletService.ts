@@ -348,3 +348,64 @@ export function formatTokenAmount(amount: string | number): string {
 	}
 	return num.toFixed(2)
 }
+
+/**
+ * Get ETH balance for an address
+ */
+export async function getETHBalance(address: string): Promise<string> {
+	try {
+		if (!address) {
+			console.warn('getETHBalance: No address provided');
+			return '0';
+		}
+
+		const provider = getProvider()
+		if (!provider) {
+			console.warn('getETHBalance: Provider not available');
+			throw new Error('Provider not available')
+		}
+
+		console.log('Fetching ETH balance for address:', address);
+		const balance = await provider.getBalance(address)
+		const formattedBalance = ethers.formatEther(balance)
+		console.log('ETH Balance:', formattedBalance, 'ETH');
+		return formattedBalance
+	} catch (error) {
+		console.error('Error getting ETH balance:', error)
+		return '0'
+	}
+}
+
+/**
+ * Send ETH transaction (for paying registration fee)
+ */
+export async function sendETHTransaction(
+	toAddress: string,
+	amountETH: string
+): Promise<string> {
+	try {
+		const provider = getProvider()
+		if (!provider) {
+			throw new Error('MetaMask chưa được cài đặt')
+		}
+
+		const signer = await provider.getSigner()
+		const tx = await signer.sendTransaction({
+			to: toAddress,
+			value: ethers.parseEther(amountETH)
+		})
+
+		// Wait for transaction to be mined
+		await tx.wait()
+		return tx.hash
+	} catch (error: any) {
+		console.error('Error sending ETH transaction:', error)
+		if (error.code === 4001) {
+			throw new Error('Người dùng từ chối giao dịch')
+		}
+		if (error.message?.includes('insufficient funds')) {
+			throw new Error('Số dư ETH không đủ')
+		}
+		throw new Error('Không thể thực hiện giao dịch: ' + (error.message || 'Unknown error'))
+	}
+}
