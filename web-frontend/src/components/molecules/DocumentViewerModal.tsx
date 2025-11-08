@@ -50,7 +50,10 @@ export default function DocumentViewerModal({
           throw new Error('Vui lòng đăng nhập');
         }
 
-        const response = await fetch(`http://localhost:8080/api/copyrights/download/${documentId}`, {
+        const downloadUrl = import.meta.env.VITE_API_BASE_URL 
+          ? `${import.meta.env.VITE_API_BASE_URL}/api/copyrights/download/${documentId}`
+          : `http://localhost:8080/api/copyrights/download/${documentId}`;
+        const response = await fetch(downloadUrl, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

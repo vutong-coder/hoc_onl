@@ -19,7 +19,9 @@ import {
 } from '../../types/copyright';
 
 // API Gateway endpoint for copyright service
-const API_BASE_URL = 'http://localhost:8080/api/copyrights';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL 
+  ? `${import.meta.env.VITE_API_BASE_URL}/api/copyrights`
+  : 'http://localhost:8080/api/copyrights';
 
 const copyrightApi = axios.create({
   baseURL: API_BASE_URL,

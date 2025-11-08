@@ -271,7 +271,10 @@ export default function CopyrightDocumentsList({
     }
     
     // Create download link
-    fetch(`http://localhost:8080/api/copyrights/download/${documentId}`, {
+    const downloadUrl = import.meta.env.VITE_API_BASE_URL 
+      ? `${import.meta.env.VITE_API_BASE_URL}/api/copyrights/download/${documentId}`
+      : `http://localhost:8080/api/copyrights/download/${documentId}`;
+    fetch(downloadUrl, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
