@@ -5,11 +5,9 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "vite",
-  "cleanUrls": true,
-  "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/((?!api/).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
