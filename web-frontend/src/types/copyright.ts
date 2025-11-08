@@ -71,8 +71,10 @@ export interface CopyrightStats {
   totalVerified: number;
   totalOwners: number;
   contractBalance: string;
-  registrationFee: string;
-  verificationFee: string;
+  registrationFee?: string;
+  verificationFee?: string;
+  recentRegistrations?: number;
+  verificationRate?: string | number;
 }
 
 // User copyright profile

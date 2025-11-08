@@ -109,7 +109,41 @@
 }
 
 /* Fee Info */
+/* Wallet Info */
+.walletInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  gap: 16px;
+}
+
+.walletAddress {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.balanceInfo {
+  color: #667eea;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.balanceInfo .loadingText {
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+  font-size: 14px;
+}
+
 .feeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   padding: 12px 16px;
@@ -117,6 +151,13 @@
   text-align: center;
   color: #ffffff;
   font-weight: 500;
+}
+
+.insufficientBalance {
+  color: #ff6b6b;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 4px;
 }
 
 /* Upload Type Section */
@@ -232,6 +273,193 @@
 
 .selectedFile button:hover {
   background: rgba(255, 107, 107, 0.1);
+}
+
+/* Similarity Check Styles */
+.similarityChecking {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  margin-top: 16px;
+  color: #3b82f6;
+  font-size: 14px;
+}
+
+.similarityChecking .spinner {
+  animation: spin 1s linear infinite;
+}
+
+.similarityResult {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid;
+}
+
+.similaritySafe {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.similarityWarning {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.similarityHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.similarityHeader h4 {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.similarityHeader p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  margin: 0;
+}
+
+.successIcon {
+  color: #10b981;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.warningIcon {
+  color: #ef4444;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.similarDocumentsList {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.similarDocumentsTitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 12px 0;
+}
+
+.similarDocuments {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.similarDocumentItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.similarDocumentInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.similarDocumentInfo svg {
+  color: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+
+.similarDocumentName {
+  color: #ffffff;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.similarityPercentage {
+  color: #f59e0b;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 12px;
+  background: rgba(245, 158, 11, 0.2);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.moreDocuments {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  font-style: italic;
+  margin: 8px 0 0 0;
+  text-align: center;
+}
+
+.similarityWarningMessage {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(239, 68, 68, 0.15);
+  border-left: 3px solid #ef4444;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.similarityWarningMessage svg {
+  color: #ef4444;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.recheckButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 16px;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-radius: 8px;
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.recheckButton:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.6);
+}
+
+.recheckButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.recheckButton .spinner {
+  animation: spin 1s linear infinite;
 }
 
 /* Text Input Section */

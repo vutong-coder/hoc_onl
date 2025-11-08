@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, FileText, AlertCircle, CheckCircle, X, Loader2 } from 'lucide-react';
 import { useCopyright } from '../../hooks/useCopyright';
-import { DocumentMetadata, DocumentCategory, COPYRIGHT_CONSTANTS } from '../../types/copyright';
+import { DocumentMetadata, DocumentCategory, COPYRIGHT_CONSTANTS, CopyrightFileType } from '../../types/copyright';
 import styles from '../../assets/css/CopyrightUploadModal.module.css';
 
 interface CopyrightUploadModalProps {
@@ -17,9 +17,9 @@ export default function CopyrightUploadModal({
 }: CopyrightUploadModalProps): JSX.Element {
   const { 
     isConnected, 
-    connectWallet, 
-    registerFileDocument, 
+    registerDocument, 
     registerTextDocument,
+    checkSimilarity,
     getRegistrationFee,
     isLoading,
     error 
@@ -42,6 +42,20 @@ export default function CopyrightUploadModal({
   });
   const [registrationFee, setRegistrationFee] = useState('0');
   const [isRegistering, setIsRegistering] = useState(false);
+  const [isCheckingSimilarity, setIsCheckingSimilarity] = useState(false);
+  const [similarityResult, setSimilarityResult] = useState<{
+    isSimilar: boolean;
+    similarityScore: number;
+    similarDocuments: Array<{
+      id: number;
+      filename: string;
+      similarityScore: number;
+      matchedSections?: any[];
+    }>;
+    totalDocumentsChecked: number;
+    message: string;
+  } | null>(null);
+  const [showSimilarityWarning, setShowSimilarityWarning] = useState(false);
   const [registrationResult, setRegistrationResult] = useState<{
     success: boolean;
     documentHash?: string;
@@ -68,7 +82,7 @@ export default function CopyrightUploadModal({
     }
   };
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       // Validate file
@@ -78,7 +92,7 @@ export default function CopyrightUploadModal({
       }
 
       const extension = '.' + file.name.split('.').pop()?.toLowerCase();
-      if (!COPYRIGHT_CONSTANTS.ALLOWED_EXTENSIONS.includes(extension)) {
+      if (!COPYRIGHT_CONSTANTS.ALLOWED_EXTENSIONS.includes(extension as CopyrightFileType)) {
         alert(`Định dạng file không được hỗ trợ. Các định dạng được hỗ trợ: ${COPYRIGHT_CONSTANTS.ALLOWED_EXTENSIONS.join(', ')}`);
         return;
       }
@@ -90,6 +104,50 @@ export default function CopyrightUploadModal({
         fileSize: file.size,
         title: file.name.replace(/\.[^/.]+$/, '') // Remove extension from title
       }));
+
+      // Auto check similarity when file is selected
+      await handleCheckSimilarity(file);
+    }
+  };
+
+  const handleCheckSimilarity = async (file: File) => {
+    if (!file) return;
+
+    setIsCheckingSimilarity(true);
+    setSimilarityResult(null);
+    setShowSimilarityWarning(false);
+
+    try {
+      const result = await checkSimilarity(file);
+      console.log('Similarity check result:', result);
+
+      if (result?.similarityInfo) {
+        const similarityInfo = result.similarityInfo;
+        setSimilarityResult({
+          isSimilar: similarityInfo.isSimilar || false,
+          similarityScore: similarityInfo.similarityScore || 0,
+          similarDocuments: similarityInfo.similarDocuments || [],
+          totalDocumentsChecked: similarityInfo.totalDocumentsChecked || 0,
+          message: similarityInfo.message || ''
+        });
+
+        // Show warning if similarity is detected
+        if (similarityInfo.isSimilar && similarityInfo.similarityScore > 0.3) {
+          setShowSimilarityWarning(true);
+        }
+      }
+    } catch (err: any) {
+      console.error('Error checking similarity:', err);
+      // Don't block registration if similarity check fails
+      setSimilarityResult({
+        isSimilar: false,
+        similarityScore: 0,
+        similarDocuments: [],
+        totalDocumentsChecked: 0,
+        message: 'Không thể kiểm tra tương đồng. Bạn vẫn có thể tiếp tục đăng ký.'
+      });
+    } finally {
+      setIsCheckingSimilarity(false);
     }
   };
 
@@ -112,8 +170,8 @@ export default function CopyrightUploadModal({
 
   const handleRegister = async () => {
     if (!isConnected) {
-      const connected = await connectWallet();
-      if (!connected) return;
+      alert('Vui lòng đăng nhập để đăng ký tài liệu');
+      return;
     }
 
     // Validate metadata
@@ -127,6 +185,17 @@ export default function CopyrightUploadModal({
       return;
     }
 
+    // Warn if high similarity detected
+    if (showSimilarityWarning && similarityResult && similarityResult.similarityScore > 0.5) {
+      const confirmContinue = window.confirm(
+        `⚠️ Cảnh báo: Tài liệu này có độ tương đồng rất cao (${(similarityResult.similarityScore * 100).toFixed(1)}%) với các tài liệu đã có trong hệ thống.\n\n` +
+        `Bạn có chắc chắn muốn tiếp tục đăng ký?`
+      );
+      if (!confirmContinue) {
+        return;
+      }
+    }
+
     setIsRegistering(true);
     setRegistrationResult(null);
 
@@ -138,28 +207,56 @@ export default function CopyrightUploadModal({
           alert('Vui lòng chọn file');
           return;
         }
-        result = await registerFileDocument(selectedFile, metadata);
+        result = await registerDocument(selectedFile, metadata);
       } else {
         if (!textContent.trim()) {
           alert('Vui lòng nhập nội dung văn bản');
           return;
         }
-        result = await registerTextDocument(textContent, {
-          ...metadata,
-          fileExtension: '.txt',
-          fileSize: new Blob([textContent]).size
-        });
+        const { fileExtension, fileSize, ...restMetadata } = metadata;
+        result = await registerTextDocument(textContent, restMetadata);
       }
 
-      setRegistrationResult(result);
+      // Debug: Log the full response
+      console.log('Registration response:', result);
+      
+      // Map backend response to expected format
+      // Backend returns: { success: true, message: "...", copyright: { hash, transactionHash, ... } }
+      const mappedResult = {
+        success: result?.success === true || result?.success === 'true' || false,
+        documentHash: result?.copyright?.hash || result?.copyright?.id?.toString() || result?.hash || result?.id?.toString() || '',
+        transactionHash: result?.copyright?.transactionHash || result?.transactionHash || '',
+        message: result?.message || '',
+        error: undefined
+      };
+      
+      // Only set error if success is explicitly false
+      if (!mappedResult.success) {
+        mappedResult.error = result?.message || 'Đăng ký bản quyền thất bại';
+      }
+      
+      console.log('Mapped result:', mappedResult);
+      setRegistrationResult(mappedResult);
 
-      if (result.success && result.documentHash && result.transactionHash) {
-        onSuccess?.(result.documentHash, result.transactionHash);
+      // Success if we have success=true and documentHash
+      if (mappedResult.success && mappedResult.documentHash) {
+        console.log('Registration successful!', mappedResult);
+        
+        onSuccess?.(
+          mappedResult.documentHash, 
+          mappedResult.transactionHash || 'pending'
+        );
         // Reset form after successful registration
         setTimeout(() => {
           resetForm();
           onClose();
-        }, 3000);
+        }, 2000);
+      } else if (mappedResult.success && !mappedResult.documentHash) {
+        // Success but no hash - might be a warning
+        console.warn('Registration successful but no documentHash:', mappedResult);
+      } else {
+        // Failed
+        console.error('Registration failed:', mappedResult);
       }
     } catch (err) {
       console.error('Registration failed:', err);
@@ -188,6 +285,8 @@ export default function CopyrightUploadModal({
       abstract: ''
     });
     setRegistrationResult(null);
+    setSimilarityResult(null);
+    setShowSimilarityWarning(false);
     setNewTag('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -222,14 +321,7 @@ export default function CopyrightUploadModal({
           {!isConnected && (
             <div className={styles.warning}>
               <AlertCircle size={20} />
-              <span>Vui lòng kết nối ví MetaMask để đăng ký bản quyền</span>
-              <button 
-                className={styles.connectButton}
-                onClick={connectWallet}
-                disabled={isLoading}
-              >
-                {isLoading ? <Loader2 className={styles.spinner} /> : 'Kết nối ví'}
-              </button>
+              <span>Vui lòng đăng nhập để đăng ký bản quyền</span>
             </div>
           )}
 
@@ -301,6 +393,88 @@ export default function CopyrightUploadModal({
                 onChange={handleFileSelect}
                 style={{ display: 'none' }}
               />
+
+              {/* Similarity Check Result */}
+              {isCheckingSimilarity && (
+                <div className={styles.similarityChecking}>
+                  <Loader2 className={styles.spinner} />
+                  <span>Đang kiểm tra tương đồng với các tài liệu trong hệ thống...</span>
+                </div>
+              )}
+
+              {similarityResult && !isCheckingSimilarity && (
+                <div className={`${styles.similarityResult} ${similarityResult.isSimilar ? styles.similarityWarning : styles.similaritySafe}`}>
+                  <div className={styles.similarityHeader}>
+                    {similarityResult.isSimilar ? (
+                      <AlertCircle size={20} className={styles.warningIcon} />
+                    ) : (
+                      <CheckCircle size={20} className={styles.successIcon} />
+                    )}
+                    <div>
+                      <h4>
+                        {similarityResult.isSimilar 
+                          ? `⚠️ Phát hiện tương đồng: ${(similarityResult.similarityScore * 100).toFixed(1)}%`
+                          : '✅ Không phát hiện tương đồng đáng kể'
+                        }
+                      </h4>
+                      <p>
+                        Đã kiểm tra {similarityResult.totalDocumentsChecked} tài liệu trong hệ thống
+                      </p>
+                    </div>
+                  </div>
+
+                  {similarityResult.isSimilar && similarityResult.similarDocuments.length > 0 && (
+                    <div className={styles.similarDocumentsList}>
+                      <p className={styles.similarDocumentsTitle}>Tài liệu tương tự:</p>
+                      <div className={styles.similarDocuments}>
+                        {similarityResult.similarDocuments.slice(0, 5).map((doc, index) => (
+                          <div key={doc.id || index} className={styles.similarDocumentItem}>
+                            <div className={styles.similarDocumentInfo}>
+                              <FileText size={16} />
+                              <span className={styles.similarDocumentName}>{doc.filename}</span>
+                            </div>
+                            <div className={styles.similarityPercentage}>
+                              {(doc.similarityScore * 100).toFixed(1)}%
+                            </div>
+                          </div>
+                        ))}
+                        {similarityResult.similarDocuments.length > 5 && (
+                          <p className={styles.moreDocuments}>
+                            và {similarityResult.similarDocuments.length - 5} tài liệu khác...
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {showSimilarityWarning && (
+                    <div className={styles.similarityWarningMessage}>
+                      <AlertCircle size={16} />
+                      <span>
+                        Tài liệu này có độ tương đồng cao ({((similarityResult.similarityScore || 0) * 100).toFixed(1)}%) với các tài liệu đã có. 
+                        Bạn có chắc chắn muốn tiếp tục đăng ký?
+                      </span>
+                    </div>
+                  )}
+
+                  {selectedFile && (
+                    <button
+                      className={styles.recheckButton}
+                      onClick={() => handleCheckSimilarity(selectedFile)}
+                      disabled={isCheckingSimilarity}
+                    >
+                      {isCheckingSimilarity ? (
+                        <>
+                          <Loader2 className={styles.spinner} size={16} />
+                          Đang kiểm tra...
+                        </>
+                      ) : (
+                        '🔄 Kiểm tra lại'
+                      )}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -439,9 +613,15 @@ export default function CopyrightUploadModal({
                 <>
                   <CheckCircle size={20} />
                   <div>
-                    <p>Đăng ký bản quyền thành công!</p>
-                    <p>Hash: {registrationResult.documentHash}</p>
-                    <p>Transaction: {registrationResult.transactionHash}</p>
+                    <p>{registrationResult.message || 'Đăng ký bản quyền thành công!'}</p>
+                    <p className={styles.hashInfo}>
+                      <strong>Document Hash:</strong> {registrationResult.documentHash}
+                    </p>
+                    {registrationResult.transactionHash && registrationResult.transactionHash !== 'pending' && (
+                      <p className={styles.hashInfo}>
+                        <strong>Blockchain TX:</strong> {registrationResult.transactionHash}
+                      </p>
+                    )}
                   </div>
                 </>
               ) : (
@@ -468,7 +648,12 @@ export default function CopyrightUploadModal({
             <button 
               className={styles.registerButton}
               onClick={handleRegister}
-              disabled={!isConnected || isRegistering || !metadata.title.trim() || !metadata.description.trim()}
+              disabled={
+                !isConnected || 
+                isRegistering || 
+                !metadata.title.trim() || 
+                !metadata.description.trim()
+              }
             >
               {isRegistering ? (
                 <>

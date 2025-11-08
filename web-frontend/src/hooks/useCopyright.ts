@@ -1,41 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
-import { copyrightService, DocumentMetadata, DocumentCopyright, CopyrightStats } from '../services/blockchain/copyrightService';
+import { useState, useCallback } from 'react';
+import { copyrightService } from '../services/api/copyrightService';
+import { DocumentMetadata, DocumentCopyright, CopyrightStats } from '../types/copyright';
 
-export interface UseCopyrightReturn {
-  // Connection state
-  isConnected: boolean;
-  currentAddress: string | null;
-  connectWallet: () => Promise<boolean>;
-  
-  // Document operations
-  registerFileDocument: (file: File, metadata: DocumentMetadata) => Promise<RegistrationResult>;
-  registerTextDocument: (content: string, metadata: DocumentMetadata) => Promise<RegistrationResult>;
-  verifyDocument: (documentHash: string) => Promise<VerificationResult>;
-  
-  // Document queries
-  documentExists: (documentHash: string) => Promise<boolean>;
-  getDocument: (documentHash: string) => Promise<DocumentCopyright | null>;
-  getUserDocuments: (address: string) => Promise<string[]>;
-  getCategoryDocuments: (category: string) => Promise<string[]>;
-  searchDocuments: (partialHash: string) => Promise<string[]>;
-  
-  // Contract info
-  getStatistics: () => Promise<CopyrightStats | null>;
-  getRegistrationFee: () => Promise<string>;
-  getVerificationFee: () => Promise<string>;
-  
-  // Document management
-  updateDocument: (documentHash: string, field: 'title' | 'description', value: string) => Promise<boolean>;
-  updateDocumentTags: (documentHash: string, newTags: string[]) => Promise<boolean>;
-  deactivateDocument: (documentHash: string) => Promise<boolean>;
-  
-  // Utility functions
-  calculateFileHash: (file: File) => Promise<string>;
-  calculateTextHash: (content: string) => string;
-  
-  // Loading states
-  isLoading: boolean;
-  error: string | null;
+interface VerificationResult {
+  success: boolean;
+  transactionHash?: string;
+  error?: string;
 }
 
 interface RegistrationResult {
@@ -45,293 +15,326 @@ interface RegistrationResult {
   error?: string;
 }
 
-interface VerificationResult {
-  success: boolean;
-  transactionHash?: string;
-  error?: string;
-}
-
-export function useCopyright(): UseCopyrightReturn {
-  const [isConnected, setIsConnected] = useState(false);
-  const [currentAddress, setCurrentAddress] = useState<string | null>(null);
+export function useCopyright() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isConnected = !!localStorage.getItem('accessToken');
+  
+  // Get user info from localStorage
+  const getUserAddress = () => {
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        // Use user ID or email as "address" for now
+        return user.id || user.email || null;
+      }
+    } catch (err) {
+      console.error('Failed to parse user data:', err);
+    }
+    return null;
+  };
+  
+  const currentAddress = getUserAddress();
 
-  // Check connection status
-  useEffect(() => {
-    const checkConnection = async () => {
-      try {
-        const connected = copyrightService.isWalletConnected();
-        setIsConnected(connected);
-        
-        if (connected) {
-          const address = await copyrightService.getCurrentAddress();
-          setCurrentAddress(address);
+  const getRegistrationFee = async () => {
+    // Default fee, can be fetched from contract or API
+    return '0.01';
+  };
+
+  // Register a new document via FormData
+  const registerDocument = async (file: File, metadata: Omit<DocumentMetadata, 'fileExtension' | 'fileSize'>) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      Object.entries(metadata).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((item) => formData.append(key, item as string));
+        } else {
+          formData.append(key, value as string | Blob);
         }
-      } catch (err) {
-        console.error('Failed to check connection:', err);
-        setIsConnected(false);
-        setCurrentAddress(null);
-      }
-    };
+      });
 
-    checkConnection();
-  }, []);
+      const response = await copyrightService.registerDocument(formData);
+      // Response structure: { success: true, message: "...", copyright: {...} }
+      console.log('registerTextDocument response:', response);
+      return response;
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Failed to register document';
+      setError(message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  // Connect wallet
-  const connectWallet = useCallback(async (): Promise<boolean> => {
+  const registerTextDocument = async (text: string, metadata: Omit<DocumentMetadata, 'fileExtension' | 'fileSize'>) => {
     setIsLoading(true);
     setError(null);
-    
     try {
-      const success = await copyrightService.connectWallet();
-      setIsConnected(success);
+      const formData = new FormData();
+      const file = new Blob([text], { type: 'text/plain' });
+      formData.append('file', file, metadata.title || 'document.txt');
+      Object.entries(metadata).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((item) => formData.append(key, item as string));
+        } else {
+          formData.append(key, value as string | Blob);
+        }
+      });
+
+      const response = await copyrightService.registerDocument(formData);
+      // Response structure: { success: true, message: "...", copyright: {...} }
+      console.log('registerTextDocument response:', response);
+      return response;
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Failed to register document';
+      setError(message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getDocument = async (documentId: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await copyrightService.getCopyrightById(documentId);
+      return response.data;
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Failed to fetch document';
+      setError(message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateDocument = async (documentId: string, updates: Partial<DocumentMetadata>) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await copyrightService.updateCopyright(documentId, updates);
+      return response.data;
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Failed to update document';
+      setError(message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteDocument = async (documentId: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await copyrightService.deleteCopyright(documentId);
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Failed to delete document';
+      setError(message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const checkSimilarity = async (file: File) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append('document', file);
+      // copyrightService.checkSimilarity already returns response.data, so don't unwrap again
+      const response = await copyrightService.checkSimilarity(formData);
+      return response; // Return directly, no .data needed
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Failed to check similarity';
+      setError(message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const searchDocuments = async (query: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await copyrightService.searchDocuments(query);
+      return response.data || [];
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Failed to search documents';
+      setError(message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getStatistics = useCallback(async (): Promise<CopyrightStats> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await copyrightService.getStatistics();
+      console.log('useCopyright.getStatistics - response from service:', response);
+      console.log('useCopyright.getStatistics - response type:', typeof response);
+      console.log('useCopyright.getStatistics - response keys:', response ? Object.keys(response) : 'null');
       
-      if (success) {
-        const address = await copyrightService.getCurrentAddress();
-        setCurrentAddress(address);
+      // Backend returns: { success: true, data: {...} }
+      // Axios wraps it: axios response = { data: { success: true, data: {...} } }
+      // copyrightService.getStatistics() returns: response.data = { success: true, data: {...} }
+      // So we need to access response.data to get the actual stats object
+      
+      let statsData: CopyrightStats;
+      
+      if (!response || typeof response !== 'object') {
+        throw new Error('Invalid response: response is not an object. Response: ' + JSON.stringify(response));
       }
       
-      return success;
+      // Check if response has the expected structure
+      if (response.success === true && response.data && typeof response.data === 'object') {
+        // Response is { success: true, data: {...} }
+        console.log('✅ Detected format: { success: true, data: {...} }');
+        statsData = response.data as CopyrightStats;
+      } else if (response.totalDocuments !== undefined) {
+        // Response is already the stats object directly (unlikely but possible)
+        console.log('✅ Detected format: Direct stats object');
+        statsData = response as CopyrightStats;
+      } else {
+        // Try to find data in nested structure
+        console.warn('⚠️ Unexpected response format:', JSON.stringify(response, null, 2));
+        throw new Error('Invalid response format. Expected { success: true, data: {...} } but got: ' + JSON.stringify(response));
+      }
+      
+      console.log('✅ Parsed statistics data:', statsData);
+      return statsData;
     } catch (err: any) {
-      setError(err.message || 'Failed to connect wallet');
-      return false;
+      console.error('❌ Error in getStatistics:', err);
+      console.error('❌ Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      const message = err.response?.data?.message || err.message || 'Failed to fetch statistics';
+      setError(message);
+      throw err;
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Register file document
-  const registerFileDocument = useCallback(async (
-    file: File,
-    metadata: DocumentMetadata
-  ): Promise<RegistrationResult> => {
+  const getAnalytics = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    
     try {
-      const result = await copyrightService.registerDocument(file, metadata);
-      if (!result.success) {
-        setError(result.error || 'Registration failed');
+      const response = await copyrightService.getAnalytics();
+      console.log('getAnalytics response:', response);
+      
+      // Handle response structure similar to getStatistics
+      if (response && response.success && response.data) {
+        return response.data;
+      } else if (response && response.categoryDistribution) {
+        // Response is already the analytics object
+        return response;
+      } else if (response && response.data) {
+        return response.data;
       }
-      return result;
+      
+      throw new Error('Invalid analytics response format');
     } catch (err: any) {
-      const errorMsg = err.message || 'Registration failed';
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+      console.error('Error in getAnalytics:', err);
+      const message = err.response?.data?.message || err.message || 'Failed to fetch analytics';
+      setError(message);
+      throw err;
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Register text document
-  const registerTextDocument = useCallback(async (
-    content: string,
-    metadata: DocumentMetadata
-  ): Promise<RegistrationResult> => {
+  const getDocumentsByOwner = useCallback(async (ownerAddress: string, page = 1, limit = 10) => {
     setIsLoading(true);
     setError(null);
-    
     try {
-      const result = await copyrightService.registerTextDocument(content, metadata);
-      if (!result.success) {
-        setError(result.error || 'Text registration failed');
-      }
-      return result;
+      const response = await copyrightService.getDocumentsByOwner(ownerAddress, { page, limit });
+      return response;
     } catch (err: any) {
-      const errorMsg = err.message || 'Text registration failed';
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+      const message = err.response?.data?.message || 'Failed to fetch documents';
+      setError(message);
+      throw err;
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Verify document
-  const verifyDocument = useCallback(async (
-    documentHash: string
-  ): Promise<VerificationResult> => {
+  const getAllDocuments = useCallback(async (params?: any) => {
     setIsLoading(true);
     setError(null);
-    
     try {
-      const result = await copyrightService.verifyDocument(documentHash);
-      if (!result.success) {
-        setError(result.error || 'Verification failed');
-      }
-      return result;
+      const response = await copyrightService.getAllDocuments(params);
+      return response;
     } catch (err: any) {
-      const errorMsg = err.message || 'Verification failed';
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+      const message = err.response?.data?.message || 'Failed to fetch documents';
+      setError(message);
+      throw err;
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Document queries
-  const documentExists = useCallback(async (documentHash: string): Promise<boolean> => {
+  const getRecentDocuments = useCallback(async (limit = 10) => {
+    setIsLoading(true);
+    setError(null);
     try {
-      return await copyrightService.documentExists(documentHash);
+      const response = await copyrightService.getRecentDocuments(limit);
+      return response.data || [];
     } catch (err: any) {
-      setError(err.message || 'Failed to check document existence');
-      return false;
+      const message = err.response?.data?.message || 'Failed to fetch recent documents';
+      setError(message);
+      throw err;
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  const getDocument = useCallback(async (documentHash: string): Promise<DocumentCopyright | null> => {
+  const getBlockchainStatus = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
     try {
-      return await copyrightService.getDocument(documentHash);
+      const response = await copyrightService.getBlockchainStatus();
+      return response.data;
     } catch (err: any) {
-      setError(err.message || 'Failed to get document');
-      return null;
+      const message = err.response?.data?.message || 'Failed to get blockchain status';
+      setError(message);
+      throw err;
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  const getUserDocuments = useCallback(async (address: string): Promise<string[]> => {
-    try {
-      return await copyrightService.getUserDocuments(address);
-    } catch (err: any) {
-      setError(err.message || 'Failed to get user documents');
-      return [];
-    }
-  }, []);
-
-  const getCategoryDocuments = useCallback(async (category: string): Promise<string[]> => {
-    try {
-      return await copyrightService.getCategoryDocuments(category);
-    } catch (err: any) {
-      setError(err.message || 'Failed to get category documents');
-      return [];
-    }
-  }, []);
-
-  const searchDocuments = useCallback(async (partialHash: string): Promise<string[]> => {
-    try {
-      return await copyrightService.searchDocuments(partialHash);
-    } catch (err: any) {
-      setError(err.message || 'Failed to search documents');
-      return [];
-    }
-  }, []);
-
-  // Contract info
-  const getStatistics = useCallback(async (): Promise<CopyrightStats | null> => {
-    try {
-      return await copyrightService.getStatistics();
-    } catch (err: any) {
-      setError(err.message || 'Failed to get statistics');
-      return null;
-    }
-  }, []);
-
-  const getRegistrationFee = useCallback(async (): Promise<string> => {
-    try {
-      return await copyrightService.getRegistrationFee();
-    } catch (err: any) {
-      setError(err.message || 'Failed to get registration fee');
-      return '0';
-    }
-  }, []);
-
-  const getVerificationFee = useCallback(async (): Promise<string> => {
-    try {
-      return await copyrightService.getVerificationFee();
-    } catch (err: any) {
-      setError(err.message || 'Failed to get verification fee');
-      return '0';
-    }
-  }, []);
-
-  // Document management
-  const updateDocument = useCallback(async (
-    documentHash: string,
-    field: 'title' | 'description',
-    value: string
-  ): Promise<boolean> => {
-    try {
-      return await copyrightService.updateDocument(documentHash, field, value);
-    } catch (err: any) {
-      setError(err.message || 'Failed to update document');
-      return false;
-    }
-  }, []);
-
-  const updateDocumentTags = useCallback(async (
-    documentHash: string,
-    newTags: string[]
-  ): Promise<boolean> => {
-    try {
-      return await copyrightService.updateDocumentTags(documentHash, newTags);
-    } catch (err: any) {
-      setError(err.message || 'Failed to update document tags');
-      return false;
-    }
-  }, []);
-
-  const deactivateDocument = useCallback(async (documentHash: string): Promise<boolean> => {
-    try {
-      return await copyrightService.deactivateDocument(documentHash);
-    } catch (err: any) {
-      setError(err.message || 'Failed to deactivate document');
-      return false;
-    }
-  }, []);
-
-  // Utility functions
-  const calculateFileHash = useCallback(async (file: File): Promise<string> => {
-    try {
-      return await copyrightService.calculateFileHash(file);
-    } catch (err: any) {
-      setError(err.message || 'Failed to calculate file hash');
-      return '';
-    }
-  }, []);
-
-  const calculateTextHash = useCallback((content: string): string => {
-    try {
-      return copyrightService.calculateTextHash(content);
-    } catch (err: any) {
-      setError(err.message || 'Failed to calculate text hash');
-      return '';
-    }
-  }, []);
-
+  // Return all hooks and state
   return {
-    // Connection state
     isConnected,
     currentAddress,
-    connectWallet,
-    
-    // Document operations
-    registerFileDocument,
-    registerTextDocument,
-    verifyDocument,
-    
-    // Document queries
-    documentExists,
-    getDocument,
-    getUserDocuments,
-    getCategoryDocuments,
-    searchDocuments,
-    
-    // Contract info
-    getStatistics,
     getRegistrationFee,
-    getVerificationFee,
-    
-    // Document management
+    registerDocument,
+    registerTextDocument,
+    getDocument,
     updateDocument,
-    updateDocumentTags,
-    deactivateDocument,
-    
-    // Utility functions
-    calculateFileHash,
-    calculateTextHash,
-    
-    // Loading states
+    deleteDocument,
+    checkSimilarity,
+    searchDocuments,
+    getStatistics,
+    getAnalytics,
+    getDocumentsByOwner,
+    getAllDocuments,
+    getRecentDocuments,
+    getBlockchainStatus,
     isLoading,
-    error
+    error,
   };
 }
 

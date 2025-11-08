@@ -11,10 +11,13 @@ import {
   Filter,
   Calendar,
   Hash,
-  ExternalLink
+  ExternalLink,
+  Download,
+  Eye
 } from 'lucide-react';
 import { useCopyright } from '../../hooks/useCopyright';
 import { DocumentCopyright, DocumentCategory, COPYRIGHT_CATEGORY_LABELS } from '../../types/copyright';
+import DocumentViewerModal from './DocumentViewerModal';
 import styles from '../../assets/css/CopyrightDocumentsList.module.css';
 
 interface CopyrightDocumentsListProps {
@@ -33,9 +36,8 @@ export default function CopyrightDocumentsList({
   const { 
     isConnected, 
     currentAddress, 
-    getUserDocuments, 
-    getCategoryDocuments, 
-    getDocument,
+    getDocumentsByOwner,
+    getAllDocuments,
     getStatistics,
     isLoading 
   } = useCopyright();
@@ -53,10 +55,19 @@ export default function CopyrightDocumentsList({
     totalVerified: number;
     totalOwners: number;
   } | null>(null);
+  
+  // Document viewer modal state
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewingDocument, setViewingDocument] = useState<{
+    id: number;
+    title: string;
+    mimeType?: string;
+  } | null>(null);
 
   // Load documents when component mounts or dependencies change
   useEffect(() => {
     loadDocuments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address, category, isConnected, currentAddress]);
 
   // Filter and sort documents when documents or filters change
@@ -71,36 +82,58 @@ export default function CopyrightDocumentsList({
     setError(null);
 
     try {
-      let documentHashes: string[] = [];
+      let response;
 
       if (address) {
         // Load documents for specific address
-        documentHashes = await getUserDocuments(address);
+        response = await getDocumentsByOwner(address, 1, 100);
       } else if (category) {
         // Load documents for specific category
-        documentHashes = await getCategoryDocuments(category);
+        response = await getAllDocuments({
+          category,
+          page: 1,
+          limit: 100,
+          sortBy: 'createdAt',
+          sortOrder: 'DESC'
+        });
       } else if (currentAddress) {
         // Load current user's documents
-        documentHashes = await getUserDocuments(currentAddress);
+        response = await getDocumentsByOwner(currentAddress, 1, 100);
+      } else {
+        // Load all documents if no filter
+        response = await getAllDocuments({
+          page: 1,
+          limit: 100,
+          sortBy: 'createdAt',
+          sortOrder: 'DESC'
+        });
       }
 
-      // Fetch document details
-      const documentPromises = documentHashes.map(async (hash) => {
-        try {
-          const doc = await getDocument(hash);
-          return doc;
-        } catch (err) {
-          console.error(`Failed to load document ${hash}:`, err);
-          return null;
-        }
-      });
-
-      const documentResults = await Promise.all(documentPromises);
-      const validDocuments = documentResults.filter((doc): doc is DocumentCopyright => doc !== null);
-      
-      setDocuments(validDocuments);
+      if (response && response.data) {
+        // Map backend data to frontend DocumentCopyright format
+        const mappedDocuments: DocumentCopyright[] = response.data.map((doc: any) => ({
+          id: doc.id, // Store actual database ID for API calls
+          documentHash: doc.hash || doc.id?.toString() || '',
+          title: doc.title || doc.filename || 'Untitled',
+          description: doc.description || '',
+          owner: doc.ownerUsername || doc.ownerEmail || doc.ownerAddress || 'Unknown',
+          timestamp: doc.createdAt ? Math.floor(new Date(doc.createdAt).getTime() / 1000) : Date.now() / 1000,
+          category: doc.category || 'other',
+          tags: doc.tags || [],
+          fileExtension: doc.mimeType || doc.fileExtension || '',
+          mimeType: doc.mimeType || null, // Store mimeType separately for viewer
+          fileSize: doc.fileSize || 0,
+          isVerified: !!doc.transactionHash
+        }));
+        
+        setDocuments(mappedDocuments);
+      } else {
+        setDocuments([]);
+      }
     } catch (err: any) {
+      console.error('Failed to load documents:', err);
       setError(err.message || 'Failed to load documents');
+      setDocuments([]);
     } finally {
       setLoading(false);
     }
@@ -185,6 +218,82 @@ export default function CopyrightDocumentsList({
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
+  };
+
+  const viewDocument = (e: React.MouseEvent, document: any) => {
+    e.stopPropagation();
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('Vui lòng đăng nhập để xem tài liệu');
+      return;
+    }
+    
+    // Open viewer modal - use mimeType from document or detect from filename
+    const mimeType = document.mimeType || detectMimeTypeFromFilename(document.title || document.filename || '');
+    
+    setViewingDocument({
+      id: document.id,
+      title: document.title,
+      mimeType: mimeType
+    });
+    setViewerOpen(true);
+  };
+
+  // Helper function to detect mimeType from filename extension
+  const detectMimeTypeFromFilename = (filename: string): string | undefined => {
+    const ext = filename.toLowerCase().split('.').pop();
+    const mimeMap: { [key: string]: string } = {
+      'pdf': 'application/pdf',
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'gif': 'image/gif',
+      'webp': 'image/webp',
+      'txt': 'text/plain',
+      'html': 'text/html',
+      'htm': 'text/html',
+      'doc': 'application/msword',
+      'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'xls': 'application/vnd.ms-excel',
+      'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'ppt': 'application/vnd.ms-powerpoint',
+      'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    };
+    return ext ? mimeMap[ext] : undefined;
+  };
+
+  const downloadDocument = (e: React.MouseEvent, documentId: number, filename: string) => {
+    e.stopPropagation();
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('Vui lòng đăng nhập để tải xuống tài liệu');
+      return;
+    }
+    
+    // Create download link
+    fetch(`http://localhost:8080/api/copyrights/download/${documentId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Không thể tải xuống file');
+      return response.blob();
+    })
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    })
+    .catch(error => {
+      console.error('Download error:', error);
+      alert('Không thể tải xuống file. Vui lòng thử lại.');
+    });
   };
 
   if (!isConnected) {
@@ -388,6 +497,25 @@ export default function CopyrightDocumentsList({
                   </span>
                   <ExternalLink size={12} />
                 </div>
+
+                <div className={styles.documentActions}>
+                  <button 
+                    className={styles.actionButton}
+                    onClick={(e) => viewDocument(e, document)}
+                    title="Xem tài liệu"
+                  >
+                    <Eye size={16} />
+                    <span>Xem</span>
+                  </button>
+                  <button 
+                    className={styles.actionButton}
+                    onClick={(e) => downloadDocument(e, (document as any).id, document.title)}
+                    title="Tải xuống"
+                  >
+                    <Download size={16} />
+                    <span>Tải xuống</span>
+                  </button>
+                </div>
               </div>
             ))
           )}
@@ -401,6 +529,20 @@ export default function CopyrightDocumentsList({
             Tải thêm tài liệu
           </button>
         </div>
+      )}
+
+      {/* Document Viewer Modal */}
+      {viewingDocument && (
+        <DocumentViewerModal
+          isOpen={viewerOpen}
+          onClose={() => {
+            setViewerOpen(false);
+            setViewingDocument(null);
+          }}
+          documentId={viewingDocument.id}
+          documentTitle={viewingDocument.title}
+          mimeType={viewingDocument.mimeType}
+        />
       )}
     </div>
   );
