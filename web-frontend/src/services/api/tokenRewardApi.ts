@@ -36,7 +36,7 @@ export interface BalanceResponse {
 
 export interface Transaction {
   id: number | string;
-  studentId: number;
+  studentId: number | string;
   amount: number;
   type: 'grant' | 'spend' | 'withdraw';
   reasonCode?: string;

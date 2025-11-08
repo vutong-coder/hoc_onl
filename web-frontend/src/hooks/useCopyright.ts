@@ -200,10 +200,10 @@ export function useCopyright() {
         // Response is { success: true, data: {...} }
         console.log('✅ Detected format: { success: true, data: {...} }');
         statsData = response.data as CopyrightStats;
-      } else if (response.totalDocuments !== undefined) {
+      } else if (response && typeof response === 'object' && 'totalDocuments' in response) {
         // Response is already the stats object directly (unlikely but possible)
         console.log('✅ Detected format: Direct stats object');
-        statsData = response as CopyrightStats;
+        statsData = response as unknown as CopyrightStats;
       } else {
         // Try to find data in nested structure
         console.warn('⚠️ Unexpected response format:', JSON.stringify(response, null, 2));
@@ -237,9 +237,9 @@ export function useCopyright() {
       // Handle response structure similar to getStatistics
       if (response && response.success && response.data) {
         return response.data;
-      } else if (response && response.categoryDistribution) {
+      } else if (response && typeof response === 'object' && 'categoryDistribution' in response) {
         // Response is already the analytics object
-        return response;
+        return response as any;
       } else if (response && response.data) {
         return response.data;
       }

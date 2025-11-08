@@ -126,7 +126,12 @@ export default function CopyrightUploadModal({
         setSimilarityResult({
           isSimilar: similarityInfo.isSimilar || false,
           similarityScore: similarityInfo.similarityScore || 0,
-          similarDocuments: similarityInfo.similarDocuments || [],
+          similarDocuments: (similarityInfo.similarDocuments || []).map((doc: any) => ({
+            id: typeof doc.id === 'string' ? parseInt(doc.id) || 0 : doc.id,
+            filename: doc.filename,
+            similarityScore: doc.similarityScore || 0,
+            matchedSections: doc.matchedSections || []
+          })),
           totalDocumentsChecked: similarityInfo.totalDocumentsChecked || 0,
           message: similarityInfo.message || ''
         });

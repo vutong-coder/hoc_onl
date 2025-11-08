@@ -127,6 +127,9 @@ export default function RewardStorePage(): JSX.Element {
 
         try {
             // Call API to spend tokens
+            if (!userId) {
+                throw new Error('User ID không tồn tại. Vui lòng đăng nhập lại.');
+            }
             await spendTokens({
                 studentId: userId,
                 amount: totalCost,

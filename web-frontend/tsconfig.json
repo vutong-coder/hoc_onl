@@ -13,8 +13,9 @@
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "noImplicitAny": false
   },
-  "include": ["src", "App.tsx"],
+  "include": ["src", "App.tsx", "vite-env.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

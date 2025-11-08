@@ -194,7 +194,7 @@ export default function CopyrightPage(): JSX.Element {
       console.log('Result stringified:', JSON.stringify(result, null, 2));
 
       // Handle different response structures
-      let similarityInfo = null;
+      let similarityInfo: any = null;
       
       // Try multiple possible structures
       if (result?.similarityInfo) {
@@ -205,11 +205,11 @@ export default function CopyrightPage(): JSX.Element {
         // Nested structure: { data: { similarityInfo: {...} } }
         similarityInfo = result.data.similarityInfo;
         console.log('✓ Found similarityInfo in result.data.similarityInfo');
-      } else if (result?.data && result.data.isSimilar !== undefined) {
+      } else if (result?.data && (result.data as any).isSimilar !== undefined) {
         // Data is already similarityInfo
         similarityInfo = result.data;
         console.log('✓ Found similarityInfo as result.data');
-      } else if (result?.isSimilar !== undefined) {
+      } else if ((result as any)?.isSimilar !== undefined) {
         // Already similarityInfo structure
         similarityInfo = result;
         console.log('✓ Found similarityInfo as direct result');
@@ -219,7 +219,7 @@ export default function CopyrightPage(): JSX.Element {
         console.warn('Result structure:', {
           hasSimilarityInfo: !!result?.similarityInfo,
           hasData: !!result?.data,
-          hasIsSimilar: result?.isSimilar !== undefined,
+          hasIsSimilar: (result as any)?.isSimilar !== undefined,
           resultKeys: result ? Object.keys(result) : []
         });
       }
@@ -229,7 +229,7 @@ export default function CopyrightPage(): JSX.Element {
 
       if (similarityInfo) {
         // Map similar documents với đầy đủ thông tin
-        const mappedDocuments = (similarityInfo.similarDocuments || []).map((doc: any) => ({
+        const mappedDocuments = ((similarityInfo.similarDocuments || []) as any[]).map((doc: any) => ({
           id: doc.id,
           filename: doc.filename,
           similarityScore: doc.similarityScore || 0,
