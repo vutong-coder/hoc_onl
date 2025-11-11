@@ -46,11 +46,15 @@ export default function GenerateQuestionsModal({
 	const [hardCount, setHardCount] = useState(5)
 	const [isGenerating, setIsGenerating] = useState(false)
 
+	const eligibleExams = useMemo(() => {
+		return exams.filter(exam => (exam.assignedQuestionCount ?? 0) === 0)
+	}, [exams])
+
 	// Get unique subjects from exams
 	const availableSubjects = useMemo(() => {
-		const subjects = new Set(exams.map(e => e.subject))
+		const subjects = new Set(eligibleExams.map(e => e.subject))
 		return Array.from(subjects).sort()
-	}, [exams])
+	}, [eligibleExams])
 
 	// Use API difficulties or fallback
 	const availableDifficulties = useMemo(() => {
@@ -65,7 +69,7 @@ export default function GenerateQuestionsModal({
 
 	// Filter exams
 	const filteredExams = useMemo(() => {
-		return exams.filter(exam => {
+		return eligibleExams.filter(exam => {
 			const matchSearch = searchTerm === '' || 
 				exam.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
 				(exam.description || '').toLowerCase().includes(searchTerm.toLowerCase())
@@ -74,11 +78,11 @@ export default function GenerateQuestionsModal({
 			
 			return matchSearch && matchSubject
 		})
-	}, [exams, searchTerm, selectedSubject])
+	}, [eligibleExams, searchTerm, selectedSubject])
 
 	const selectedExam = useMemo(() => {
-		return exams.find(e => e.id === selectedExamId)
-	}, [exams, selectedExamId])
+		return eligibleExams.find(e => e.id === selectedExamId)
+	}, [eligibleExams, selectedExamId])
 
 	const handleGenerate = async () => {
 		if (!selectedExamId || !selectedExam) return
@@ -158,44 +162,45 @@ export default function GenerateQuestionsModal({
 			<div className="modal-content-wrapper">
 				{/* Step 1: Select Exam */}
 				<div className="modal-form-group">
-					<label className="form-label" style={{ fontSize: '15px', marginBottom: '12px', display: 'block' }}>
-						<Search size={18} />
-						Bước 1: Chọn đề thi <span className="required">*</span>
+				<label className="form-label" style={{ fontSize: '15px', marginBottom: '12px', display: 'block' }}>
+					Bước 1: Chọn đề thi <span className="required">*</span>
 					</label>
 
-					{/* Search and Filter */}
-					<div style={{ marginBottom: '12px', display: 'flex', gap: '12px' }}>
-						<div style={{ flex: 1, position: 'relative' }}>
-							<Search 
-								size={18} 
-								style={{ 
-									position: 'absolute', 
-									left: '12px', 
-									top: '50%', 
-									transform: 'translateY(-50%)',
-									color: 'var(--muted-foreground)' 
-								}} 
-							/>
-							<input
-								type="text"
-								className="form-input"
-								placeholder="Tìm kiếm đề thi..."
-								value={searchTerm}
-								onChange={(e) => setSearchTerm(e.target.value)}
-								style={{ paddingLeft: '40px' }}
-							/>
-						</div>
-						<select
-							className="form-select"
-							value={selectedSubject}
-							onChange={(e) => setSelectedSubject(e.target.value)}
-							style={{ minWidth: '200px' }}
-						>
-							<option value="all">Tất cả môn học</option>
-							{availableSubjects.map(subject => (
-								<option key={subject} value={subject}>{subject}</option>
-							))}
-						</select>
+				{/* Search and Filter */}
+				<div style={{ marginBottom: '12px' }}>
+					<div style={{ position: 'relative' }}>
+						<Search 
+							size={18} 
+							style={{ 
+								position: 'absolute', 
+								left: '12px', 
+								top: '50%', 
+								transform: 'translateY(-50%)',
+								color: 'var(--muted-foreground)' 
+							}} 
+						/>
+						<input
+							type="text"
+							className="form-input"
+							placeholder="Tìm kiếm đề thi..."
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
+							style={{ paddingLeft: '40px' }}
+						/>
+					</div>
+				</div>
+				<div style={{ marginBottom: '12px' }}>
+					<select
+						className="form-select"
+						value={selectedSubject}
+						onChange={(e) => setSelectedSubject(e.target.value)}
+						style={{ width: '100%' }}
+					>
+						<option value="all">Tất cả môn học</option>
+						{availableSubjects.map(subject => (
+							<option key={subject} value={subject}>{subject}</option>
+						))}
+					</select>
 					</div>
 
 					{/* Exam List */}
@@ -206,14 +211,19 @@ export default function GenerateQuestionsModal({
 						overflowY: 'auto',
 						background: 'var(--card)'
 					}}>
-						{filteredExams.length === 0 ? (
+				{filteredExams.length === 0 ? (
 							<div style={{
 								padding: '32px',
 								textAlign: 'center',
 								color: 'var(--muted-foreground)'
 							}}>
 								<AlertCircle size={32} style={{ marginBottom: '8px', opacity: 0.5 }} />
-								<p>Không tìm thấy đề thi nào</p>
+						<p>Không có đề thi nào chưa có câu hỏi.</p>
+						{eligibleExams.length === 0 && (
+							<p style={{ marginTop: '8px', fontSize: '13px' }}>
+								Tất cả đề thi hiện tại đã có câu hỏi. Vui lòng tạo đề mới hoặc xóa câu hỏi cũ.
+							</p>
+						)}
 							</div>
 						) : (
 							filteredExams.map(exam => (
@@ -272,8 +282,8 @@ export default function GenerateQuestionsModal({
 											gap: '12px',
 											flexWrap: 'wrap'
 										}}>
-											<span>📚 {exam.subject}</span>
-											<span>❓ {exam.totalQuestions} câu</span>
+							<span>📚 {exam.subject}</span>
+							<span>❓ {exam.assignedQuestionCount}/{exam.totalQuestions} câu</span>
 											<span>⏱️ {exam.duration} phút</span>
 										</div>
 									</div>
@@ -282,13 +292,13 @@ export default function GenerateQuestionsModal({
 						)}
 					</div>
 
-					{filteredExams.length > 0 && (
+				{filteredExams.length > 0 && (
 						<div style={{ 
 							marginTop: '8px', 
 							fontSize: '13px', 
 							color: 'var(--muted-foreground)' 
 						}}>
-							Hiển thị {filteredExams.length} / {exams.length} đề thi
+						Hiển thị {filteredExams.length} / {eligibleExams.length} đề thi đủ điều kiện
 						</div>
 					)}
 				</div>

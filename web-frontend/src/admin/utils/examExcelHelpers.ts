@@ -156,7 +156,7 @@ export const importExamsFromExcel = (file: File): Promise<Partial<Exam>[]> => {
 						if (!exam.type) exam.type = 'practice'
 						if (!exam.difficulty) exam.difficulty = 'medium'
 						if (!exam.status) exam.status = 'draft'
-						if (!exam.totalPoints) exam.totalPoints = exam.totalQuestions * 2
+					if (!exam.totalPoints) exam.totalPoints = exam.totalQuestions * 10
 						if (!exam.passingScore) exam.passingScore = Math.floor(exam.totalPoints * 0.5)
 						if (!exam.maxAttempts) exam.maxAttempts = 3
 						if (exam.allowReview === undefined) exam.allowReview = true
@@ -204,8 +204,8 @@ export const downloadExamTemplate = () => {
 		'Kiểm tra',
 		30,
 		60,
-		60,
-		30,
+		300,
+		150,
 		'Trung bình',
 		'Nháp',
 		3,
@@ -256,7 +256,7 @@ export const downloadExamTemplate = () => {
 		['LƯU Ý:'],
 		['- Số câu hỏi, Thời gian, Điểm phải là số nguyên dương'],
 		['- Điểm đạt không được lớn hơn Tổng điểm'],
-		['- Nếu không điền Tổng điểm, hệ thống tự tính = Số câu × 2'],
+		['- Nếu không điền Tổng điểm, hệ thống tự tính = Số câu × 10'],
 		['- Nếu không điền Điểm đạt, hệ thống tự tính = 50% Tổng điểm']
 	]
 	

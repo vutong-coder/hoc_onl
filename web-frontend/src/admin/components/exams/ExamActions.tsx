@@ -24,6 +24,13 @@ export default function ExamActions({
 	
 	const isDraft = exam.status === 'draft'
 	const isPublished = exam.status === 'published'
+	const canPublish = isDraft && exam.totalQuestions > 0 && exam.assignedQuestionCount >= exam.totalQuestions
+	const missingQuestions = Math.max(0, exam.totalQuestions - exam.assignedQuestionCount)
+	const publishTitle = canPublish
+		? 'Xuất bản đề thi'
+		: exam.totalQuestions <= 0
+			? 'Chưa thiết lập số câu hỏi mục tiêu cho đề thi'
+			: `Còn thiếu ${missingQuestions} câu hỏi trong đề`
 	
 	return (
 		<div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
@@ -41,25 +48,28 @@ export default function ExamActions({
 			<button
 				className="btn btn-sm"
 				onClick={() => onPublish(exam)}
-				title="Xuất bản đề thi"
+				title={publishTitle}
+				disabled={!canPublish}
 				style={{ 
 					backgroundColor: '#22c55e',
 					color: 'white',
 					border: 'none',
 					padding: '6px 12px',
 					borderRadius: '6px',
-					cursor: 'pointer',
+					cursor: canPublish ? 'pointer' : 'not-allowed',
 					display: 'inline-flex',
 					alignItems: 'center',
 					justifyContent: 'center',
 					transition: 'all 0.2s',
-					opacity: 1
+					opacity: canPublish ? 1 : 0.5
 				}}
 				onMouseEnter={(e) => {
+					if (!canPublish) return
 					e.currentTarget.style.backgroundColor = '#16a34a'
 					e.currentTarget.style.transform = 'scale(1.05)'
 				}}
 				onMouseLeave={(e) => {
+					if (!canPublish) return
 					e.currentTarget.style.backgroundColor = '#22c55e'
 					e.currentTarget.style.transform = 'scale(1)'
 				}}

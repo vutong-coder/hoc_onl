@@ -155,10 +155,22 @@ export default function ExamTableRow({
 				</Badge>
 			</td>
 			<td>
-				<div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
-					<FileText size={14} />
-					{exam.totalQuestions} câu
-				</div>
+		<div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
+			<FileText size={14} />
+			{exam.assignedQuestionCount}/{exam.totalQuestions} câu
+			{exam.assignedQuestionCount < exam.totalQuestions && (
+				<span style={{
+					fontSize: '11px',
+					padding: '2px 6px',
+					borderRadius: '999px',
+					background: 'rgba(250, 204, 21, 0.2)',
+					color: '#92400e',
+					fontWeight: 600
+				}}>
+					Thiếu {Math.max(exam.totalQuestions - exam.assignedQuestionCount, 0)}
+				</span>
+			)}
+		</div>
 			</td>
 			<td>
 				<div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>

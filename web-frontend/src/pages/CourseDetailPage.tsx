@@ -10,11 +10,13 @@ import {
   Play,
   FileText,
   CheckCircle,
-  Lock,
-  Video,
-  FileQuestion,
   ArrowLeft,
-  TrendingUp
+  TrendingUp,
+  Clapperboard,
+  ClipboardList,
+  PlayCircle,
+  BadgeCheck,
+  LockKeyhole
 } from 'lucide-react'
 import courseApi, { Course, Material, Progress } from '../services/api/courseApi'
 import { useAppSelector } from '../store/hooks'
@@ -111,17 +113,106 @@ export default function CourseDetailPage(): JSX.Element {
     }
   }
 
-  const getMaterialIcon = (type: string) => {
-    switch (type) {
-      case 'video': return <Video size={20} />
-      case 'quiz': return <FileQuestion size={20} />
-      case 'document': return <FileText size={20} />
-      default: return <FileText size={20} />
+  const formatDuration = (duration: number | string | null | undefined) => {
+    const numeric = Number(duration)
+
+    if (!Number.isFinite(numeric) || numeric <= 0) {
+      return '0 giờ'
+    }
+
+    if (Number.isInteger(numeric)) {
+      return `${numeric} giờ`
+    }
+
+    return `${numeric.toFixed(1)} giờ`
+  }
+
+  const formatMaterialDuration = (duration: number | string | null | undefined) => {
+    const numeric = Number(duration)
+
+    if (!Number.isFinite(numeric) || numeric <= 0) {
+      return null
+    }
+
+    const totalMinutes = Math.round(numeric)
+
+    if (totalMinutes >= 60) {
+      const hours = Math.floor(totalMinutes / 60)
+      const minutes = totalMinutes % 60
+      const parts: string[] = []
+
+      if (hours > 0) {
+        parts.push(`${hours} giờ`)
+      }
+
+      if (minutes > 0) {
+        parts.push(`${minutes} phút`)
+      }
+
+      return parts.join(' ')
+    }
+
+    return `${totalMinutes} phút`
+  }
+
+  const getMaterialTypeMeta = (type?: string) => {
+    const normalizedType = type?.toLowerCase()
+
+    switch (normalizedType) {
+      case 'video':
+        return {
+          className: 'video',
+          label: 'Video bài giảng',
+          icon: <Clapperboard size={24} strokeWidth={1.8} />
+        }
+      case 'quiz':
+        return {
+          className: 'quiz',
+          label: 'Bài kiểm tra',
+          icon: <ClipboardList size={24} strokeWidth={1.8} />
+        }
+      case 'document':
+      case 'pdf':
+        return {
+          className: 'document',
+          label: 'Tài liệu',
+          icon: <FileText size={24} strokeWidth={1.8} />
+        }
+      default:
+        return {
+          className: 'default',
+          label: 'Nội dung',
+          icon: <BookOpen size={24} strokeWidth={1.8} />
+        }
     }
   }
 
   const isMaterialCompleted = (materialId: string) => {
     return progress?.completedMaterials.includes(materialId) || false
+  }
+
+  const getMaterialStatusMeta = (materialId: string) => {
+    if (isMaterialCompleted(materialId)) {
+      return {
+        className: 'completed',
+        label: 'Đã hoàn thành',
+        icon: <BadgeCheck size={20} />
+      }
+    }
+
+    if (!isEnrolled) {
+      return {
+        className: 'locked',
+        label: 'Bị khóa',
+        icon: <LockKeyhole size={20} />
+      }
+    }
+
+    return {
+      className: 'active',
+      label: 'Học ngay',
+      icon: <PlayCircle size={20} />
+    }
   }
 
   if (loading) {
@@ -146,16 +237,10 @@ export default function CourseDetailPage(): JSX.Element {
 
   return (
     <div className="course-detail-page">
-      {/* Back Button */}
-      <button onClick={() => navigate('/user/courses')} className="btn-back-nav">
-        <ArrowLeft size={20} />
-        <span>Quay lại</span>
-      </button>
-
-      {/* Hero Section */}
-      <div className="course-hero">
-        <div className="hero-content">
-          <div className="hero-left">
+      <div className="course-detail-container">
+        {/* Summary Card */}
+        <div className="course-summary-card">
+          <div className="course-summary-main">
             {/* Category & Level */}
             <div className="course-meta">
               {course.category && (
@@ -191,7 +276,7 @@ export default function CourseDetailPage(): JSX.Element {
 
               <div className="stat">
                 <Clock size={20} />
-                <span>{course.duration} giờ</span>
+                <span>{formatDuration(course.duration)}</span>
               </div>
 
               {course.certificateAvailable && (
@@ -219,36 +304,38 @@ export default function CourseDetailPage(): JSX.Element {
               </div>
             )}
 
-            {/* CTA Button */}
-            {isEnrolled ? (
-              <button onClick={handleStartLearning} className="btn-primary">
-                <Play size={20} />
-                <span>Tiếp tục học</span>
-                {progress && (
-                  <span className="progress-badge">{progress.progressPercentage}%</span>
-                )}
-              </button>
-            ) : (
-              <button onClick={handleEnrollCourse} className="btn-primary">
-                <span>Đăng ký học</span>
-                <ChevronRight size={20} />
-              </button>
-            )}
-
-            {/* Price */}
-            <div className="course-price">
-              {course.price === 0 ? (
-                <span className="free">Miễn phí</span>
+            <div className="course-actions">
+              {/* CTA Button */}
+              {isEnrolled ? (
+                <button onClick={handleStartLearning} className="btn-primary">
+                  <Play size={20} />
+                  <span>Tiếp tục học</span>
+                  {progress && (
+                    <span className="progress-badge">{progress.progressPercentage}%</span>
+                  )}
+                </button>
               ) : (
-                <>
-                  <span className="price">{course.price}</span>
-                  <span className="token">{course.tokenSymbol || 'LEARN'}</span>
-                </>
+                <button onClick={handleEnrollCourse} className="btn-primary">
+                  <span>Đăng ký học</span>
+                  <ChevronRight size={20} />
+                </button>
               )}
+
+              {/* Price */}
+              <div className="course-price">
+                {course.price === 0 ? (
+                  <span className="free">Miễn phí</span>
+                ) : (
+                  <>
+                    <span className="price">{course.price}</span>
+                    <span className="token">{course.tokenSymbol || 'LEARN'}</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="hero-right">
+          <div className="course-summary-side">
             {/* Thumbnail */}
             <div className="course-thumbnail">
               {course.thumbnail ? (
@@ -280,32 +367,31 @@ export default function CourseDetailPage(): JSX.Element {
             )}
           </div>
         </div>
-      </div>
 
-      {/* Tabs */}
-      <div className="course-tabs">
-        <button
-          className={activeTab === 'overview' ? 'active' : ''}
-          onClick={() => setActiveTab('overview')}
-        >
-          Tổng quan
-        </button>
-        <button
-          className={activeTab === 'curriculum' ? 'active' : ''}
-          onClick={() => setActiveTab('curriculum')}
-        >
-          Nội dung khóa học
-        </button>
-        <button
-          className={activeTab === 'instructor' ? 'active' : ''}
-          onClick={() => setActiveTab('instructor')}
-        >
-          Giảng viên
-        </button>
-      </div>
+        {/* Tabs */}
+        <div className="course-tabs">
+          <button
+            className={activeTab === 'overview' ? 'active' : ''}
+            onClick={() => setActiveTab('overview')}
+          >
+            Tổng quan
+          </button>
+          <button
+            className={activeTab === 'curriculum' ? 'active' : ''}
+            onClick={() => setActiveTab('curriculum')}
+          >
+            Nội dung khóa học
+          </button>
+          <button
+            className={activeTab === 'instructor' ? 'active' : ''}
+            onClick={() => setActiveTab('instructor')}
+          >
+            Giảng viên
+          </button>
+        </div>
 
-      {/* Tab Content */}
-      <div className="course-content">
+        {/* Tab Content */}
+        <div className="course-content">
         {/* Overview Tab */}
         {activeTab === 'overview' && (
           <div className="tab-content">
@@ -347,7 +433,7 @@ export default function CourseDetailPage(): JSX.Element {
                   <Clock size={24} />
                   <div>
                     <p className="label">Thời lượng</p>
-                    <p className="value">{course.duration} giờ</p>
+                    <p className="value">{formatDuration(course.duration)}</p>
                   </div>
                 </div>
                 <div className="info-item">
@@ -384,7 +470,7 @@ export default function CourseDetailPage(): JSX.Element {
             <div className="content-section">
               <h2>Nội dung khóa học</h2>
               <p className="section-description">
-                {materials.length} tài liệu • {course.duration} giờ học
+                {materials.length} tài liệu • {formatDuration(course.duration)}
               </p>
 
               {materials.length === 0 ? (
@@ -394,41 +480,49 @@ export default function CourseDetailPage(): JSX.Element {
                 </div>
               ) : (
                 <div className="materials-list">
-                  {materials.map((material, index) => (
-                    <div
-                      key={material.id}
-                      className={`material-item ${isMaterialCompleted(material.id) ? 'completed' : ''} ${!isEnrolled ? 'locked' : ''}`}
-                      onClick={() => handleMaterialClick(material.id)}
-                    >
-                      <div className="material-left">
-                        <span className="material-number">{index + 1}</span>
-                        <div className="material-icon">
-                          {getMaterialIcon(material.type)}
+                  {materials.map((material, index) => {
+                    const typeMeta = getMaterialTypeMeta(material.type)
+                    const statusMeta = getMaterialStatusMeta(material.id)
+                    const materialDuration = formatMaterialDuration(material.duration)
+
+                    return (
+                      <div
+                        key={material.id}
+                        className={`material-item ${isMaterialCompleted(material.id) ? 'completed' : ''} ${!isEnrolled ? 'locked' : ''}`}
+                        onClick={() => handleMaterialClick(material.id)}
+                      >
+                        <div className="material-left">
+                          <span className="material-number">{String(index + 1).padStart(2, '0')}</span>
+                          <div className={`material-icon ${typeMeta.className}`}>
+                            {typeMeta.icon}
+                          </div>
+                          <div className="material-info">
+                            <div className="material-header">
+                              <h3>{material.title}</h3>
+                              <span className={`material-type-badge ${typeMeta.className}`}>
+                                {typeMeta.label}
+                              </span>
+                            </div>
+                            {material.description && (
+                              <p>{material.description}</p>
+                            )}
+                          </div>
                         </div>
-                        <div className="material-info">
-                          <h3>{material.title}</h3>
-                          {material.description && (
-                            <p>{material.description}</p>
+                        <div className="material-right">
+                          {materialDuration && (
+                            <span className="material-duration">
+                              <Clock size={16} />
+                              {materialDuration}
+                            </span>
                           )}
+                          <span className={`material-status ${statusMeta.className}`}>
+                            {statusMeta.icon}
+                            <span>{statusMeta.label}</span>
+                          </span>
                         </div>
                       </div>
-                      <div className="material-right">
-                        {material.duration && (
-                          <span className="material-duration">
-                            <Clock size={16} />
-                            {material.duration} phút
-                          </span>
-                        )}
-                        {isMaterialCompleted(material.id) ? (
-                          <CheckCircle size={24} className="status-icon completed" />
-                        ) : !isEnrolled ? (
-                          <Lock size={24} className="status-icon locked" />
-                        ) : (
-                          <Play size={24} className="status-icon" />
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -460,6 +554,7 @@ export default function CourseDetailPage(): JSX.Element {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   )

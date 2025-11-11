@@ -43,7 +43,8 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 	if (!exam) return null
 
 	const isPublished = exam.status === 'published'
-	const isSubjectLocked = (exam.totalQuestions ?? 0) > 0
+	const assignedQuestionCount = exam.assignedQuestionCount ?? 0
+	const isSubjectLocked = assignedQuestionCount > 0
 
 	const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault()
@@ -78,7 +79,7 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 			if (examData.title && examData.subject && examData.totalQuestions && examData.duration) {
 				// Auto-calculate if not provided
 				if (!examData.totalPoints) {
-					examData.totalPoints = examData.totalQuestions * 2
+				examData.totalPoints = examData.totalQuestions * 10
 				}
 				if (!examData.passingScore) {
 					examData.passingScore = Math.floor(examData.totalPoints * 0.5)
@@ -142,10 +143,10 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 								<FileText />
 								Tiêu đề đề thi <span className="required">*</span>
 							</label>
-						<input 
-							type="text" 
-							name="title" 
-							className="form-input" 
+							<input 
+								type="text" 
+								name="title" 
+								className="form-input" 
 							disabled={isPublished}
 								defaultValue={exam.title}
 								placeholder="VD: Kiểm tra giữa kỳ - Lập trình Web" 
@@ -158,9 +159,9 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 								<FileText />
 								Mô tả
 							</label>
-						<textarea 
-							name="description" 
-							className="form-textarea" 
+							<textarea 
+								name="description" 
+								className="form-textarea" 
 							disabled={isPublished}
 								defaultValue={exam.description || ''}
 								placeholder="Mô tả ngắn về đề thi..."
@@ -174,10 +175,10 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<BookOpen />
 									Môn học <span className="required">*</span>
 								</label>
-						<select 
-							name="subject" 
-							className="form-select" 
-							disabled={isPublished || isSubjectLocked}
+								<select 
+									name="subject" 
+									className="form-select" 
+						disabled={isPublished || isSubjectLocked}
 									defaultValue={exam.subject}
 									required
 								>
@@ -185,13 +186,13 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 										<option key={s} value={s}>{s}</option>
 									))}
 								</select>
-						{isSubjectLocked && !isPublished && (
-							<small
-								style={{ color: '#a16207', fontSize: '12px', marginTop: '6px', display: 'block' }}
-							>
-								Không thể thay đổi môn học khi đề thi đã có câu hỏi.
-							</small>
-						)}
+				{isSubjectLocked && !isPublished && (
+					<small
+						style={{ color: '#a16207', fontSize: '12px', marginTop: '6px', display: 'block' }}
+					>
+						Không thể thay đổi môn học khi đề thi đã có câu hỏi ({assignedQuestionCount}/{exam.totalQuestions}).
+					</small>
+				)}
 							</div>
 
 							<div className="modal-form-group">
@@ -199,9 +200,9 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<Settings />
 									Loại bài thi
 								</label>
-						<select 
-							name="type" 
-							className="form-select" 
+								<select 
+									name="type" 
+									className="form-select" 
 							disabled={isPublished}
 									defaultValue={exam.type}
 								>
@@ -225,10 +226,10 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<CheckSquare />
 									Số câu hỏi <span className="required">*</span>
 								</label>
-						<input 
-							type="number" 
-							name="totalQuestions" 
-							className="form-input" 
+								<input 
+									type="number" 
+									name="totalQuestions" 
+									className="form-input" 
 							disabled={isPublished}
 									defaultValue={exam.totalQuestions}
 									placeholder="30" 
@@ -242,10 +243,10 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<Clock />
 									Thời gian (phút) <span className="required">*</span>
 								</label>
-						<input 
-							type="number" 
-							name="duration" 
-							className="form-input" 
+								<input 
+									type="number" 
+									name="duration" 
+									className="form-input" 
 							disabled={isPublished}
 									defaultValue={exam.duration}
 									placeholder="60" 
@@ -259,9 +260,9 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<Target />
 									Độ khó
 								</label>
-						<select 
-							name="difficulty" 
-							className="form-select" 
+								<select 
+									name="difficulty" 
+									className="form-select" 
 							disabled={isPublished}
 									defaultValue={exam.difficulty}
 								>
@@ -285,13 +286,13 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<Target />
 									Tổng điểm
 								</label>
-						<input 
-							type="number" 
-							name="totalPoints" 
-							className="form-input" 
+								<input 
+									type="number" 
+									name="totalPoints" 
+									className="form-input" 
 							disabled={isPublished}
 									defaultValue={exam.totalPoints}
-									placeholder="Auto = Số câu × 2" 
+								placeholder="Auto = Số câu × 10"
 									min="0"
 								/>
 								<small>Tự động tính nếu để trống</small>
@@ -302,10 +303,10 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<Target />
 									Điểm đạt
 								</label>
-						<input 
-							type="number" 
-							name="passingScore" 
-							className="form-input" 
+								<input 
+									type="number" 
+									name="passingScore" 
+									className="form-input" 
 							disabled={isPublished}
 									defaultValue={exam.passingScore}
 									placeholder="Auto = 50% tổng điểm" 
@@ -319,10 +320,10 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 									<Hash />
 									Số lần thi tối đa
 								</label>
-						<input 
-							type="number" 
-							name="maxAttempts" 
-							className="form-input" 
+								<input 
+									type="number" 
+									name="maxAttempts" 
+									className="form-input" 
 							disabled={isPublished}
 									defaultValue={exam.maxAttempts}
 									min="1"
@@ -339,30 +340,30 @@ const EditExamModal: React.FC<EditExamModalProps> = ({
 						
 						<div className="modal-checkbox-group">
 							<div className="checkbox-item">
-						<input 
-							type="checkbox" 
-							name="allowReview" 
-							defaultChecked={exam.allowReview}
+								<input 
+									type="checkbox" 
+									name="allowReview" 
+									defaultChecked={exam.allowReview}
 							disabled={isPublished}
 								/>
 								<label>Cho phép xem lại câu hỏi</label>
 							</div>
 
 							<div className="checkbox-item">
-						<input 
-							type="checkbox" 
-							name="shuffleQuestions" 
-							defaultChecked={exam.shuffleQuestions}
+								<input 
+									type="checkbox" 
+									name="shuffleQuestions" 
+									defaultChecked={exam.shuffleQuestions}
 							disabled={isPublished}
 								/>
 								<label>Trộn câu hỏi</label>
 							</div>
 
 							<div className="checkbox-item">
-						<input 
-							type="checkbox" 
-							name="showResults" 
-							defaultChecked={exam.showResults}
+								<input 
+									type="checkbox" 
+									name="showResults" 
+									defaultChecked={exam.showResults}
 							disabled={isPublished}
 								/>
 								<label>Hiển thị kết quả</label>

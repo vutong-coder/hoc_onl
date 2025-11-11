@@ -65,143 +65,106 @@ export interface Lesson {
   contentUrl?: string;
 }
 
+export type CourseVisibility = 'draft' | 'published' | 'archived' | 'suspended' | 'private';
+
 export interface Course {
   id: string;
+  instructorId: number;
   title: string;
+  slug: string;
   description: string;
-  shortDescription?: string;
-  category?: CourseCategory;
-  instructor?: Instructor;
-  level: 'beginner' | 'intermediate' | 'advanced';
-  duration: number; // hours
-  price: number;
-  tokenSymbol?: string;
-  thumbnail?: string;
-  videoUrl?: string;
-  tags?: string[];
-  status?: string;
-  isPublished: boolean;
-  isFeatured?: boolean;
-  enrollmentCount?: number;
-  maxEnrollments?: number;
-  rating?: number;
-  reviewCount?: number;
+  thumbnailUrl?: string;
+  visibility: CourseVisibility;
   createdAt: string;
   updatedAt: string;
-  publishedAt?: string;
-  lessons?: Lesson[];
-  prerequisites?: string[];
-  learningOutcomes?: string[];
-  certificateAvailable?: boolean;
+  [key: string]: any;
 }
 
 export interface CreateCourseRequest {
-  id?: string; // UUID required by backend
+  id: string;
   title: string;
-  instructorId?: number;
-  description?: string;
+  instructorId: number;
+  description: string;
   thumbnailUrl?: string;
-  visibility?: string; // 'published' | 'draft' | etc.
-  // Legacy fields (kept for backward compatibility but backend doesn't support)
-  shortDescription?: string;
-  categoryId?: string;
-  level?: 'beginner' | 'intermediate' | 'advanced';
-  duration?: number;
-  price?: number;
-  thumbnail?: string;
-  tags?: string[];
-  prerequisites?: string[];
-  learningOutcomes?: string[];
-  certificateAvailable?: boolean;
+  visibility: CourseVisibility;
 }
 
 export interface UpdateCourseRequest {
   title?: string;
   description?: string;
   thumbnailUrl?: string;
-  visibility?: string; // 'published' | 'draft' | etc.
-  // Legacy fields (kept for backward compatibility but backend doesn't support)
-  shortDescription?: string;
-  level?: 'beginner' | 'intermediate' | 'advanced';
-  duration?: number;
-  price?: number;
-  thumbnail?: string;
-  tags?: string[];
-  isPublished?: boolean;
-  isFeatured?: boolean;
+  visibility?: CourseVisibility;
 }
 
 export interface Material {
   id: string;
   title: string;
-  description?: string;
-  type: 'video' | 'document' | 'quiz' | 'text';
-  contentUrl?: string;
-  videoUrl?: string;
-  order: number;
-  duration?: number;
-  createdAt: string;
+  type: string;
+  storageKey?: string;
+  content?: string;
+  displayOrder?: number;
+  createdAt?: string;
 }
 
 export interface CreateMaterialRequest {
   title: string;
-  description?: string;
-  type: 'video' | 'document' | 'quiz' | 'text';
-  contentUrl?: string;
-  videoUrl?: string;
-  order: number;
-  duration?: number;
+  type: string;
+  storageKey?: string;
+  content?: string;
+  displayOrder?: number;
 }
 
-export interface QuizQuestion {
-  id: string;
-  questionText: string;
-  questionType: 'multiple_choice' | 'true_false' | 'short_answer';
-  options?: QuizOption[];
-  correctAnswer?: string;
-  points: number;
+export interface UpdateMaterialRequest {
+  title?: string;
+  type?: string;
+  storageKey?: string;
+  content?: string;
+  displayOrder?: number;
 }
 
 export interface QuizOption {
   id: string;
-  optionText: string;
+  content: string;
   isCorrect: boolean;
+}
+
+export interface QuizQuestion {
+  id: string;
+  content: string;
+  type: string;
+  options: QuizOption[];
 }
 
 export interface Quiz {
   id: string;
   title: string;
   description?: string;
-  timeLimit?: number;
-  passingScore: number;
+  timeLimitMinutes?: number;
+  createdAt?: string;
   questions: QuizQuestion[];
 }
 
 export interface SubmitQuizRequest {
   studentId: number;
-  answers: Array<{
-    questionId: string;
-    answer: string;
-  }>;
+  answers: Record<string, string[]>;
 }
 
 export interface QuizResult {
+  id: string;
+  studentId: number;
+  quizId: string;
   score: number;
-  totalPoints: number;
-  passed: boolean;
-  correctAnswers: number;
-  totalQuestions: number;
   submittedAt: string;
+  answers?: unknown;
 }
 
 export interface Progress {
-  id: string;
+  id: number;
   studentId: number;
   courseId: string;
-  completedMaterials: string[];
-  progressPercentage: number;
-  lastAccessedAt: string;
-  completedAt?: string;
+  percentComplete: number;
+  lastMaterialId?: string;
+  updatedAt: string;
 }
 
 export interface PageResponse<T> {
@@ -234,9 +197,26 @@ export interface PageResponse<T> {
 }
 
 export interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data: T;
+  success: boolean;
+  message?: string;
+  data?: T;
+  error?: unknown;
+}
+
+export interface Reward {
+  id: number | string;
+  studentId: number | string;
+  tokensAwarded: number;
+  reasonCode: string;
+  relatedId?: string | number;
+  awardedAt: string;
+}
+
+export interface GrantRewardRequest {
+  studentId: number;
+  tokens: number;
+  reason: string;
+  relatedId?: string;
 }
 
 // ==================== Course Operations ====================
@@ -346,6 +326,20 @@ export const addMaterialToCourse = async (courseId: string, materialData: Create
 };
 
 /**
+ * Update material
+ */
+export const updateMaterial = async (materialId: string, materialData: UpdateMaterialRequest): Promise<ApiResponse<Material>> => {
+  try {
+    // Note: Backend may not have this endpoint yet
+    const response = await courseAxios.put(`/materials/${materialId}`, materialData);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error updating material:', error);
+    throw new Error(error.response?.data?.message || 'Failed to update material');
+  }
+};
+
+/**
  * Delete material
  */
 export const deleteMaterial = async (materialId: string): Promise<ApiResponse<void>> => {
@@ -421,16 +415,16 @@ export const getStudentProgress = async (studentId: number, courseId: string): P
     const status = error?.response?.status;
     if (status === 404 || status === 500) {
       return {
-        code: status || 500,
+        success: true,
         message: 'No progress yet',
         data: {
-          id: 'temp',
+          id: 0,
           studentId,
           courseId,
-          completedMaterials: [],
-          progressPercentage: 0,
-          lastAccessedAt: new Date().toISOString(),
-        } as unknown as Progress,
+          percentComplete: 0,
+          lastMaterialId: undefined,
+          updatedAt: new Date().toISOString(),
+        },
       };
     }
     console.error('Error getting progress:', error);
@@ -451,6 +445,37 @@ export const getCourseProgressDashboard = async (courseId: string): Promise<ApiR
   }
 };
 
+// ==================== Reward Operations ====================
+
+/**
+ * Get student rewards
+ */
+export const getStudentRewards = async (studentId: number): Promise<ApiResponse<Reward[]>> => {
+  try {
+    const response = await courseAxios.get(`/rewards/student/${studentId}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error getting student rewards:', error);
+    throw new Error(error.response?.data?.message || 'Failed to get student rewards');
+  }
+};
+
+/**
+ * Grant reward to student
+ * Note: This may not be available as a public API endpoint.
+ * Rewards are typically granted internally by the system.
+ */
+export const grantReward = async (rewardData: GrantRewardRequest): Promise<ApiResponse<Reward>> => {
+  try {
+    // Note: Backend may not have this endpoint yet - rewards are typically granted internally
+    const response = await courseAxios.post('/rewards/grant', rewardData);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error granting reward:', error);
+    throw new Error(error.response?.data?.message || 'Failed to grant reward');
+  }
+};
+
 // ==================== Default Export ====================
 
 const courseApi = {
@@ -464,6 +489,7 @@ const courseApi = {
   // Material operations
   getCourseMaterials,
   addMaterialToCourse,
+  updateMaterial,
   deleteMaterial,
   
   // Quiz operations
@@ -474,6 +500,10 @@ const courseApi = {
   updateProgress,
   getStudentProgress,
   getCourseProgressDashboard,
+  
+  // Reward operations
+  getStudentRewards,
+  grantReward,
 };
 
 export default courseApi;

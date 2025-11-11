@@ -125,13 +125,13 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
       return null;
     }
 
-    const minSize = 5000; // Accept if > 5KB (relaxed from calculated minimum)
+      const minSize = 5000; // Accept if > 5KB (relaxed from calculated minimum)
     if (dataUrl.length < minSize) {
-      console.error('captureScreenshot: Captured image too small:', dataUrl.length, 'bytes, expected >', minSize);
-      return null;
-    }
-
-    return dataUrl;
+        console.error('captureScreenshot: Captured image too small:', dataUrl.length, 'bytes, expected >', minSize);
+        return null;
+      }
+      
+      return dataUrl;
   }, []);
 
   const updateCameraMetrics = useCallback(() => {
@@ -243,7 +243,7 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
         analysisIntervalRef.current = setInterval(analyzeFrame, 3000);
       }
 
-      analyzeFrame();
+        analyzeFrame();
 
       const handleVisibilityChange = () => {
         if (state.enabledDetections.has('tab_switch')) {
@@ -256,7 +256,7 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
     } catch (err) {
       console.error('Error starting camera monitoring:', err);
       let errorMessage = 'Không thể khởi động camera AI';
-
+      
       if (err instanceof Error) {
         if (err.name === 'NotAllowedError') {
           errorMessage = 'Bạn đã từ chối quyền truy cập camera. Vui lòng cho phép camera để tiếp tục.';
@@ -273,7 +273,7 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
         cameraManager.decrementUsage();
         cameraUsageRef.current = false;
       }
-
+      
       updateState({ error: errorMessage, isAnalyzing: false });
     }
   }, [analyzeFrame, state.enabledDetections, updateState]);
@@ -294,10 +294,10 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
       cameraUsageRef.current = false;
     }
 
-    updateState({
-      isActive: false,
-      isAnalyzing: false,
-      detections: [],
+    updateState({ 
+      isActive: false, 
+      isAnalyzing: false, 
+      detections: [], 
       metrics: null,
     });
     isActiveRef.current = false;

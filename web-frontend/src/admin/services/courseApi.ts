@@ -7,15 +7,21 @@ import courseApiMain, {
   deleteCourse,
   getCourseMaterials,
   addMaterialToCourse,
+  updateMaterial,
   deleteMaterial,
   getQuizDetails,
   submitQuiz,
   getCourseProgressDashboard,
+  grantReward,
+  getStudentRewards,
   type Course,
   type CreateCourseRequest,
   type UpdateCourseRequest,
   type Material,
   type CreateMaterialRequest,
+  type UpdateMaterialRequest,
+  type Reward,
+  type GrantRewardRequest,
   type Quiz,
   type QuizResult,
   type SubmitQuizRequest,
@@ -24,6 +30,24 @@ import courseApiMain, {
   type ApiResponse,
 } from '../../services/api/courseApi';
 
+// Re-export functions for admin use
+export {
+  getAllCourses,
+  getCourseById,
+  createCourse,
+  updateCourse,
+  deleteCourse,
+  getCourseMaterials,
+  addMaterialToCourse,
+  updateMaterial,
+  deleteMaterial,
+  getQuizDetails,
+  submitQuiz,
+  getCourseProgressDashboard,
+  grantReward,
+  getStudentRewards,
+};
+
 // Re-export types for admin use
 export type {
   Course,
@@ -31,6 +55,9 @@ export type {
   UpdateCourseRequest,
   Material,
   CreateMaterialRequest,
+  UpdateMaterialRequest,
+  Reward,
+  GrantRewardRequest,
   Quiz,
   QuizResult,
   SubmitQuizRequest,
@@ -59,6 +86,9 @@ export async function getCourseStatistics(): Promise<{
     
     // Placeholder: Calculate from getAllCourses
     const coursesResponse = await getAllCourses(0, 1000);
+    if (!coursesResponse.data) {
+      throw new Error('No data received from getAllCourses');
+    }
     const courses = coursesResponse.data.content;
     
     return {
@@ -80,6 +110,9 @@ export async function getCourseStatistics(): Promise<{
 export async function getTopCourses(limit: number = 10): Promise<Course[]> {
   try {
     const coursesResponse = await getAllCourses(0, 100);
+    if (!coursesResponse.data) {
+      throw new Error('No data received from getAllCourses');
+    }
     const courses = coursesResponse.data.content;
     
     return courses
@@ -105,17 +138,38 @@ export async function searchCourses(query: string, page = 0, size = 10): Promise
       return coursesResponse;
     }
     
+    if (!coursesResponse.data) {
+      throw new Error('No data received from getAllCourses');
+    }
+    
     const filtered = coursesResponse.data.content.filter(course =>
       course.title.toLowerCase().includes(query.toLowerCase()) ||
       course.description.toLowerCase().includes(query.toLowerCase())
     );
     
+    const totalPages = Math.ceil(filtered.length / size);
+    
     return {
       ...coursesResponse,
       data: {
-        ...coursesResponse.data,
         content: filtered,
         totalElements: filtered.length,
+        totalPages,
+        pageable: coursesResponse.data.pageable ?? {
+          pageNumber: page,
+          pageSize: size,
+          sort: { sorted: false, unsorted: true, empty: true },
+          offset: page * size,
+          paged: true,
+          unpaged: false,
+        },
+        last: page >= totalPages - 1,
+        size,
+        number: page,
+        sort: coursesResponse.data.sort ?? { sorted: false, unsorted: true, empty: true },
+        numberOfElements: filtered.length,
+        first: page === 0,
+        empty: filtered.length === 0,
       }
     };
   } catch (error) {
@@ -136,7 +190,12 @@ export const adminCourseApi = {
   // Material operations
   getCourseMaterials,
   addMaterialToCourse,
+  updateMaterial,
   deleteMaterial,
+
+  // Reward operations
+  grantReward,
+  getStudentRewards,
   
   // Quiz operations
   getQuizDetails,

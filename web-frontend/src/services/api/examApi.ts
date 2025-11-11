@@ -40,7 +40,7 @@ examAxios.interceptors.response.use(
 
 // ==================== Types ====================
 
-export type ExamStatus = 'DRAFT' | 'SCHEDULED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+export type ExamStatus = 'DRAFT' | 'SCHEDULED' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 export type QuestionType = 'SINGLE_CHOICE' | 'MULTIPLE_CHOICE' | 'TRUE_FALSE' | 'SHORT_ANSWER' | 'ESSAY';
 
 export interface Exam {
@@ -54,6 +54,7 @@ export interface Exam {
 	passScore?: number;
 	maxAttempts?: number;
 	totalQuestions?: number; // ✨ NEW: Total number of questions
+    assignedQuestionCount?: number; // ✨ NEW: Number of questions currently attached to exam
 	createdBy: string;
 	status: ExamStatus;
 	createdAt: string;
@@ -87,6 +88,18 @@ export interface ExamConfigRequest {
 	durationMinutes?: number;
 	passScore?: number;
 	maxAttempts?: number;
+}
+
+export interface ExamUpdateRequest {
+	title?: string;
+	description?: string;
+	startAt?: string;
+	endAt?: string;
+	durationMinutes?: number;
+	passScore?: number;
+	maxAttempts?: number;
+	totalQuestions?: number;
+	tags?: string[];
 }
 
 export interface ExamScheduleRequest {
@@ -184,6 +197,19 @@ export const updateExamConfig = async (
 	} catch (error: any) {
 		console.error('Error updating exam config:', error);
 		throw new Error(error.response?.data?.message || 'Failed to update exam config');
+	}
+};
+
+export const updateExam = async (
+	examId: string,
+	request: ExamUpdateRequest
+): Promise<Exam> => {
+	try {
+		const response = await examAxios.put(`/exams/${examId}`, request);
+		return response.data;
+	} catch (error: any) {
+		console.error('Error updating exam:', error);
+		throw new Error(error.response?.data?.message || 'Failed to update exam');
 	}
 };
 
@@ -330,6 +356,7 @@ const examApi = {
 	createExam,
 	getExamById,
 	updateExamConfig,
+	updateExam,
 	deleteExam,
 	scheduleExam,
 	generateExamQuestions,

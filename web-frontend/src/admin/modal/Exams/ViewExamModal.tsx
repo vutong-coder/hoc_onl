@@ -83,10 +83,10 @@ const ViewExamModal: React.FC<ViewExamModalProps> = ({
 							<div className="info-label">Loại bài thi</div>
 							<div className="info-value">{getTypeLabel(exam.type)}</div>
 						</div>
-						<div className="modal-info-pair">
-							<div className="info-label">Số câu hỏi</div>
-							<div className="info-value">{exam.totalQuestions} câu</div>
-						</div>
+					<div className="modal-info-pair">
+						<div className="info-label">Câu hỏi đã gán</div>
+						<div className="info-value">{exam.assignedQuestionCount}/{exam.totalQuestions} câu</div>
+					</div>
 						<div className="modal-info-pair">
 							<div className="info-label">Thời gian</div>
 							<div className="info-value">{exam.duration} phút</div>

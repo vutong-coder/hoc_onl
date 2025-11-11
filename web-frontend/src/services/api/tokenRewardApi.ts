@@ -6,6 +6,45 @@ import axios from 'axios';
 // Port 9009 for Docker deployment
 const API_BASE_URL = `${import.meta.env.VITE_TOKEN_REWARD_API_URL || 'http://localhost:9009'}/api/tokens`;
 
+// Create axios instance with JWT interceptors
+const tokenRewardAxios = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { 'Content-Type': 'application/json' }
+});
+
+// Request interceptor to add JWT token
+tokenRewardAxios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor to handle errors
+tokenRewardAxios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid
+      const errorMessage = error.response?.data?.message || 'Unauthorized: No token provided';
+      console.error('Token error:', errorMessage);
+      // Don't redirect automatically, let the component handle it
+    }
+    if (error.response?.status === 403) {
+      // Forbidden - usually means invalid token or missing permissions
+      const errorMessage = error.response?.data?.message || 'Forbidden: Invalid token';
+      console.error('Forbidden error:', errorMessage);
+    }
+    return Promise.reject(error);
+  }
+);
+
 // ==================== Types ====================
 
 export interface GrantTokenRequest {
@@ -69,7 +108,7 @@ export interface WithdrawResponse {
  */
 export const grantTokens = async (request: GrantTokenRequest): Promise<Transaction> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/grant`, request);
+    const response = await tokenRewardAxios.post(`/grant`, request);
     return response.data;
   } catch (error: any) {
     console.error('Error granting tokens:', error);
@@ -82,7 +121,7 @@ export const grantTokens = async (request: GrantTokenRequest): Promise<Transacti
  */
 export const spendTokens = async (request: SpendTokenRequest): Promise<Transaction> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/spend`, request);
+    const response = await tokenRewardAxios.post(`/spend`, request);
     return response.data;
   } catch (error: any) {
     console.error('Error spending tokens:', error);
@@ -98,7 +137,7 @@ export const spendTokens = async (request: SpendTokenRequest): Promise<Transacti
  */
 export const withdrawTokens = async (request: WithdrawTokenRequest): Promise<WithdrawResponse> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/withdraw`, request);
+    const response = await tokenRewardAxios.post(`/withdraw`, request);
     return response.data;
   } catch (error: any) {
     console.error('Error withdrawing tokens:', error);
@@ -117,12 +156,24 @@ export const withdrawTokens = async (request: WithdrawTokenRequest): Promise<Wit
  */
 export const getBalance = async (studentId: number | string): Promise<BalanceResponse> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/balance/${studentId}`);
-    return response.data;
+    const response = await tokenRewardAxios.get(`/balance/${studentId}`);
+    // Backend may return { tokenBalance } instead of { balance }
+    const data = response.data || {};
+    return {
+      balance: data.balance ?? data.tokenBalance ?? 0,
+      totalEarned: data.totalEarned,
+      totalSpent: data.totalSpent,
+    };
   } catch (error: any) {
     console.error('Error getting balance:', error);
     if (error.response?.status === 404) {
       throw new Error('User not found.');
+    }
+    if (error.response?.status === 401) {
+      throw new Error('Unauthorized: No token provided');
+    }
+    if (error.response?.status === 403) {
+      throw new Error('Forbidden: Invalid token. Please log in again.');
     }
     throw new Error(error.response?.data?.message || 'Failed to get balance');
   }
@@ -137,12 +188,18 @@ export const getHistory = async (
   limit: number = 10
 ): Promise<HistoryResponse> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/history/${studentId}`, {
+    const response = await tokenRewardAxios.get(`/history/${studentId}`, {
       params: { page, limit }
     });
     return response.data;
   } catch (error: any) {
     console.error('Error getting history:', error);
+    if (error.response?.status === 401) {
+      throw new Error('Unauthorized: No token provided');
+    }
+    if (error.response?.status === 403) {
+      throw new Error('Forbidden: Invalid token. Please log in again.');
+    }
     throw new Error(error.response?.data?.message || 'Failed to get history');
   }
 };

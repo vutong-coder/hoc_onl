@@ -44,43 +44,48 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 		const form = modalContainer?.querySelector('form') as HTMLFormElement | null
 		if (form) {
 			const formData = new FormData(form)
-			const title = formData.get('title') as string
-			const duration = parseInt(formData.get('duration') as string) || 0
+			const title = (formData.get('title') as string)?.trim()
+			const totalQuestions = parseInt(formData.get('totalQuestions') as string, 10) || 0
+			const duration = parseInt(formData.get('duration') as string, 10) || 0
+			const totalPointsRaw = formData.get('totalPoints') as string | null
+			const totalPointsParsed = totalPointsRaw && totalPointsRaw.trim() !== '' ? parseInt(totalPointsRaw, 10) : NaN
+			const totalPoints = Number.isFinite(totalPointsParsed) ? totalPointsParsed : (totalQuestions > 0 ? totalQuestions * 10 : 0)
+			const passingScoreRaw = formData.get('passingScore') as string | null
+			const passingScoreParsed = passingScoreRaw && passingScoreRaw.trim() !== '' ? parseInt(passingScoreRaw, 10) : NaN
+			const passingScore = Number.isFinite(passingScoreParsed) ? passingScoreParsed : Math.floor(totalPoints * 0.5)
+			const maxAttempts = parseInt(formData.get('maxAttempts') as string, 10) || 3
 			
 			// Validation
-			if (!title || !duration) {
-				alert('Vui lòng điền đầy đủ các trường bắt buộc (*)')
+			if (!title || totalQuestions <= 0 || duration <= 0) {
+				alert('Vui lòng điền đầy đủ các trường bắt buộc (*) với giá trị hợp lệ')
 				return
 			}
-			
-			const passingScore = parseInt(formData.get('passingScore') as string) || 50
-			const maxAttempts = parseInt(formData.get('maxAttempts') as string) || 3
-			
-			// Validation
-			if (duration <= 0) {
-				alert('Thời gian thi phải lớn hơn 0')
-				return
-			}
-			if (passingScore < 0 || passingScore > 100) {
-				alert('Điểm đạt phải từ 0-100')
+			if (totalPoints <= 0) {
+				alert('Tổng điểm phải lớn hơn 0')
 				return
 			}
 			if (maxAttempts < 1) {
 				alert('Số lần thi tối đa phải >= 1')
 				return
 			}
+			if (passingScore < 0 || (totalPoints > 0 && passingScore > totalPoints)) {
+				alert('Điểm đạt phải nằm trong khoảng từ 0 đến Tổng điểm')
+				return
+			}
 			
 			const examData = {
 				title,
-				description: formData.get('description') as string || '',
+				description: (formData.get('description') as string) || '',
 				subject: formData.get('subject') as string,
 				type: formData.get('type') as any,
 				difficulty: formData.get('difficulty') as any,
 				duration, // durationMinutes
+				totalPoints,
 				passingScore,
 				maxAttempts,
 				// Frontend-only fields for display/config (not sent to backend directly)
-				totalQuestions: parseInt(formData.get('totalQuestions') as string) || 0,
+				totalQuestions,
+				assignedQuestionCount: 0,
 				allowReview: formData.get('allowReview') === 'on',
 				shuffleQuestions: formData.get('shuffleQuestions') === 'on',
 				showResults: formData.get('showResults') === 'on',
@@ -205,7 +210,7 @@ const AddExamModal: React.FC<AddExamModalProps> = ({
 							type="number" 
 							name="totalPoints" 
 							className="form-input" 
-							placeholder="Auto = Số câu × 2" 
+					placeholder="Auto = Số câu × 10" 
 							min="0"
 						/>
 					</div>

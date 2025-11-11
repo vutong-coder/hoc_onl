@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Modal from '../../components/common/Modal'
-import { BookOpen, Clock, DollarSign, Users, Star, Calendar, Tag, CheckCircle, Award, Target } from 'lucide-react'
+import { BookOpen, Calendar, Hash, User, Layers } from 'lucide-react'
 import courseApi, { type Material, type CreateMaterialRequest } from '../../../services/api/courseApi'
 import CourseQuizModal from './CourseQuizModal'
 
@@ -10,332 +10,267 @@ interface CourseDetailModalProps {
 	course: any
 }
 
+const visibilityLabelMap: Record<string, string> = {
+	draft: 'Bản nháp',
+	published: 'Đã xuất bản',
+	archived: 'Đã lưu trữ',
+	suspended: 'Tạm dừng',
+	private: 'Riêng tư'
+}
+
+const visibilityClassMap: Record<string, string> = {
+	draft: 'warning',
+	published: 'success',
+	archived: 'secondary',
+	suspended: 'danger',
+	private: 'secondary'
+}
+
+const safeImg = (url?: string) => {
+	if (typeof url === 'string' && url.trim().length > 0) return url
+	return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="100%" height="100%" fill="%23e2e8f0"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="12" fill="%2394a3b8">No image</text></svg>'
+}
+
+const formatDateTime = (value?: string) => {
+	if (!value) return '—'
+	try {
+		return new Date(value).toLocaleString('vi-VN')
+	} catch {
+		return value
+	}
+}
+
 const CourseDetailModal: React.FC<CourseDetailModalProps> = ({
 	isOpen,
 	onClose,
 	course
 }) => {
-    if (!course) return null
+	if (!course) return null
 
-    const safeImg = (url?: string) => {
-        if (typeof url === 'string' && url.trim().length > 0) return url
-        // local, non-network fallback to avoid DNS issues
-        return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="%23e5e7eb"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="12" fill="%239ca3af">No Image</text></svg>'
-    }
+	const [materials, setMaterials] = useState<Material[]>([])
+	const [materialsLoading, setMaterialsLoading] = useState(false)
+	const [newMaterial, setNewMaterial] = useState<CreateMaterialRequest>({
+		title: '',
+		type: 'video',
+		storageKey: '',
+		content: '',
+		displayOrder: 1
+	})
+	const [quizModalOpen, setQuizModalOpen] = useState(false)
 
-    const formatPrice = (price?: number | null, token?: string) => {
-        const value = typeof price === 'number' && isFinite(price) ? price : 0
-        if (value === 0) return 'Miễn phí'
-        return `${value.toLocaleString()} ${token && token.trim() ? token : 'LEARN'}`
-    }
+	useEffect(() => {
+		const loadMaterials = async () => {
+			if (!course?.id) return
+			setMaterialsLoading(true)
+			try {
+				const res = await courseApi.getCourseMaterials(course.id)
+				setMaterials(res.data ?? [])
+			} catch (e) {
+				console.error('Load materials failed', e)
+			} finally {
+				setMaterialsLoading(false)
+			}
+		}
 
-    // Materials state
-    const [materials, setMaterials] = useState<Material[]>([])
-    const [materialsLoading, setMaterialsLoading] = useState(false)
-    const [newMaterial, setNewMaterial] = useState<CreateMaterialRequest>({
-        title: '',
-        description: '',
-        type: 'video',
-        contentUrl: '',
-        videoUrl: '',
-        order: 1,
-        duration: 0,
-    })
+		if (isOpen && course?.id) {
+			loadMaterials()
+		}
+	}, [isOpen, course?.id])
 
-    const loadMaterials = async () => {
-        if (!course?.id) return
-        setMaterialsLoading(true)
-        try {
-            const res = await courseApi.getCourseMaterials(course.id)
-            setMaterials(res.data)
-        } catch (e) {
-            console.error('Load materials failed', e)
-        } finally {
-            setMaterialsLoading(false)
-        }
-    }
+	const handleAddMaterial = async () => {
+		if (!course?.id) return
+		if (!newMaterial.title?.trim()) return
+		try {
+			const payload: CreateMaterialRequest = {
+				title: newMaterial.title.trim(),
+				type: newMaterial.type,
+				displayOrder: newMaterial.displayOrder,
+				storageKey: newMaterial.storageKey?.trim() || undefined,
+				content: newMaterial.content?.trim() || undefined
+			}
+			await courseApi.addMaterialToCourse(course.id, payload)
+			setNewMaterial({
+				title: '',
+				type: 'video',
+				storageKey: '',
+				content: '',
+				displayOrder: (newMaterial.displayOrder ?? 0) + 1
+			})
+			const updated = await courseApi.getCourseMaterials(course.id)
+			setMaterials(updated.data ?? [])
+		} catch (e) {
+			alert('Thêm học liệu thất bại')
+		}
+	}
 
-    useEffect(() => {
-        if (isOpen && course?.id) {
-            loadMaterials()
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isOpen, course?.id])
+	const handleDeleteMaterial = async (materialId: string) => {
+		try {
+			await courseApi.deleteMaterial(materialId)
+			const updated = await courseApi.getCourseMaterials(course.id)
+			setMaterials(updated.data ?? [])
+		} catch (e) {
+			alert('Xóa học liệu thất bại')
+		}
+	}
 
-    const handleAddMaterial = async () => {
-        if (!course?.id) return
-        if (!newMaterial.title?.trim()) return
-        try {
-            await courseApi.addMaterialToCourse(course.id, newMaterial)
-            setNewMaterial({ title: '', description: '', type: 'video', contentUrl: '', videoUrl: '', order: (newMaterial.order || 1) + 1, duration: 0 })
-            await loadMaterials()
-        } catch (e) {
-            alert('Thêm học liệu thất bại')
-        }
-    }
-
-    const handleDeleteMaterial = async (materialId: string) => {
-        try {
-            await courseApi.deleteMaterial(materialId)
-            await loadMaterials()
-        } catch (e) {
-            alert('Xóa học liệu thất bại')
-        }
-    }
-
-    // Quiz modal
-    const [quizModalOpen, setQuizModalOpen] = useState(false)
+	const visibility = visibilityLabelMap[course.visibility] ?? course.visibility ?? 'Không xác định'
+	const visibilityClass = visibilityClassMap[course.visibility] ?? 'secondary'
 
 	return (
-		<Modal
-			isOpen={isOpen}
-			onClose={onClose}
-			title="Chi tiết khóa học"
-			maxWidth="800px"
-		>
+		<Modal isOpen={isOpen} onClose={onClose} title="Chi tiết khóa học" maxWidth="800px">
 			<div className="modal-content-wrapper">
-				{/* Course Header Info */}
 				<div className="modal-info-card">
 					<div className="card-icon">
-                        <img 
-                            src={safeImg(course.thumbnail)} 
-                            alt={course.title || 'Course'}
-							style={{ 
-								width: '40px', 
-								height: '40px', 
-								objectFit: 'cover', 
-								borderRadius: '12px' 
-							}}
+						<img
+							src={safeImg(course.thumbnailUrl || course.thumbnail)}
+							alt={course.title || 'Course thumbnail'}
+							style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: '16px' }}
 						/>
 					</div>
-                    <div className="card-title">{course.title || '—'}</div>
-                    <div className="card-description">{course.shortDescription || ''}</div>
-					<div className="card-value">
-						<span style={{ 
-							padding: '4px 8px', 
-							background: 'var(--muted)', 
-							borderRadius: 'var(--radius-sm)',
-							fontSize: '12px',
-							marginRight: '8px'
-						}}>
-                            <BookOpen size={12} /> {(course as any)?.category?.name || 'Khác'}
-						</span>
-						<span style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
-                            bởi {(course as any)?.instructor?.name || '—'}
-						</span>
+					<div className="card-title">{course.title || '—'}</div>
+					<div className={`modal-status-badge ${visibilityClass}`} style={{ marginTop: 8 }}>
+						{visibility}
 					</div>
 				</div>
 
-				{/* Course Information */}
 				<div className="modal-detail-section">
 					<div className="section-title">
 						<BookOpen />
-						<h4>Thông tin khóa học</h4>
+						<h4>Thông tin chung</h4>
 					</div>
 					<div className="modal-info-pairs">
 						<div className="modal-info-pair">
-							<div className="info-label">Cấp độ</div>
-                            <div className="info-value">{course.level || '—'}</div>
-						</div>
-						<div className="modal-info-pair">
-							<div className="info-label">Thời lượng</div>
-                            <div className="info-value">{course.duration || 0} giờ</div>
-						</div>
-						<div className="modal-info-pair">
-							<div className="info-label">Giá</div>
-							<div className="info-value" style={{ fontWeight: 600, color: 'var(--primary)' }}>
-                                {formatPrice(course.price, (course as any)?.tokenSymbol)}
-							</div>
-						</div>
-						<div className="modal-info-pair">
-							<div className="info-label">Học viên</div>
-                            <div className="info-value">{(course.enrollmentCount || 0).toLocaleString()}</div>
-						</div>
-						<div className="modal-info-pair">
-							<div className="info-label">Đánh giá</div>
-                            <div className="info-value">{course.rating || 0} ⭐ ({course.reviewCount || 0})</div>
-						</div>
-					</div>
-				</div>
-
-				{/* Status Information */}
-				<div className="modal-detail-section">
-					<div className="section-title">
-						<CheckCircle />
-						<h4>Trạng thái</h4>
-					</div>
-					<div className="modal-info-pairs">
-						<div className="modal-info-pair">
-							<div className="info-label">Trạng thái</div>
+							<div className="info-label">Giảng viên</div>
 							<div className="info-value">
-								<span className={`modal-status-badge ${course.isPublished ? 'success' : 'warning'}`}>
-									{course.isPublished ? 'Đã xuất bản' : 'Bản nháp'}
-								</span>
+								<User size={14} style={{ marginRight: 6 }} />
+								#{course.instructorId ?? '—'}
 							</div>
 						</div>
 						<div className="modal-info-pair">
-							<div className="info-label">Nổi bật</div>
-							<div className="info-value">{course.isFeatured ? 'Có' : 'Không'}</div>
-						</div>
-						<div className="modal-info-pair">
-							<div className="info-label">Chứng chỉ</div>
-							<div className="info-value">{course.certificateAvailable ? 'Có' : 'Không'}</div>
+							<div className="info-label">Slug</div>
+							<div className="info-value">
+								<Hash size={14} style={{ marginRight: 6 }} />
+								{course.slug || '—'}
+							</div>
 						</div>
 						<div className="modal-info-pair">
 							<div className="info-label">Tạo lúc</div>
-                            <div className="info-value">{course.createdAt ? new Date(course.createdAt).toLocaleDateString('vi-VN') : '—'}</div>
+							<div className="info-value">
+								<Calendar size={14} style={{ marginRight: 6 }} />
+								{formatDateTime(course.createdAt)}
+							</div>
 						</div>
 						<div className="modal-info-pair">
 							<div className="info-label">Cập nhật</div>
-                            <div className="info-value">{course.updatedAt ? new Date(course.updatedAt).toLocaleDateString('vi-VN') : '—'}</div>
+							<div className="info-value">
+								<Calendar size={14} style={{ marginRight: 6 }} />
+								{formatDateTime(course.updatedAt)}
+							</div>
 						</div>
 					</div>
 				</div>
 
-				{/* Description */}
 				<div className="modal-detail-section">
 					<div className="section-title">
 						<BookOpen />
-						<h4>Mô tả chi tiết</h4>
+						<h4>Mô tả</h4>
 					</div>
-                    <p style={{ fontSize: '15px', color: '#475569', lineHeight: '1.6', margin: 0 }}>
-                        {course.description || ''}
+					<p style={{ fontSize: 15, color: '#475569', lineHeight: 1.6, margin: 0 }}>
+						{course.description || 'Chưa có mô tả'}
 					</p>
 				</div>
 
-                {/* Materials */}
-                <div className="modal-detail-section">
-                    <div className="section-title">
-                        <BookOpen />
-                        <h4>Học liệu</h4>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                        <div style={{ fontWeight: 600 }}>Quản lý học liệu</div>
-                        <button className="btn btn-secondary" type="button" onClick={() => setQuizModalOpen(true)}>Quản trị Quiz</button>
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
-                        <input
-                            type="text"
-                            className="form-input"
-                            placeholder="Tiêu đề học liệu"
-                            value={newMaterial.title}
-                            onChange={(e) => setNewMaterial(prev => ({ ...prev, title: e.target.value }))}
-                            style={{ minWidth: 220 }}
-                        />
-                        <select
-                            className="form-input"
-                            value={newMaterial.type}
-                            onChange={(e) => setNewMaterial(prev => ({ ...prev, type: e.target.value as any }))}
-                        >
-                            <option value="video">Video</option>
-                            <option value="document">Tài liệu</option>
-                            <option value="quiz">Quiz</option>
-                            <option value="text">Text</option>
-                        </select>
-                        <input
-                            type="url"
-                            className="form-input"
-                            placeholder={newMaterial.type === 'video' ? 'Video URL' : 'Content URL'}
-                            value={newMaterial.type === 'video' ? (newMaterial.videoUrl || '') : (newMaterial.contentUrl || '')}
-                            onChange={(e) => setNewMaterial(prev => (
-                                prev.type === 'video' ? { ...prev, videoUrl: e.target.value } : { ...prev, contentUrl: e.target.value }
-                            ))}
-                            style={{ minWidth: 240 }}
-                        />
-                        <input
-                            type="number"
-                            className="form-input"
-                            placeholder="Thứ tự"
-                            value={newMaterial.order}
-                            onChange={(e) => setNewMaterial(prev => ({ ...prev, order: Number(e.target.value) || 1 }))}
-                            style={{ width: 100 }}
-                        />
-                        <button className="btn btn-primary" type="button" onClick={handleAddMaterial}>Thêm học liệu</button>
-                    </div>
-                    {materialsLoading ? (
-                        <div>Đang tải học liệu...</div>
-                    ) : materials.length === 0 ? (
-                        <div style={{ color: 'var(--muted-foreground)' }}>Chưa có học liệu</div>
-                    ) : (
-                        <ul className="modal-list">
-                            {materials.map(m => (
-                                <li key={m.id} className="list-item">
-                                    <div className="item-icon"><BookOpen /></div>
-                                    <div className="item-content">
-                                        <div className="item-title">{m.title}</div>
-                                        <div className="item-subtitle" style={{ color: 'var(--muted-foreground)', fontSize: 12 }}>
-                                            {m.type} • Thứ tự {m.order ?? m['displayOrder'] ?? '-'}
-                                        </div>
-                                    </div>
-                                    <div className="item-meta">
-                                        <button className="modal-action-button" type="button" onClick={() => handleDeleteMaterial(m.id)}>Xóa</button>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
-
-                <CourseQuizModal isOpen={quizModalOpen} onClose={() => setQuizModalOpen(false)} />
-
-				{/* Tags */}
-                {(course.tags || []).length > 0 && (
-					<div className="modal-detail-section">
-						<div className="section-title">
-							<Tag />
-							<h4>Tags</h4>
-						</div>
-						<div className="modal-tags">
-                            {(course.tags || []).map(tag => (
-								<span key={tag} className="modal-tag">{tag}</span>
-							))}
-						</div>
+				<div className="modal-detail-section">
+					<div className="section-title">
+						<Layers />
+						<h4>Học liệu</h4>
 					</div>
-				)}
-
-				{/* Prerequisites */}
-                {(course.prerequisites || []).length > 0 && (
-					<div className="modal-detail-section">
-						<div className="section-title">
-							<CheckCircle />
-							<h4>Điều kiện tiên quyết</h4>
-						</div>
+					<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+						<div style={{ fontWeight: 600 }}>Quản lý học liệu</div>
+						<button className="btn btn-secondary" type="button" onClick={() => setQuizModalOpen(true)}>
+							Quản trị Quiz
+						</button>
+					</div>
+			<div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+						<input
+							type="text"
+							className="form-input"
+							placeholder="Tiêu đề học liệu"
+							value={newMaterial.title}
+							onChange={(e) => setNewMaterial(prev => ({ ...prev, title: e.target.value }))}
+							style={{ minWidth: 220 }}
+						/>
+						<select
+							className="form-input"
+							value={newMaterial.type}
+					onChange={(e) => setNewMaterial(prev => ({ ...prev, type: e.target.value }))}
+						>
+							<option value="video">Video</option>
+							<option value="document">Tài liệu</option>
+							<option value="quiz">Quiz</option>
+							<option value="text">Text</option>
+						</select>
+						<input
+					type="text"
+							className="form-input"
+					placeholder="Storage key (tùy chọn)"
+					value={newMaterial.storageKey ?? ''}
+					onChange={(e) => setNewMaterial(prev => ({ ...prev, storageKey: e.target.value }))}
+					style={{ minWidth: 200 }}
+				/>
+				<textarea
+					className="form-textarea"
+					placeholder="Nội dung học liệu (tùy chọn)"
+					value={newMaterial.content ?? ''}
+					onChange={(e) => setNewMaterial(prev => ({ ...prev, content: e.target.value }))}
+					rows={2}
+					style={{ minWidth: 220 }}
+						/>
+						<input
+							type="number"
+							className="form-input"
+							placeholder="Thứ tự"
+					value={newMaterial.displayOrder ?? ''}
+					onChange={(e) => setNewMaterial(prev => ({ ...prev, displayOrder: Number(e.target.value) || undefined }))}
+							style={{ width: 100 }}
+						/>
+						<button className="btn btn-primary" type="button" onClick={handleAddMaterial}>
+							Thêm học liệu
+						</button>
+					</div>
+					{materialsLoading ? (
+						<div>Đang tải học liệu...</div>
+					) : materials.length === 0 ? (
+						<div style={{ color: 'var(--muted-foreground)' }}>Chưa có học liệu</div>
+					) : (
 						<ul className="modal-list">
-                            {(course.prerequisites || []).map((prereq, index) => (
-								<li key={index} className="list-item">
-									<div className="item-icon">
-										<CheckCircle />
-									</div>
+							{materials.map(m => (
+								<li key={m.id} className="list-item">
+									<div className="item-icon"><BookOpen /></div>
 									<div className="item-content">
-										<div className="item-title">{prereq}</div>
+										<div className="item-title">{m.title}</div>
+									<div className="item-subtitle" style={{ color: 'var(--muted-foreground)', fontSize: 12 }}>
+										{m.type} • Thứ tự {m.displayOrder ?? '-'}
+										{m.storageKey ? ` • Key ${m.storageKey}` : ''}
+									</div>
+									{m.content && (
+										<div style={{ color: 'var(--muted-foreground)', fontSize: 12, marginTop: 4 }}>
+											{m.content.length > 80 ? `${m.content.slice(0, 80)}…` : m.content}
+										</div>
+									)}
+									</div>
+									<div className="item-meta">
+										<button className="modal-action-button" type="button" onClick={() => handleDeleteMaterial(m.id)}>
+											Xóa
+										</button>
 									</div>
 								</li>
 							))}
 						</ul>
-					</div>
-				)}
+					)}
+				</div>
 
-				{/* Learning Outcomes */}
-                {(course.learningOutcomes || []).length > 0 && (
-					<div className="modal-detail-section">
-						<div className="section-title">
-							<Target />
-							<h4>Kết quả học tập</h4>
-						</div>
-						<ul className="modal-list">
-                            {(course.learningOutcomes || []).map((outcome, index) => (
-								<li key={index} className="list-item">
-									<div className="item-icon">
-										<Award />
-									</div>
-									<div className="item-content">
-										<div className="item-title">{outcome}</div>
-									</div>
-								</li>
-							))}
-						</ul>
-					</div>
-				)}
+				<CourseQuizModal isOpen={quizModalOpen} onClose={() => setQuizModalOpen(false)} />
 			</div>
 		</Modal>
 	)

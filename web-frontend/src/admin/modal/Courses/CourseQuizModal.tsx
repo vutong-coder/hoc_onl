@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Modal from '../../components/common/Modal'
 import { BookOpen, ListChecks, PlusCircle } from 'lucide-react'
-import courseApi from '../../../services/api/courseApi'
+import courseApi, { type Quiz } from '../../../services/api/courseApi'
 
 interface CourseQuizModalProps {
     isOpen: boolean
@@ -11,7 +11,7 @@ interface CourseQuizModalProps {
 export default function CourseQuizModal({ isOpen, onClose }: CourseQuizModalProps): JSX.Element {
     const [quizId, setQuizId] = useState('')
     const [loading, setLoading] = useState(false)
-    const [quiz, setQuiz] = useState<any | null>(null)
+	const [quiz, setQuiz] = useState<Quiz | null>(null)
     const [error, setError] = useState<string | null>(null)
 
     const fetchQuiz = async () => {
@@ -21,7 +21,7 @@ export default function CourseQuizModal({ isOpen, onClose }: CourseQuizModalProp
         setLoading(true)
         try {
             const res = await courseApi.getQuizDetails(quizId.trim())
-            setQuiz(res.data)
+			setQuiz(res.data ?? null)
         } catch (e: any) {
             setError(e?.message || 'Không lấy được chi tiết quiz')
         } finally {
@@ -78,14 +78,24 @@ export default function CourseQuizModal({ isOpen, onClose }: CourseQuizModalProp
                         <div style={{ marginBottom: 8, fontWeight: 600 }}>{quiz.title}</div>
                         <div style={{ color: 'var(--muted-foreground)', marginBottom: 12 }}>{quiz.description}</div>
                         <ul className="modal-list">
-                            {(quiz.questions || []).map((q: any, idx: number) => (
-                                <li key={q.id || idx} className="list-item">
+					{(quiz.questions || []).map((q, idx) => (
+						<li key={q.id || idx} className="list-item">
                                     <div className="item-icon">Q{idx + 1}</div>
                                     <div className="item-content">
-                                        <div className="item-title">{q.questionText}</div>
-                                        <div className="item-subtitle" style={{ color: 'var(--muted-foreground)', fontSize: 12 }}>
-                                            {q.questionType} • {Array.isArray(q.options) ? `${q.options.length} lựa chọn` : '—'}
+								<div className="item-title">{q.content}</div>
+								<div className="item-subtitle" style={{ color: 'var(--muted-foreground)', fontSize: 12 }}>
+									{q.type} • {Array.isArray(q.options) ? `${q.options.length} lựa chọn` : '—'}
                                         </div>
+								{Array.isArray(q.options) && q.options.length > 0 && (
+									<ul style={{ marginTop: 8, paddingLeft: 18, color: 'var(--muted-foreground)', fontSize: 12 }}>
+										{q.options.map(option => (
+											<li key={option.id || option.content}>
+												{option.content}
+												{option.isCorrect ? ' ✅' : ''}
+											</li>
+										))}
+									</ul>
+								)}
                                     </div>
                                 </li>
                             ))}

@@ -34,7 +34,7 @@ export default function ExamTable({
 	const columns = [
 		{ key: 'title', label: 'Tiêu đề', sortable: true },
 		{ key: 'type', label: 'Loại', sortable: true, width: '120px' },
-		{ key: 'totalQuestions', label: 'Số câu hỏi', sortable: true, width: '120px' },
+		{ key: 'assignedQuestionCount', label: 'Câu hỏi (đã gán / mục tiêu)', sortable: true, width: '170px' },
 		{ key: 'duration', label: 'Thời gian', sortable: true, width: '110px' },
 		{ key: 'totalPoints', label: 'Tổng điểm', sortable: true, width: '110px' },
 		{ key: 'difficulty', label: 'Độ khó', sortable: true, width: '130px' },

@@ -1,4 +1,5 @@
 import React from 'react'
+import { AlertTriangle } from 'lucide-react'
 import Modal from '../../components/common/Modal'
 
 interface DeleteExamModalProps {
@@ -19,6 +20,7 @@ const DeleteExamModal: React.FC<DeleteExamModalProps> = ({
 			isOpen={isOpen}
 			onClose={onClose}
 			title="Xác nhận xóa đề thi"
+			maxWidth="520px"
 			footer={
 				<>
 					<button 
@@ -36,11 +38,26 @@ const DeleteExamModal: React.FC<DeleteExamModalProps> = ({
 				</>
 			}
 		>
-			<p style={{ margin: 0 }}>
-				Bạn có chắc chắn muốn xóa đề thi <strong>{exam?.title}</strong>?
-				<br />
-				Hành động này không thể hoàn tác.
-			</p>
+			<div className="modal-content-wrapper">
+				<div className="modal-confirmation-card danger">
+					<div className="modal-confirmation-icon">
+						<AlertTriangle size={28} strokeWidth={2.4} />
+					</div>
+					<div className="modal-confirmation-content">
+						<h3>Xóa đề thi</h3>
+						<p className="modal-confirmation-message">
+							Bạn có chắc chắn muốn xóa đề thi{' '}
+							<span className="modal-confirmation-highlight">
+								{exam?.title ?? 'này'}
+							</span>
+							?
+						</p>
+						<p className="modal-confirmation-subtext">
+							Hành động này không thể hoàn tác. Vui lòng kiểm tra kỹ trước khi tiếp tục.
+						</p>
+					</div>
+				</div>
+			</div>
 		</Modal>
 	)
 }

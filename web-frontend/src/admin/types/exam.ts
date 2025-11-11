@@ -16,6 +16,7 @@ export interface Exam {
 	subject: string
 	duration: number // phút
 	totalQuestions: number
+	assignedQuestionCount: number
 	totalPoints: number
 	difficulty: ExamDifficulty
 	status: ExamStatus

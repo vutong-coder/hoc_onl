@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { 
-  BookOpen, 
-  Filter, 
-  Search, 
-  Grid3x3, 
-  List,
+import {
+  BookOpen,
+  Search,
   Clock,
   Users,
   Star,
@@ -18,6 +15,34 @@ import courseApi, { Course } from '../services/api/courseApi'
 import { useAppSelector } from '../store/hooks'
 import '../assets/css/UserCoursesPage.css'
 
+const formatRelativeTime = (isoDate: string | undefined): string => {
+  if (!isoDate) return ''
+  const target = new Date(isoDate)
+  if (Number.isNaN(target.getTime())) return ''
+
+  const now = Date.now()
+  const diffSeconds = Math.floor((now - target.getTime()) / 1000)
+
+  if (diffSeconds < 45) return 'vừa xong'
+  const diffMinutes = Math.floor(diffSeconds / 60)
+  if (diffMinutes < 60) return `khoảng ${diffMinutes} phút trước`
+
+  const diffHours = Math.floor(diffMinutes / 60)
+  if (diffHours < 24) return `khoảng ${diffHours} giờ trước`
+
+  const diffDays = Math.floor(diffHours / 24)
+  if (diffDays < 7) return `khoảng ${diffDays} ngày trước`
+
+  const diffWeeks = Math.floor(diffDays / 7)
+  if (diffWeeks < 5) return `khoảng ${diffWeeks} tuần trước`
+
+  const diffMonths = Math.floor(diffDays / 30)
+  if (diffMonths < 12) return `khoảng ${diffMonths} tháng trước`
+
+  const diffYears = Math.max(1, Math.floor(diffDays / 365))
+  return `khoảng ${diffYears} năm trước`
+}
+
 export default function UserCoursesPage(): JSX.Element {
   const navigate = useNavigate()
   const { user } = useAppSelector((state) => state.auth)
@@ -25,7 +50,6 @@ export default function UserCoursesPage(): JSX.Element {
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedLevel, setSelectedLevel] = useState<string>('all')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
@@ -156,25 +180,6 @@ export default function UserCoursesPage(): JSX.Element {
           </select>
         </div>
 
-        <div className="filters-right">
-          {/* View Mode Toggle */}
-          <div className="view-mode-toggle">
-            <button
-              className={viewMode === 'grid' ? 'active' : ''}
-              onClick={() => setViewMode('grid')}
-              title="Hiển thị dạng lưới"
-            >
-              <Grid3x3 size={20} />
-            </button>
-            <button
-              className={viewMode === 'list' ? 'active' : ''}
-              onClick={() => setViewMode('list')}
-              title="Hiển thị dạng danh sách"
-            >
-              <List size={20} />
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Content */}
@@ -199,109 +204,124 @@ export default function UserCoursesPage(): JSX.Element {
           </div>
         ) : (
           <>
-            <div className={`courses-grid ${viewMode}`}>
-              {filteredCourses.map((course) => (
-                <div
-                  key={course.id}
-                  className="course-card"
-                  onClick={() => handleCourseClick(course.id)}
-                >
-                  {/* Thumbnail */}
-                  <div className="course-thumbnail">
-                    {course.thumbnail ? (
-                      <img src={course.thumbnail} alt={course.title} />
-                    ) : (
-                      <div className="thumbnail-placeholder">
-                        <BookOpen size={48} />
-                      </div>
-                    )}
-                    
-                    {/* Level Badge */}
-                    <div 
-                      className="level-badge"
-                      style={{ background: getLevelBadgeColor(course.level) }}
-                    >
-                      {getLevelText(course.level)}
+            <div className="courses-grid">
+              {filteredCourses.map((course) => {
+                const subtitleParts = [course.instructor?.name, course.category?.name].filter(Boolean) as string[]
+                const subtitleText = subtitleParts.length > 0
+                  ? subtitleParts.join(' | ')
+                  : 'Khóa học trên nền tảng Code Spark'
+
+                return (
+                  <div
+                    key={course.id}
+                    className="course-card"
+                    onClick={() => handleCourseClick(course.id)}
+                  >
+                    <div className="course-icon">
+                      <BookOpen size={28} />
                     </div>
 
-                    {/* Featured Badge */}
-                    {course.isFeatured && (
-                      <div className="featured-badge">
-                        <Star size={14} />
-                        <span>Nổi bật</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="course-content">
-                    {/* Category */}
-                    {course.category && (
-                      <div className="course-category">
-                        {course.category.name}
-                      </div>
-                    )}
-
-                    {/* Title */}
-                    <h3 className="course-title">{course.title}</h3>
-
-                    {/* Description */}
-                    <p className="course-description">
-                      {course.shortDescription || course.description}
-                    </p>
-
-                    {/* Instructor */}
-                    {course.instructor && (
-                      <div className="course-instructor">
-                        <Users size={16} />
-                        <span>{course.instructor.name}</span>
-                      </div>
-                    )}
-
-                    {/* Stats */}
-                    <div className="course-stats">
-                      <div className="stat">
-                        <Clock size={16} />
-                        <span>{course.duration}h</span>
-                      </div>
-                      
-                      {course.enrollmentCount !== undefined && (
-                        <div className="stat">
-                          <Users size={16} />
-                          <span>{course.enrollmentCount} học viên</span>
+                    <div className="course-card-content">
+                      <div className="course-card-header">
+                        <div>
+                          <h3 className="course-title">{course.title}</h3>
+                          <p className="course-subtitle">{subtitleText}</p>
                         </div>
-                      )}
 
-                      {course.rating !== undefined && (
-                        <div className="stat rating">
-                          <Star size={16} fill="currentColor" />
-                          <span>{course.rating.toFixed(1)}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="course-footer">
-                      <div className="course-price">
-                        {course.price === 0 ? (
-                          <span className="free">Miễn phí</span>
-                        ) : (
-                          <span className="price">{course.price} {course.tokenSymbol || 'LEARN'}</span>
+                        {course.updatedAt && (
+                          <span className="course-time">{formatRelativeTime(course.updatedAt)}</span>
                         )}
                       </div>
 
-                      <button
-                        className="btn-enroll"
-                        onClick={(e) => handleEnrollCourse(course.id, e)}
-                      >
-                        <Play size={16} />
-                        <span>Học ngay</span>
-                        <ChevronRight size={16} />
-                      </button>
+                      <p className="course-description">
+                        {course.shortDescription || course.description}
+                      </p>
+
+                      <div className="course-tags">
+                        {course.instructor && (
+                          <span className="course-tag">
+                            <Users size={14} />
+                            {course.instructor.name}
+                          </span>
+                        )}
+
+                        {course.category && (
+                          <span className="course-tag neutral">
+                            <BookOpen size={14} />
+                            {course.category.name}
+                          </span>
+                        )}
+
+                        <span className="course-tag level">
+                          {getLevelText(course.level)}
+                        </span>
+
+                        {course.certificateAvailable && (
+                          <span className="course-tag success">
+                            <Award size={14} />
+                            Chứng chỉ
+                          </span>
+                        )}
+
+                        {course.isFeatured && (
+                          <span className="course-tag highlight">
+                            <Star size={14} />
+                            Nổi bật
+                          </span>
+                        )}
+
+                        {course.price === 0 ? (
+                          <span className="course-tag free">Miễn phí</span>
+                        ) : (
+                          <span className="course-tag token">
+                            <TrendingUp size={14} />
+                            +{course.price} {course.tokenSymbol || 'token'}
+                          </span>
+                        )}
+
+                        {course.tags?.map((tag) => (
+                          <span key={`${course.id}-${tag}`} className="course-tag subtle">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="course-footer">
+                        <div className="course-meta">
+                          <div className="meta-item">
+                            <Clock size={16} />
+                            <span>{course.duration} giờ</span>
+                          </div>
+
+                          {course.enrollmentCount !== undefined && (
+                            <div className="meta-item">
+                              <Users size={16} />
+                              <span>{course.enrollmentCount} học viên</span>
+                            </div>
+                          )}
+
+                          {course.rating !== undefined && (
+                            <div className="meta-item rating">
+                              <Star size={16} fill="currentColor" />
+                              <span>{course.rating.toFixed(1)}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <button
+                          type="button"
+                          className="btn-enroll"
+                          onClick={(e) => handleEnrollCourse(course.id, e)}
+                        >
+                          <Play size={16} />
+                          <span>Học ngay</span>
+                          <ChevronRight size={16} />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             {/* Pagination */}

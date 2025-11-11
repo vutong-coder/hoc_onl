@@ -205,10 +205,6 @@ export default function CourseLearnPage(): JSX.Element {
     <div className="course-learn-page">
       {/* Header */}
       <div className="learn-header">
-        <button onClick={() => navigate(`/user/courses/${courseId}`)} className="btn-back-nav">
-          <ArrowLeft size={20} />
-        </button>
-
         <div className="header-info">
           <h1>{course.title}</h1>
           <p className="material-position">

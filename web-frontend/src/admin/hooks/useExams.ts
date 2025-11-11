@@ -55,6 +55,7 @@ interface FrontendExam {
 	subject: string;
 	duration: number;
 	totalQuestions: number;
+	assignedQuestionCount: number;
 	totalPoints: number;
 	difficulty: 'easy' | 'medium' | 'hard';
 	status: FrontendExamStatus;
@@ -74,14 +75,18 @@ function adaptApiExamToFrontend(apiExam: ApiExam): FrontendExam {
 	// ✨ Use first tag as subject, fallback to 'General'
 	const subject = (apiExam.tags && apiExam.tags.length > 0) ? apiExam.tags[0] : 'General';
 	
+	const totalQuestions = apiExam.totalQuestions ?? 0;
+	const totalPoints = totalQuestions > 0 ? totalQuestions * 10 : 0;
+
 	return {
 		id: apiExam.id,
 		title: apiExam.title,
 		description: apiExam.description,
 		subject: subject,
 		duration: apiExam.durationMinutes || 60,
-		totalQuestions: apiExam.totalQuestions || 0, // ✨ NOW: Use from API
-		totalPoints: 100, // Default
+		totalQuestions: totalQuestions, // ✨ NOW: Use from API
+		assignedQuestionCount: apiExam.assignedQuestionCount ?? 0,
+		totalPoints,
 		difficulty: 'medium', // Default
 		status: mapBackendStatusToFrontend(apiExam.status),
 		type: 'quiz', // Default
@@ -290,14 +295,20 @@ export default function useExams() {
 	const updateExam = useCallback(async (updatedExam: FrontendExam) => {
 		setLoading(true)
 		try {
-			await adminExamApi.updateExamConfig(updatedExam.id, {
+			await adminExamApi.updateExam(updatedExam.id, {
+				title: updatedExam.title,
+				description: updatedExam.description,
 				durationMinutes: updatedExam.duration,
 				passScore: updatedExam.passingScore,
 				maxAttempts: updatedExam.maxAttempts,
+				totalQuestions: updatedExam.totalQuestions,
+				tags: updatedExam.subject ? [updatedExam.subject] : undefined,
 			})
 			await loadExams() // Reload after update
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Error updating exam:', error)
+			const message = error?.message || 'Cập nhật đề thi thất bại. Vui lòng thử lại.'
+			alert(message)
 			throw error
 		} finally {
 			setLoading(false)
@@ -351,6 +362,21 @@ export default function useExams() {
 
 	// Xuất bản exam (DRAFT -> PUBLISHED)
 	const publishExam = useCallback(async (examId: string) => {
+		const exam = allExams.find(e => e.id === examId)
+		if (!exam) {
+			alert('❌ Không tìm thấy đề thi để xuất bản.')
+			return
+		}
+		if (exam.totalQuestions <= 0) {
+			alert('❌ Không thể xuất bản: Vui lòng thiết lập số câu hỏi mục tiêu cho đề thi.')
+			return
+		}
+		if (exam.assignedQuestionCount < exam.totalQuestions) {
+			const missing = exam.totalQuestions - exam.assignedQuestionCount
+			alert(`❌ Không thể xuất bản: Đề thi còn thiếu ${missing} câu hỏi so với mục tiêu.`)
+			return
+		}
+
 		setLoading(true)
 		try {
 			await adminExamApi.updateExamStatus(examId, 'PUBLISHED') // PUBLISHED = user can see
@@ -361,8 +387,7 @@ export default function useExams() {
 		} finally {
 			setLoading(false)
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}, [allExams])
 
 	// Gỡ xuất bản exam (PUBLISHED -> DRAFT)
 	const unpublishExam = useCallback(async (examId: string) => {
@@ -388,6 +413,7 @@ export default function useExams() {
 				...examToDuplicate,
 				title: `${examToDuplicate.title} (Bản sao)`,
 				status: 'draft',
+				assignedQuestionCount: 0,
 			})
 		}
 	}, [allExams, addExam])

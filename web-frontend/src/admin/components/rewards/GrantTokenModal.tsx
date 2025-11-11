@@ -58,14 +58,14 @@ export default function GrantTokenModal({
         studentId: numStudentId,
         amount: numAmount,
         reasonCode: reasonCode || 'CUSTOM',
-        relatedId: relatedId || undefined
+        relatedId: relatedId ? relatedId.trim() : undefined
       };
 
-      await grantTokens(request);
+      const transaction = await grantTokens(request);
       
       setResult({ 
         success: true, 
-        message: `Đã cấp ${numAmount} token cho học viên #${numStudentId} thành công!` 
+        message: `Đã cấp ${transaction?.amount ?? numAmount} token cho học viên #${transaction?.studentId ?? numStudentId} thành công!` 
       });
       
       // Call onSuccess callback

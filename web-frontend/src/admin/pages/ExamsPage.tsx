@@ -85,6 +85,15 @@ export default function ExamsPage(): JSX.Element {
 
 	// Xử lý xuất bản
 	const handlePublish = (exam: Exam) => {
+		const missingQuestions = exam.totalQuestions - exam.assignedQuestionCount
+		if (exam.totalQuestions <= 0) {
+			alert('❌ Không thể xuất bản: Vui lòng thiết lập số câu hỏi mục tiêu cho đề thi.')
+			return
+		}
+		if (missingQuestions > 0) {
+			alert(`❌ Không thể xuất bản: Đề thi còn thiếu ${missingQuestions} câu hỏi so với mục tiêu.`)
+			return
+		}
 		if (confirm(`Bạn có chắc chắn muốn xuất bản đề thi "${exam.title}"? Đề thi sẽ hiển thị cho user.`)) {
 			publishExam(exam.id)
 		}
@@ -149,7 +158,10 @@ export default function ExamsPage(): JSX.Element {
 	// Xử lý thêm đề thi mới
 	const handleAddExam = async (examData: Partial<Exam>) => {
 		try {
-			await addExam(examData as Omit<Exam, 'id' | 'createdAt'>)
+			await addExam({
+				...examData,
+				assignedQuestionCount: examData.assignedQuestionCount ?? 0,
+			} as Omit<Exam, 'id' | 'createdAt'>)
 			setIsAddModalOpen(false)
 			// Success message will be shown by useExams hook
 			alert('✅ Đã tạo đề thi thành công!')
