@@ -29,6 +29,7 @@ import CheckDuplicatePage from '../pages/CheckDuplicatePage'
 import UserCoursesPage from '../pages/UserCoursesPage'
 import CourseDetailPage from '../pages/CourseDetailPage'
 import CourseLearnPage from '../pages/CourseLearnPage'
+import MultisigWalletPage from '../pages/MultisigWalletPage'
 import { checkAuth } from '../store/slices/authSlice'
 
 export default function AppRoutes(): JSX.Element {
@@ -78,6 +79,7 @@ export default function AppRoutes(): JSX.Element {
 			<Route path="rewards/store" element={<RewardStorePage />} />
 			<Route path="copyright" element={<CopyrightPage />} />
 			<Route path="check-duplicate" element={<CheckDuplicatePage />} />
+			<Route path="multisig" element={<MultisigWalletPage />} />
 			<Route path="profile" element={<ProfilePage />} />
 			<Route path="settings" element={<SettingsPage />} />
 			<Route path="leaderboard" element={<LeaderboardPage />} />

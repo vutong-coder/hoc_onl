@@ -93,6 +93,23 @@ export const ExamTakingPage: React.FC = () => {
     }, 2000);
   }, [currentExam, navigate]);
 
+  // Handle admin warning
+  const handleAdminWarning = useCallback((data: { message: string; sentBy?: string | null; timestamp: string }) => {
+    alert(`⚠️ Cảnh báo từ giám thị:\n\n${data.message}`);
+  }, []);
+
+  // Handle exam terminated by admin
+  const handleExamTerminated = useCallback((data: { reason?: string; terminatedBy?: string | null }) => {
+    setExamStopped(true);
+    setShowViolationAlert(false);
+    alert(`⚠️ Bài thi đã bị dừng:\n\n${data.reason || 'Phiên thi đã bị dừng bởi giám thị'}`);
+    
+    // Navigate to result page or show stopped message
+    setTimeout(() => {
+      navigate('/user/home');
+    }, 2000);
+  }, [navigate]);
+
   // Handle camera metrics update
   const handleMetricsUpdate = useCallback((metrics: any) => {
     setCameraMetrics(metrics);
@@ -194,6 +211,8 @@ export const ExamTakingPage: React.FC = () => {
                     sessionId={session.id}
                     onViolationDetected={handleViolationDetected}
                     onMetricsUpdate={handleMetricsUpdate}
+                    onAdminWarning={handleAdminWarning}
+                    onExamTerminated={handleExamTerminated}
                     className={styles.aiCameraMonitor}
                   />
                 </div>

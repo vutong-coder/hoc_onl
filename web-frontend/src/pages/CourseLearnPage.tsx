@@ -11,11 +11,21 @@ import {
   ChevronRight,
   Menu,
   X,
-  Award
+  Award,
+  AlertCircle
 } from 'lucide-react'
 import courseApi, { Course, Material, Progress, Quiz } from '../services/api/courseApi'
+import { awardCourseCompletion } from '../services/api/tokenApi'
 import { useAppSelector } from '../store/hooks'
 import '../assets/css/CourseLearnPage.css'
+
+type ProgressState = Progress & {
+  progressPercentage?: number;
+  completedMaterials?: string[];
+  lastAccessedAt?: string;
+};
+
+const COURSE_COMPLETION_REWARD = Number(import.meta.env.VITE_COURSE_COMPLETION_REWARD ?? 100);
 
 export default function CourseLearnPage(): JSX.Element {
   const { courseId } = useParams<{ courseId: string }>()
@@ -25,7 +35,7 @@ export default function CourseLearnPage(): JSX.Element {
   
   const [course, setCourse] = useState<Course | null>(null)
   const [materials, setMaterials] = useState<Material[]>([])
-  const [progress, setProgress] = useState<Progress | null>(null)
+  const [progress, setProgress] = useState<ProgressState | null>(null)
   const [currentMaterial, setCurrentMaterial] = useState<Material | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -33,6 +43,175 @@ export default function CourseLearnPage(): JSX.Element {
   const [quiz, setQuiz] = useState<Quiz | null>(null)
   const [completingMaterial, setCompletingMaterial] = useState(false)
   const [hasFetched, setHasFetched] = useState(false)
+  const [hasAwardedCompletion, setHasAwardedCompletion] = useState(false)
+  const [isAwardingTokens, setIsAwardingTokens] = useState(false)
+  const [awardMessage, setAwardMessage] = useState<string | null>(null)
+  const [awardError, setAwardError] = useState<string | null>(null)
+
+  const getPercentComplete = (value?: ProgressState | null): number => {
+    if (!value) {
+      return 0
+    }
+    const rawPercent =
+      value.percentComplete ??
+      value.progressPercentage ??
+      (value as any).progress ??
+      0
+    const numericPercent = Number(rawPercent)
+    return Number.isFinite(numericPercent) ? numericPercent : 0
+  }
+
+  const normalizeProgress = (data: any): ProgressState | null => {
+    if (!data) {
+      return null
+    }
+    const percent = Number(
+      data?.percentComplete ?? data?.progressPercentage ?? data?.progress ?? 0
+    )
+    const normalizedPercent = Number.isFinite(percent) ? percent : 0
+    const completedMaterials = Array.isArray(data?.completedMaterials)
+      ? data.completedMaterials
+      : []
+
+    return {
+      ...data,
+      percentComplete: normalizedPercent,
+      progressPercentage: normalizedPercent,
+      completedMaterials,
+    } as ProgressState
+  }
+
+  const handleCourseCompletionReward = async (): Promise<void> => {
+    if (!user?.id || !courseId) {
+      return
+    }
+
+    setIsAwardingTokens(true)
+    setAwardMessage(null)
+    setAwardError(null)
+
+    try {
+      const transaction = await awardCourseCompletion({
+        userId: user.id,
+        courseId,
+        amount: COURSE_COMPLETION_REWARD,
+      })
+
+      setHasAwardedCompletion(true)
+      const awardedAmountRaw =
+        transaction?.amount ??
+        transaction?.tokensAwarded ??
+        COURSE_COMPLETION_REWARD
+      const awardedAmount = Number.isFinite(Number(awardedAmountRaw))
+        ? Number(awardedAmountRaw)
+        : COURSE_COMPLETION_REWARD
+      setAwardMessage(
+        `Bạn đã nhận ${awardedAmount} LEARN khi hoàn thành khóa học${course?.title ? ` "${course.title}"` : ''
+        }.`
+      )
+    } catch (rewardErr: unknown) {
+      const message =
+        rewardErr instanceof Error
+          ? rewardErr.message
+          : (rewardErr as { message?: string })?.message || 'Không thể cộng token phần thưởng.'
+      setAwardError(message)
+    } finally {
+      setIsAwardingTokens(false)
+    }
+  }
+
+  const handleRetryAward = () => {
+    if (isAwardingTokens) {
+      return
+    }
+    void handleCourseCompletionReward()
+  }
+
+  const percentComplete = getPercentComplete(progress)
+  const completedMaterialsCount = progress?.completedMaterials?.length ?? 0
+
+  const rewardBanner = (() => {
+    if (isAwardingTokens) {
+      return (
+        <div
+          style={{
+            marginTop: '1.25rem',
+            padding: '0.75rem 1rem',
+            borderRadius: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            fontWeight: 500,
+            backgroundColor: 'rgba(59,130,246,0.12)',
+            color: '#1d4ed8',
+          }}
+        >
+          <Award size={20} />
+          <span>Đang cộng token phần thưởng cho bạn...</span>
+        </div>
+      )
+    }
+
+    if (awardMessage) {
+      return (
+        <div
+          style={{
+            marginTop: '1.25rem',
+            padding: '0.75rem 1rem',
+            borderRadius: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            fontWeight: 500,
+            backgroundColor: 'rgba(34,197,94,0.12)',
+            color: '#047857',
+          }}
+        >
+          <Award size={20} />
+          <span>{awardMessage}</span>
+        </div>
+      )
+    }
+
+    if (awardError) {
+      return (
+        <div
+          style={{
+            marginTop: '1.25rem',
+            padding: '0.75rem 1rem',
+            borderRadius: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            fontWeight: 500,
+            backgroundColor: 'rgba(239,68,68,0.12)',
+            color: '#b91c1c',
+          }}
+        >
+          <AlertCircle size={20} />
+          <span>{awardError}</span>
+          <button
+            type="button"
+            onClick={handleRetryAward}
+            disabled={isAwardingTokens}
+            style={{
+              marginLeft: 'auto',
+              padding: '0.35rem 0.9rem',
+              borderRadius: '999px',
+              border: '1px solid rgba(185,28,28,0.35)',
+              background: 'transparent',
+              color: '#b91c1c',
+              cursor: isAwardingTokens ? 'not-allowed' : 'pointer',
+            }}
+          >
+            Thử lại
+          </button>
+        </div>
+      )
+    }
+
+    return null
+  })()
 
   // ✅ FIX: Add guard to prevent duplicate fetch
   useEffect(() => {
@@ -67,28 +246,38 @@ export default function CourseLearnPage(): JSX.Element {
       
       // Fetch course details
       const courseResponse = await courseApi.getCourseById(courseId)
-      setCourse(courseResponse.data)
+      setCourse(courseResponse.data ?? null)
 
       // Fetch materials
       const materialsResponse = await courseApi.getCourseMaterials(courseId)
-      const sortedMaterials = materialsResponse.data.sort((a, b) => a.order - b.order)
+      const sortedMaterials = (materialsResponse.data ?? []).sort((a, b) => {
+        const orderA = a.order ?? a.displayOrder ?? 0
+        const orderB = b.order ?? b.displayOrder ?? 0
+        return orderA - orderB
+      })
       setMaterials(sortedMaterials)
 
       // Fetch progress
       if (user?.id) {
         try {
           const progressResponse = await courseApi.getStudentProgress(Number(user.id), courseId)
-          setProgress(progressResponse.data)
+          const normalizedProgress = normalizeProgress(progressResponse.data)
+          setProgress(normalizedProgress)
+          setHasAwardedCompletion(getPercentComplete(normalizedProgress) >= 100)
         } catch (err) {
           // Backend có thể trả 404/500 khi chưa có progress
-          setProgress({
-            id: 'temp',
+          const fallbackProgress = normalizeProgress({
+            id: 0,
             studentId: Number(user.id),
             courseId,
             completedMaterials: [],
+            percentComplete: 0,
             progressPercentage: 0,
-            lastAccessedAt: new Date().toISOString()
-          } as unknown as Progress)
+            lastAccessedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          } as ProgressState)
+          setProgress(fallbackProgress)
+          setHasAwardedCompletion(false)
         }
       }
 
@@ -106,7 +295,7 @@ export default function CourseLearnPage(): JSX.Element {
       // Load quiz content
       try {
         const quizResponse = await courseApi.getQuizDetails(material.id)
-        setQuiz(quizResponse.data)
+        setQuiz(quizResponse.data ?? null)
       } catch (err) {
         console.error('Error loading quiz:', err)
       }
@@ -124,6 +313,7 @@ export default function CourseLearnPage(): JSX.Element {
   const handleMarkComplete = async () => {
     if (!currentMaterial || !user?.id || !courseId) return
     
+    const previousPercent = getPercentComplete(progress)
     setCompletingMaterial(true)
     try {
       const response = await courseApi.updateProgress(
@@ -131,7 +321,13 @@ export default function CourseLearnPage(): JSX.Element {
         courseId,
         currentMaterial.id
       )
-      setProgress(response.data)
+      const normalizedProgress = normalizeProgress(response.data)
+      setProgress(normalizedProgress)
+
+      const newPercent = getPercentComplete(normalizedProgress)
+      if (!hasAwardedCompletion && previousPercent < 100 && newPercent >= 100) {
+        await handleCourseCompletionReward()
+      }
       
       // Move to next material
       const currentIndex = materials.findIndex(m => m.id === currentMaterial.id)
@@ -212,17 +408,15 @@ export default function CourseLearnPage(): JSX.Element {
           </p>
         </div>
 
-        {progress && (
           <div className="header-progress">
             <div className="progress-bar">
               <div 
                 className="progress-fill" 
-                style={{ width: `${progress.progressPercentage}%` }}
+              style={{ width: `${percentComplete}%` }}
               ></div>
-            </div>
-            <span className="progress-text">{progress.progressPercentage}%</span>
           </div>
-        )}
+          <span className="progress-text">{percentComplete}%</span>
+        </div>
 
         <button 
           onClick={() => setSidebarOpen(!sidebarOpen)} 
@@ -232,6 +426,8 @@ export default function CourseLearnPage(): JSX.Element {
           {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
+
+      {rewardBanner}
 
       {/* Content Area */}
       <div className="learn-content">
@@ -390,7 +586,7 @@ export default function CourseLearnPage(): JSX.Element {
         <div className={`materials-sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
           <div className="sidebar-header">
             <h3>Nội dung khóa học</h3>
-            <p>{materials.filter(m => isMaterialCompleted(m.id)).length} / {materials.length} hoàn thành</p>
+            <p>{completedMaterialsCount} / {materials.length} hoàn thành</p>
           </div>
 
           <div className="materials-list">

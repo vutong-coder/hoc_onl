@@ -117,6 +117,21 @@ export interface SubmitQuizResponse {
   };
 }
 
+export interface ActiveProctoredStudent {
+  sessionId: string;
+  sessionStatus: string | null;
+  studentId: string | number | null;
+  examId: string | number | null;
+  examTitle: string | null;
+  examStatus: string | null;
+  examStartAt: string | null;
+  examEndAt: string | null;
+  submissionId: string | null;
+  startedAt: string | null;
+  timeSpentSeconds: number | null;
+  lastUpdatedAt: string | null;
+}
+
 // ============================================================================
 // STUDENT QUIZ API
 // ============================================================================
@@ -268,6 +283,22 @@ export const getMyAllSubmissions = async (): Promise<QuizSubmission[]> => {
 };
 
 // ============================================================================
+// PROCTORING MONITORING API
+// ============================================================================
+
+export const getActiveProctoredStudents = async (): Promise<ActiveProctoredStudent[]> => {
+  try {
+    const response = await onlineExamAxios.get<{ success: boolean; data: ActiveProctoredStudent[] }>(
+      `/api/proctoring/active-sessions`
+    );
+    return response.data.data ?? [];
+  } catch (error) {
+    console.error('Error fetching active proctored students:', error);
+    return [];
+  }
+};
+
+// ============================================================================
 // EXAM SERVICE OBJECT (similar to examApi)
 // ============================================================================
 
@@ -286,6 +317,9 @@ const onlineExamApi = {
   // All quizzes operations (for exam list page)
   getAllQuizzes,
   getMyAllSubmissions,
+
+  // Proctoring monitoring
+  getActiveProctoredStudents,
 };
 
 export default onlineExamApi;

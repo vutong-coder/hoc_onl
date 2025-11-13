@@ -4,13 +4,19 @@ import tokenRewardApi, {
   spendTokens as spendTokensReward,
   getBalance as getBalanceReward,
   getHistory as getHistoryReward,
+  grantCourseCompletionTokens,
   type GrantTokenRequest,
   type SpendTokenRequest,
   type BalanceResponse,
   type HistoryResponse,
+  type CourseCompletionRewardRequest,
+  type Transaction,
 } from './tokenRewardApi'
 
 const API_BASE_URL = import.meta.env.VITE_TOKEN_API_URL || 'http://localhost:9009'
+const DEFAULT_COURSE_COMPLETION_REWARD = Number(
+	import.meta.env.VITE_COURSE_COMPLETION_REWARD ?? 100
+)
 
 // Create axios instance with interceptors
 const api = axios.create({
@@ -51,6 +57,8 @@ export type {
   SpendTokenRequest,
   BalanceResponse,
   HistoryResponse,
+  CourseCompletionRewardRequest,
+  Transaction,
 } from './tokenRewardApi'
 
 export interface RewardRequest {
@@ -137,6 +145,53 @@ export async function awardCertification(request: RewardRequest): Promise<TokenT
 export async function awardContestWin(request: RewardRequest & { rank: number }): Promise<TokenTransaction> {
 	const res = await api.post<TokenTransaction>('/tokens/reward/contest', request)
 	return res.data
+}
+
+export interface CourseCompletionAwardParams {
+	userId: string | number
+	courseId: string | number
+	amount?: number
+	reasonCode?: string
+}
+
+export async function awardCourseCompletion({
+	userId,
+	courseId,
+	amount,
+	reasonCode
+}: CourseCompletionAwardParams): Promise<Transaction> {
+	if (userId === undefined || userId === null) {
+		throw new Error('User id is required to award course completion tokens.')
+	}
+	if (courseId === undefined || courseId === null) {
+		throw new Error('Course id is required to award course completion tokens.')
+	}
+
+	const normalizedUserId =
+		typeof userId === 'string'
+			? (() => {
+					const trimmed = userId.trim()
+					if (trimmed.length === 0) {
+						throw new Error('User id is required to award course completion tokens.')
+					}
+					return Number.isFinite(Number(trimmed)) ? Number(trimmed) : trimmed
+			  })()
+			: userId
+
+	const rewardAmount = Number.isFinite(Number(amount))
+		? Number(amount)
+		: DEFAULT_COURSE_COMPLETION_REWARD
+
+	if (!(rewardAmount > 0)) {
+		throw new Error('Reward amount must be a positive number.')
+	}
+
+	return grantCourseCompletionTokens({
+		studentId: normalizedUserId,
+		courseId,
+		amount: rewardAmount,
+		reasonCode,
+	})
 }
 
 /**

@@ -10,6 +10,8 @@ interface AICameraMonitorProps {
   sessionId?: string;
   onViolationDetected?: (detection: CheatingDetection) => void;
   onMetricsUpdate?: (metrics: any) => void;
+  onAdminWarning?: (data: { message: string; sentBy?: string | null; timestamp: string }) => void;
+  onExamTerminated?: (data: { reason?: string; terminatedBy?: string | null }) => void;
   className?: string;
 }
 
@@ -19,6 +21,8 @@ export const AICameraMonitor: React.FC<AICameraMonitorProps> = ({
   sessionId,
   onViolationDetected,
   onMetricsUpdate,
+  onAdminWarning,
+  onExamTerminated,
   className = ''
 }) => {
   const {
@@ -33,7 +37,7 @@ export const AICameraMonitor: React.FC<AICameraMonitorProps> = ({
     setDetectionSensitivity,
     enableDetectionType,
     frameStorage
-  } = useAICameraMonitor({ examId, studentId, sessionId });
+  } = useAICameraMonitor({ examId, studentId, sessionId, onAdminWarning, onExamTerminated });
 
   const [showSettings, setShowSettings] = useState(false);
   const [detectionTypes, setDetectionTypes] = useState({

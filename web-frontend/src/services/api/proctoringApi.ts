@@ -176,6 +176,34 @@ export const terminateSession = async (sessionId: string): Promise<boolean> => {
   }
 };
 
+/**
+ * Send warning to student
+ */
+export const sendWarning = async (sessionId: string, message?: string): Promise<boolean> => {
+  try {
+    const response = await proctoringAxios.post(`/proctoring/sessions/${sessionId}/warning`, {
+      message: message || 'Bạn đã nhận được cảnh báo từ giám thị'
+    });
+    return response.status === 200;
+  } catch (error: any) {
+    console.error('Error sending warning:', error);
+    return false;
+  }
+};
+
+/**
+ * Complete proctoring session (mark as completed)
+ */
+export const completeSession = async (sessionId: string): Promise<boolean> => {
+  try {
+    const response = await proctoringAxios.post(`/proctoring/sessions/${sessionId}/complete`);
+    return response.status === 200;
+  } catch (error: any) {
+    console.error('Error completing session:', error);
+    return false;
+  }
+};
+
 // ==================== Events ====================
 
 /**
@@ -183,7 +211,7 @@ export const terminateSession = async (sessionId: string): Promise<boolean> => {
  */
 export const getEventsBySession = async (sessionId: string): Promise<ProctoringEvent[]> => {
   try {
-    const response = await proctoringAxios.get(`/sessions/${sessionId}/events`);
+    const response = await proctoringAxios.get(`/proctoring/sessions/${sessionId}/events`);
     return response.data;
   } catch (error: any) {
     console.error('Error fetching events:', error);
@@ -247,6 +275,8 @@ const proctoringApi = {
   getSessionById,
   getSessionWithDetails,
   terminateSession,
+  completeSession,
+  sendWarning,
   
   // Events
   getEventsBySession,

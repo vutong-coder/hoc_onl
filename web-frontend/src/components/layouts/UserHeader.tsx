@@ -433,6 +433,7 @@ export default function UserHeader(): JSX.Element {
 												{ icon: <Clock style={{ width: '16px', height: '16px' }} />, label: 'Bài thi gần đây', onClick: () => navigate('/user/exams/recent') },
 												{ icon: <Trophy style={{ width: '16px', height: '16px' }} />, label: 'Bảng xếp hạng', onClick: () => navigate('/user/leaderboard') },
 												{ icon: <Settings style={{ width: '16px', height: '16px' }} />, label: 'Cài đặt', onClick: () => navigate('/user/settings') },
+												{ icon: <Shield style={{ width: '16px', height: '16px' }} />, label: 'Ví Multisig', onClick: () => navigate('/user/multisig') },
 												{ icon: <Copyright style={{ width: '16px', height: '16px' }} />, label: 'Bản quyền', onClick: () => navigate('/user/copyright') },
 												{ icon: <LogOut style={{ width: '16px', height: '16px' }} />, label: 'Đăng xuất', onClick: handleLogout }
 											].map((item, index) => (

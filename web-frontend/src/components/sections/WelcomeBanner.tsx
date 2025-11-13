@@ -142,7 +142,7 @@ export default function WelcomeBanner({
 							backgroundClip: 'text',
 							animation: 'slideInLeft 0.6s ease-out'
 						}}>
-							Chào mừng trở lại, {userName}! 👋
+							Chào mừng trở lại, {userName}! 
 						</h1>
 						<p style={{
 							fontSize: '16px',

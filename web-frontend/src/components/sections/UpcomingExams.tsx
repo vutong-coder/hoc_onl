@@ -11,6 +11,7 @@ interface UpcomingExam {
 	type: 'scheduled' | 'practice' | 'certification'
 	status: 'upcoming' | 'registered' | 'ready'
 	proctoring?: boolean
+	isStopped?: boolean // Bài thi đã bị dừng bởi giám thị
 }
 
 interface UpcomingExamsProps {
@@ -172,6 +173,27 @@ export default function UpcomingExams({
 	}
 
 	const getActionButton = (exam: UpcomingExam) => {
+		// Nếu bài thi đã bị dừng, không hiển thị nút hành động
+		if (exam.isStopped) {
+			return (
+				<div
+					style={{
+						padding: '8px 16px',
+						borderRadius: 'var(--radius-md)',
+						fontSize: '14px',
+						fontWeight: 500,
+						minWidth: '120px',
+						textAlign: 'center',
+						background: 'var(--muted)',
+						color: 'var(--muted-foreground)',
+						border: '1px solid var(--border)'
+					}}
+				>
+					Đã bị dừng
+				</div>
+			)
+		}
+		
 		switch (exam.status) {
 			case 'ready':
 				return (

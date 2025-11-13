@@ -22,6 +22,13 @@ import courseApi, { Course, Material, Progress } from '../services/api/courseApi
 import { useAppSelector } from '../store/hooks'
 import '../assets/css/CourseDetailPage.css'
 
+type ProgressState = Progress & {
+  progressPercentage?: number;
+  completedMaterials?: string[];
+};
+
+const COURSE_COMPLETION_REWARD = Number(import.meta.env.VITE_COURSE_COMPLETION_REWARD ?? 100);
+
 export default function CourseDetailPage(): JSX.Element {
   const { courseId } = useParams<{ courseId: string }>()
   const navigate = useNavigate()
@@ -29,12 +36,45 @@ export default function CourseDetailPage(): JSX.Element {
   
   const [course, setCourse] = useState<Course | null>(null)
   const [materials, setMaterials] = useState<Material[]>([])
-  const [progress, setProgress] = useState<Progress | null>(null)
+  const [progress, setProgress] = useState<ProgressState | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'curriculum' | 'instructor'>('overview')
   const [isEnrolled, setIsEnrolled] = useState(false)
   const [hasFetched, setHasFetched] = useState(false)
+
+  const getPercentComplete = (value?: ProgressState | null): number => {
+    if (!value) {
+      return 0
+    }
+    const rawPercent =
+      value.percentComplete ??
+      value.progressPercentage ??
+      (value as Record<string, unknown>).progress ??
+      0
+    const numeric = Number(rawPercent)
+    return Number.isFinite(numeric) ? numeric : 0
+  }
+
+  const normalizeProgress = (data: any): ProgressState | null => {
+    if (!data) {
+      return null
+    }
+    const percent = Number(
+      data?.percentComplete ?? data?.progressPercentage ?? data?.progress ?? 0
+    )
+    const normalizedPercent = Number.isFinite(percent) ? percent : 0
+    const completedMaterials = Array.isArray(data?.completedMaterials)
+      ? data.completedMaterials
+      : []
+
+    return {
+      ...data,
+      percentComplete: normalizedPercent,
+      progressPercentage: normalizedPercent,
+      completedMaterials,
+    } as ProgressState
+  }
 
   // ✅ FIX: Add guard to prevent duplicate fetch in React StrictMode
   useEffect(() => {
@@ -66,10 +106,12 @@ export default function CourseDetailPage(): JSX.Element {
       if (user?.id) {
         try {
           const progressResponse = await courseApi.getStudentProgress(Number(user.id), courseId)
-          setProgress(progressResponse.data)
+          const normalizedProgress = normalizeProgress(progressResponse.data)
+          setProgress(normalizedProgress)
           setIsEnrolled(true)
         } catch (err) {
           console.log('User not enrolled or no progress found')
+          setProgress(null)
           setIsEnrolled(false)
         }
       }
@@ -188,7 +230,8 @@ export default function CourseDetailPage(): JSX.Element {
   }
 
   const isMaterialCompleted = (materialId: string) => {
-    return progress?.completedMaterials.includes(materialId) || false
+    const completed = progress?.completedMaterials ?? []
+    return Array.isArray(completed) ? completed.includes(materialId) : false
   }
 
   const getMaterialStatusMeta = (materialId: string) => {
@@ -214,6 +257,9 @@ export default function CourseDetailPage(): JSX.Element {
       icon: <PlayCircle size={20} />
     }
   }
+
+  const percentComplete = getPercentComplete(progress)
+  const completedMaterialsCount = progress?.completedMaterials?.length ?? 0
 
   if (loading) {
     return (
@@ -311,7 +357,7 @@ export default function CourseDetailPage(): JSX.Element {
                   <Play size={20} />
                   <span>Tiếp tục học</span>
                   {progress && (
-                    <span className="progress-badge">{progress.progressPercentage}%</span>
+                    <span className="progress-badge">{percentComplete}%</span>
                   )}
                 </button>
               ) : (
@@ -331,6 +377,23 @@ export default function CourseDetailPage(): JSX.Element {
                     <span className="token">{course.tokenSymbol || 'LEARN'}</span>
                   </>
                 )}
+              </div>
+
+              <div
+                style={{
+                  marginTop: '0.75rem',
+                  padding: '0.6rem 0.9rem',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(34,197,94,0.12)',
+                  color: '#047857',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  fontWeight: 500,
+                }}
+              >
+                <Award size={18} />
+                <span>Hoàn thành khóa học để nhận {COURSE_COMPLETION_REWARD} LEARN.</span>
               </div>
             </div>
           </div>
@@ -357,11 +420,11 @@ export default function CourseDetailPage(): JSX.Element {
                 <div className="progress-bar">
                   <div 
                     className="progress-fill" 
-                    style={{ width: `${progress.progressPercentage}%` }}
+                    style={{ width: `${percentComplete}%` }}
                   ></div>
                 </div>
                 <p className="progress-text">
-                  {progress.completedMaterials.length} / {materials.length} tài liệu hoàn thành
+                  {completedMaterialsCount} / {materials.length} tài liệu hoàn thành
                 </p>
               </div>
             )}

@@ -103,7 +103,12 @@ export interface Material {
   storageKey?: string;
   content?: string;
   displayOrder?: number;
+  order?: number;
   createdAt?: string;
+  videoUrl?: string;
+  contentUrl?: string;
+  description?: string;
+  duration?: number;
 }
 
 export interface CreateMaterialRequest {
@@ -140,6 +145,8 @@ export interface Quiz {
   title: string;
   description?: string;
   timeLimitMinutes?: number;
+  timeLimit?: number;
+  passingScore?: number;
   createdAt?: string;
   questions: QuizQuestion[];
 }
@@ -165,6 +172,9 @@ export interface Progress {
   percentComplete: number;
   lastMaterialId?: string;
   updatedAt: string;
+  progressPercentage?: number;
+  completedMaterials?: string[];
+  lastAccessedAt?: string;
 }
 
 export interface PageResponse<T> {

@@ -1,6 +1,20 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Users, FileText, Video, Lock, Award, BookOpen, Building, Server, BarChart, Copyright, Badge } from 'lucide-react'
+import {
+	LayoutDashboard,
+	Users,
+	FileText,
+	Video,
+	Lock,
+	Award,
+	BookOpen,
+	Building,
+	Server,
+	BarChart,
+	Copyright,
+	Badge,
+	ShieldCheck,
+} from 'lucide-react'
 import '../../styles/sidebar.css'
 
 type Item = { icon: React.ReactNode; label: string; path: string }
@@ -11,6 +25,7 @@ const items: Item[] = [
 	{ icon: <FileText className="w-5 h-5" />, label: 'Quản lý bài thi', path: '/admin/exams' },
 	{ icon: <Video className="w-5 h-5" />, label: 'Giám sát & Chống gian lận', path: '/admin/proctoring' },
 	{ icon: <Lock className="w-5 h-5" />, label: 'Bảo mật & Blockchain', path: '/admin/security' },
+	{ icon: <ShieldCheck className="w-5 h-5" />, label: 'Quản lý Multisig', path: '/admin/multisig' },
 	{ icon: <Award className="w-5 h-5" />, label: 'Hệ thống thưởng Token', path: '/admin/reward' },
 	{ icon: <BookOpen className="w-5 h-5" />, label: 'Quản lý khóa học', path: '/admin/courses' },
 	{ icon: <Building className="w-5 h-5" />, label: 'Quản lý tổ chức', path: '/admin/organizations' },

@@ -27,6 +27,42 @@ export default function CourseProgress({
     onContinueCourse,
     onViewCourse
 }: CourseProgressProps): JSX.Element {
+    const normalizeProgress = (data: any) => {
+        const percent = Number(
+            data?.percentComplete ??
+            data?.progressPercentage ??
+            data?.progress ??
+            0
+        )
+
+        const percentComplete = Number.isFinite(percent)
+            ? Math.min(Math.max(percent, 0), 100)
+            : 0
+
+        const completedMaterials = Array.isArray(data?.completedMaterials)
+            ? data.completedMaterials
+            : []
+
+        return {
+            percentComplete,
+            completedMaterials
+        }
+    }
+
+    const formatDuration = (duration: number | string | null | undefined) => {
+        const numeric = Number(duration)
+
+        if (!Number.isFinite(numeric) || numeric <= 0) {
+            return '0 giờ'
+        }
+
+        if (Number.isInteger(numeric)) {
+            return `${numeric} giờ`
+        }
+
+        return `${numeric.toFixed(1)} giờ`
+    }
+
     const navigate = useNavigate()
     const { user } = useAppSelector((state) => state.auth)
     const [showCourseDetailModal, setShowCourseDetailModal] = useState(false)
@@ -48,37 +84,32 @@ export default function CourseProgress({
             setLoading(true)
             // Fetch courses with progress
             const coursesResponse = await courseApi.getAllCourses(0, 4)
-            const coursesData = coursesResponse.data.content
+            const coursesData = coursesResponse.data?.content ?? []
             
             // Fetch progress for each course and transform data
             const coursesWithProgress = await Promise.all(
                 coursesData.slice(0, 4).map(async (course) => {
-                    try {
-                        const progressResponse = await courseApi.getStudentProgress(Number(user.id), course.id)
-                        const progress = progressResponse.data
-                        const materialsResponse = await courseApi.getCourseMaterials(course.id)
-                        const materials = materialsResponse.data
-                        
-                        return {
-                            id: course.id,
-                            title: course.title,
-                            progress: progress.progressPercentage,
-                            totalLessons: materials.length,
-                            completedLessons: progress.completedMaterials.length,
-                            duration: `${course.duration} giờ`,
-                            certificate: course.certificateAvailable
-                        }
-                    } catch (err) {
-                        // If no progress, return with 0 progress
-                        return {
-                            id: course.id,
-                            title: course.title,
-                            progress: 0,
-                            totalLessons: 0,
-                            completedLessons: 0,
-                            duration: `${course.duration} giờ`,
-                            certificate: course.certificateAvailable
-                        }
+                    const [progressResult, materialsResult] = await Promise.allSettled([
+                        courseApi.getStudentProgress(Number(user.id), course.id),
+                        courseApi.getCourseMaterials(course.id)
+                    ])
+
+                    const normalizedProgress = progressResult.status === 'fulfilled'
+                        ? normalizeProgress(progressResult.value.data)
+                        : normalizeProgress(null)
+
+                    const materials = materialsResult.status === 'fulfilled' && Array.isArray(materialsResult.value.data)
+                        ? materialsResult.value.data
+                        : []
+
+                    return {
+                        id: course.id,
+                        title: course.title,
+                        progress: normalizedProgress.percentComplete,
+                        totalLessons: materials.length,
+                        completedLessons: normalizedProgress.completedMaterials.length,
+                        duration: formatDuration(course.duration ?? course.totalDuration),
+                        certificate: Boolean(course.certificateAvailable ?? course.certificate)
                     }
                 })
             )
