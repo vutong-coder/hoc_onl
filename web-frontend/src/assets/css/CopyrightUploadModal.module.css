@@ -14,14 +14,14 @@
 }
 
 .modal {
-  background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+  background: var(--card);
   border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-xl);
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
 }
 
 .header {
@@ -29,11 +29,11 @@
   align-items: center;
   justify-content: space-between;
   padding: 24px 32px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border);
 }
 
 .header h2 {
-  color: #ffffff;
+  color: var(--foreground);
   font-size: 24px;
   font-weight: 600;
   margin: 0;
@@ -42,7 +42,7 @@
 .closeButton {
   background: none;
   border: none;
-  color: #ffffff;
+  color: var(--foreground);
   cursor: pointer;
   padding: 8px;
   border-radius: 8px;
@@ -53,7 +53,7 @@
 }
 
 .closeButton:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--hover-bg);
 }
 
 .closeButton:disabled {
@@ -70,12 +70,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: linear-gradient(135deg, #ff6b6b20, #ff8e8e20);
-  border: 1px solid #ff6b6b;
+  background: var(--destructive);
+  border: 1px solid var(--destructive);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 24px;
-  color: #ff6b6b;
+  color: var(--destructive-foreground);
+  opacity: 0.9;
 }
 
 .warning span {
@@ -84,8 +85,8 @@
 }
 
 .connectButton {
-  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
-  color: white;
+  background: var(--destructive);
+  color: var(--destructive-foreground);
   border: none;
   padding: 8px 16px;
   border-radius: 8px;
@@ -99,7 +100,8 @@
 
 .connectButton:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  box-shadow: var(--shadow-lg);
+  opacity: 0.9;
 }
 
 .connectButton:disabled {
@@ -114,8 +116,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(102, 126, 234, 0.1);
-  border: 1px solid rgba(102, 126, 234, 0.3);
+  background: var(--muted);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 12px;
@@ -123,19 +125,19 @@
 }
 
 .walletAddress {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--muted-foreground);
   font-size: 14px;
   font-family: 'Monaco', 'Menlo', monospace;
 }
 
 .balanceInfo {
-  color: #667eea;
+  color: var(--primary);
   font-weight: 600;
   font-size: 16px;
 }
 
 .balanceInfo .loadingText {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--muted-foreground);
   font-style: italic;
   font-size: 14px;
 }
@@ -144,17 +146,17 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--muted);
   border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 24px;
   text-align: center;
-  color: #ffffff;
+  color: var(--foreground);
   font-weight: 500;
 }
 
 .insufficientBalance {
-  color: #ff6b6b;
+  color: var(--destructive);
   font-size: 13px;
   font-weight: 500;
   margin-top: 4px;
@@ -167,7 +169,7 @@
 
 .uploadTypeSection label {
   display: block;
-  color: #ffffff;
+  color: var(--foreground);
   font-weight: 500;
   margin-bottom: 12px;
 }
@@ -184,22 +186,23 @@
   justify-content: center;
   gap: 8px;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--muted);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--foreground);
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: 500;
 }
 
 .uploadTypeButton:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--hover-bg);
 }
 
 .uploadTypeButton.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-color: #667eea;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
 }
 
 /* File Upload Section */
@@ -209,28 +212,28 @@
 
 .fileUploadSection label {
   display: block;
-  color: #ffffff;
+  color: var(--foreground);
   font-weight: 500;
   margin-bottom: 12px;
 }
 
 .fileDropZone {
-  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border: 2px dashed var(--border);
   border-radius: 12px;
   padding: 32px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--muted);
 }
 
 .fileDropZone:hover {
-  border-color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--primary);
+  background: var(--hover-bg);
 }
 
 .dropZoneContent {
-  color: #ffffff;
+  color: var(--foreground);
 }
 
 .dropZoneContent p {
@@ -239,15 +242,15 @@
 
 .dropZoneContent .supportedFormats {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--muted-foreground);
 }
 
 .selectedFile {
   display: flex;
   align-items: center;
   gap: 16px;
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--foreground);
+  background: var(--muted);
   border-radius: 8px;
   padding: 16px;
 }
@@ -264,7 +267,7 @@
 .selectedFile button {
   background: none;
   border: none;
-  color: #ff6b6b;
+  color: var(--destructive);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -272,7 +275,9 @@
 }
 
 .selectedFile button:hover {
-  background: rgba(255, 107, 107, 0.1);
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+  opacity: 0.9;
 }
 
 /* Similarity Check Styles */
@@ -281,11 +286,11 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: var(--muted);
+  border: 1px solid var(--primary);
   border-radius: 8px;
   margin-top: 16px;
-  color: #3b82f6;
+  color: var(--primary);
   font-size: 14px;
 }
 
@@ -301,13 +306,15 @@
 }
 
 .similaritySafe {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
+  background: var(--primary);
+  border-color: var(--primary);
+  opacity: 0.9;
 }
 
 .similarityWarning {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
+  background: var(--destructive);
+  border-color: var(--destructive);
+  opacity: 0.9;
 }
 
 .similarityHeader {
@@ -318,26 +325,26 @@
 }
 
 .similarityHeader h4 {
-  color: #ffffff;
+  color: var(--foreground);
   font-size: 16px;
   font-weight: 600;
   margin: 0 0 4px 0;
 }
 
 .similarityHeader p {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--muted-foreground);
   font-size: 13px;
   margin: 0;
 }
 
 .successIcon {
-  color: #10b981;
+  color: var(--primary);
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 .warningIcon {
-  color: #ef4444;
+  color: var(--destructive);
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -345,11 +352,11 @@
 .similarDocumentsList {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--border);
 }
 
 .similarDocumentsTitle {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--foreground);
   font-size: 14px;
   font-weight: 500;
   margin: 0 0 12px 0;
@@ -366,9 +373,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--muted);
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
 }
 
 .similarDocumentInfo {
@@ -380,12 +387,12 @@
 }
 
 .similarDocumentInfo svg {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--muted-foreground);
   flex-shrink: 0;
 }
 
 .similarDocumentName {
-  color: #ffffff;
+  color: var(--foreground);
   font-size: 13px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -393,17 +400,17 @@
 }
 
 .similarityPercentage {
-  color: #f59e0b;
+  color: var(--accent-foreground);
   font-size: 14px;
   font-weight: 600;
   padding: 4px 12px;
-  background: rgba(245, 158, 11, 0.2);
+  background: var(--accent);
   border-radius: 12px;
   flex-shrink: 0;
 }
 
 .moreDocuments {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--muted-foreground);
   font-size: 12px;
   font-style: italic;
   margin: 8px 0 0 0;
@@ -416,16 +423,17 @@
   gap: 8px;
   margin-top: 16px;
   padding: 12px;
-  background: rgba(239, 68, 68, 0.15);
-  border-left: 3px solid #ef4444;
+  background: var(--destructive);
+  border-left: 3px solid var(--destructive);
   border-radius: 6px;
-  color: #ffffff;
+  color: var(--destructive-foreground);
   font-size: 13px;
   line-height: 1.5;
+  opacity: 0.9;
 }
 
 .similarityWarningMessage svg {
-  color: #ef4444;
+  color: var(--destructive-foreground);
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -437,10 +445,10 @@
   gap: 8px;
   margin-top: 12px;
   padding: 10px 16px;
-  background: rgba(59, 130, 246, 0.2);
-  border: 1px solid rgba(59, 130, 246, 0.4);
+  background: var(--secondary);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  color: #3b82f6;
+  color: var(--secondary-foreground);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -449,8 +457,9 @@
 }
 
 .recheckButton:hover:not(:disabled) {
-  background: rgba(59, 130, 246, 0.3);
-  border-color: rgba(59, 130, 246, 0.6);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
 }
 
 .recheckButton:disabled {
@@ -469,31 +478,31 @@
 
 .textInputSection label {
   display: block;
-  color: #ffffff;
+  color: var(--foreground);
   font-weight: 500;
   margin-bottom: 12px;
 }
 
 .textInputSection textarea {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--input);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 12px;
-  color: #ffffff;
+  color: var(--foreground);
   font-size: 14px;
   resize: vertical;
   min-height: 120px;
 }
 
 .textInputSection textarea::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--muted-foreground);
 }
 
 .characterCount {
   text-align: right;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--muted-foreground);
   margin-top: 4px;
 }
 
@@ -503,7 +512,7 @@
 }
 
 .metadataSection h3 {
-  color: #ffffff;
+  color: var(--foreground);
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 20px;
@@ -522,7 +531,7 @@
 
 .formGroup label {
   display: block;
-  color: #ffffff;
+  color: var(--foreground);
   font-weight: 500;
   margin-bottom: 8px;
 }
@@ -531,17 +540,17 @@
 .formGroup select,
 .formGroup textarea {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--input);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 12px;
-  color: #ffffff;
+  color: var(--foreground);
   font-size: 14px;
 }
 
 .formGroup input::placeholder,
 .formGroup textarea::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--muted-foreground);
 }
 
 .formGroup select {
@@ -560,8 +569,8 @@
 }
 
 .tagsInput button {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: var(--primary);
+  color: var(--primary-foreground);
   border: none;
   padding: 12px 16px;
   border-radius: 8px;
@@ -572,7 +581,8 @@
 
 .tagsInput button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-lg);
+  background: var(--accent);
 }
 
 .tagsInput button:disabled {
@@ -591,8 +601,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: var(--primary);
+  color: var(--primary-foreground);
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -602,7 +612,7 @@
 .tag button {
   background: none;
   border: none;
-  color: white;
+  color: var(--primary-foreground);
   cursor: pointer;
   padding: 2px;
   border-radius: 50%;
@@ -610,7 +620,7 @@
 }
 
 .tag button:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--hover-bg);
 }
 
 /* Error Display */
@@ -618,12 +628,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(255, 107, 107, 0.1);
-  border: 1px solid #ff6b6b;
+  background: var(--destructive);
+  border: 1px solid var(--destructive);
   border-radius: 8px;
   padding: 12px 16px;
-  color: #ff6b6b;
+  color: var(--destructive-foreground);
   margin-bottom: 16px;
+  opacity: 0.9;
 }
 
 /* Result Display */
@@ -637,15 +648,17 @@
 }
 
 .result.success {
-  background: rgba(46, 204, 113, 0.1);
-  border: 1px solid #2ecc71;
-  color: #2ecc71;
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  color: var(--primary-foreground);
+  opacity: 0.9;
 }
 
 .result.error {
-  background: rgba(255, 107, 107, 0.1);
-  border: 1px solid #ff6b6b;
-  color: #ff6b6b;
+  background: var(--destructive);
+  border: 1px solid var(--destructive);
+  color: var(--destructive-foreground);
+  opacity: 0.9;
 }
 
 .result div {
@@ -669,13 +682,13 @@
   justify-content: flex-end;
   margin-top: 32px;
   padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--border);
 }
 
 .cancelButton {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  color: var(--secondary-foreground);
   padding: 12px 24px;
   border-radius: 8px;
   cursor: pointer;
@@ -684,7 +697,7 @@
 }
 
 .cancelButton:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--hover-bg);
 }
 
 .cancelButton:disabled {
@@ -693,8 +706,8 @@
 }
 
 .registerButton {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: var(--primary);
+  color: var(--primary-foreground);
   border: none;
   padding: 12px 24px;
   border-radius: 8px;
@@ -708,7 +721,8 @@
 
 .registerButton:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-lg);
+  background: var(--accent);
 }
 
 .registerButton:disabled {

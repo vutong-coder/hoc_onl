@@ -104,7 +104,7 @@ export const useExamSession = () => {
   useEffect(() => {
     const autoSave = setInterval(() => {
       if (session && currentQuestion && answers[currentQuestion.id]) {
-        examService.saveAnswer(session.id, Number(currentQuestion.id), answers[currentQuestion.id].answer);
+        examService.saveAnswer(session.id, currentQuestion.id, answers[currentQuestion.id].answer);
       }
     }, 30000);
 
@@ -114,7 +114,7 @@ export const useExamSession = () => {
   const handleAnswerChange = useCallback((answer: any) => {
     if (currentQuestion) {
       dispatch(updateAnswer({ 
-        questionId: Number(currentQuestion.id), 
+        questionId: currentQuestion.id, 
         answer 
       }));
     }
@@ -122,7 +122,7 @@ export const useExamSession = () => {
 
   const handleFlagQuestion = useCallback(() => {
     if (currentQuestion) {
-      dispatch(toggleQuestionFlag(Number(currentQuestion.id)));
+      dispatch(toggleQuestionFlag(currentQuestion.id));
     }
   }, [currentQuestion, dispatch]);
 

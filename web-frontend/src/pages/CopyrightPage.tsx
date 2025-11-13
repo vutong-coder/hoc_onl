@@ -789,7 +789,7 @@ export default function CopyrightPage(): JSX.Element {
 
               {/* Debug info */}
               {process.env.NODE_ENV === 'development' && similarityCheckResult && (
-                <div style={{ padding: '10px', background: '#f0f0f0', margin: '10px 0', fontSize: '12px' }}>
+                <div className={styles.debugInfo}>
                   Debug: isSimilar={String(similarityCheckResult.isSimilar)}, 
                   score={similarityCheckResult.similarityScore}, 
                   docs={similarityCheckResult.similarDocuments.length}

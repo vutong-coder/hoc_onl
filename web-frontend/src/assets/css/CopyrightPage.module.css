@@ -87,18 +87,18 @@
 }
 
 .walletLabel {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--muted-foreground);
   font-weight: 500;
 }
 
 .walletAddress {
-  color: #667eea;
+  color: var(--primary);
   font-family: 'Monaco', 'Menlo', monospace;
   font-weight: 600;
 }
 
 .balance {
-  color: #2ecc71;
+  color: var(--primary);
   font-weight: 600;
   margin-left: 8px;
 }
@@ -108,19 +108,19 @@
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--muted-foreground);
 }
 
 .connectedIcon {
-  color: #2ecc71;
+  color: var(--primary);
 }
 
 .disconnectedIcon {
-  color: #ff6b6b;
+  color: var(--destructive);
 }
 
 .networkDetails {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--muted-foreground);
   font-size: 11px;
   font-family: 'Monaco', 'Menlo', monospace;
   margin-left: 4px;
@@ -236,13 +236,13 @@
 
 /* Wallet Balance Card */
 .walletBalanceCard {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-card);
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-lg);
-  color: #ffffff;
+  color: var(--foreground);
 }
 
 .walletCardHeader {
@@ -259,19 +259,19 @@
 }
 
 .walletCardTitle h3 {
-  color: #ffffff;
+  color: var(--foreground);
   font-size: 20px;
   font-weight: 600;
   margin: 0;
 }
 
 .refreshButton {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--muted);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px;
   cursor: pointer;
-  color: #ffffff;
+  color: var(--foreground);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -279,7 +279,7 @@
 }
 
 .refreshButton:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--accent);
   transform: rotate(180deg);
 }
 
@@ -314,7 +314,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--muted);
   border-radius: 8px;
 }
 
@@ -322,7 +322,7 @@
 .balanceLabel,
 .networkLabel {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--muted-foreground);
   font-weight: 500;
   min-width: 100px;
 }
@@ -330,7 +330,7 @@
 .addressValue {
   font-family: 'Monaco', 'Menlo', monospace;
   font-size: 14px;
-  color: #ffffff;
+  color: var(--foreground);
   font-weight: 600;
   word-break: break-all;
 }
@@ -344,18 +344,18 @@
 .balanceAmount {
   font-size: 24px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--foreground);
   font-family: 'Monaco', 'Menlo', monospace;
 }
 
 .loading {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--muted-foreground);
   font-style: italic;
 }
 
 .networkValue {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--foreground);
   font-family: 'Monaco', 'Menlo', monospace;
 }
 
@@ -370,21 +370,21 @@
 }
 
 .notConnectedSection svg {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--muted-foreground);
 }
 
 .notConnectedText {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--foreground);
   font-size: 16px;
   margin: 0;
 }
 
 .connectWalletButton {
-  background: rgba(255, 255, 255, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  background: var(--primary);
+  border: 2px solid var(--primary);
   border-radius: 8px;
   padding: 12px 24px;
-  color: #ffffff;
+  color: var(--primary-foreground);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -392,10 +392,10 @@
 }
 
 .connectWalletButton:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.6);
+  background: var(--accent);
+  border-color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
 }
 
 .installMetaMaskSection {
@@ -407,18 +407,18 @@
 }
 
 .installText {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--muted-foreground);
   font-size: 14px;
   margin: 0;
   text-align: center;
 }
 
 .installLink {
-  background: rgba(255, 255, 255, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  background: var(--secondary);
+  border: 2px solid var(--border);
   border-radius: 8px;
   padding: 12px 24px;
-  color: #ffffff;
+  color: var(--secondary-foreground);
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
@@ -427,10 +427,10 @@
 }
 
 .installLink:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.6);
+  background: var(--accent);
+  border-color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Statistics Grid */
@@ -682,12 +682,12 @@
 }
 
 .verifiedIcon {
-  color: #10b981;
+  color: var(--primary);
   flex-shrink: 0;
 }
 
 .pendingIcon {
-  color: #f59e0b;
+  color: var(--accent);
   flex-shrink: 0;
 }
 
@@ -705,12 +705,12 @@
 }
 
 .verificationRate {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #ffffff;
+  background: var(--gradient-card);
+  color: var(--foreground);
   padding: 20px;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-lg);
 }
 
 .rateLabel {
@@ -785,7 +785,7 @@
 }
 
 .modalHeader button:hover {
-  background: var(--accent);
+  background: var(--hover-bg);
 }
 
 .modalBody {
@@ -821,7 +821,7 @@
 
 .hash {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  background: var(--accent);
+  background: var(--muted);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
@@ -986,19 +986,19 @@
 }
 
 .checkFileDropZone {
-  border: 3px dashed rgba(255, 255, 255, 0.3);
+  border: 3px dashed var(--border);
   border-radius: 16px;
   padding: 48px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--muted);
   margin-bottom: 24px;
 }
 
 .checkFileDropZone:hover {
   border-color: var(--primary);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hover-bg);
   transform: translateY(-2px);
 }
 
@@ -1022,7 +1022,7 @@
   align-items: center;
   gap: 20px;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--muted);
   border-radius: 12px;
   border: 2px solid var(--primary);
 }
@@ -1046,18 +1046,19 @@
 }
 
 .removeFileButton {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: var(--destructive);
+  border: 1px solid var(--destructive);
   border-radius: 8px;
   padding: 8px;
-  color: #ef4444;
+  color: var(--destructive-foreground);
   cursor: pointer;
   transition: all 0.2s ease;
   margin-left: auto;
 }
 
 .removeFileButton:hover {
-  background: rgba(239, 68, 68, 0.3);
+  background: var(--destructive);
+  opacity: 0.8;
   transform: scale(1.05);
 }
 
@@ -1068,20 +1069,21 @@
   gap: 12px;
   width: 100%;
   padding: 16px 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #ffffff;
+  background: var(--primary);
+  color: var(--primary-foreground);
   border: none;
   border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-lg);
 }
 
 .checkButton:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  background: var(--accent);
+  box-shadow: var(--shadow-xl);
 }
 
 .checkButton:disabled {
@@ -1098,14 +1100,14 @@
   align-items: center;
   gap: 20px;
   padding: 32px;
-  background: rgba(59, 130, 246, 0.1);
-  border: 2px solid rgba(59, 130, 246, 0.3);
+  background: var(--muted);
+  border: 2px solid var(--primary);
   border-radius: 16px;
   margin: 32px 0;
 }
 
 .checkingStatus .spinner {
-  color: #3b82f6;
+  color: var(--primary);
   animation: spin 1s linear infinite;
 }
 
@@ -1139,11 +1141,11 @@
 }
 
 .resultSafe {
-  border-left: 4px solid #10b981;
+  border-left: 4px solid var(--primary);
 }
 
 .resultWarning {
-  border-left: 4px solid #ef4444;
+  border-left: 4px solid var(--destructive);
 }
 
 .resultIcon {
@@ -1172,11 +1174,12 @@
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background: rgba(239, 68, 68, 0.15);
-  border: 2px solid rgba(239, 68, 68, 0.3);
+  background: var(--destructive);
+  border: 2px solid var(--destructive);
   border-radius: 12px;
   font-size: 16px;
-  color: #ef4444;
+  color: var(--destructive-foreground);
+  opacity: 0.9;
 }
 
 .similarityScoreBadge strong {
@@ -1206,7 +1209,7 @@
   grid-template-columns: 60px 2fr 1.5fr 120px 150px;
   gap: 16px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--muted);
   border-bottom: 2px solid var(--border);
   font-weight: 600;
   color: var(--foreground);
@@ -1223,7 +1226,7 @@
 }
 
 .tableRow:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--hover-bg);
 }
 
 .tableRow:last-child {
@@ -1247,10 +1250,10 @@
 .similarityBadge {
   display: inline-block;
   padding: 6px 12px;
-  background: rgba(245, 158, 11, 0.2);
-  border: 1px solid rgba(245, 158, 11, 0.4);
+  background: var(--accent);
+  border: 1px solid var(--accent);
   border-radius: 8px;
-  color: #f59e0b;
+  color: var(--accent-foreground);
   font-weight: 600;
   font-size: 13px;
 }
@@ -1260,28 +1263,29 @@
   align-items: flex-start;
   gap: 16px;
   padding: 20px;
-  background: rgba(239, 68, 68, 0.1);
-  border: 2px solid rgba(239, 68, 68, 0.3);
-  border-left: 4px solid #ef4444;
+  background: var(--destructive);
+  border: 2px solid var(--destructive);
+  border-left: 4px solid var(--destructive);
   border-radius: 12px;
   margin-top: 24px;
+  opacity: 0.9;
 }
 
 .plagiarismWarning svg {
-  color: #ef4444;
+  color: var(--destructive-foreground);
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 .plagiarismWarning h4 {
-  color: #ef4444;
+  color: var(--destructive-foreground);
   font-size: 16px;
   font-weight: 600;
   margin: 0 0 8px 0;
 }
 
 .plagiarismWarning p {
-  color: var(--foreground);
+  color: var(--destructive-foreground);
   font-size: 14px;
   line-height: 1.6;
   margin: 0;
@@ -1292,19 +1296,20 @@
   align-items: center;
   gap: 16px;
   padding: 24px;
-  background: rgba(16, 185, 129, 0.1);
-  border: 2px solid rgba(16, 185, 129, 0.3);
+  background: var(--primary);
+  border: 2px solid var(--primary);
   border-radius: 12px;
   margin-top: 24px;
+  opacity: 0.9;
 }
 
 .noSimilarityMessage svg {
-  color: #10b981;
+  color: var(--primary-foreground);
   flex-shrink: 0;
 }
 
 .noSimilarityMessage p {
-  color: var(--foreground);
+  color: var(--primary-foreground);
   font-size: 15px;
   line-height: 1.6;
   margin: 0;
@@ -1315,10 +1320,10 @@
   width: 100%;
   margin-top: 24px;
   padding: 14px 24px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--secondary);
   border: 2px solid var(--border);
   border-radius: 10px;
-  color: var(--foreground);
+  color: var(--secondary-foreground);
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
@@ -1326,9 +1331,21 @@
 }
 
 .resetCheckButton:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--hover-bg);
   border-color: var(--primary);
   transform: translateY(-1px);
+}
+
+/* Debug Info */
+.debugInfo {
+  padding: 10px;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 10px 0;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
 }
 
 @media (max-width: 768px) {
