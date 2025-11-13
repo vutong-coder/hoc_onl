@@ -104,7 +104,7 @@ export const useExamSession = () => {
   useEffect(() => {
     const autoSave = setInterval(() => {
       if (session && currentQuestion && answers[currentQuestion.id]) {
-        examService.saveAnswer(session.id, currentQuestion.id, answers[currentQuestion.id].answer);
+        examService.saveAnswer(session.id, Number(currentQuestion.id), answers[currentQuestion.id].answer);
       }
     }, 30000);
 
@@ -114,7 +114,7 @@ export const useExamSession = () => {
   const handleAnswerChange = useCallback((answer: any) => {
     if (currentQuestion) {
       dispatch(updateAnswer({ 
-        questionId: currentQuestion.id, 
+        questionId: Number(currentQuestion.id), 
         answer 
       }));
     }
@@ -122,7 +122,7 @@ export const useExamSession = () => {
 
   const handleFlagQuestion = useCallback(() => {
     if (currentQuestion) {
-      dispatch(toggleQuestionFlag(currentQuestion.id));
+      dispatch(toggleQuestionFlag(Number(currentQuestion.id)));
     }
   }, [currentQuestion, dispatch]);
 
@@ -159,7 +159,6 @@ export const useExamSession = () => {
 
             if (proctoringSession) {
               await proctoringApi.completeSession(proctoringSession.id);
-              console.log('[useExamSession] Đã đánh dấu proctoring session hoàn thành:', proctoringSession.id);
             } else {
               console.warn('[useExamSession] Không tìm thấy proctoring session để complete', { examId, userId: authUser.id });
             }

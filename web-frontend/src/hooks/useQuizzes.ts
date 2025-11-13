@@ -202,11 +202,26 @@ export function useQuizzes() {
   useEffect(() => {
     if (!isBrowser || !hasFetched || quizzes.length === 0) return;
 
-    const userIdStr = localStorage.getItem('userId') || localStorage.getItem('user_id');
-    const userId = userIdStr ? String(userIdStr) : null;
+    // Get userId from user object in localStorage
+    const userStr = localStorage.getItem('user');
+    let userId: string | null = null;
+    
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        userId = user?.id ? String(user.id) : null;
+      } catch (error) {
+        // Failed to parse user from localStorage
+      }
+    }
+    
+    // Fallback to direct userId keys if user object doesn't exist
+    if (!userId) {
+      const userIdStr = localStorage.getItem('userId') || localStorage.getItem('user_id');
+      userId = userIdStr ? String(userIdStr) : null;
+    }
 
     if (!userId) {
-      console.warn('[useQuizzes] No userId found, skipping socket connections');
       return;
     }
 
@@ -214,65 +229,109 @@ export function useQuizzes() {
     // Backend requires examId in query and automatically joins the room
     const sockets: Socket[] = [];
 
-    quizzes.forEach(quiz => {
+    // Check server health before creating connections
+    const checkServerHealth = async (): Promise<boolean> => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        const response = await fetch(DEFAULT_PROCTORING_WS_URL, { 
+          method: 'HEAD',
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        return response.ok;
+      } catch (error) {
+        // Server health check failed
+        return false;
+      }
+    };
+
+    // Create socket connections with delay to avoid overwhelming the server
+    quizzes.forEach((quiz, index) => {
       const examIdStr = String(quiz.id);
       
-      const socket = io(DEFAULT_PROCTORING_WS_URL, {
-        query: {
-          examId: examIdStr,
-          userId,
-          userType: 'student',
-        },
-        transports: ['websocket'],
-      });
-
-      socket.on('connect', () => {
-        console.log(`[useQuizzes] Socket connected for exam ${examIdStr}`);
-      });
-
-      socket.on('disconnect', () => {
-        console.warn(`[useQuizzes] Socket disconnected for exam ${examIdStr}`);
-      });
-
-      // Listen for proctoring_session_terminated events
-      socket.on('proctoring_session_terminated', (data: {
-        sessionId?: string;
-        examId?: string;
-        userId?: string;
-        reason?: string;
-        terminatedBy?: string | null;
-      }) => {
-        console.log(`[useQuizzes] Received proctoring_session_terminated event for exam ${examIdStr}:`, data);
-
-        // Check if this event is for the current user
-        if (data.userId && String(data.userId) !== userId) {
-          console.log('[useQuizzes] Event is for different user, ignoring');
-          return;
+      // Add delay between connections to prevent race conditions
+      setTimeout(async () => {
+        // Wait for server to be ready (especially important for first connection)
+        if (index === 0) {
+          const isHealthy = await checkServerHealth();
+          if (!isHealthy) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
         }
+        const createSocket = (retryCount = 0) => {
+          const socket = io(DEFAULT_PROCTORING_WS_URL, {
+            query: {
+              examId: examIdStr,
+              userId,
+              userType: 'student',
+            },
+            transports: ['websocket'],
+            timeout: 15000, // 15 second timeout
+            forceNew: true, // Force new connection to avoid conflicts
+            reconnection: true,
+            reconnectionAttempts: 3,
+            reconnectionDelay: 1000,
+          });
 
-        // If examId is provided, update that specific exam
-        if (data.examId) {
-          const receivedExamIdStr = String(data.examId);
-          console.log('[useQuizzes] Marking exam as stopped:', receivedExamIdStr);
+          socket.on('connect', () => {
+            // Socket connected successfully
+          });
 
-          setQuizzes(prevQuizzes => 
-            prevQuizzes.map(q => {
-              if (String(q.id) === receivedExamIdStr) {
-                console.log('[useQuizzes] ✅ Updated exam to stopped:', q.title);
-                return {
-                  ...q,
-                  isStopped: true
-                };
-              }
-              return q;
-            })
-          );
-        } else {
-          console.warn('[useQuizzes] Received terminated event without examId');
-        }
-      });
+          socket.on('connect_error', (error) => {
+            // Retry up to 2 times with increasing delay
+            if (retryCount < 2) {
+              setTimeout(() => {
+                socket.disconnect();
+                createSocket(retryCount + 1);
+              }, (retryCount + 1) * 2000);
+            }
+          });
 
-      sockets.push(socket);
+          socket.on('disconnect', (reason) => {
+            // Socket disconnected
+          });
+
+          return socket;
+        };
+
+        const socket = createSocket();
+
+        // Listen for proctoring_session_terminated events
+        socket.on('proctoring_session_terminated', (data: {
+          sessionId?: string;
+          examId?: string;
+          userId?: string;
+          reason?: string;
+          terminatedBy?: string | null;
+        }) => {
+          // Check if this event is for the current user
+          if (data.userId && String(data.userId) !== userId) {
+            return;
+          }
+
+          // If examId is provided, update that specific exam
+          if (data.examId) {
+            const receivedExamIdStr = String(data.examId);
+
+            setQuizzes(prevQuizzes => 
+              prevQuizzes.map(q => {
+                if (String(q.id) === receivedExamIdStr) {
+                  return {
+                    ...q,
+                    isStopped: true
+                  };
+                }
+                return q;
+              })
+            );
+          }
+        });
+
+        sockets.push(socket);
+      }, index === 0 ? 1000 : (index * 500) + 1000); // 1s for first, then 500ms intervals
     });
 
     // Store all sockets in ref for cleanup

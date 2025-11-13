@@ -672,7 +672,7 @@ export const ExamResultPage: React.FC = () => {
                     marginBottom: 'var(--space-3)',
                     color: 'var(--foreground)'
                   }}>
-                    📚 Gợi ý tiếp theo:
+                    Gợi ý tiếp theo:
                   </h4>
                   <ul style={{
                     fontSize: '13px',

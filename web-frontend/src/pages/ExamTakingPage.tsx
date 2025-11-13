@@ -95,14 +95,14 @@ export const ExamTakingPage: React.FC = () => {
 
   // Handle admin warning
   const handleAdminWarning = useCallback((data: { message: string; sentBy?: string | null; timestamp: string }) => {
-    alert(`⚠️ Cảnh báo từ giám thị:\n\n${data.message}`);
+    alert(`Cảnh báo từ giám thị:\n\n${data.message}`);
   }, []);
 
   // Handle exam terminated by admin
   const handleExamTerminated = useCallback((data: { reason?: string; terminatedBy?: string | null }) => {
     setExamStopped(true);
     setShowViolationAlert(false);
-    alert(`⚠️ Bài thi đã bị dừng:\n\n${data.reason || 'Phiên thi đã bị dừng bởi giám thị'}`);
+    alert(`Bài thi đã bị dừng:\n\n${data.reason || 'Phiên thi đã bị dừng bởi giám thị'}`);
     
     // Navigate to result page or show stopped message
     setTimeout(() => {

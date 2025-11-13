@@ -809,8 +809,8 @@ export default function CopyrightPage(): JSX.Element {
                     <div className={styles.resultInfo}>
                       <h3>
                         {similarityCheckResult.isSimilar 
-                          ? `⚠️ Phát hiện tương đồng: ${(similarityCheckResult.similarityScore * 100).toFixed(1)}%`
-                          : '✅ Không phát hiện tương đồng đáng kể'
+                          ? `Phát hiện tương đồng: ${(similarityCheckResult.similarityScore * 100).toFixed(1)}%`
+                          : 'Không phát hiện tương đồng đáng kể'
                         }
                       </h3>
                       <p>

@@ -249,11 +249,11 @@ export default function MockInterviews({
                                 Tính năng nổi bật:
                             </h3>
                             <ul style={{ paddingLeft: '20px', marginBottom: '16px' }}>
-                                <li style={{ marginBottom: '8px' }}>🤖 AI phỏng vấn thông minh với câu hỏi động</li>
-                                <li style={{ marginBottom: '8px' }}>📊 Đánh giá chi tiết về kỹ năng và điểm mạnh/yếu</li>
-                                <li style={{ marginBottom: '8px' }}>💡 Gợi ý cải thiện dựa trên hiệu suất</li>
-                                <li style={{ marginBottom: '8px' }}>🎯 Phỏng vấn theo từng vị trí cụ thể</li>
-                                <li style={{ marginBottom: '8px' }}>⏱️ Mô phỏng áp lực thời gian thực tế</li>
+                                <li style={{ marginBottom: '8px' }}>AI phỏng vấn thông minh với câu hỏi động</li>
+                                <li style={{ marginBottom: '8px' }}>Đánh giá chi tiết về kỹ năng và điểm mạnh/yếu</li>
+                                <li style={{ marginBottom: '8px' }}>Gợi ý cải thiện dựa trên hiệu suất</li>
+                                <li style={{ marginBottom: '8px' }}>Phỏng vấn theo từng vị trí cụ thể</li>
+                                <li style={{ marginBottom: '8px' }}>Mô phỏng áp lực thời gian thực tế</li>
                             </ul>
 
                             <h3 style={{ fontSize: '20px', fontWeight: 600, marginTop: '24px', marginBottom: '12px' }}>

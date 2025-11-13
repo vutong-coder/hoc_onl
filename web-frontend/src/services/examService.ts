@@ -58,7 +58,7 @@ class ExamService {
     
     // Debug log to see what backend actually sends
     if (typeof questionText !== 'string') {
-      console.error('⚠️ Question content is not a string!', {
+      console.error('Question content is not a string!', {
         questionId: question.id,
         contentType: typeof questionText,
         content: questionText,

@@ -280,9 +280,8 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
       try {
         if (candidate) {
           await peer.addIceCandidate(new RTCIceCandidate(candidate));
-        } else {
-          await peer.addIceCandidate(null);
         }
+        // Note: addIceCandidate(null) is deprecated, just skip if no candidate
       } catch (error) {
         console.error('[AICameraMonitor] Không thể thêm ICE candidate', error);
       }
