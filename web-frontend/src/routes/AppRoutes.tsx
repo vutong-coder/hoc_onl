@@ -30,6 +30,7 @@ import UserCoursesPage from '../pages/UserCoursesPage'
 import CourseDetailPage from '../pages/CourseDetailPage'
 import CourseLearnPage from '../pages/CourseLearnPage'
 import { checkAuth } from '../store/slices/authSlice'
+import OAuth2RedirectHandler from '../pages/OAuth2RedirectHandler'
 
 export default function AppRoutes(): JSX.Element {
 	const dispatch = useAppDispatch()
@@ -45,6 +46,9 @@ export default function AppRoutes(): JSX.Element {
 			<Route path="/auth/*" element={<AuthLayout />} />
 			<Route path="/login" element={<Navigate to="/auth" replace />} />
 			
+			{/* OAuth2 Redirect Handler */}
+			<Route path="/user" element={<OAuth2RedirectHandler />} />
+
 			{/* Admin Routes */}
 			<Route path="/admin/*" element={
 				<ProtectedRoute requiredRole="admin">

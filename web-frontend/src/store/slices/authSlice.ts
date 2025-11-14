@@ -2,6 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { login, register } from '../../services/api/authApi'
 import { User, LoginCredentials } from '../../data/mockAuthService'
 import type { RegisterCredentials } from '../../services/api/authApi'
+import { getUserProfile } from '../../services/api/userApi'
 
 export type UserRole = 'admin' | 'user' | null
 
@@ -97,6 +98,32 @@ export const checkAuth = createAsyncThunk(
 	}
 )
 
+export const fetchUserAfterOAuth = createAsyncThunk(
+    'auth/fetchUserAfterOAuth',
+    async (token: string, { rejectWithValue }) => {
+        try {
+            const response = await getUserProfile(token);
+            if (response.success && response.data) {
+                const backendUser = response.data;
+                const user: User = {
+                    id: backendUser.id.toString(),
+                    email: backendUser.email,
+                    name: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
+                    role: backendUser.roles[0]?.toLowerCase() as 'admin' | 'user',
+                    avatar: backendUser.avatarUrl
+                };
+                localStorage.setItem('user', JSON.stringify(user));
+                return user;
+            } else {
+                return rejectWithValue(response.message || 'Failed to fetch user profile');
+            }
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Network error');
+        }
+    }
+);
+
+
 const authSlice = createSlice({
 	name: 'auth',
 	initialState,
@@ -157,6 +184,25 @@ const authSlice = createSlice({
 				state.user = null
 				state.role = null
 			})
+            // Fetch user after OAuth
+            .addCase(fetchUserAfterOAuth.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchUserAfterOAuth.fulfilled, (state, action: PayloadAction<User>) => {
+                state.loading = false;
+                state.loggedIn = true;
+                state.user = action.payload;
+                state.role = action.payload.role;
+                state.error = null;
+            })
+            .addCase(fetchUserAfterOAuth.rejected, (state, action) => {
+                state.loading = false;
+                state.loggedIn = false;
+                state.user = null;
+                state.role = null;
+                state.error = action.payload as string;
+            });
 		},
 	})
 

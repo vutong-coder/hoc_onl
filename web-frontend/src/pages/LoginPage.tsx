@@ -71,8 +71,7 @@ export default function LoginPage(): JSX.Element {
 	}
 
 	const handleGoogleAuth = () => {
-		console.log('Google authentication')
-		// TODO: Implement Google OAuth
+		window.location.href = `${import.meta.env.VITE_API_BASE_URL || ''}/identity/oauth2/authorization/google`
 	}
 
 	const handleFacebookAuth = () => {

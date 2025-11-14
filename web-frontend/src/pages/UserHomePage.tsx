@@ -16,6 +16,7 @@ export default function UserHomePage(): JSX.Element {
 	const { user } = useAppSelector((state) => state.auth)
 	const { quizzes, loading: quizzesLoading } = useQuizzes()
 	const [showRewardStore, setShowRewardStore] = useState(false)
+
 	const handleStartInterview = (interviewId: string) => {
 		console.log(`Start interview ${interviewId}`)
 	}
