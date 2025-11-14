@@ -5,10 +5,31 @@ import { examService } from '../services/examService';
 import proctoringApi from '../services/api/proctoringApi';
 
 const isBrowser = typeof window !== 'undefined';
-const DEFAULT_PROCTORING_WS_URL =
-  (isBrowser && (window as any)?.__PROCTORING_WS_URL) ??
-  ((import.meta as any)?.env?.VITE_PROCTORING_WS_URL as string | undefined) ??
-  'http://localhost:8082';
+// Use API Gateway WebSocket endpoint for proctoring (Socket.IO path)
+// Fallback to direct proctoring-service if Gateway doesn't support Socket.IO
+const getProctoringWSUrl = () => {
+  // 1. Check for explicit override
+  if (isBrowser && (window as any)?.__PROCTORING_WS_URL) {
+    return (window as any).__PROCTORING_WS_URL;
+  }
+  
+  // 2. Check environment variable
+  if ((import.meta as any)?.env?.VITE_PROCTORING_WS_URL) {
+    return (import.meta as any).env.VITE_PROCTORING_WS_URL;
+  }
+  
+  // 3. Try API Gateway first (Socket.IO path)
+  const gatewayUrl = import.meta.env.VITE_API_BASE_URL?.replace('http://', 'ws://').replace('https://', 'wss://') || 'ws://localhost:8080';
+  const gatewayWS = `${gatewayUrl}/socket.io`;
+  
+  // 4. Fallback to direct proctoring-service (port 8082)
+  const directWS = 'ws://localhost:8082/socket.io';
+  
+  // Return Gateway URL, but frontend can fallback if connection fails
+  return gatewayWS;
+};
+
+const DEFAULT_PROCTORING_WS_URL = getProctoringWSUrl();
 
 interface UpcomingExam {
   id: string;
@@ -229,14 +250,16 @@ export function useQuizzes() {
     // Backend requires examId in query and automatically joins the room
     const sockets: Socket[] = [];
 
-    // Check server health before creating connections
+    // Check server health before creating connections (via API Gateway)
     const checkServerHealth = async (): Promise<boolean> => {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
         
-        const response = await fetch(DEFAULT_PROCTORING_WS_URL, { 
-          method: 'HEAD',
+        // Use API Gateway for health check
+        const gatewayUrl = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/proctoring/test`;
+        const response = await fetch(gatewayUrl, { 
+          method: 'GET',
           signal: controller.signal
         });
         
@@ -261,14 +284,19 @@ export function useQuizzes() {
             await new Promise(resolve => setTimeout(resolve, 2000));
           }
         }
-        const createSocket = (retryCount = 0) => {
-          const socket = io(DEFAULT_PROCTORING_WS_URL, {
+        const createSocket = (retryCount = 0, useDirectConnection = false) => {
+          // Fallback to direct proctoring-service if Gateway fails
+          const wsUrl = useDirectConnection 
+            ? 'ws://localhost:8082/socket.io'
+            : DEFAULT_PROCTORING_WS_URL;
+          
+          const socket = io(wsUrl, {
             query: {
               examId: examIdStr,
               userId,
               userType: 'student',
             },
-            transports: ['websocket'],
+            transports: ['websocket'], // Real-time WebSocket only, no HTTP long-polling
             timeout: 15000, // 15 second timeout
             forceNew: true, // Force new connection to avoid conflicts
             reconnection: true,
@@ -277,16 +305,29 @@ export function useQuizzes() {
           });
 
           socket.on('connect', () => {
-            // Socket connected successfully
+            console.log(`[WebSocket] ✅ Connected to ${useDirectConnection ? 'direct proctoring-service' : 'API Gateway'}`);
+            // Socket connected successfully - REAL-TIME communication active
           });
 
           socket.on('connect_error', (error) => {
+            console.warn(`[WebSocket] ❌ Connection error (attempt ${retryCount + 1}):`, error.message);
+            
+            // If Gateway fails and we haven't tried direct connection yet, try direct
+            if (!useDirectConnection && retryCount >= 1) {
+              console.log('[WebSocket] 🔄 Falling back to direct proctoring-service connection...');
+              socket.disconnect();
+              createSocket(0, true); // Try direct connection
+              return;
+            }
+            
             // Retry up to 2 times with increasing delay
             if (retryCount < 2) {
               setTimeout(() => {
                 socket.disconnect();
-                createSocket(retryCount + 1);
+                createSocket(retryCount + 1, useDirectConnection);
               }, (retryCount + 1) * 2000);
+            } else {
+              console.error('[WebSocket] ❌ Failed to connect after all retries');
             }
           });
 

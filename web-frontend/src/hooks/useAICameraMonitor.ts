@@ -10,10 +10,11 @@ const ICE_SERVERS: RTCIceServer[] = [
 
 const isBrowser = typeof window !== 'undefined';
 
+// Use API Gateway WebSocket endpoint for proctoring (Socket.IO path)
 const DEFAULT_PROCTORING_WS_URL =
   (isBrowser && (window as any)?.__PROCTORING_WS_URL) ??
   ((import.meta as any)?.env?.VITE_PROCTORING_WS_URL as string | undefined) ??
-  'http://localhost:8082';
+  `${import.meta.env.VITE_API_BASE_URL?.replace('http://', 'ws://').replace('https://', 'wss://') || 'ws://localhost:8080'}/socket.io`;
 
 export interface CheatingDetection {
   type: 'FACE_NOT_DETECTED' | 'MULTIPLE_FACES' | 'MOBILE_PHONE_DETECTED' | 'CAMERA_TAMPERED' | 'LOOKING_AWAY' | 'tab_switch';
@@ -604,30 +605,39 @@ export const useAICameraMonitor = (props?: UseAICameraMonitorProps): AICameraMon
   }, [analyzeFrame, state.enabledDetections, updateState]);
 
   const stopMonitoring = useCallback(() => {
+    // Set isActiveRef to false FIRST to prevent any new frames from being sent
+    isActiveRef.current = false;
+
+    // Clear the analysis interval to stop sending frames
     if (analysisIntervalRef.current) {
       clearInterval(analysisIntervalRef.current);
       analysisIntervalRef.current = null;
     }
 
+    // Remove visibility change listener
     if (visibilityListenerRef.current) {
       document.removeEventListener('visibilitychange', visibilityListenerRef.current);
       visibilityListenerRef.current = null;
     }
 
+    // Stop camera usage
     if (cameraUsageRef.current) {
       cameraManager.decrementUsage();
       cameraUsageRef.current = false;
     }
 
+    // Teardown all peer connections (WebRTC streams)
     teardownAllPeers();
 
+    // Update state
     updateState({ 
       isActive: false, 
       isAnalyzing: false, 
       detections: [], 
       metrics: null,
     });
-    isActiveRef.current = false;
+
+    console.log('[useAICameraMonitor] Camera monitoring stopped. Camera and frame sending disabled.');
   }, [teardownAllPeers, updateState]);
 
   const handleSetDetectionSensitivity = useCallback((level: 'low' | 'medium' | 'high') => {

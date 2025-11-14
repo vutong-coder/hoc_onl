@@ -20,6 +20,7 @@ export const ExamTakingPage: React.FC = () => {
   const [currentViolation, setCurrentViolation] = useState<CheatingDetection | null>(null);
   const [showViolationAlert, setShowViolationAlert] = useState(false);
   const [examStopped, setExamStopped] = useState(false);
+  const [isExamSubmitted, setIsExamSubmitted] = useState(false); // Flag để báo cho camera monitor biết exam đã submit
 
   const authUser = useSelector((state: RootState) => state.auth.user);
 
@@ -117,6 +118,8 @@ export const ExamTakingPage: React.FC = () => {
 
   // Submit exam using backend API
   const handleSubmitExamWithBackend = useCallback(async () => {
+    // Set flag to stop camera monitoring before submitting
+    setIsExamSubmitted(true);
     // Call original submit handler which uses backend API
     handleSubmitExam();
   }, [currentExam, answers, totalQuestions, handleSubmitExam]);
@@ -214,6 +217,7 @@ export const ExamTakingPage: React.FC = () => {
                     onAdminWarning={handleAdminWarning}
                     onExamTerminated={handleExamTerminated}
                     className={styles.aiCameraMonitor}
+                    shouldStop={isExamSubmitted}
                   />
                 </div>
               )}

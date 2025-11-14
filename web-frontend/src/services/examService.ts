@@ -5,7 +5,8 @@ class ExamService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+    // Use API Gateway for all requests
+    this.baseUrl = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/exam`;
   }
 
   /**

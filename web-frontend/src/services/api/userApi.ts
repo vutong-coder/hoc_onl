@@ -1,7 +1,8 @@
 // User API Service
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_USER_API_URL || 'http://localhost:9010/api/v1';
+// Use API Gateway for all requests
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/identity/api/v1`;
 
 // Create axios instance with interceptors
 const userAxios = axios.create({
@@ -15,8 +16,14 @@ const userAxios = axios.create({
 userAxios.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
+    console.log('[userApi] Request interceptor - Token exists:', !!token);
+    console.log('[userApi] Request URL:', config.url);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('[userApi] Authorization header set');
+    } else {
+      console.warn('[userApi] No access token found in localStorage');
+      console.warn('[userApi] Available localStorage keys:', Object.keys(localStorage));
     }
     return config;
   },
@@ -31,9 +38,22 @@ userAxios.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Handle unauthorized access
-      console.error('Unauthorized access - redirecting to login');
-      // Optionally redirect to login page
-      // window.location.href = '/auth';
+      console.error('[userApi] Unauthorized access (401)');
+      console.error('[userApi] Request URL:', error.config?.url);
+      console.error('[userApi] Request headers:', error.config?.headers);
+      console.error('[userApi] Token in localStorage:', !!localStorage.getItem('accessToken'));
+      console.error('[userApi] Error response:', error.response?.data);
+      
+      // Clear invalid tokens
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      
+      // Redirect to login page
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/auth') {
+        console.log('[userApi] Redirecting to login page');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

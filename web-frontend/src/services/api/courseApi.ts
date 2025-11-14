@@ -1,7 +1,8 @@
 // Course API Service
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_COURSE_API_URL || 'http://localhost:9001/api';
+// Use API Gateway for all requests
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/v1`;
 
 // Create axios instance with interceptors
 const courseAxios = axios.create({

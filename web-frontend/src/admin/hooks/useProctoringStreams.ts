@@ -28,10 +28,11 @@ interface RequestOptions {
 
 const isBrowser = typeof window !== 'undefined'
 
+// Use API Gateway WebSocket endpoint for proctoring (Socket.IO path)
 const DEFAULT_SERVER_URL =
 	(typeof window !== 'undefined' && (window as any)?.__PROCTORING_WS_URL) ??
 	((import.meta as any)?.env?.VITE_PROCTORING_WS_URL as string | undefined) ??
-	'http://localhost:8082'
+	`${import.meta.env.VITE_API_BASE_URL?.replace('http://', 'ws://').replace('https://', 'wss://') || 'ws://localhost:8080'}/socket.io`
 
 export function useProctoringStreams(
 	allSessions: ProctoringSession[],

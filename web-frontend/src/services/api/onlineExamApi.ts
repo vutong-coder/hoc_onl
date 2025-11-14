@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_ONLINE_EXAM_API_URL || 'http://localhost:9003';
+// Use API Gateway for all requests
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/exam`;
 
 // Create axios instance with JWT interceptors
 const onlineExamAxios = axios.create({
@@ -142,7 +143,7 @@ export interface ActiveProctoredStudent {
  */
 export const startQuiz = async (quizId: string): Promise<StartQuizResponse> => {
   const response = await onlineExamAxios.post<StartQuizResponse>(
-    `/api/quizzes/${quizId}/start`
+    `/quizzes/${quizId}/start`
   );
   return response.data;
 };
@@ -156,7 +157,7 @@ export const submitQuiz = async (
   request: SubmitQuizRequest
 ): Promise<SubmitQuizResponse> => {
   const response = await onlineExamAxios.post<SubmitQuizResponse>(
-    `/api/submissions/${submissionId}/submit`,
+    `/submissions/${submissionId}/submit`,
     request
   );
   return response.data;
@@ -168,7 +169,7 @@ export const submitQuiz = async (
  */
 export const getQuizDetails = async (quizId: string): Promise<Quiz> => {
   const response = await onlineExamAxios.get<{ success: boolean; data: Quiz }>(
-    `/api/quizzes/${quizId}`
+    `/quizzes/${quizId}`
   );
   return response.data.data;
 };
@@ -181,7 +182,7 @@ export const getSubmissionStatus = async (
   submissionId: string
 ): Promise<QuizSubmission> => {
   const response = await onlineExamAxios.get<{ success: boolean; data: QuizSubmission }>(
-    `/api/submissions/${submissionId}`
+    `/submissions/${submissionId}`
   );
   return response.data.data;
 };
@@ -210,7 +211,7 @@ export const getQuizResult = async (
   questionResults?: any[]; // Detailed question results
 }> => {
   const response = await onlineExamAxios.get(
-    `/api/submissions/${submissionId}/result`
+    `/submissions/${submissionId}/result`
   );
   return response.data.data;
 };
@@ -225,7 +226,7 @@ export const getQuizResult = async (
  */
 export const getCourseQuizzes = async (courseId: string): Promise<Quiz[]> => {
   const response = await onlineExamAxios.get<{ success: boolean; data: Quiz[] }>(
-    `/api/courses/${courseId}/quizzes`
+    `/courses/${courseId}/quizzes`
   );
   return response.data.data;
 };
@@ -238,7 +239,7 @@ export const getMyCourseSubmissions = async (
   courseId: string
 ): Promise<QuizSubmission[]> => {
   const response = await onlineExamAxios.get<{ success: boolean; data: QuizSubmission[] }>(
-    `/api/courses/${courseId}/my-submissions`
+    `/courses/${courseId}/my-submissions`
   );
   return response.data.data;
 };
@@ -257,7 +258,7 @@ export const getAllQuizzes = async (): Promise<Quiz[]> => {
   // For now, return empty array or implement based on backend structure
   try {
     const response = await onlineExamAxios.get<{ success: boolean; data: Quiz[] }>(
-      `/api/quizzes`
+      `/quizzes`
     );
     return response.data.data;
   } catch (error) {
@@ -273,7 +274,7 @@ export const getAllQuizzes = async (): Promise<Quiz[]> => {
 export const getMyAllSubmissions = async (): Promise<QuizSubmission[]> => {
   try {
     const response = await onlineExamAxios.get<{ success: boolean; data: QuizSubmission[] }>(
-      `/api/my-submissions`
+      `/my-submissions`
     );
     return response.data.data;
   } catch (error) {
@@ -288,10 +289,20 @@ export const getMyAllSubmissions = async (): Promise<QuizSubmission[]> => {
 
 export const getActiveProctoredStudents = async (): Promise<ActiveProctoredStudent[]> => {
   try {
-    const response = await onlineExamAxios.get<{ success: boolean; data: ActiveProctoredStudent[] }>(
-      `/api/proctoring/active-sessions`
-    );
-    return response.data.data ?? [];
+    // Call proctoring service directly through API Gateway
+    const proctoringApiUrl = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/proctoring/sessions`;
+    const token = localStorage.getItem('accessToken');
+    
+    const response = await axios.get<ActiveProctoredStudent[]>(proctoringApiUrl, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` })
+      }
+    });
+    
+    // Transform ProctoringSession[] to ActiveProctoredStudent[] if needed
+    // For now, assume the response is already in the correct format
+    return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error('Error fetching active proctored students:', error);
     return [];

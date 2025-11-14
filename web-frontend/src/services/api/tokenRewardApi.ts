@@ -1,10 +1,8 @@
 // Token Reward API Service
 import axios from 'axios';
 
-// Call directly to token-reward-service 
-// Port 3000 for local development (npm run dev)
-// Port 9009 for Docker deployment
-const API_BASE_URL = `${import.meta.env.VITE_TOKEN_REWARD_API_URL || 'http://localhost:9009'}/api/tokens`;
+// Use API Gateway for all requests
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/tokens`;
 const DEFAULT_COURSE_COMPLETION_REWARD = Number(
   import.meta.env.VITE_COURSE_COMPLETION_REWARD ?? 100
 );

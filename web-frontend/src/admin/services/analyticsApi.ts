@@ -1,7 +1,8 @@
 // Analytics API Service
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_ANALYTICS_API_URL || 'http://localhost:9004';
+// Use API Gateway for all requests
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/analytics`;
 
 // Create axios instance with interceptors
 const analyticsAxios = axios.create({
@@ -121,7 +122,7 @@ export interface DashboardResponse {
  */
 export async function getAnalyticsOverview(): Promise<ApiResponse<AnalyticsOverviewResponse>> {
   try {
-    const response = await analyticsAxios.get<ApiResponse<AnalyticsOverviewResponse>>('/analytics/overview');
+    const response = await analyticsAxios.get<ApiResponse<AnalyticsOverviewResponse>>('/overview');
     return response.data;
   } catch (error: any) {
     console.error('Error fetching analytics overview:', error);
@@ -134,7 +135,7 @@ export async function getAnalyticsOverview(): Promise<ApiResponse<AnalyticsOverv
  */
 export async function getKpiMetrics(): Promise<ApiResponse<KpiMetricResponse[]>> {
   try {
-    const response = await analyticsAxios.get<ApiResponse<KpiMetricResponse[]>>('/analytics/kpis');
+    const response = await analyticsAxios.get<ApiResponse<KpiMetricResponse[]>>('/kpis');
     return response.data;
   } catch (error: any) {
     console.error('Error fetching KPI metrics:', error);
@@ -147,7 +148,7 @@ export async function getKpiMetrics(): Promise<ApiResponse<KpiMetricResponse[]>>
  */
 export async function getScoreTrend(): Promise<ApiResponse<ScoreTrendPoint[]>> {
   try {
-    const response = await analyticsAxios.get<ApiResponse<ScoreTrendPoint[]>>('/analytics/score-trend');
+    const response = await analyticsAxios.get<ApiResponse<ScoreTrendPoint[]>>('/score-trend');
     return response.data;
   } catch (error: any) {
     console.error('Error fetching score trend:', error);
@@ -160,7 +161,7 @@ export async function getScoreTrend(): Promise<ApiResponse<ScoreTrendPoint[]>> {
  */
 export async function getTopPerformers(limit: number = 5): Promise<ApiResponse<TopPerformerResponse[]>> {
   try {
-    const response = await analyticsAxios.get<ApiResponse<TopPerformerResponse[]>>('/analytics/top-performers', {
+    const response = await analyticsAxios.get<ApiResponse<TopPerformerResponse[]>>('/top-performers', {
       params: { limit },
     });
     return response.data;
@@ -175,7 +176,7 @@ export async function getTopPerformers(limit: number = 5): Promise<ApiResponse<T
  */
 export async function getTopCourses(limit: number = 5): Promise<ApiResponse<TopCourseResponse[]>> {
   try {
-    const response = await analyticsAxios.get<ApiResponse<TopCourseResponse[]>>('/analytics/top-courses', {
+    const response = await analyticsAxios.get<ApiResponse<TopCourseResponse[]>>('/top-courses', {
       params: { limit },
     });
     return response.data;
@@ -197,7 +198,7 @@ export async function getExamResults(
     if (examId) params.examId = examId;
     if (userId) params.userId = userId;
 
-    const response = await analyticsAxios.get<ApiResponse<ExamResultResponse[]>>('/analytics/exam-results', {
+    const response = await analyticsAxios.get<ApiResponse<ExamResultResponse[]>>('/exam-results', {
       params,
     });
     return response.data;
@@ -212,7 +213,7 @@ export async function getExamResults(
  */
 export async function getCheatingStats(examId: string): Promise<ApiResponse<CheatingStatsResponse>> {
   try {
-    const response = await analyticsAxios.get<ApiResponse<CheatingStatsResponse>>('/analytics/cheating-stats', {
+    const response = await analyticsAxios.get<ApiResponse<CheatingStatsResponse>>('/cheating-stats', {
       params: { examId },
     });
     return response.data;
@@ -227,7 +228,7 @@ export async function getCheatingStats(examId: string): Promise<ApiResponse<Chea
  */
 export async function getDashboardData(userId: string): Promise<ApiResponse<DashboardResponse>> {
   try {
-    const response = await analyticsAxios.get<ApiResponse<DashboardResponse>>('/analytics/dashboards', {
+    const response = await analyticsAxios.get<ApiResponse<DashboardResponse>>('/dashboards', {
       params: { userId },
     });
     return response.data;
@@ -242,7 +243,7 @@ export async function getDashboardData(userId: string): Promise<ApiResponse<Dash
  */
 export async function getRecommendations(userId: string): Promise<ApiResponse<RecommendationResponse[]>> {
   try {
-    const response = await analyticsAxios.get<ApiResponse<RecommendationResponse[]>>('/analytics/recommendations', {
+    const response = await analyticsAxios.get<ApiResponse<RecommendationResponse[]>>('/recommendations', {
       params: { userId },
     });
     return response.data;

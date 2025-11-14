@@ -13,7 +13,9 @@ import tokenRewardApi, {
   type Transaction,
 } from './tokenRewardApi'
 
-const API_BASE_URL = import.meta.env.VITE_TOKEN_API_URL || 'http://localhost:9009'
+// Use API Gateway - This API_BASE_URL is not actually used because we're using tokenRewardApi
+// Keeping it for backward compatibility if needed
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/tokens`
 const DEFAULT_COURSE_COMPLETION_REWARD = Number(
 	import.meta.env.VITE_COURSE_COMPLETION_REWARD ?? 100
 )
@@ -199,9 +201,9 @@ export async function awardCourseCompletion({
  * Uses token-reward-service backend
  */
 export async function getAvailableGifts(category?: string): Promise<GiftItem[]> {
-	const API_BASE_URL = import.meta.env.VITE_TOKEN_REWARD_API_URL || 'http://localhost:9009'
+	const API_GATEWAY_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/tokens`
 	const params = category && category !== 'all' ? `?category=${category}` : ''
-	const res = await fetch(`${API_BASE_URL}/api/tokens/gifts${params}`)
+	const res = await fetch(`${API_GATEWAY_URL}/gifts${params}`)
 	if (!res.ok) {
 		throw new Error('Failed to fetch gifts')
 	}

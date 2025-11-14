@@ -26,31 +26,85 @@ export default function useUsers() {
 			// Fetch tất cả users một lần với size lớn để lấy hết dữ liệu
 			const response = await getUsers(0, 1000)
 			
-			if (response.data) {
-				// Debug: Log first user to check lastLoginAt field
-				if (response.data.content && response.data.content.length > 0) {
-					console.log('Sample user from API:', response.data.content[0])
-					console.log('lastLoginAt field:', response.data.content[0].lastLoginAt)
-					console.log('last_login_at field:', (response.data.content[0] as any).last_login_at)
+			console.log('[useUsers] Full API response:', response)
+			console.log('[useUsers] Response data:', response.data)
+			
+			if (response && response.data) {
+				const pageData = response.data as any
+				console.log('[useUsers] Page data:', pageData)
+				console.log('[useUsers] Content array:', pageData.content)
+				console.log('[useUsers] Content length:', pageData.content?.length)
+				
+				// Xử lý cả camelCase và snake_case
+				const totalElements = pageData.totalElements || pageData.total_elements || 0
+				const totalPages = pageData.totalPages || pageData.total_pages || 0
+				
+				console.log('[useUsers] Total elements:', totalElements)
+				console.log('[useUsers] Total pages:', totalPages)
+				
+				// Đảm bảo content là một array
+				const contentArray = Array.isArray(pageData.content) ? pageData.content : []
+				
+				if (contentArray.length > 0) {
+					console.log('[useUsers] First user from API:', contentArray[0])
+					console.log('[useUsers] lastLoginAt field:', contentArray[0].lastLoginAt)
+					console.log('[useUsers] last_login_at field:', (contentArray[0] as any).last_login_at)
+				} else {
+					console.warn('[useUsers] No users found in response. Content array is empty.')
 				}
 				
-				const mappedUsers = response.data.content.map(mapUserResponseToUser)
+				// Map users từ response
+				const mappedUsers = contentArray.map((userResponse: any) => {
+					try {
+						return mapUserResponseToUser(userResponse)
+					} catch (mapError) {
+						console.error('[useUsers] Error mapping user:', userResponse, mapError)
+						return null
+					}
+				}).filter((user: any) => user !== null) as User[]
+				
+				console.log('[useUsers] Mapped users count:', mappedUsers.length)
 				
 				// Debug: Log mapped user to check lastLogin field
 				if (mappedUsers.length > 0) {
-					console.log('Sample mapped user:', mappedUsers[0])
-					console.log('lastLogin field:', mappedUsers[0].lastLogin)
+					console.log('[useUsers] Sample mapped user:', mappedUsers[0])
+					console.log('[useUsers] lastLogin field:', mappedUsers[0].lastLogin)
 				}
 				
 				setAllUsersData(mappedUsers)
-				setBackendTotalPages(response.data.totalPages)
-				setBackendTotalItems(response.data.totalElements)
+				setBackendTotalPages(totalPages)
+				setBackendTotalItems(totalElements || mappedUsers.length)
+				
+				if (mappedUsers.length === 0 && contentArray.length > 0) {
+					console.error('[useUsers] Warning: Users exist in API but mapping failed!')
+					setError('Có lỗi khi xử lý dữ liệu người dùng. Vui lòng kiểm tra console để biết thêm chi tiết.')
+				}
 			} else {
-				setError('Không thể tải dữ liệu người dùng')
+				console.error('[useUsers] Invalid response structure:', response)
+				setError('Không thể tải dữ liệu người dùng: Response không hợp lệ')
 			}
 		} catch (err: any) {
-			console.error('Error fetching users:', err)
-			setError(err.message || 'Lỗi khi tải dữ liệu người dùng')
+			console.error('[useUsers] Error fetching users:', err)
+			console.error('[useUsers] Error details:', {
+				message: err.message,
+				response: err.response,
+				status: err.response?.status,
+				statusText: err.response?.statusText,
+				data: err.response?.data,
+				stack: err.stack
+			})
+			
+			// Kiểm tra token
+			const token = localStorage.getItem('accessToken')
+			console.log('[useUsers] Token exists:', !!token)
+			
+			// Xử lý lỗi 401 (Unauthorized)
+			if (err.response?.status === 401 || err.message?.includes('401') || err.message?.includes('Unauthorized')) {
+				setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.')
+				// Token sẽ được xóa và redirect bởi interceptor
+			} else {
+				setError(err.message || 'Lỗi khi tải dữ liệu người dùng')
+			}
 		} finally {
 			setLoading(false)
 		}

@@ -841,23 +841,23 @@ const MultisigPage = (): JSX.Element => {
 										<div style={{ padding: '12px', textAlign: 'center', color: 'var(--muted-foreground)' }}>
 											{availableUsers.length === 0 ? (
 												<>
-													Không thể tải danh sách người dùng từ identity-service.{' '}
-													<button
-														type="button"
-														className="btn-link"
-														onClick={() => setUseManualInput(true)}
-														style={{
-															fontSize: 12,
-															color: 'var(--primary)',
-															textDecoration: 'underline',
-															background: 'none',
-															border: 'none',
-															cursor: 'pointer',
-															padding: 0
-														}}
-													>
-														Nhập thủ công ID
-													</button>
+											Không thể tải danh sách người dùng từ identity-service.{' '}
+											<button
+												type="button"
+												className="btn-link"
+												onClick={() => setUseManualInput(true)}
+												style={{
+													fontSize: 12,
+													color: 'var(--primary)',
+													textDecoration: 'underline',
+													background: 'none',
+													border: 'none',
+													cursor: 'pointer',
+													padding: 0
+												}}
+											>
+												Nhập thủ công ID
+											</button>
 												</>
 											) : (
 												<>

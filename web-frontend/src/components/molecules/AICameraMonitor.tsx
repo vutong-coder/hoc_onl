@@ -13,6 +13,7 @@ interface AICameraMonitorProps {
   onAdminWarning?: (data: { message: string; sentBy?: string | null; timestamp: string }) => void;
   onExamTerminated?: (data: { reason?: string; terminatedBy?: string | null }) => void;
   className?: string;
+  shouldStop?: boolean; // Prop để báo cho component biết cần dừng camera
 }
 
 export const AICameraMonitor: React.FC<AICameraMonitorProps> = ({
@@ -23,7 +24,8 @@ export const AICameraMonitor: React.FC<AICameraMonitorProps> = ({
   onMetricsUpdate,
   onAdminWarning,
   onExamTerminated,
-  className = ''
+  className = '',
+  shouldStop = false
 }) => {
   const {
     isActive,
@@ -84,6 +86,14 @@ export const AICameraMonitor: React.FC<AICameraMonitorProps> = ({
       onMetricsUpdate?.(metrics);
     }
   }, [metrics, onMetricsUpdate]);
+
+  // Auto-stop camera when shouldStop prop becomes true (e.g., when exam is submitted)
+  useEffect(() => {
+    if (shouldStop && isActive) {
+      console.log('[AICameraMonitor] Exam submitted, stopping camera monitoring...');
+      stopMonitoring();
+    }
+  }, [shouldStop, isActive, stopMonitoring]);
 
   const handleStartMonitoring = async () => {
     try {

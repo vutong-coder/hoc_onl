@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const API_BASE_URL = `${import.meta.env.VITE_MULTISIG_SERVICE_URL || 'http://localhost:3001'}/api/v1/multisig`
+// Use API Gateway for all requests
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/v1/multisig`
 
 const multisigAxios = axios.create({
 	baseURL: API_BASE_URL,
