@@ -12,7 +12,6 @@ interface SuccessNotificationProps {
 export default function SuccessNotification({
 	title,
 	message,
-	icon = '🎉',
 	onClose,
 	autoClose = false,
 	duration = 5000
@@ -79,7 +78,6 @@ export default function SuccessNotification({
 				justifyContent: 'center',
 				gap: '0.5rem'
 			}}>
-				<span role="img" aria-label="success">{icon}</span>
 				{title}
 			</div>
 			

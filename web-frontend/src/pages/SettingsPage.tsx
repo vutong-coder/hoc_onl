@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import WebAuthnRegistration from '../components/molecules/WebAuthnRegistration';
+import { changePassword } from '../services/api/authApi';
 
 const SettingsPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState('security');
@@ -13,6 +14,21 @@ const SettingsPage: React.FC = () => {
         showEmail: false,
         showPhone: false
     });
+    
+    // Password change state
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+    const [passwordErrors, setPasswordErrors] = useState<{
+        currentPassword?: string;
+        newPassword?: string;
+        confirmPassword?: string;
+    }>({});
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+    const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     const tabs = [
         { id: 'security', label: 'Bảo mật' },
@@ -21,6 +37,76 @@ const SettingsPage: React.FC = () => {
         { id: 'privacy', label: 'Quyền riêng tư' },
         { id: 'appearance', label: 'Giao diện' }
     ];
+
+    // Password change handlers
+    const handleOpenPasswordModal = () => {
+        setShowPasswordModal(true);
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        setPasswordErrors({});
+        setPasswordMessage(null);
+    };
+
+    const handleClosePasswordModal = () => {
+        setShowPasswordModal(false);
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        setPasswordErrors({});
+        setPasswordMessage(null);
+    };
+
+    const validatePasswordForm = (): boolean => {
+        const errors: typeof passwordErrors = {};
+        
+        if (!passwordData.currentPassword) {
+            errors.currentPassword = 'Vui lòng nhập mật khẩu hiện tại';
+        }
+        
+        if (!passwordData.newPassword) {
+            errors.newPassword = 'Vui lòng nhập mật khẩu mới';
+        } else if (passwordData.newPassword.length < 6) {
+            errors.newPassword = 'Mật khẩu mới phải có ít nhất 6 ký tự';
+        }
+        
+        if (!passwordData.confirmPassword) {
+            errors.confirmPassword = 'Vui lòng xác nhận mật khẩu mới';
+        } else if (passwordData.newPassword !== passwordData.confirmPassword) {
+            errors.confirmPassword = 'Mật khẩu xác nhận không khớp';
+        }
+        
+        if (passwordData.currentPassword === passwordData.newPassword) {
+            errors.newPassword = 'Mật khẩu mới phải khác mật khẩu hiện tại';
+        }
+        
+        setPasswordErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const handleChangePassword = async () => {
+        if (!validatePasswordForm()) {
+            return;
+        }
+
+        setIsChangingPassword(true);
+        setPasswordMessage(null);
+
+        try {
+            await changePassword({
+                currentPassword: passwordData.currentPassword,
+                newPassword: passwordData.newPassword
+            });
+            
+            setPasswordMessage({ type: 'success', text: 'Đổi mật khẩu thành công!' });
+            setTimeout(() => {
+                handleClosePasswordModal();
+            }, 2000);
+        } catch (error: any) {
+            setPasswordMessage({ 
+                type: 'error', 
+                text: error.message || 'Đổi mật khẩu thất bại. Vui lòng thử lại.' 
+            });
+        } finally {
+            setIsChangingPassword(false);
+        }
+    };
 
     const renderSecurityTab = () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -46,17 +132,26 @@ const SettingsPage: React.FC = () => {
                 }}>
                     Thay đổi mật khẩu để bảo vệ tài khoản của bạn
                 </p>
-                <button style={{
-                    background: 'var(--primary)',
-                    color: 'var(--primary-foreground)',
-                    border: 'none',
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                }}>
+                <button 
+                    onClick={handleOpenPasswordModal}
+                    style={{
+                        background: 'var(--primary)',
+                        color: 'var(--primary-foreground)',
+                        border: 'none',
+                        padding: '0.75rem 1.5rem',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.opacity = '0.9';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.opacity = '1';
+                    }}
+                >
                     Đổi mật khẩu
                 </button>
             </div>
@@ -591,6 +686,213 @@ const SettingsPage: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Password Change Modal */}
+            {showPasswordModal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }} onClick={handleClosePasswordModal}>
+                    <div style={{
+                        background: 'var(--card)',
+                        borderRadius: 'var(--radius-lg)',
+                        padding: '2rem',
+                        maxWidth: '500px',
+                        width: '90%',
+                        border: '1px solid var(--border)',
+                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
+                    }} onClick={(e) => e.stopPropagation()}>
+                        <h2 style={{
+                            fontSize: '1.5rem',
+                            fontWeight: '600',
+                            marginBottom: '1.5rem',
+                            color: 'var(--foreground)'
+                        }}>
+                            Đổi mật khẩu
+                        </h2>
+
+                        {passwordMessage && (
+                            <div style={{
+                                padding: '0.75rem 1rem',
+                                borderRadius: 'var(--radius-md)',
+                                marginBottom: '1rem',
+                                background: passwordMessage.type === 'success' 
+                                    ? 'rgba(34, 197, 94, 0.1)' 
+                                    : 'rgba(239, 68, 68, 0.1)',
+                                color: passwordMessage.type === 'success'
+                                    ? 'rgb(34, 197, 94)'
+                                    : 'rgb(239, 68, 68)',
+                                fontSize: '0.875rem'
+                            }}>
+                                {passwordMessage.text}
+                            </div>
+                        )}
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div>
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '0.875rem',
+                                    fontWeight: '500',
+                                    marginBottom: '0.5rem',
+                                    color: 'var(--foreground)'
+                                }}>
+                                    Mật khẩu hiện tại
+                                </label>
+                                <input
+                                    type="password"
+                                    value={passwordData.currentPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                                    placeholder="Nhập mật khẩu hiện tại"
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem',
+                                        border: `1px solid ${passwordErrors.currentPassword ? 'rgb(239, 68, 68)' : 'var(--border)'}`,
+                                        borderRadius: 'var(--radius-md)',
+                                        background: 'var(--background)',
+                                        color: 'var(--foreground)',
+                                        fontSize: '0.875rem'
+                                    }}
+                                />
+                                {passwordErrors.currentPassword && (
+                                    <p style={{
+                                        color: 'rgb(239, 68, 68)',
+                                        fontSize: '0.75rem',
+                                        marginTop: '0.25rem',
+                                        margin: 0
+                                    }}>
+                                        {passwordErrors.currentPassword}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '0.875rem',
+                                    fontWeight: '500',
+                                    marginBottom: '0.5rem',
+                                    color: 'var(--foreground)'
+                                }}>
+                                    Mật khẩu mới
+                                </label>
+                                <input
+                                    type="password"
+                                    value={passwordData.newPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                    placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem',
+                                        border: `1px solid ${passwordErrors.newPassword ? 'rgb(239, 68, 68)' : 'var(--border)'}`,
+                                        borderRadius: 'var(--radius-md)',
+                                        background: 'var(--background)',
+                                        color: 'var(--foreground)',
+                                        fontSize: '0.875rem'
+                                    }}
+                                />
+                                {passwordErrors.newPassword && (
+                                    <p style={{
+                                        color: 'rgb(239, 68, 68)',
+                                        fontSize: '0.75rem',
+                                        marginTop: '0.25rem',
+                                        margin: 0
+                                    }}>
+                                        {passwordErrors.newPassword}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '0.875rem',
+                                    fontWeight: '500',
+                                    marginBottom: '0.5rem',
+                                    color: 'var(--foreground)'
+                                }}>
+                                    Xác nhận mật khẩu mới
+                                </label>
+                                <input
+                                    type="password"
+                                    value={passwordData.confirmPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                    placeholder="Nhập lại mật khẩu mới"
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem',
+                                        border: `1px solid ${passwordErrors.confirmPassword ? 'rgb(239, 68, 68)' : 'var(--border)'}`,
+                                        borderRadius: 'var(--radius-md)',
+                                        background: 'var(--background)',
+                                        color: 'var(--foreground)',
+                                        fontSize: '0.875rem'
+                                    }}
+                                />
+                                {passwordErrors.confirmPassword && (
+                                    <p style={{
+                                        color: 'rgb(239, 68, 68)',
+                                        fontSize: '0.75rem',
+                                        marginTop: '0.25rem',
+                                        margin: 0
+                                    }}>
+                                        {passwordErrors.confirmPassword}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div style={{
+                            display: 'flex',
+                            gap: '1rem',
+                            marginTop: '1.5rem',
+                            justifyContent: 'flex-end'
+                        }}>
+                            <button
+                                onClick={handleClosePasswordModal}
+                                disabled={isChangingPassword}
+                                style={{
+                                    padding: '0.75rem 1.5rem',
+                                    border: '1px solid var(--border)',
+                                    borderRadius: 'var(--radius-md)',
+                                    background: 'var(--background)',
+                                    color: 'var(--foreground)',
+                                    fontSize: '0.875rem',
+                                    fontWeight: '500',
+                                    cursor: isChangingPassword ? 'not-allowed' : 'pointer',
+                                    opacity: isChangingPassword ? 0.5 : 1
+                                }}
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                onClick={handleChangePassword}
+                                disabled={isChangingPassword}
+                                style={{
+                                    padding: '0.75rem 1.5rem',
+                                    border: 'none',
+                                    borderRadius: 'var(--radius-md)',
+                                    background: 'var(--primary)',
+                                    color: 'var(--primary-foreground)',
+                                    fontSize: '0.875rem',
+                                    fontWeight: '500',
+                                    cursor: isChangingPassword ? 'not-allowed' : 'pointer',
+                                    opacity: isChangingPassword ? 0.5 : 1
+                                }}
+                            >
+                                {isChangingPassword ? 'Đang xử lý...' : 'Đổi mật khẩu'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

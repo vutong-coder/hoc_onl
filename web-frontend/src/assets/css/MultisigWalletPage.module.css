@@ -394,3 +394,64 @@
 	font-size: 14px;
 }
 
+.ownedWalletsList {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.ownedWalletItem {
+	background: var(--muted);
+	border: 1px solid var(--border);
+	border-radius: 12px;
+	padding: 16px;
+	text-align: left;
+	cursor: pointer;
+	transition: all var(--transition-normal);
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.ownedWalletItem:hover {
+	background: var(--accent);
+	border-color: var(--primary);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ownedWalletItemActive {
+	background: var(--accent);
+	border-color: var(--primary);
+	border-width: 2px;
+}
+
+.ownedWalletHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.ownedWalletBadge {
+	background: var(--background);
+	color: var(--muted-foreground);
+	padding: 4px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.ownedWalletMeta {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.ownedWalletDescription {
+	color: var(--muted-foreground);
+	font-size: 13px;
+	margin-top: 4px;
+}
+

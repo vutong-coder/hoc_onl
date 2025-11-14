@@ -634,13 +634,6 @@ export const ExamResultPage: React.FC = () => {
                   marginBottom: 'var(--space-4)',
                   border: '1px solid #6ee7b7'
                 }}>
-                  <div style={{
-                    fontSize: '40px',
-                    textAlign: 'center',
-                    marginBottom: 'var(--space-3)'
-                  }}>
-                    🎉
-                  </div>
                   <p style={{
                     fontSize: '16px',
                     fontWeight: 600,

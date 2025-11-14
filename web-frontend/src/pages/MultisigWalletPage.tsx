@@ -1,5 +1,7 @@
-import { FormEvent, useCallback, useMemo, useState } from 'react'
-import { AlertCircle, CheckCircle2, FilePlus2, Link2, Play, RefreshCcw, Send, Shield, Wallet } from 'lucide-react'
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react'
+import { AlertCircle, CheckCircle2, FilePlus2, Link2, Play, RefreshCcw, Send, Shield, Wallet, ListChecks } from 'lucide-react'
+import { useSelector } from 'react-redux'
+import { RootState } from '../store'
 import multisigApi, {
 	ConfirmTransactionRequest,
 	CreateWalletRequest,
@@ -20,11 +22,14 @@ type AlertState = {
 } | null
 
 const MultisigWalletPage = (): JSX.Element => {
+	const user = useSelector((state: RootState) => state.auth.user)
 	const [alertState, setAlertState] = useState<AlertState>(null)
 	const [walletIdInput, setWalletIdInput] = useState('')
 	const [activeWalletId, setActiveWalletId] = useState<string | null>(null)
 	const [wallet, setWallet] = useState<MultisigWallet | null>(null)
 	const [transactions, setTransactions] = useState<MultisigTransaction[]>([])
+	const [ownedWallets, setOwnedWallets] = useState<MultisigWallet[]>([])
+	const [loadingOwnedWallets, setLoadingOwnedWallets] = useState(false)
 	const [loadingWallet, setLoadingWallet] = useState(false)
 	const [loadingTransactions, setLoadingTransactions] = useState(false)
 	const [createLoading, setCreateLoading] = useState(false)
@@ -111,6 +116,65 @@ const MultisigWalletPage = (): JSX.Element => {
 		[showAlert],
 	)
 
+	const fetchOwnedWallets = useCallback(async () => {
+		if (!user?.id) {
+			console.log('[MultisigWalletPage] fetchOwnedWallets: No user ID available')
+			return
+		}
+		console.log('[MultisigWalletPage] fetchOwnedWallets: Starting, user ID:', user.id)
+		setLoadingOwnedWallets(true)
+		try {
+			const allWallets = await multisigApi.getAllWallets()
+			console.log('[MultisigWalletPage] fetchOwnedWallets: Got', allWallets.length, 'total wallets')
+			const currentUserId = Number(user.id)
+			console.log('[MultisigWalletPage] fetchOwnedWallets: Current user ID (number):', currentUserId)
+			// Filter wallets where current user is an owner
+			const owned = allWallets.filter((w) => {
+				// Check ownerUserIds first (more reliable)
+				if (w.ownerUserIds && w.ownerUserIds.length > 0) {
+					const isInOwnerUserIds = w.ownerUserIds.some((id) => {
+						const idNum = typeof id === 'string' ? Number(id) : id
+						return idNum === currentUserId
+					})
+					if (isInOwnerUserIds) {
+						console.log('[MultisigWalletPage] fetchOwnedWallets: Found user in ownerUserIds for wallet', w.id)
+						return true
+					}
+				}
+				// Fallback to ownerDetails if ownerUserIds is not available
+				if (w.ownerDetails && w.ownerDetails.length > 0) {
+					const isOwner = w.ownerDetails.some((owner) => {
+						const matches = owner.userId === currentUserId
+						if (matches) {
+							console.log('[MultisigWalletPage] fetchOwnedWallets: Found matching owner in wallet', w.id, 'owner userId:', owner.userId)
+						}
+						return matches
+					})
+					return isOwner
+				}
+				console.log('[MultisigWalletPage] fetchOwnedWallets: Wallet', w.id, 'has no ownerUserIds or ownerDetails')
+				return false
+			})
+			console.log('[MultisigWalletPage] fetchOwnedWallets: Found', owned.length, 'owned wallets')
+			setOwnedWallets(owned)
+		} catch (error: any) {
+			console.error('[MultisigWalletPage] fetchOwnedWallets: Error:', error)
+			console.warn('Không thể tải danh sách ví đang sở hữu:', error.message)
+			setOwnedWallets([])
+		} finally {
+			setLoadingOwnedWallets(false)
+		}
+	}, [user?.id])
+
+	const handleSelectOwnedWallet = useCallback(
+		async (walletId: string) => {
+			setWalletIdInput(walletId)
+			await fetchWallet(walletId, { suppressAlert: true })
+			await fetchTransactions(walletId)
+		},
+		[fetchWallet, fetchTransactions],
+	)
+
 	const handleLoadWallet = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 		if (!walletIdInput.trim()) {
@@ -126,62 +190,12 @@ const MultisigWalletPage = (): JSX.Element => {
 
 	const handleCreateWallet = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
-		const owners = parseOwners(createForm.ownersText)
-		if (owners.length === 0) {
-			showAlert({
-				type: 'error',
-				message: 'Vui lòng nhập ít nhất 1 owner',
-			})
-			return
-		}
-		const payload: CreateWalletRequest = {
-			name: createForm.name.trim(),
-			description: createForm.description.trim() || undefined,
-			owners,
-			threshold: Number(createForm.threshold),
-		}
-
-		if (!payload.name) {
-			showAlert({
-				type: 'error',
-				message: 'Tên ví không được để trống',
-			})
-			return
-		}
-
-		if (Number.isNaN(payload.threshold) || payload.threshold < 1) {
-			showAlert({
-				type: 'error',
-				message: 'Ngưỡng chữ ký phải là số nguyên dương',
-			})
-			return
-		}
-
-		setCreateLoading(true)
-		try {
-			const newWallet = await multisigApi.createWallet(payload)
-			setCreateForm({
-				name: '',
-				description: '',
-				ownersText: '',
-				threshold: 1,
-			})
-			setWalletIdInput(newWallet.id)
-			await fetchWallet(newWallet.id, { suppressAlert: true })
-			await fetchTransactions(newWallet.id)
-			showAlert({
-				type: 'success',
-				message: 'Tạo ví multisig thành công',
-			})
-		} catch (error: any) {
-			showAlert({
-				type: 'error',
-				message: 'Không thể tạo ví multisig',
-				details: error.message,
-			})
-		} finally {
-			setCreateLoading(false)
-		}
+		showAlert({
+			type: 'info',
+			message: 'Tính năng tạo ví chỉ dành cho admin. Vui lòng liên hệ admin để tạo ví mới.',
+		})
+		// Note: User page should not create wallets, only view and confirm transactions
+		// This functionality is available in admin MultisigPage
 	}
 
 	const handleLinkWallet = async (event: FormEvent<HTMLFormElement>) => {
@@ -335,14 +349,35 @@ const MultisigWalletPage = (): JSX.Element => {
 		[transactions],
 	)
 
+	// Get transactions that need confirmation from current user
+	const transactionsNeedingConfirmation = useMemo(() => {
+		if (!wallet || !user?.id) return []
+		const currentUserId = Number(user.id)
+		// Find owner address for current user
+		const ownerDetail = wallet.ownerDetails?.find((o) => o.userId === currentUserId)
+		if (!ownerDetail) return []
+		const userAddress = ownerDetail.address
+		// Filter transactions that haven't been confirmed by this user yet
+		return pendingTransactions.filter((tx) => {
+			const confirmations = tx.confirmations || []
+			return !confirmations.includes(userAddress) && tx.status !== 'executed'
+		})
+	}, [pendingTransactions, wallet, user?.id])
+
+	// Fetch owned wallets on mount and when user changes
+	useEffect(() => {
+		console.log('[MultisigWalletPage] useEffect: user from Redux:', user)
+		console.log('[MultisigWalletPage] useEffect: user?.id:', user?.id)
+		fetchOwnedWallets()
+	}, [fetchOwnedWallets, user])
+
 	return (
 		<div className={styles.page}>
 			<div className={styles.header}>
-				<h1 className={styles.headerTitle}>Ví Multisig</h1>
+				<h1 className={styles.headerTitle}>Ví Multisig của tôi</h1>
 				<p className={styles.headerSubtitle}>
-					Tạo, liên kết và quản lý các giao dịch multisig ngay trong nền tảng. Bạn cần đảm
-					bảo Service Account nằm trong danh sách owner và ví đã được nạp đủ ETH để thực thi
-					giao dịch.
+					Xem và quản lý các ví multisig mà bạn đang sở hữu. Xác nhận các giao dịch cần chữ ký của bạn
+					để hoàn tất quá trình xác thực multisig.
 				</p>
 			</div>
 
@@ -364,13 +399,15 @@ const MultisigWalletPage = (): JSX.Element => {
 				</div>
 			)}
 
-			<div className={styles.formsGrid}>
-				<div className={styles.card}>
-					<div className={styles.sectionTitle}>
-						<Wallet size={20} />
-						Tạo ví mới
-					</div>
-					<form className={styles.form} onSubmit={handleCreateWallet}>
+			{/* Tạo ví và liên kết ví chỉ dành cho admin - ẩn ở trang user */}
+			{false && (
+				<div className={styles.formsGrid}>
+					<div className={styles.card}>
+						<div className={styles.sectionTitle}>
+							<Wallet size={20} />
+							Tạo ví mới
+						</div>
+						<form className={styles.form} onSubmit={handleCreateWallet}>
 						<label className={styles.formLabel}>
 							Tên ví
 							<input
@@ -487,6 +524,49 @@ const MultisigWalletPage = (): JSX.Element => {
 						</button>
 					</form>
 				</div>
+				</div>
+			)}
+
+			<div className={styles.card}>
+				<div className={styles.sectionTitle}>
+					<ListChecks size={20} />
+					Ví đang sở hữu {ownedWallets.length > 0 && `(${ownedWallets.length})`}
+				</div>
+				{loadingOwnedWallets ? (
+					<div className={styles.loadingText}>Đang tải danh sách ví...</div>
+				) : ownedWallets.length === 0 ? (
+					<div className={styles.emptyState}>
+						Bạn chưa sở hữu ví multisig nào. Vui lòng liên hệ admin để được thêm vào danh sách owner của ví.
+					</div>
+				) : (
+					<div className={styles.ownedWalletsList}>
+						{ownedWallets.map((w) => (
+							<button
+								key={w.id}
+								type="button"
+								className={`${styles.ownedWalletItem} ${
+									w.id === activeWalletId ? styles.ownedWalletItemActive : ''
+								}`}
+								onClick={() => handleSelectOwnedWallet(w.id)}
+							>
+								<div className={styles.ownedWalletHeader}>
+									<strong>{w.name || 'Chưa đặt tên'}</strong>
+									<span className={styles.ownedWalletBadge}>
+										{w.ownerDetails?.length || 0} owners • Threshold: {w.threshold}
+									</span>
+								</div>
+								<div className={styles.ownedWalletMeta}>
+									<span className={styles.inputMono} style={{ fontSize: 11 }}>
+										{w.contractAddress}
+									</span>
+								</div>
+								{w.description && (
+									<div className={styles.ownedWalletDescription}>{w.description}</div>
+								)}
+							</button>
+						))}
+					</div>
+				)}
 			</div>
 
 			<div className={styles.card}>
@@ -543,6 +623,87 @@ const MultisigWalletPage = (): JSX.Element => {
 							})
 						}
 					/>
+
+					{transactionsNeedingConfirmation.length > 0 && (
+						<div className={styles.card} style={{ border: '2px solid #f59e0b', background: '#fffbeb' }}>
+							<div className={styles.pendingHeader}>
+								<div className={styles.sectionTitle}>
+									<CheckCircle2 size={20} style={{ color: '#f59e0b' }} />
+									Giao dịch cần xác nhận ({transactionsNeedingConfirmation.length})
+								</div>
+								<button
+									type="button"
+									className={`${styles.button} ${styles.buttonSecondary}`}
+									disabled={loadingTransactions}
+									onClick={() => activeWalletId && fetchTransactions(activeWalletId)}
+								>
+									<RefreshCcw size={16} />
+									Làm mới
+								</button>
+							</div>
+							<div className={styles.transactionList}>
+								{transactionsNeedingConfirmation.map((tx) => (
+									<div key={tx.id} className={styles.transactionItem} style={{ border: '1px solid #f59e0b' }}>
+										<div className={styles.transactionHeader}>
+											<div className={styles.transactionMeta}>
+												<strong>#{tx.txIndexOnChain}</strong>
+												<span>ID: {tx.id}</span>
+												<span>TX Hash: {tx.txHash || '—'}</span>
+											</div>
+											<div className={styles.transactionStatus}>{tx.status}</div>
+										</div>
+										<div className={styles.transactionGrid}>
+											<div>
+												<div className={styles.transactionLabel}>Gửi tới</div>
+												<div className={styles.inputMono}>{tx.destination}</div>
+											</div>
+											<div>
+												<div className={styles.transactionLabel}>Giá trị</div>
+												<div>{formatWeiToEth(tx.value)} ETH</div>
+											</div>
+											<div>
+												<div className={styles.transactionLabel}>Lượt xác nhận</div>
+												<div>
+													{tx.confirmations?.length || 0}/{wallet.threshold}
+												</div>
+											</div>
+										</div>
+										{tx.data && tx.data !== '0x' && (
+											<div>
+												<div className={styles.transactionLabel}>Dữ liệu bổ sung</div>
+												<pre className={styles.transactionData}>{tx.data}</pre>
+											</div>
+										)}
+										<div className={styles.transactionActions}>
+											<label className={styles.formLabel}>
+												Private key để xác nhận (tuỳ chọn)
+												<input
+													className={`${styles.input} ${styles.inputMono}`}
+													type="password"
+													value={confirmKeys[tx.id] || ''}
+													onChange={(event) =>
+														setConfirmKeys((prev) => ({ ...prev, [tx.id]: event.target.value }))
+													}
+													placeholder="Nếu bỏ trống sẽ dùng Service Account"
+												/>
+											</label>
+											<div className={styles.transactionActionsButtons}>
+												<button
+													type="button"
+													className={`${styles.button} ${styles.buttonPrimary}`}
+													disabled={confirmLoading[tx.id]}
+													onClick={() => handleConfirmTransaction(tx.id)}
+												>
+													<CheckCircle2 size={18} />
+													{confirmLoading[tx.id] ? 'Đang xác nhận...' : 'Xác nhận giao dịch'}
+												</button>
+											</div>
+										</div>
+									</div>
+								))}
+							</div>
+						</div>
+					)}
 
 					<div className={styles.card}>
 						<div className={styles.pendingHeader}>

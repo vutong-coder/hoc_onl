@@ -76,9 +76,9 @@ export default function RecentExams({
 	const getPerformanceMessage = (score?: number, maxScore: number = 100) => {
 		if (!score) return ''
 		const percentage = (score / maxScore) * 100
-		if (percentage >= 90) return 'Xuất sắc! 🎉'
-		if (percentage >= 80) return 'Rất tốt! 👍'
-		if (percentage >= 70) return 'Tốt! ✓'
+		if (percentage >= 90) return 'Xuất sắc!'
+		if (percentage >= 80) return 'Rất tốt!'
+		if (percentage >= 70) return 'Tốt!'
 		if (percentage >= 60) return 'Đạt yêu cầu'
 		return 'Cần cải thiện'
 	}

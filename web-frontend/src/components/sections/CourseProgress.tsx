@@ -166,10 +166,10 @@ export default function CourseProgress({
     }
 
     const getProgressMessage = (progress: number) => {
-        if (progress === 100) return 'Đã hoàn thành! 🎉'
-        if (progress >= 80) return 'Sắp hoàn thành! 💪'
-        if (progress >= 60) return 'Đang tiến bộ tốt! 👍'
-        if (progress >= 40) return 'Tiếp tục phát huy! ✓'
+        if (progress === 100) return 'Đã hoàn thành!'
+        if (progress >= 80) return 'Sắp hoàn thành!'
+        if (progress >= 60) return 'Đang tiến bộ tốt!'
+        if (progress >= 40) return 'Tiếp tục phát huy!'
         if (progress >= 20) return 'Đang bắt đầu'
         return 'Mới bắt đầu'
     }
@@ -591,21 +591,6 @@ export default function CourseProgress({
                         >
                             <X style={{ width: '20px', height: '20px' }} />
                         </button>
-
-                        {/* Success Icon */}
-                        <div style={{
-                            width: '100px',
-                            height: '100px',
-                            margin: '0 auto 24px',
-                            background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '50px'
-                        }}>
-                            🎉
-                        </div>
 
                         <h2 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '12px' }}>
                             Chúc mừng!

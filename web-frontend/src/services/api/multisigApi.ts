@@ -30,6 +30,30 @@ multisigAxios.interceptors.response.use(
 	},
 )
 
+export interface Identity {
+	id: string
+	fullName?: string
+	firstName?: string
+	lastName?: string
+	username?: string
+	email?: string
+	phone?: string
+}
+
+export interface OwnerDetail {
+	userId: number
+	identity?: Identity
+	address: string
+	privateKeyMasked?: string
+}
+
+export interface OwnerCredentialResponse {
+	userId: number
+	address: string
+	privateKey: string
+	identity?: Identity
+}
+
 export interface MultisigWallet {
 	id: string
 	contractAddress: string
@@ -37,6 +61,8 @@ export interface MultisigWallet {
 	description?: string | null
 	creatorId?: string | null
 	owners: string[]
+	ownerUserIds?: (number | string)[]
+	ownerDetails?: OwnerDetail[]
 	threshold: number
 	onChainBalance?: string
 	onChainError?: string
@@ -65,7 +91,7 @@ export interface MultisigTransaction {
 export interface CreateWalletRequest {
 	name: string
 	description?: string
-	owners: string[]
+	ownerUserIds: number[]
 	threshold: number
 }
 
@@ -73,6 +99,7 @@ export interface LinkWalletRequest {
 	name: string
 	description?: string
 	contractAddress: string
+	ownerUserIds?: number[]
 }
 
 export interface SubmitTransactionRequest {
@@ -102,8 +129,18 @@ export const getWalletById = async (walletId: string): Promise<MultisigWallet> =
 }
 
 export const getTransactionsByWallet = async (walletId: string): Promise<MultisigTransaction[]> => {
-	const { data } = await multisigAxios.get<MultisigTransaction[]>(`/${walletId}/transactions`)
-	return data
+	console.log('[multisigApi] getTransactionsByWallet: Calling API for walletId:', walletId)
+	console.log('[multisigApi] getTransactionsByWallet: Full URL:', `${API_BASE_URL}/${walletId}/transactions`)
+	const response = await multisigAxios.get<MultisigTransaction[]>(`/${walletId}/transactions`)
+	console.log('[multisigApi] getTransactionsByWallet: Response:', response)
+	console.log('[multisigApi] getTransactionsByWallet: Response data:', response.data)
+	console.log('[multisigApi] getTransactionsByWallet: Response data type:', Array.isArray(response.data) ? 'array' : typeof response.data)
+	if (Array.isArray(response.data)) {
+		console.log('[multisigApi] getTransactionsByWallet: Returning', response.data.length, 'transactions')
+	} else {
+		console.warn('[multisigApi] getTransactionsByWallet: Response is not an array!', response.data)
+	}
+	return response.data
 }
 
 export const submitTransaction = async (
@@ -138,15 +175,33 @@ export const executeTransaction = async (transactionId: string): Promise<Multisi
 	return data
 }
 
+export const getAvailableUsers = async (): Promise<any[]> => {
+	const { data } = await multisigAxios.get<any[]>('/users/available')
+	return data
+}
+
+export const getAllWallets = async (): Promise<MultisigWallet[]> => {
+	const { data } = await multisigAxios.get<MultisigWallet[]>('')
+	return data
+}
+
+export const getOwnerCredential = async (walletId: string): Promise<OwnerCredentialResponse> => {
+	const { data } = await multisigAxios.get<OwnerCredentialResponse>(`/${walletId}/owners/me`)
+	return data
+}
+
 const multisigApi = {
 	createWallet,
 	linkWallet,
 	getWalletById,
+	getAllWallets,
+	getAvailableUsers,
 	getTransactionsByWallet,
 	submitTransaction,
 	getTransactionById,
 	confirmTransaction,
 	executeTransaction,
+	getOwnerCredential,
 }
 
 export default multisigApi
