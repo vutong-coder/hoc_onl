@@ -35,6 +35,7 @@ import {
 import { useAppSelector } from '../store/hooks';
 import { getAvailableGifts, type GiftItem } from '../services/api/tokenApi';
 import { getLinkedWallet, linkWallet as linkWalletAddress, type LinkedWalletResponse } from '../services/api/tokenRewardApi';
+import styles from '../assets/css/RewardPage.module.css';
 
 interface ToastMessage {
 	type: 'success' | 'error' | 'info';
@@ -656,171 +657,79 @@ export default function RewardPage(): JSX.Element {
 
 	const renderToast = () => {
 		if (!toast) return null;
-		const background =
+		const toastClass =
 			toast.type === 'success'
-				? 'rgba(22, 163, 74, 0.95)'
+				? styles.toastSuccess
 				: toast.type === 'error'
-					? 'rgba(220, 38, 38, 0.95)'
-					: 'rgba(59, 130, 246, 0.95)';
+					? styles.toastError
+					: styles.toastInfo;
 		return (
-			<div
-				style={{
-					position: 'fixed',
-					bottom: '24px',
-					right: '24px',
-					background,
-					color: 'white',
-					padding: '16px 20px',
-					borderRadius: '12px',
-					boxShadow: '0 20px 40px rgba(0, 0, 0, 0.35)',
-					zIndex: 999,
-					maxWidth: '360px'
-				}}
-			>
-				<div style={{ fontWeight: 600, marginBottom: toast.detail ? '4px' : 0 }}>{toast.message}</div>
-				{toast.detail && <div style={{ fontSize: '13px', opacity: 0.85 }}>{toast.detail}</div>}
+			<div className={`${styles.toast} ${toastClass}`}>
+				<div className={styles.toastMessage}>{toast.message}</div>
+				{toast.detail && <div className={styles.toastDetail}>{toast.detail}</div>}
 			</div>
 		);
 	};
 
 	const renderDepositNote = () => {
 		if (!depositNote) return null;
-		const palette = depositNote.type === 'success'
-			? { bg: 'rgba(34,197,94,0.1)', border: '#22c55e', color: '#047857' }
-			: depositNote.type === 'error'
-				? { bg: 'rgba(248,113,113,0.12)', border: '#ef4444', color: '#b91c1c' }
-				: { bg: 'rgba(59,130,246,0.12)', border: '#3b82f6', color: '#1d4ed8' };
+		const noteClass =
+			depositNote.type === 'success'
+				? styles.noteSuccess
+				: depositNote.type === 'error'
+					? styles.noteError
+					: styles.noteInfo;
 		return (
-			<div
-				style={{
-					marginTop: '8px',
-					padding: '12px 14px',
-					borderRadius: '10px',
-					border: `1px solid ${palette.border}`,
-					background: palette.bg,
-					color: palette.color,
-					fontSize: '13px'
-				}}
-			>
-				<div style={{ fontWeight: 600, marginBottom: depositNote.detail ? '4px' : 0 }}>{depositNote.message}</div>
-				{depositNote.detail && <div style={{ color: palette.color }}>{depositNote.detail}</div>}
+			<div className={`${styles.note} ${noteClass}`}>
+				<div className={styles.noteMessage}>{depositNote.message}</div>
+				{depositNote.detail && <div className={styles.noteDetail}>{depositNote.detail}</div>}
 			</div>
 		);
 	};
 
 	const renderWithdrawNote = () => {
 		if (!withdrawNote) return null;
-		const palette = withdrawNote.type === 'success'
-			? { bg: 'rgba(34,197,94,0.1)', border: '#22c55e', color: '#047857' }
-			: withdrawNote.type === 'error'
-				? { bg: 'rgba(248,113,113,0.1)', border: '#ef4444', color: '#b91c1c' }
-				: { bg: 'rgba(59,130,246,0.1)', border: '#3b82f6', color: '#1d4ed8' };
+		const noteClass =
+			withdrawNote.type === 'success'
+				? styles.noteSuccess
+				: withdrawNote.type === 'error'
+					? styles.noteError
+					: styles.noteInfo;
 		return (
-			<div
-				style={{
-					marginTop: '16px',
-					padding: '12px 14px',
-					borderRadius: '10px',
-					border: `1px solid ${palette.border}`,
-					background: palette.bg,
-					color: palette.color,
-					fontSize: '13px'
-				}}
-			>
-				<div style={{ fontWeight: 600, marginBottom: withdrawNote.detail ? '4px' : 0 }}>{withdrawNote.message}</div>
-				{withdrawNote.detail && <div style={{ color: palette.color }}>{withdrawNote.detail}</div>}
+			<div className={`${styles.note} ${styles.withdrawNote} ${noteClass}`}>
+				<div className={styles.noteMessage}>{withdrawNote.message}</div>
+				{withdrawNote.detail && <div className={styles.noteDetail}>{withdrawNote.detail}</div>}
 			</div>
 		);
 	};
 
 	return (
-		<div
-			style={{
-				padding: '32px',
-				maxWidth: '1280px',
-				margin: '0 auto',
-				display: 'flex',
-				flexDirection: 'column',
-				gap: '28px'
-			}}
-		>
+		<div className={styles.page}>
 			{/* Header */}
-			<div
-				style={{
-					display: 'flex',
-					justifyContent: 'space-between',
-					alignItems: 'center',
-					flexWrap: 'wrap',
-					rowGap: '16px',
-					columnGap: '24px'
-				}}
-			>
-				<div>
-					<h1
-						style={{
-							fontSize: '32px',
-							fontWeight: 700,
-							margin: 0,
-							display: 'flex',
-							alignItems: 'center',
-							gap: '12px'
-						}}
-					>
-						<Gift size={36} style={{ color: 'var(--primary)' }} />
+			<div className={styles.header}>
+				<div className={styles.headerContent}>
+					<h1 className={styles.headerTitle}>
+						<Gift size={36} className={styles.headerTitleIcon} />
 						Token Hub
 					</h1>
-					<p
-						style={{
-							margin: '8px 0 0 0',
-							color: 'var(--muted-foreground)',
-							fontSize: '15px'
-						}}
-					>
+					<p className={styles.headerSubtitle}>
 						Quản lý số dư off-chain, kết nối ví MetaMask và rút token về blockchain an toàn.
 					</p>
 				</div>
-				<div
-					style={{
-						display: 'flex',
-						alignItems: 'center',
-						gap: '12px'
-					}}
-				>
-					<div
-						style={{
-							padding: '10px 16px',
-							borderRadius: '999px',
-							background: 'var(--muted)',
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: '8px',
-							fontSize: '14px',
-							fontWeight: 500
-						}}
-					>
-						<Coins size={18} style={{ color: 'var(--primary)' }} />
+				<div className={styles.headerActions}>
+					<div className={styles.balanceBadge}>
+						<Coins size={18} className={styles.balanceBadgeIcon} />
 						Số dư nội bộ:
-						<span style={{ fontWeight: 700, color: 'var(--foreground)' }}>
+						<span className={styles.balanceBadgeValue}>
 							{balance.toLocaleString()} {TOKEN_SYMBOL}
 						</span>
 					</div>
 					<button
 						onClick={handleConnectWallet}
 						disabled={loadingWalletLink}
-						style={{
-							padding: '12px 18px',
-							borderRadius: '10px',
-							border: 'none',
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: '8px',
-							background: isWalletConnected ? 'rgba(59,130,246,0.12)' : 'var(--primary)',
-							color: isWalletConnected ? 'var(--foreground)' : '#fff',
-							fontWeight: 600,
-							cursor: loadingWalletLink ? 'not-allowed' : 'pointer',
-							opacity: loadingWalletLink ? 0.7 : 1,
-							boxShadow: isWalletConnected || loadingWalletLink ? 'none' : '0 10px 30px rgba(99,102,241,0.35)'
-						}}
+						className={`${styles.connectButton} ${
+							isWalletConnected ? styles.connectButtonConnected : styles.connectButtonNotConnected
+						}`}
 					>
 						{isWalletConnected ? <Wallet size={18} /> : <Plug size={18} />}
 						{loadingWalletLink
@@ -833,64 +742,25 @@ export default function RewardPage(): JSX.Element {
 			</div>
 
 			{/* Network warning */}
-			<div
-				style={{
-					display: 'grid',
-					gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-					gap: '24px'
-				}}
-			>
-				<div
-					style={{
-						background: 'var(--card)',
-						borderRadius: '16px',
-						padding: '20px',
-						border: '1px solid var(--border)',
-						display: 'flex',
-						flexDirection: 'column',
-						gap: '16px'
-					}}
-				>
-					<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-						<Shield size={20} style={{ color: 'var(--primary)' }} />
-						<div style={{ fontWeight: 600, fontSize: '15px' }}>Thông tin mạng hỗ trợ</div>
+			<div className={styles.networkCardsGrid}>
+				<div className={styles.networkCard}>
+					<div className={styles.networkCardHeader}>
+						<Shield size={20} className={styles.networkCardIcon} />
+						<div className={styles.networkCardTitle}>Thông tin mạng hỗ trợ</div>
 					</div>
-					<div style={{ fontSize: '14px', color: 'var(--muted-foreground)' }}>
+					<div className={styles.networkCardContent}>
 						Chỉ sử dụng mạng <strong>{NETWORK_NAME}</strong> cho mọi giao dịch nạp/rút. Gửi token sai mạng có thể gây mất tài sản vĩnh viễn.
 					</div>
 					<button
 						onClick={() => handleCopy(ESCROW_CONTRACT_ADDRESS, 'địa chỉ hợp đồng escrow')}
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'space-between',
-							padding: '12px 16px',
-							borderRadius: '12px',
-							background: 'var(--muted)',
-							border: 'none',
-							cursor: 'pointer',
-							fontFamily: 'monospace',
-							fontSize: '13px'
-						}}
+						className={styles.networkCardButton}
 					>
 						<span>Escrow contract: {formatAddress(ESCROW_CONTRACT_ADDRESS)}</span>
 						<Copy size={16} />
 					</button>
 					{isWalletConnected && !isCorrectNetwork && (
-						<div
-							style={{
-								padding: '12px 14px',
-								border: '1px solid #f97316',
-								background: 'rgba(249, 115, 22, 0.12)',
-								borderRadius: '12px',
-								color: '#9a3412',
-								fontSize: '13px',
-								display: 'flex',
-								gap: '10px',
-								alignItems: 'flex-start'
-							}}
-						>
-							<AlertTriangle size={16} style={{ marginTop: '2px' }} />
+						<div className={styles.networkWarning}>
+							<AlertTriangle size={16} className={styles.networkWarningIcon} />
 							<div>
 								<div style={{ fontWeight: 600 }}>Sai mạng kết nối</div>
 								<div>Vui lòng chuyển MetaMask sang mạng {NETWORK_NAME} trước khi thực hiện giao dịch.</div>
@@ -899,38 +769,28 @@ export default function RewardPage(): JSX.Element {
 					)}
 				</div>
 
-				<div
-					style={{
-						background: 'var(--card)',
-						borderRadius: '16px',
-						padding: '20px',
-						border: '1px solid var(--border)',
-						display: 'flex',
-						flexDirection: 'column',
-						gap: '12px'
-					}}
-				>
-					<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-						<Wallet size={20} style={{ color: 'var(--primary)' }} />
-						<div style={{ fontWeight: 600, fontSize: '15px' }}>Trạng thái ví MetaMask</div>
+				<div className={styles.networkCard}>
+					<div className={styles.networkCardHeader}>
+						<Wallet size={20} className={styles.networkCardIcon} />
+						<div className={styles.networkCardTitle}>Trạng thái ví MetaMask</div>
 					</div>
-					<div style={{ display: 'grid', gap: '8px', fontSize: '14px', color: 'var(--muted-foreground)' }}>
-						<div>
-							<span style={{ fontWeight: 600, color: 'var(--foreground)' }}>Ví liên kết:</span>{' '}
+					<div className={styles.networkInfoGrid}>
+						<div className={styles.networkInfoItem}>
+							<span className={styles.networkInfoLabel}>Ví liên kết:</span>{' '}
 							{displayWalletAddress ? formatAddress(displayWalletAddress) : 'Chưa kết nối'}
 						</div>
-						<div>
-							<span style={{ fontWeight: 600, color: 'var(--foreground)' }}>Số dư on-chain:</span>{' '}
+						<div className={styles.networkInfoItem}>
+							<span className={styles.networkInfoLabel}>Số dư on-chain:</span>{' '}
 							{isCorrectNetwork ? `${formattedOnchainBalance} ${TOKEN_SYMBOL}` : '--'}
 						</div>
-						<div>
-							<span style={{ fontWeight: 600, color: 'var(--foreground)' }}>
+						<div className={styles.networkInfoItem}>
+							<span className={styles.networkInfoLabel}>
 								{WITHDRAW_GAS_TOKEN} để trả gas:
 							</span>{' '}
 							{isCorrectNetwork ? `${formattedEthBalance} ${WITHDRAW_GAS_TOKEN}` : '--'}
 						</div>
-						<div>
-							<span style={{ fontWeight: 600, color: 'var(--foreground)' }}>Phí gas ước tính:</span>{' '}
+						<div className={styles.networkInfoItem}>
+							<span className={styles.networkInfoLabel}>Phí gas ước tính:</span>{' '}
 							{estimatingDepositGas
 								? 'Đang ước tính...'
 								: depositGasEstimate && formattedDepositFee
@@ -942,19 +802,7 @@ export default function RewardPage(): JSX.Element {
 					</div>
 					<button
 						onClick={refresh}
-						style={{
-							marginTop: '8px',
-							padding: '10px 14px',
-							border: '1px solid var(--border)',
-							borderRadius: '10px',
-							background: 'transparent',
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: '8px',
-							cursor: 'pointer',
-							fontSize: '13px',
-							fontWeight: 500
-						}}
+						className={styles.refreshButton}
 					>
 						<Zap size={16} />
 						Làm mới dữ liệu
@@ -963,61 +811,23 @@ export default function RewardPage(): JSX.Element {
 			</div>
 
 			{/* Deposit & Withdraw */}
-			<div
-				style={{
-					display: 'grid',
-					gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-					gap: '24px'
-				}}
-			>
+			<div className={styles.depositWithdrawGrid}>
 				{/* Deposit Card */}
-				<div
-					style={{
-						background: 'var(--card)',
-						borderRadius: '20px',
-						padding: '24px',
-						border: '1px solid var(--border)',
-						display: 'flex',
-						flexDirection: 'column',
-						gap: '18px',
-						position: 'relative',
-						overflow: 'hidden'
-					}}
-				>
-					<div
-						style={{
-							position: 'absolute',
-							top: '-60px',
-							right: '-60px',
-							width: '160px',
-							height: '160px',
-							background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(79,70,229,0.05))',
-							borderRadius: '50%',
-							zIndex: 0
-						}}
-					/>
-					<div style={{ zIndex: 1 }}>
-						<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-							<h2
-								style={{
-									margin: 0,
-									fontSize: '20px',
-									fontWeight: 700,
-									display: 'flex',
-									alignItems: 'center',
-									gap: '8px'
-								}}
-							>
-								<ShoppingBag size={22} style={{ color: 'var(--primary)' }} />
+				<div className={`${styles.card} ${styles.depositCard}`}>
+					<div className={styles.depositCardBackground} />
+					<div className={styles.depositCardContent}>
+						<div className={styles.cardHeader}>
+							<h2 className={styles.cardTitle}>
+								<ShoppingBag size={22} className={styles.cardTitleIcon} />
 								Nạp token vào quỹ
 							</h2>
 						</div>
-						<p style={{ margin: 0, fontSize: '14px', color: 'var(--muted-foreground)' }}>
+						<p className={styles.cardDescription}>
 							Gửi {TOKEN_SYMBOL} từ ví cá nhân vào địa chỉ nạp dưới đây. Chỉ dùng mạng {NETWORK_NAME}.
 						</p>
-						<form onSubmit={handleDepositSubmit} style={{ marginTop: '14px', display: 'grid', gap: '12px' }}>
-							<div style={{ display: 'grid', gap: '6px' }}>
-								<label style={{ fontSize: '13px', fontWeight: 600 }}>Số lượng token muốn nạp</label>
+						<form onSubmit={handleDepositSubmit} className={styles.form}>
+							<div className={styles.formGroup}>
+								<label className={styles.formLabel}>Số lượng token muốn nạp</label>
 								<input
 									type="number"
 									min="0"
@@ -1028,33 +838,16 @@ export default function RewardPage(): JSX.Element {
 									onChange={(event) => setDepositAmount(event.target.value)}
 									disabled={submittingDeposit || !rewardTokenConfigured || !isDepositAddressConfigured}
 									placeholder="Ví dụ: 50"
-									style={{
-										padding: '12px 14px',
-										borderRadius: '10px',
-										border: '1px solid var(--border)',
-										background: 'var(--background)',
-										fontSize: '14px'
-									}}
+									className={styles.formInput}
 								/>
 							</div>
-							<div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+							<div className={styles.formActions}>
 								<button
 									type="submit"
 									disabled={!canSubmitDeposit || submittingDeposit}
-									style={{
-										border: 'none',
-										borderRadius: '10px',
-										padding: '12px 18px',
-										background: !canSubmitDeposit ? 'rgba(99,102,241,0.35)' : 'var(--primary)',
-										color: '#fff',
-										fontWeight: 600,
-										cursor: !canSubmitDeposit ? 'not-allowed' : 'pointer',
-										opacity: submittingDeposit ? 0.7 : 1,
-										display: 'inline-flex',
-										alignItems: 'center',
-										gap: '8px',
-										boxShadow: canSubmitDeposit ? '0 12px 30px rgba(99,102,241,0.25)' : 'none'
-									}}
+									className={`${styles.formButton} ${
+										!canSubmitDeposit ? styles.formButtonDisabled : styles.formButtonPrimary
+									}`}
 								>
 									{submittingDeposit ? 'Đang gửi giao dịch...' : 'Nạp token'}
 								</button>
@@ -1062,20 +855,13 @@ export default function RewardPage(): JSX.Element {
 									<button
 										type="button"
 										onClick={handleConnectWallet}
-										style={{
-											border: '1px solid var(--border)',
-											borderRadius: '10px',
-											padding: '12px 18px',
-											background: 'var(--card)',
-											fontWeight: 500,
-											cursor: 'pointer'
-										}}
+										className={`${styles.formButton} ${styles.formButtonSecondary}`}
 									>
 										Kết nối MetaMask
 									</button>
 								)}
 							</div>
-							<div style={{ fontSize: '12px', color: 'var(--muted-foreground)', display: 'grid', gap: '4px' }}>
+							<div className={styles.formHelper}>
 								<span>{depositHelperMessage}</span>
 								{estimatingDepositGas && <span>Đang ước tính phí gas...</span>}
 								{!estimatingDepositGas && depositGasEstimate && formattedDepositFee && (
@@ -1085,43 +871,22 @@ export default function RewardPage(): JSX.Element {
 									</span>
 								)}
 								{!estimatingDepositGas && depositGasError && (
-									<span style={{ color: '#dc2626' }}>{depositGasError}</span>
+									<span className={styles.formHelperError}>{depositGasError}</span>
 								)}
 							</div>
 						</form>
 						{renderDepositNote()}
 					</div>
-					<div
-						style={{
-							background: 'rgba(247, 147, 26, 0.12)',
-							border: '1px solid rgba(247, 147, 26, 0.4)',
-							borderRadius: '12px',
-							padding: '14px 16px',
-							display: 'flex',
-							gap: '12px',
-							alignItems: 'flex-start'
-						}}
-					>
-						<AlertTriangle size={18} style={{ color: '#b45309', marginTop: '2px' }} />
-						<div style={{ fontSize: '13px', color: '#b45309' }}>
+					<div className={styles.depositWarning}>
+						<AlertTriangle size={18} className={styles.depositWarningIcon} />
+						<div className={styles.depositWarningText}>
 							Chỉ nạp {TOKEN_SYMBOL} trên mạng {NETWORK_NAME}. Gửi token trên bất kỳ mạng nào khác có thể dẫn đến mất tài sản vĩnh viễn.
 						</div>
 					</div>
-					<div
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'space-between',
-							padding: '14px 16px',
-							borderRadius: '12px',
-							background: 'var(--muted)',
-							fontFamily: 'monospace',
-							fontSize: '14px'
-						}}
-					>
+					<div className={styles.depositAddressContainer}>
 						<div>
-							<div style={{ fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.7 }}>Deposit Address</div>
-							<div>{depositAddressDisplay}</div>
+							<div className={styles.depositAddressLabel}>Deposit Address</div>
+							<div className={styles.depositAddressValue}>{depositAddressDisplay}</div>
 						</div>
 						<button
 							type="button"
@@ -1131,140 +896,61 @@ export default function RewardPage(): JSX.Element {
 								}
 							}}
 							disabled={!isDepositAddressConfigured}
-							style={{
-								border: 'none',
-								background: 'var(--card)',
-								borderRadius: '10px',
-								padding: '10px',
-								cursor: isDepositAddressConfigured ? 'pointer' : 'not-allowed',
-								opacity: isDepositAddressConfigured ? 1 : 0.5,
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center'
-							}}
+							className={styles.depositAddressCopyButton}
 						>
 							<Copy size={16} />
 						</button>
 					</div>
-					<div
-						style={{
-							display: 'grid',
-							gridTemplateColumns: '120px 1fr',
-							gap: '18px',
-							alignItems: 'center'
-						}}
-					>
-						<div
-							style={{
-								width: '100%',
-								paddingTop: '100%',
-								borderRadius: '12px',
-								overflow: 'hidden',
-								position: 'relative',
-								background: 'var(--muted)'
-							}}
-						>
+					<div className={styles.depositQRContainer}>
+						<div className={styles.depositQRImage}>
 							<img
 								src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(DEPOSIT_ADDRESS)}`}
 								alt="Deposit QR"
-								style={{
-									position: 'absolute',
-									top: 0,
-									left: 0,
-									width: '100%',
-									height: '100%'
-								}}
 							/>
 						</div>
-						<div style={{ fontSize: '13px', color: 'var(--muted-foreground)', display: 'grid', gap: '8px' }}>
-							<div style={{ fontWeight: 600, color: 'var(--foreground)' }}>Hướng dẫn nạp</div>
-							<ol style={{ margin: 0, paddingLeft: '18px', display: 'grid', gap: '6px' }}>
-								<li>Mở MetaMask hoặc ví non-custodial của bạn.</li>
-								<li>Chọn mạng {NETWORK_NAME} và token {TOKEN_SYMBOL}.</li>
-								<li>Quét QR hoặc dán địa chỉ trên, nhập số lượng và gửi.</li>
-								<li>Chờ 1-2 phút, số dư nội bộ sẽ được cộng khi giao dịch xác nhận.</li>
+						<div className={styles.depositInstructions}>
+							<div className={styles.depositInstructionsTitle}>Hướng dẫn nạp</div>
+							<ol className={styles.depositInstructionsList}>
+								<li className={styles.depositInstructionsListItem}>Mở MetaMask hoặc ví non-custodial của bạn.</li>
+								<li className={styles.depositInstructionsListItem}>Chọn mạng {NETWORK_NAME} và token {TOKEN_SYMBOL}.</li>
+								<li className={styles.depositInstructionsListItem}>Quét QR hoặc dán địa chỉ trên, nhập số lượng và gửi.</li>
+								<li className={styles.depositInstructionsListItem}>Chờ 1-2 phút, số dư nội bộ sẽ được cộng khi giao dịch xác nhận.</li>
 							</ol>
 						</div>
 					</div>
-					<div
-						style={{
-							marginTop: 'auto',
-							padding: '12px',
-							borderRadius: '10px',
-							background: 'var(--muted)',
-							fontSize: '12px',
-							color: 'var(--muted-foreground)'
-						}}
-					>
+					<div className={styles.depositFooter}>
 						Lịch sử nạp sẽ tự động đồng bộ từ blockchain khi listener phát hiện giao dịch thành công.
 					</div>
 				</div>
 
 				{/* Withdraw Card */}
-				<div
-					style={{
-						background: 'var(--card)',
-						borderRadius: '20px',
-						padding: '24px',
-						border: '1px solid var(--border)',
-						display: 'flex',
-						flexDirection: 'column',
-						gap: '18px'
-					}}
-				>
+				<div className={styles.card}>
 					<div>
-						<h2
-							style={{
-								margin: 0,
-								fontSize: '20px',
-								fontWeight: 700,
-								display: 'flex',
-								alignItems: 'center',
-								gap: '8px'
-							}}
-						>
-							<Wallet size={22} style={{ color: 'var(--primary)' }} />
+						<h2 className={styles.cardTitle}>
+							<Wallet size={22} className={styles.cardTitleIcon} />
 							Rút token ra ví on-chain
 						</h2>
-						<p style={{ margin: '6px 0 0 0', fontSize: '14px', color: 'var(--muted-foreground)' }}>
+						<p className={styles.cardDescription}>
 							Claim token từ quỹ escrow về ví của bạn. Yêu cầu phải trả phí gas bằng {WITHDRAW_GAS_TOKEN}.
 						</p>
 					</div>
-					<div
-						style={{
-							display: 'grid',
-							gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-							gap: '12px'
-						}}
-					>
-						<div
-							style={{
-								padding: '12px 14px',
-								borderRadius: '14px',
-								background: 'var(--muted)'
-							}}
-						>
-							<div style={{ fontSize: '12px', opacity: 0.7 }}>Số dư nội bộ (có thể rút)</div>
-							<div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--primary)' }}>
+					<div className={styles.withdrawStatsGrid}>
+						<div className={styles.withdrawStatCard}>
+							<div className={styles.withdrawStatLabel}>Số dư nội bộ (có thể rút)</div>
+							<div className={styles.withdrawStatValue}>
 								{balance.toLocaleString()} {TOKEN_SYMBOL}
 							</div>
 						</div>
-						<div
-							style={{
-								padding: '12px 14px',
-								borderRadius: '14px',
-								background: 'var(--muted)'
-							}}
-						>
-							<div style={{ fontSize: '12px', opacity: 0.7 }}>Số dư trên ví MetaMask</div>
-							<div style={{ fontSize: '22px', fontWeight: 700 }}>
+						<div className={styles.withdrawStatCard}>
+							<div className={styles.withdrawStatLabel}>Số dư trên ví MetaMask</div>
+							<div className={styles.withdrawStatValue}>
 								{isCorrectNetwork ? `${Number(onchainBalance).toLocaleString()} ${TOKEN_SYMBOL}` : '--'}
 							</div>
 						</div>
 					</div>
-					<form onSubmit={handleWithdrawSubmit} style={{ display: 'grid', gap: '14px' }}>
-						<div style={{ display: 'grid', gap: '6px' }}>
-							<label style={{ fontSize: '13px', fontWeight: 600 }}>Số lượng token</label>
+					<form onSubmit={handleWithdrawSubmit} className={styles.withdrawForm}>
+						<div className={styles.formGroup}>
+							<label className={styles.formLabel}>Số lượng token</label>
 							<input
 								type="number"
 								min={MIN_WITHDRAW_AMOUNT}
@@ -1272,95 +958,41 @@ export default function RewardPage(): JSX.Element {
 								value={withdrawAmount}
 								onChange={(event) => setWithdrawAmount(event.target.value)}
 								placeholder={`Nhập từ ${MIN_WITHDRAW_AMOUNT} ${TOKEN_SYMBOL}`}
-								style={{
-									width: '100%',
-									padding: '12px',
-									borderRadius: '10px',
-									border: '1px solid var(--border)',
-									background: 'var(--background)',
-									fontSize: '14px'
-								}}
+								className={styles.formInput}
 							/>
 						</div>
-						<div style={{ display: 'grid', gap: '6px' }}>
-							<label style={{ fontSize: '13px', fontWeight: 600 }}>Địa chỉ ví nhận</label>
+						<div className={styles.formGroup}>
+							<label className={styles.formLabel}>Địa chỉ ví nhận</label>
 							<input
 								type="text"
 								value={withdrawAddress}
 								onChange={(event) => setWithdrawAddress(event.target.value)}
 								placeholder="0x..."
-								style={{
-									width: '100%',
-									padding: '12px',
-									borderRadius: '10px',
-									border: '1px solid var(--border)',
-									background: 'var(--background)',
-									fontSize: '14px',
-									fontFamily: 'monospace'
-								}}
+								className={`${styles.formInput} ${styles.formInputMonospace}`}
 							/>
-							<div
-								style={{
-									display: 'flex',
-									alignItems: 'center',
-									gap: '6px',
-									fontSize: '12px',
-									color: 'var(--muted-foreground)'
-								}}
-							>
-								<AlertCircle size={14} />
+							<div className={styles.withdrawWarning}>
+								<AlertCircle size={14} className={styles.withdrawWarningIcon} />
 								Giao dịch blockchain không thể hoàn tác. Kiểm tra kỹ địa chỉ trước khi xác nhận.
 							</div>
 						</div>
 						<button
 							type="submit"
 							disabled={submittingWithdraw || !isWalletConnected || !isCorrectNetwork}
-							style={{
-								marginTop: '4px',
-								padding: '14px',
-								borderRadius: '12px',
-								background: submittingWithdraw ? 'var(--muted)' : 'linear-gradient(135deg, var(--primary), var(--accent))',
-								border: 'none',
-								color: 'white',
-								fontWeight: 600,
-								fontSize: '15px',
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								gap: '8px',
-								cursor: submittingWithdraw || !isWalletConnected || !isCorrectNetwork ? 'not-allowed' : 'pointer',
-								opacity: submittingWithdraw || !isWalletConnected || !isCorrectNetwork ? 0.6 : 1
-							}}
+							className={styles.withdrawFormButton}
 						>
 							{submittingWithdraw ? (
 								<>
-									<span
-										style={{
-											width: '16px',
-											height: '16px',
-											border: '2px solid rgba(255,255,255,0.3)',
-											borderTopColor: '#fff',
-											borderRadius: '50%',
-											animation: 'spin 1s linear infinite'
-										}}
-									/>
+									<span className={styles.loadingSpinner} />
 									Đang xử lý...
 								</>
 							) : (
 								'Gửi yêu cầu rút'
 							)}
 						</button>
-						<div
-							style={{
-								fontSize: '12px',
-								color: 'var(--muted-foreground)',
-								display: 'grid',
-								gap: '4px'
-							}}
-						>
-							<div>- Rút tối thiểu: {MIN_WITHDRAW_AMOUNT} {TOKEN_SYMBOL}</div>
-							<div>- Cần ~0.002 {WITHDRAW_GAS_TOKEN} để trả phí mạng (ước lượng).</div>
-							<div>- Backend sẽ ký thông điệp off-chain, bạn xác nhận giao dịch trên MetaMask.</div>
+						<div className={styles.withdrawFormHelper}>
+							<div className={styles.withdrawFormHelperItem}>- Rút tối thiểu: {MIN_WITHDRAW_AMOUNT} {TOKEN_SYMBOL}</div>
+							<div className={styles.withdrawFormHelperItem}>- Cần ~0.002 {WITHDRAW_GAS_TOKEN} để trả phí mạng (ước lượng).</div>
+							<div className={styles.withdrawFormHelperItem}>- Backend sẽ ký thông điệp off-chain, bạn xác nhận giao dịch trên MetaMask.</div>
 						</div>
 						{renderWithdrawNote()}
 					</form>
@@ -1368,185 +1000,73 @@ export default function RewardPage(): JSX.Element {
 			</div>
 
 			{/* Reward Spending Section */}
-			<div
-				style={{
-					background: 'var(--card)',
-					borderRadius: '20px',
-					padding: '24px',
-					border: '1px solid var(--border)',
-					display: 'flex',
-					flexDirection: 'column',
-					gap: '20px'
-				}}
-			>
-				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-					<div>
-						<h2
-							style={{
-								margin: 0,
-								fontSize: '22px',
-								fontWeight: 700,
-								display: 'flex',
-								alignItems: 'center',
-								gap: '8px'
-							}}
-						>
-							<ShoppingBag size={22} style={{ color: 'var(--primary)' }} />
+			<div className={`${styles.card} ${styles.storeSection}`}>
+				<div className={styles.storeHeader}>
+					<div className={styles.storeHeaderContent}>
+						<h2 className={styles.storeTitle}>
+							<ShoppingBag size={22} className={styles.storeTitleIcon} />
 							Đổi quà bằng token
 						</h2>
-						<p style={{ margin: '6px 0 0 0', fontSize: '13px', color: 'var(--muted-foreground)' }}>
+						<p className={styles.storeDescription}>
 							Giao dịch đổi quà diễn ra 100% off-chain để đảm bảo tốc độ và trải nghiệm tốt nhất.
 						</p>
 					</div>
-					<div
-						style={{
-							display: 'inline-flex',
-							gap: '8px',
-							background: 'var(--muted)',
-							padding: '6px',
-							borderRadius: '12px'
-						}}
-					>
+					<div className={styles.storeTabs}>
 						<button
 							onClick={() => setActiveStoreTab('store')}
-							style={{
-								padding: '10px 18px',
-								borderRadius: '10px',
-								border: 'none',
-								background: activeStoreTab === 'store' ? 'var(--card)' : 'transparent',
-								fontSize: '13px',
-								fontWeight: 600,
-								cursor: 'pointer'
-							}}
+							className={`${styles.storeTab} ${
+								activeStoreTab === 'store' ? styles.storeTabActive : styles.storeTabInactive
+							}`}
 						>
 							Cửa hàng
 						</button>
 						<button
 							onClick={() => setActiveStoreTab('history')}
-							style={{
-								padding: '10px 18px',
-								borderRadius: '10px',
-								border: 'none',
-								background: activeStoreTab === 'history' ? 'var(--card)' : 'transparent',
-								fontSize: '13px',
-								fontWeight: 600,
-								cursor: 'pointer'
-							}}
+							className={`${styles.storeTab} ${
+								activeStoreTab === 'history' ? styles.storeTabActive : styles.storeTabInactive
+							}`}
 						>
 							Lịch sử đổi quà
 						</button>
 					</div>
 				</div>
 				{activeStoreTab === 'store' ? (
-					<div
-						style={{
-							display: 'grid',
-							gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-							gap: '18px'
-						}}
-					>
+					<div className={styles.storeItemsGrid}>
 						{loadingStoreItems ? (
-							<div
-								style={{
-									gridColumn: '1 / -1',
-									padding: '24px',
-									border: '1px dashed var(--border)',
-									borderRadius: '16px',
-									textAlign: 'center',
-									color: 'var(--muted-foreground)'
-								}}
-							>
+							<div className={styles.storeLoadingState}>
 								Đang tải danh sách quà tặng...
 							</div>
 						) : storeError ? (
-							<div
-								style={{
-									gridColumn: '1 / -1',
-									padding: '20px',
-									borderRadius: '16px',
-									border: '1px solid rgba(239, 68, 68, 0.35)',
-									background: 'rgba(239, 68, 68, 0.08)',
-									color: '#b91c1c',
-									textAlign: 'center',
-									fontSize: '13px'
-								}}
-							>
+							<div className={styles.storeErrorState}>
 								{storeError}
 							</div>
 						) : storeItems.length === 0 ? (
-							<div
-								style={{
-									gridColumn: '1 / -1',
-									padding: '20px',
-									borderRadius: '16px',
-									border: '1px dashed var(--border)',
-									textAlign: 'center',
-									color: 'var(--muted-foreground)',
-									fontSize: '13px'
-								}}
-							>
+							<div className={styles.storeEmptyState}>
 								Chưa có phần thưởng nào sẵn sàng. Quay lại sau nhé!
 							</div>
 						) : (
 							storeItems.map((item) => (
-								<div
-									key={item.id}
-									style={{
-										border: '1px solid var(--border)',
-										borderRadius: '16px',
-										padding: '16px',
-										display: 'grid',
-										gap: '12px',
-										background: 'var(--background)'
-									}}
-								>
-									<div
-										style={{
-											height: '120px',
-											borderRadius: '12px',
-											background: 'var(--muted)',
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-											overflow: 'hidden'
-										}}
-									>
+								<div key={item.id} className={styles.storeItem}>
+									<div className={styles.storeItemImage}>
 										{item.imageUrl ? (
-											<img
-												src={item.imageUrl}
-												alt={item.name}
-												style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-											/>
+											<img src={item.imageUrl} alt={item.name} />
 										) : (
 											<Gift size={36} style={{ color: 'var(--muted-foreground)' }} />
 										)}
 									</div>
-									<div>
-										<div style={{ fontSize: '15px', fontWeight: 600 }}>{item.name}</div>
-										<div style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginTop: '4px' }}>{item.description}</div>
+									<div className={styles.storeItemContent}>
+										<div className={styles.storeItemName}>{item.name}</div>
+										<div className={styles.storeItemDescription}>{item.description}</div>
 									</div>
-									<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-										<div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--primary)' }}>
+									<div className={styles.storeItemFooter}>
+										<div className={styles.storeItemPrice}>
 											{item.tokenPrice.toLocaleString()} {TOKEN_SYMBOL}
 										</div>
-										<div style={{ fontSize: '11px', color: 'var(--muted-foreground)' }}>Còn {item.stockQuantity}</div>
+										<div className={styles.storeItemStock}>Còn {item.stockQuantity}</div>
 									</div>
 									<button
 										onClick={() => navigate('/user/rewards/store')}
-										style={{
-											padding: '10px 12px',
-											borderRadius: '10px',
-											border: 'none',
-											background: 'var(--primary)',
-											color: 'white',
-											fontSize: '13px',
-											fontWeight: 600,
-											cursor: 'pointer',
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-											gap: '6px'
-										}}
+										className={styles.storeItemButton}
 									>
 										Đi tới đổi quà
 										<ExternalLink size={14} />
@@ -1556,36 +1076,15 @@ export default function RewardPage(): JSX.Element {
 						)}
 					</div>
 				) : (
-					<div
-						style={{
-							border: '1px dashed var(--border)',
-							borderRadius: '16px',
-							padding: '24px',
-							display: 'flex',
-							flexDirection: 'column',
-							alignItems: 'center',
-							textAlign: 'center',
-							gap: '12px'
-						}}
-					>
-						<Clock size={32} style={{ color: 'var(--muted-foreground)' }} />
-						<div style={{ fontWeight: 600 }}>Lịch sử đổi quà</div>
-						<div style={{ fontSize: '13px', color: 'var(--muted-foreground)' }}>
+					<div className={styles.storeHistoryEmpty}>
+						<Clock size={32} className={styles.storeHistoryEmptyIcon} />
+						<div className={styles.storeHistoryEmptyTitle}>Lịch sử đổi quà</div>
+						<div className={styles.storeHistoryEmptyText}>
 							Các giao dịch đổi quà sẽ xuất hiện tại đây ngay sau khi backend hoàn tất xử lý phiếu quà tặng.
 						</div>
 						<button
 							onClick={() => navigate('/user/rewards/store')}
-							style={{
-								padding: '10px 16px',
-								borderRadius: '10px',
-								border: '1px solid var(--border)',
-								background: 'transparent',
-								cursor: 'pointer',
-								display: 'flex',
-								alignItems: 'center',
-								gap: '6px',
-								fontSize: '13px'
-							}}
+							className={styles.storeHistoryEmptyButton}
 						>
 							Quản lý đơn đổi quà
 							<ArrowRightIcon />
@@ -1595,46 +1094,18 @@ export default function RewardPage(): JSX.Element {
 			</div>
 
 			{/* Token history */}
-			<div
-				style={{
-					background: 'var(--card)',
-					borderRadius: '20px',
-					padding: '24px',
-					border: '1px solid var(--border)',
-					display: 'flex',
-					flexDirection: 'column',
-					gap: '20px'
-				}}
-			>
-				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-					<div>
-						<h2
-							style={{
-								margin: 0,
-								fontSize: '22px',
-								fontWeight: 700,
-								display: 'flex',
-								alignItems: 'center',
-								gap: '8px'
-							}}
-						>
-							<Clock size={22} style={{ color: 'var(--primary)' }} />
+			<div className={`${styles.card} ${styles.historySection}`}>
+				<div className={styles.historyHeader}>
+					<div className={styles.historyHeaderContent}>
+						<h2 className={styles.historyTitle}>
+							<Clock size={22} className={styles.historyTitleIcon} />
 							Lịch sử giao dịch token
 						</h2>
-						<p style={{ margin: '6px 0 0 0', fontSize: '13px', color: 'var(--muted-foreground)' }}>
+						<p className={styles.historyDescription}>
 							Thống kê đầy đủ các lần thưởng, rút và tiêu dùng token trong hệ thống.
 						</p>
 					</div>
-					<div
-						style={{
-							fontSize: '13px',
-							background: 'var(--muted)',
-							padding: '8px 14px',
-							borderRadius: '16px',
-							color: 'var(--muted-foreground)',
-							fontWeight: 500
-						}}
-					>
+					<div className={styles.historyBadge}>
 						{totalItems} giao dịch
 					</div>
 				</div>
@@ -1649,33 +1120,14 @@ export default function RewardPage(): JSX.Element {
 					onNext={nextPage}
 				/>
 				{error && (
-					<div
-						style={{
-							padding: '12px 14px',
-							borderRadius: '10px',
-							border: '1px solid rgba(239, 68, 68, 0.35)',
-							background: 'rgba(239, 68, 68, 0.1)',
-							display: 'flex',
-							alignItems: 'center',
-							gap: '8px',
-							color: '#b91c1c',
-							fontSize: '13px'
-						}}
-					>
-						<AlertTriangle size={16} />
+					<div className={styles.historyError}>
+						<AlertTriangle size={16} className={styles.historyErrorIcon} />
 						{error}
 					</div>
 				)}
 			</div>
 
 			{renderToast()}
-
-			<style>{`
-				@keyframes spin {
-					from { transform: rotate(0deg); }
-					to { transform: rotate(360deg); }
-				}
-			`}</style>
 		</div>
 	);
 }

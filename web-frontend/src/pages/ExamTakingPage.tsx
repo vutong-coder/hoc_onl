@@ -200,14 +200,7 @@ export const ExamTakingPage: React.FC = () => {
           
               {/* AI Camera Monitor - Hidden but functional */}
               {currentExam && session && authUser && (
-                <div style={{ 
-                  position: 'absolute', 
-                  top: '-9999px', 
-                  left: '-9999px',
-                  width: '1px',
-                  height: '1px',
-                  overflow: 'hidden'
-                }}>
+                <div className={styles.aiCameraMonitorHidden}>
                   <AICameraMonitor
                     examId={currentExam.id}
                     studentId={authUser.id}

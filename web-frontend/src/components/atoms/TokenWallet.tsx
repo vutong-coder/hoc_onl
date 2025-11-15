@@ -245,11 +245,14 @@ export default function TokenWallet({ userId }: TokenWalletProps): JSX.Element {
     return (
         <div className="card stagger-load hover-lift interactive" style={{
             animationDelay: '200ms',
-            height: '370px',
-            padding: '16px',
+            minHeight: '370px',
+            height: '100%',
+            padding: 'clamp(12px, 2vw, 16px)',
             display: 'flex',
             flexDirection: 'column',
-            position: 'relative'
+            position: 'relative',
+            width: '100%',
+            boxSizing: 'border-box'
         }}>
             {/* --- HEADER --- */}
             <div style={{ flexShrink: 0 }}>

@@ -9,34 +9,40 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 10000; /* Higher than header (9999) */
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .modal {
   background: var(--card);
   border-radius: 16px;
   box-shadow: var(--shadow-xl);
-  width: 90%;
+  width: min(90%, 800px);
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
   border: 1px solid var(--border);
+  margin: clamp(16px, 3vw, 20px);
+  box-sizing: border-box;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 32px;
+  padding: clamp(16px, 3vw, 24px) clamp(20px, 3vw, 32px);
   border-bottom: 1px solid var(--border);
+  gap: clamp(12px, 2vw, 16px);
 }
 
 .header h2 {
   color: var(--foreground);
-  font-size: 24px;
+  font-size: clamp(20px, 4vw, 24px);
   font-weight: 600;
   margin: 0;
+  word-break: break-word;
+  flex: 1;
 }
 
 .closeButton {
@@ -44,12 +50,18 @@
   border: none;
   color: var(--foreground);
   cursor: pointer;
-  padding: 8px;
+  padding: clamp(6px, 1vw, 8px);
   border-radius: 8px;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+.closeButton svg {
+  width: clamp(18px, 2.5vw, 20px);
+  height: clamp(18px, 2.5vw, 20px);
 }
 
 .closeButton:hover {
@@ -62,40 +74,52 @@
 }
 
 .content {
-  padding: 32px;
+  padding: clamp(20px, 3vw, 32px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Warning Section */
 .warning {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(10px, 1.5vw, 12px);
   background: var(--destructive);
   border: 1px solid var(--destructive);
   border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 24px;
+  padding: clamp(12px, 2vw, 16px);
+  margin-bottom: clamp(20px, 3vw, 24px);
   color: var(--destructive-foreground);
   opacity: 0.9;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .warning span {
   flex: 1;
   font-weight: 500;
+  font-size: clamp(13px, 2.5vw, 14px);
+  word-break: break-word;
+  width: 100%;
 }
 
 .connectButton {
   background: var(--destructive);
   color: var(--destructive-foreground);
   border: none;
-  padding: 8px 16px;
+  padding: clamp(6px, 1.5vw, 8px) clamp(12px, 2vw, 16px);
   border-radius: 8px;
   font-weight: 500;
+  font-size: clamp(12px, 2.5vw, 14px);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: clamp(6px, 1vw, 8px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .connectButton:hover {
@@ -114,26 +138,33 @@
 /* Wallet Info */
 .walletInfo {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   background: var(--muted);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
-  gap: 16px;
+  padding: clamp(12px, 2vw, 16px);
+  margin-bottom: clamp(10px, 1.5vw, 12px);
+  gap: clamp(10px, 1.5vw, 12px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .walletAddress {
   color: var(--muted-foreground);
-  font-size: 14px;
+  font-size: clamp(12px, 2.5vw, 14px);
   font-family: 'Monaco', 'Menlo', monospace;
+  word-break: break-all;
+  width: 100%;
 }
 
 .balanceInfo {
   color: var(--primary);
   font-weight: 600;
-  font-size: 16px;
+  font-size: clamp(14px, 2.5vw, 16px);
+  word-break: break-word;
+  width: 100%;
 }
 
 .balanceInfo .loadingText {
@@ -145,14 +176,17 @@
 .feeInfo {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: clamp(6px, 1vw, 8px);
   background: var(--muted);
   border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 24px;
+  padding: clamp(10px, 1.5vw, 12px) clamp(12px, 2vw, 16px);
+  margin-bottom: clamp(20px, 3vw, 24px);
   text-align: center;
   color: var(--foreground);
   font-weight: 500;
+  font-size: clamp(13px, 2.5vw, 14px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .insufficientBalance {
@@ -176,7 +210,9 @@
 
 .uploadTypeButtons {
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: clamp(10px, 1.5vw, 12px);
+  width: 100%;
 }
 
 .uploadTypeButton {
@@ -184,8 +220,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: clamp(6px, 1vw, 8px);
+  padding: clamp(10px, 1.5vw, 12px) clamp(12px, 2vw, 16px);
   background: var(--muted);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -193,6 +229,9 @@
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: 500;
+  font-size: clamp(13px, 2.5vw, 14px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .uploadTypeButton:hover {
@@ -220,11 +259,13 @@
 .fileDropZone {
   border: 2px dashed var(--border);
   border-radius: 12px;
-  padding: 32px;
+  padding: clamp(24px, 3vw, 32px);
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
   background: var(--muted);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .fileDropZone:hover {
@@ -247,21 +288,28 @@
 
 .selectedFile {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(12px, 2vw, 16px);
   color: var(--foreground);
   background: var(--muted);
   border-radius: 8px;
-  padding: 16px;
+  padding: clamp(12px, 2vw, 16px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .selectedFile div {
   flex: 1;
   text-align: left;
+  width: 100%;
+  min-width: 0;
 }
 
 .selectedFile p {
-  margin: 4px 0;
+  margin: clamp(3px, 0.8vw, 4px) 0;
+  font-size: clamp(12px, 2.5vw, 14px);
+  word-break: break-word;
 }
 
 .selectedFile button {
@@ -520,9 +568,10 @@
 
 .formRow {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 16px;
+  grid-template-columns: 1fr;
+  gap: clamp(12px, 2vw, 16px);
+  margin-bottom: clamp(12px, 2vw, 16px);
+  width: 100%;
 }
 
 .formGroup {
@@ -678,22 +727,27 @@
 /* Actions */
 .actions {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  gap: clamp(12px, 2vw, 16px);
   justify-content: flex-end;
-  margin-top: 32px;
-  padding-top: 24px;
+  margin-top: clamp(24px, 3vw, 32px);
+  padding-top: clamp(20px, 3vw, 24px);
   border-top: 1px solid var(--border);
+  width: 100%;
 }
 
 .cancelButton {
   background: var(--secondary);
   border: 1px solid var(--border);
   color: var(--secondary-foreground);
-  padding: 12px 24px;
+  padding: clamp(10px, 2vw, 12px) clamp(20px, 3vw, 24px);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
+  font-size: clamp(13px, 2.5vw, 14px);
   transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .cancelButton:hover {
@@ -709,14 +763,24 @@
   background: var(--primary);
   color: var(--primary-foreground);
   border: none;
-  padding: 12px 24px;
+  padding: clamp(10px, 2vw, 12px) clamp(20px, 3vw, 24px);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
+  font-size: clamp(13px, 2.5vw, 14px);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: clamp(6px, 1vw, 8px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.registerButton svg {
+  width: clamp(16px, 2vw, 18px);
+  height: clamp(16px, 2vw, 18px);
+  flex-shrink: 0;
 }
 
 .registerButton:hover {
@@ -745,31 +809,51 @@
   }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .modal {
-    width: 95%;
-    margin: 20px;
+/* Responsive design - Most styles now use clamp() so minimal media queries needed */
+@media (min-width: 640px) {
+  .warning {
+    flex-direction: row;
+    align-items: center;
   }
 
-  .header {
-    padding: 20px 24px;
+  .connectButton {
+    width: auto;
   }
 
-  .content {
-    padding: 24px;
+  .walletInfo {
+    flex-direction: row;
+    align-items: center;
   }
 
-  .formRow {
-    grid-template-columns: 1fr;
-    gap: 0;
+  .walletAddress {
+    word-break: break-all;
   }
 
-  .actions {
-    flex-direction: column;
+  .balanceInfo {
+    text-align: right;
   }
 
   .uploadTypeButtons {
-    flex-direction: column;
+    flex-direction: row;
+  }
+
+  .selectedFile {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .actions {
+    flex-direction: row;
+  }
+
+  .cancelButton,
+  .registerButton {
+    width: auto;
+  }
+}
+
+@media (min-width: 768px) {
+  .formRow {
+    grid-template-columns: 1fr 1fr;
   }
 }

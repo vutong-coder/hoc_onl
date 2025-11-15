@@ -133,20 +133,8 @@ export default function CourseLearnPage(): JSX.Element {
   const rewardBanner = (() => {
     if (isAwardingTokens) {
       return (
-        <div
-          style={{
-            marginTop: '1.25rem',
-            padding: '0.75rem 1rem',
-            borderRadius: '14px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            fontWeight: 500,
-            backgroundColor: 'rgba(59,130,246,0.12)',
-            color: '#1d4ed8',
-          }}
-        >
-          <Award size={20} />
+        <div className="reward-banner loading">
+          <Award />
           <span>Đang cộng token phần thưởng cho bạn...</span>
         </div>
       )
@@ -154,20 +142,8 @@ export default function CourseLearnPage(): JSX.Element {
 
     if (awardMessage) {
       return (
-        <div
-          style={{
-            marginTop: '1.25rem',
-            padding: '0.75rem 1rem',
-            borderRadius: '14px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            fontWeight: 500,
-            backgroundColor: 'rgba(34,197,94,0.12)',
-            color: '#047857',
-          }}
-        >
-          <Award size={20} />
+        <div className="reward-banner success">
+          <Award />
           <span>{awardMessage}</span>
         </div>
       )
@@ -175,34 +151,14 @@ export default function CourseLearnPage(): JSX.Element {
 
     if (awardError) {
       return (
-        <div
-          style={{
-            marginTop: '1.25rem',
-            padding: '0.75rem 1rem',
-            borderRadius: '14px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            fontWeight: 500,
-            backgroundColor: 'rgba(239,68,68,0.12)',
-            color: '#b91c1c',
-          }}
-        >
-          <AlertCircle size={20} />
+        <div className="reward-banner error">
+          <AlertCircle />
           <span>{awardError}</span>
           <button
             type="button"
             onClick={handleRetryAward}
             disabled={isAwardingTokens}
-            style={{
-              marginLeft: 'auto',
-              padding: '0.35rem 0.9rem',
-              borderRadius: '999px',
-              border: '1px solid rgba(185,28,28,0.35)',
-              background: 'transparent',
-              color: '#b91c1c',
-              cursor: isAwardingTokens ? 'not-allowed' : 'pointer',
-            }}
+            className="retry-button"
           >
             Thử lại
           </button>

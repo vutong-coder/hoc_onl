@@ -379,20 +379,8 @@ export default function CourseDetailPage(): JSX.Element {
                 )}
               </div>
 
-              <div
-                style={{
-                  marginTop: '0.75rem',
-                  padding: '0.6rem 0.9rem',
-                  borderRadius: '12px',
-                  backgroundColor: 'rgba(34,197,94,0.12)',
-                  color: '#047857',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.6rem',
-                  fontWeight: 500,
-                }}
-              >
-                <Award size={18} />
+              <div className="reward-info">
+                <Award />
                 <span>Hoàn thành khóa học để nhận {COURSE_COMPLETION_REWARD} LEARN.</span>
               </div>
             </div>

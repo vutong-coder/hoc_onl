@@ -9,6 +9,8 @@ import SuccessNotification from '../components/atoms/SuccessNotification'
 import { validateEmail, validatePassword } from '../utils/authValidation'
 import { useFormValidation } from '../hooks/useFormValidation'
 import { loginUser, clearError } from '../store/slices/authSlice'
+import styles from '../assets/css/LoginPage.module.css'
+import authFormStyles from '../assets/css/AuthForm.module.css'
 
 export default function LoginPage(): JSX.Element {
 	const [rememberMe, setRememberMe] = useState(false)
@@ -91,9 +93,14 @@ export default function LoginPage(): JSX.Element {
 		})).unwrap()
 	}, [dispatch, formData.email, formData.password])
 
-	const handleGoogleAuth = () => {
-		console.log('Google authentication')
-		// TODO: Implement Google OAuth
+	const handleGoogleAuth = async () => {
+		try {
+			const { initiateGoogleLogin } = await import('../services/api/authApi');
+			initiateGoogleLogin();
+		} catch (error) {
+			console.error('Google authentication error:', error);
+			setFieldError('email', 'Không thể kết nối với Google. Vui lòng thử lại.');
+		}
 	}
 
 	const handleFacebookAuth = () => {
@@ -255,74 +262,58 @@ export default function LoginPage(): JSX.Element {
 									typeof window.navigator.credentials.get === 'function'
 
 	return (
-		<div>
-			{/* Registration success message */}
-			{registrationData && (
-				<SuccessNotification
-					title="Đăng ký thành công!"
-					message={`Chào mừng ${registrationData.fullName}! Email của bạn đã được điền sẵn, chỉ cần nhập mật khẩu để đăng nhập.`}
-				/>
-			)}
-
-			<AuthForm
-				title={registrationData ? "Đăng nhập ngay" : "Chào mừng trở lại"}
-				subtitle={registrationData ? 
-					"Email của bạn đã được điền sẵn, chỉ cần nhập mật khẩu" : 
-					"Đăng nhập vào tài khoản của bạn để tiếp tục"
-				}
-				onSubmit={(e) => handleSubmit(onSubmit, e)}
-				buttonText="Đăng nhập"
-				loading={loading}
-				error={error}
-			afterButton={
-				<div>
-					<SocialAuthButtons
-						onGoogleAuth={handleGoogleAuth}
-						onGitHubAuth={handleGitHubAuth}
+		<div className={styles.page}>
+			<div className={styles.container}>
+				{/* Registration success message */}
+				{registrationData && (
+					<SuccessNotification
+						title="Đăng ký thành công!"
+						message={`Chào mừng ${registrationData.fullName}! Email của bạn đã được điền sẵn, chỉ cần nhập mật khẩu để đăng nhập.`}
 					/>
-					{isWebAuthnSupported && (
-						<div style={{ marginTop: '1rem', textAlign: 'center' }}>
-							<button
-								type="button"
-								onClick={startWebAuthnAuthentication}
-								disabled={webAuthnLoading}
-								style={{
-									width: '100%',
-									padding: '0.75rem',
-									backgroundColor: webAuthnLoading ? '#ccc' : '#28a745',
-									color: 'white',
-									border: 'none',
-									borderRadius: '0.375rem',
-									fontSize: '1rem',
-									cursor: webAuthnLoading ? 'not-allowed' : 'pointer'
-								}}
-							>
-								{webAuthnLoading ? 'Đang xác thực...' : 'Đăng nhập không mật khẩu'}
-							</button>
+				)}
+
+				<AuthForm
+					title={registrationData ? "Đăng nhập ngay" : "Chào mừng trở lại"}
+					subtitle={registrationData ? 
+						"Email của bạn đã được điền sẵn, chỉ cần nhập mật khẩu" : 
+						"Đăng nhập vào tài khoản của bạn để tiếp tục"
+					}
+					onSubmit={(e) => handleSubmit(onSubmit, e)}
+					buttonText="Đăng nhập"
+					loading={loading}
+					error={error}
+					afterButton={
+						<div>
+							<SocialAuthButtons
+								onGoogleAuth={handleGoogleAuth}
+								onGitHubAuth={handleGitHubAuth}
+							/>
+							{isWebAuthnSupported && (
+								<div className={styles.webAuthnContainer}>
+									<button
+										type="button"
+										onClick={startWebAuthnAuthentication}
+										disabled={webAuthnLoading}
+										className={styles.webAuthnButton}
+									>
+										{webAuthnLoading ? 'Đang xác thực...' : 'Đăng nhập không mật khẩu'}
+									</button>
+								</div>
+							)}
 						</div>
-					)}
-				</div>
-			}
-			footer={
-				<p style={{ margin: 0 }}>
-					Chưa có tài khoản?{' '}
-					<Link 
-						to="/auth/register"
-						style={{
-							background: 'none',
-							border: 'none',
-							color: 'var(--primary)',
-							cursor: 'pointer',
-							textDecoration: 'underline',
-							fontSize: 'inherit',
-							fontFamily: 'inherit'
-						}}
-					>
-						Đăng ký
-					</Link>
-				</p>
-			}
-		>
+					}
+					footer={
+						<p>
+							Chưa có tài khoản?{' '}
+							<Link 
+								to="/auth/register"
+								className={authFormStyles.footerLink}
+							>
+								Đăng ký
+							</Link>
+						</p>
+					}
+				>
 			<Input
 				id="email"
 				name="email"
@@ -355,33 +346,22 @@ export default function LoginPage(): JSX.Element {
 				required
 			/>
 			
-			<div style={{
-				display: 'flex',
-				justifyContent: 'space-between',
-				alignItems: 'center',
-				marginTop: '-0.5rem'
-			}}>
-				<Checkbox
-					id="remember"
-					label="Ghi nhớ đăng nhập"
-					checked={rememberMe}
-					onChange={setRememberMe}
-				/>
-				<Link 
-					to="/auth/forgot"
-					style={{
-						background: 'none',
-						border: 'none',
-						color: 'var(--primary)',
-						cursor: 'pointer',
-						fontSize: '0.875rem',
-						textDecoration: 'none'
-					}}
-				>
-					Quên mật khẩu?
-				</Link>
+					<div className={styles.rememberForgotContainer}>
+						<Checkbox
+							id="remember"
+							label="Ghi nhớ đăng nhập"
+							checked={rememberMe}
+							onChange={setRememberMe}
+						/>
+						<Link 
+							to="/auth/forgot"
+							className={styles.forgotPasswordLink}
+						>
+							Quên mật khẩu?
+						</Link>
+					</div>
+				</AuthForm>
 			</div>
-		</AuthForm>
 		</div>
 	)
 }

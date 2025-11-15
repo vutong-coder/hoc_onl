@@ -556,7 +556,7 @@ const MultisigWalletPage = (): JSX.Element => {
 									</span>
 								</div>
 								<div className={styles.ownedWalletMeta}>
-									<span className={styles.inputMono} style={{ fontSize: 11 }}>
+									<span className={`${styles.inputMono} ${styles.inputMonoSmall}`}>
 										{w.contractAddress}
 									</span>
 								</div>
@@ -625,10 +625,10 @@ const MultisigWalletPage = (): JSX.Element => {
 					/>
 
 					{transactionsNeedingConfirmation.length > 0 && (
-						<div className={styles.card} style={{ border: '2px solid #f59e0b', background: '#fffbeb' }}>
+						<div className={`${styles.card} ${styles.cardWarning}`}>
 							<div className={styles.pendingHeader}>
-								<div className={styles.sectionTitle}>
-									<CheckCircle2 size={20} style={{ color: '#f59e0b' }} />
+								<div className={`${styles.sectionTitle} ${styles.sectionTitleWarning}`}>
+									<CheckCircle2 size={20} />
 									Giao dịch cần xác nhận ({transactionsNeedingConfirmation.length})
 								</div>
 								<button
@@ -643,7 +643,7 @@ const MultisigWalletPage = (): JSX.Element => {
 							</div>
 							<div className={styles.transactionList}>
 								{transactionsNeedingConfirmation.map((tx) => (
-									<div key={tx.id} className={styles.transactionItem} style={{ border: '1px solid #f59e0b' }}>
+									<div key={tx.id} className={`${styles.transactionItem} ${styles.transactionItemWarning}`}>
 										<div className={styles.transactionHeader}>
 											<div className={styles.transactionMeta}>
 												<strong>#{tx.txIndexOnChain}</strong>

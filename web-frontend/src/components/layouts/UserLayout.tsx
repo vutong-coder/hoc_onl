@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import UserHeader from './UserHeader'
 import ChatBox from '../molecules/ChatBox'
+import styles from '../../assets/css/UserLayout.module.css'
 
 export default function UserLayout(): JSX.Element {
 	const [isChatOpen, setIsChatOpen] = useState(false)
@@ -15,16 +16,9 @@ export default function UserLayout(): JSX.Element {
 	}
 
 	return (
-		<div style={{
-			display: 'flex',
-			flexDirection: 'column',
-			minHeight: '100vh',
-			background: 'var(--background)',
-			color: 'var(--foreground)',
-			fontFamily: 'var(--font-sans)'
-		}}>
+		<div className={styles.layout}>
 			<UserHeader />
-			<main style={{ flex: 1, paddingTop: '80px' }}>
+			<main className={styles.main}>
 				<Outlet />
 			</main>
 			

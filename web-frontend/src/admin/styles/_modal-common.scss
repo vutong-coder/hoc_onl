@@ -17,8 +17,9 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  z-index: 9999 !important;
+  z-index: 10000 !important; /* Higher than header (9999) */
   backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
   padding: 16px !important;
   animation: fadeInOverlay 0.3s ease-out;
 }

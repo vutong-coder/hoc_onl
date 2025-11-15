@@ -26,32 +26,16 @@ export default function useUsers() {
 			// Fetch tất cả users một lần với size lớn để lấy hết dữ liệu
 			const response = await getUsers(0, 1000)
 			
-			console.log('[useUsers] Full API response:', response)
-			console.log('[useUsers] Response data:', response.data)
 			
 			if (response && response.data) {
 				const pageData = response.data as any
-				console.log('[useUsers] Page data:', pageData)
-				console.log('[useUsers] Content array:', pageData.content)
-				console.log('[useUsers] Content length:', pageData.content?.length)
 				
 				// Xử lý cả camelCase và snake_case
 				const totalElements = pageData.totalElements || pageData.total_elements || 0
 				const totalPages = pageData.totalPages || pageData.total_pages || 0
 				
-				console.log('[useUsers] Total elements:', totalElements)
-				console.log('[useUsers] Total pages:', totalPages)
-				
 				// Đảm bảo content là một array
 				const contentArray = Array.isArray(pageData.content) ? pageData.content : []
-				
-				if (contentArray.length > 0) {
-					console.log('[useUsers] First user from API:', contentArray[0])
-					console.log('[useUsers] lastLoginAt field:', contentArray[0].lastLoginAt)
-					console.log('[useUsers] last_login_at field:', (contentArray[0] as any).last_login_at)
-				} else {
-					console.warn('[useUsers] No users found in response. Content array is empty.')
-				}
 				
 				// Map users từ response
 				const mappedUsers = contentArray.map((userResponse: any) => {
@@ -63,24 +47,15 @@ export default function useUsers() {
 					}
 				}).filter((user: any) => user !== null) as User[]
 				
-				console.log('[useUsers] Mapped users count:', mappedUsers.length)
-				
-				// Debug: Log mapped user to check lastLogin field
-				if (mappedUsers.length > 0) {
-					console.log('[useUsers] Sample mapped user:', mappedUsers[0])
-					console.log('[useUsers] lastLogin field:', mappedUsers[0].lastLogin)
-				}
 				
 				setAllUsersData(mappedUsers)
 				setBackendTotalPages(totalPages)
 				setBackendTotalItems(totalElements || mappedUsers.length)
 				
 				if (mappedUsers.length === 0 && contentArray.length > 0) {
-					console.error('[useUsers] Warning: Users exist in API but mapping failed!')
 					setError('Có lỗi khi xử lý dữ liệu người dùng. Vui lòng kiểm tra console để biết thêm chi tiết.')
 				}
 			} else {
-				console.error('[useUsers] Invalid response structure:', response)
 				setError('Không thể tải dữ liệu người dùng: Response không hợp lệ')
 			}
 		} catch (err: any) {
@@ -96,7 +71,6 @@ export default function useUsers() {
 			
 			// Kiểm tra token
 			const token = localStorage.getItem('accessToken')
-			console.log('[useUsers] Token exists:', !!token)
 			
 			// Xử lý lỗi 401 (Unauthorized)
 			if (err.response?.status === 401 || err.message?.includes('401') || err.message?.includes('Unauthorized')) {
@@ -206,7 +180,6 @@ export default function useUsers() {
 			await apiDeleteUser(Number(userId))
 			await fetchUsers()
 		} catch (err: any) {
-			console.error('Error deleting user:', err)
 			setError(err.message || 'Lỗi khi xóa người dùng')
 			throw err
 		} finally {
@@ -233,7 +206,6 @@ export default function useUsers() {
 			await apiUpdateUser(Number(userId), updateRequest)
 			await fetchUsers()
 		} catch (err: any) {
-			console.error('Error toggling user status:', err)
 			setError(err.message || 'Lỗi khi thay đổi trạng thái người dùng')
 			throw err
 		} finally {
@@ -270,7 +242,6 @@ export default function useUsers() {
 				await fetchUsers()
 			}
 		} catch (err: any) {
-			console.error('Error updating user:', err)
 			setError(err.message || 'Lỗi khi cập nhật người dùng')
 			throw err
 		} finally {
@@ -287,7 +258,6 @@ export default function useUsers() {
 			await apiCreateUser(createRequest)
 			await fetchUsers()
 		} catch (err: any) {
-			console.error('Error creating user:', err)
 			setError(err.message || 'Lỗi khi tạo người dùng')
 			throw err
 		} finally {

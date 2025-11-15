@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import CourseCard from '../atoms/CourseCard'
 import courseApi from '../../services/api/courseApi'
 import { useAppSelector } from '../../store/hooks'
+import styles from '../../assets/css/CourseProgress.module.css'
 
 interface Course {
     id: string
@@ -176,73 +177,37 @@ export default function CourseProgress({
 
     return (
         <>
-            <div
-                className="card stagger-load hover-lift interactive"
-                style={{
-                    animationDelay: '400ms',
-                    height: '490px',
-                    padding: '16px',
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}
-            >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-                    <h3 style={{ fontSize: '18px', fontWeight: 600, margin: 0 }}>
+            <div className={`card stagger-load hover-lift interactive ${styles.container}`}>
+                <div className={styles.header}>
+                    <h3 className={styles.title}>
                         Tiến độ khóa học
                     </h3>
                     <button
                         onClick={handleViewAllCourses}
-                        style={{
-                            fontSize: '14px',
-                            color: 'var(--primary)',
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            padding: '4px 8px',
-                            borderRadius: '6px',
-                            fontWeight: 500
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'var(--primary-light)'
-                            e.currentTarget.style.textDecoration = 'underline'
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'none'
-                            e.currentTarget.style.textDecoration = 'none'
-                        }}
+                        className={styles.viewCoursesButton}
                     >
                         Xem khóa học
                     </button>
                 </div>
 
-                <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div className={styles.courseList}>
                     {loading ? (
-                        <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted-foreground)' }}>
-                            Đang tải...
+                        <div className={styles.stateContainer}>
+                            <p className={styles.stateText}>Đang tải...</p>
                         </div>
                     ) : courses.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted-foreground)' }}>
-                            <BookOpen size={48} style={{ margin: '0 auto 16px', opacity: 0.5 }} />
-                            <p>Bạn chưa đăng ký khóa học nào</p>
+                        <div className={styles.stateContainer}>
+                            <BookOpen className={styles.stateIcon} size={48} />
+                            <p className={styles.stateText}>Bạn chưa đăng ký khóa học nào</p>
                             <button
                                 onClick={handleViewAllCourses}
-                                style={{
-                                    marginTop: '12px',
-                                    padding: '8px 16px',
-                                    background: 'var(--primary)',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: 'var(--radius-md)',
-                                    cursor: 'pointer',
-                                    fontWeight: 600
-                                }}
+                                className={styles.exploreButton}
                             >
                                 Khám phá khóa học
                             </button>
                         </div>
                     ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div className={styles.courseListContainer}>
                             {courses.map((course) => (
                                 <CourseCard
                                     key={course.id}
@@ -259,175 +224,95 @@ export default function CourseProgress({
             {/* Course Detail Modal */}
             {showCourseDetailModal && selectedCourse && (
                 <div 
+                    className={styles.modalOverlay}
                     onClick={() => setShowCourseDetailModal(false)}
-                    style={{
-                        position: 'fixed',
-                        top: '0',
-                        left: '0',
-                        width: '100vw',
-                        height: '100vh',
-                        background: 'rgba(0, 0, 0, 0.7)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 99999,
-                        backdropFilter: 'blur(4px)',
-                        animation: 'fadeIn 0.2s ease',
-                        padding: '20px',
-                        boxSizing: 'border-box'
-                    }}
                 >
                     <div 
+                        className={styles.modalContent}
                         onClick={(e) => e.stopPropagation()}
-                        style={{
-                            background: 'var(--card)',
-                            borderRadius: 'var(--radius-lg)',
-                            padding: '32px',
-                            maxWidth: '600px',
-                            width: '100%',
-                            maxHeight: '90vh',
-                            overflowY: 'auto',
-                            position: 'relative',
-                            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-                            animation: 'modalSlideIn 0.3s ease forwards'
-                        }}
                     >
                         <button
                             onClick={() => setShowCourseDetailModal(false)}
-                            style={{
-                                position: 'absolute',
-                                top: '16px',
-                                right: '16px',
-                                background: 'var(--muted)',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '32px',
-                                height: '32px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.background = 'var(--destructive)'
-                                e.currentTarget.style.transform = 'scale(1.1)'
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'var(--muted)'
-                                e.currentTarget.style.transform = 'scale(1)'
-                            }}
+                            className={styles.modalCloseButton}
                         >
-                            <X style={{ width: '20px', height: '20px' }} />
+                            <X className={styles.modalCloseIcon} />
                         </button>
 
-                        <div style={{ textAlign: 'center' }}>
+                        <div className={styles.modalHeader}>
                             {/* Progress Circle */}
-                            <div style={{
-                                width: '120px',
-                                height: '120px',
-                                margin: '0 auto 24px',
-                                background: `linear-gradient(135deg, ${getProgressColor(selectedCourse.progress)}, var(--accent))`,
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexDirection: 'column',
-                                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)'
-                            }}>
-                                <span style={{ fontSize: '36px', fontWeight: 700, color: 'white' }}>
+                            <div 
+                                className={styles.progressCircle}
+                                style={{
+                                    background: `linear-gradient(135deg, ${getProgressColor(selectedCourse.progress)}, var(--accent))`
+                                }}
+                            >
+                                <span className={styles.progressValue}>
                                     {selectedCourse.progress}%
                                 </span>
-                                <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.9)' }}>
+                                <span className={styles.progressLabel}>
                                     Hoàn thành
                                 </span>
                             </div>
 
-                            <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '8px' }}>
+                            <h2 className={styles.modalTitle}>
                                 {selectedCourse.title}
                             </h2>
 
-                            <p style={{
-                                fontSize: '18px',
-                                fontWeight: 600,
-                                color: getProgressColor(selectedCourse.progress),
-                                marginBottom: '24px'
-                            }}>
+                            <p 
+                                className={styles.modalPerformance}
+                                style={{
+                                    color: getProgressColor(selectedCourse.progress)
+                                }}
+                            >
                                 {getProgressMessage(selectedCourse.progress)}
                             </p>
 
                             {/* Stats Grid */}
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(2, 1fr)',
-                                gap: '16px',
-                                marginBottom: '24px',
-                                textAlign: 'left'
-                            }}>
-                                <div style={{
-                                    padding: '16px',
-                                    background: 'var(--muted)',
-                                    borderRadius: 'var(--radius-md)',
-                                    border: '1px solid var(--border)'
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                                        <Clock style={{ width: '16px', height: '16px', color: 'var(--primary)', marginRight: '8px' }} />
-                                        <span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
+                            <div className={styles.statsGrid}>
+                                <div className={styles.statCard}>
+                                    <div className={styles.statHeader}>
+                                        <Clock className={styles.statIcon} />
+                                        <span className={styles.statLabel}>
                                             Thời lượng
                                         </span>
                                     </div>
-                                    <p style={{ fontSize: '16px', fontWeight: 600, margin: 0 }}>
+                                    <p className={styles.statValue}>
                                         {selectedCourse.duration}
                                     </p>
                                 </div>
 
-                                <div style={{
-                                    padding: '16px',
-                                    background: 'var(--muted)',
-                                    borderRadius: 'var(--radius-md)',
-                                    border: '1px solid var(--border)'
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                                        <BookOpen style={{ width: '16px', height: '16px', color: 'var(--primary)', marginRight: '8px' }} />
-                                        <span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
+                                <div className={styles.statCard}>
+                                    <div className={styles.statHeader}>
+                                        <BookOpen className={styles.statIcon} />
+                                        <span className={styles.statLabel}>
                                             Bài học
                                         </span>
                                     </div>
-                                    <p style={{ fontSize: '16px', fontWeight: 600, margin: 0 }}>
+                                    <p className={styles.statValue}>
                                         {selectedCourse.completedLessons}/{selectedCourse.totalLessons}
                                     </p>
                                 </div>
 
-                                <div style={{
-                                    padding: '16px',
-                                    background: 'var(--muted)',
-                                    borderRadius: 'var(--radius-md)',
-                                    border: '1px solid var(--border)'
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                                        <TrendingUp style={{ width: '16px', height: '16px', color: 'var(--primary)', marginRight: '8px' }} />
-                                        <span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
+                                <div className={styles.statCard}>
+                                    <div className={styles.statHeader}>
+                                        <TrendingUp className={styles.statIcon} />
+                                        <span className={styles.statLabel}>
                                             Tiến độ
                                         </span>
                                     </div>
-                                    <p style={{ fontSize: '16px', fontWeight: 600, margin: 0 }}>
+                                    <p className={styles.statValue}>
                                         {selectedCourse.progress}%
                                     </p>
                                 </div>
 
-                                <div style={{
-                                    padding: '16px',
-                                    background: 'var(--muted)',
-                                    borderRadius: 'var(--radius-md)',
-                                    border: '1px solid var(--border)'
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                                        <Award style={{ width: '16px', height: '16px', color: 'var(--primary)', marginRight: '8px' }} />
-                                        <span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
+                                <div className={styles.statCard}>
+                                    <div className={styles.statHeader}>
+                                        <Award className={styles.statIcon} />
+                                        <span className={styles.statLabel}>
                                             Chứng chỉ
                                         </span>
                                     </div>
-                                    <p style={{ fontSize: '16px', fontWeight: 600, margin: 0 }}>
+                                    <p className={styles.statValue}>
                                         {selectedCourse.certificate ? 'Có' : 'Không'}
                                     </p>
                                 </div>
@@ -435,88 +320,35 @@ export default function CourseProgress({
 
                             {/* Next Lesson Info */}
                             {selectedCourse.nextLesson && selectedCourse.progress < 100 && (
-                                <div style={{
-                                    padding: '16px',
-                                    background: 'var(--primary-light)',
-                                    borderRadius: 'var(--radius-md)',
-                                    borderLeft: '4px solid var(--primary)',
-                                    marginBottom: '24px',
-                                    textAlign: 'left'
-                                }}>
-                                    <p style={{ margin: 0, fontSize: '14px' }}>
+                                <div className={styles.nextLessonInfo}>
+                                    <p className={styles.nextLessonLabel}>
                                         <strong>Bài học tiếp theo:</strong>
                                     </p>
-                                    <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: 'var(--primary)' }}>
+                                    <p className={styles.nextLessonText}>
                                         {selectedCourse.nextLesson}
                                     </p>
                                 </div>
                             )}
 
                             {/* Action Buttons */}
-                            <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                            <div className={styles.actionButtons}>
                                 <button
                                     onClick={() => {
                                         setShowCourseDetailModal(false)
                                         handleContinueCourse(selectedCourse.id)
                                     }}
-                                    style={{
-                                        flex: 1,
-                                        padding: '12px',
-                                        background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: 'var(--radius-md)',
-                                        fontSize: '16px',
-                                        fontWeight: 600,
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s ease',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '8px'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-2px)'
-                                        e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)'
-                                        e.currentTarget.style.boxShadow = 'none'
-                                    }}
+                                    className={`${styles.actionButton} ${styles.actionButtonPrimary}`}
                                 >
-                                    <PlayCircle style={{ width: '20px', height: '20px' }} />
+                                    <PlayCircle className={styles.actionButtonIcon} />
                                     {selectedCourse.progress === 100 ? 'Xem lại' : 'Tiếp tục học'}
                                 </button>
 
                                 {selectedCourse.certificate && selectedCourse.progress === 100 && (
                                     <button
                                         onClick={handleViewCertificate}
-                                        style={{
-                                            flex: 1,
-                                            padding: '12px',
-                                            background: 'var(--muted)',
-                                            color: 'var(--foreground)',
-                                            border: '1px solid var(--border)',
-                                            borderRadius: 'var(--radius-md)',
-                                            fontSize: '16px',
-                                            fontWeight: 600,
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '8px'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.background = 'var(--border)'
-                                            e.currentTarget.style.borderColor = 'var(--primary)'
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.background = 'var(--muted)'
-                                            e.currentTarget.style.borderColor = 'var(--border)'
-                                        }}
+                                        className={`${styles.actionButton} ${styles.actionButtonSecondary}`}
                                     >
-                                        <Award style={{ width: '20px', height: '20px' }} />
+                                        <Award className={styles.actionButtonIcon} />
                                         Xem chứng chỉ
                                     </button>
                                 )}
@@ -529,94 +361,35 @@ export default function CourseProgress({
             {/* Course Completion Modal */}
             {showCompletionModal && selectedCourse && selectedCourse.progress === 100 && (
                 <div 
+                    className={styles.modalOverlay}
                     onClick={() => setShowCompletionModal(false)}
-                    style={{
-                        position: 'fixed',
-                        top: '0',
-                        left: '0',
-                        width: '100vw',
-                        height: '100vh',
-                        background: 'rgba(0, 0, 0, 0.7)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 99999,
-                        backdropFilter: 'blur(4px)',
-                        animation: 'fadeIn 0.2s ease',
-                        padding: '20px',
-                        boxSizing: 'border-box'
-                    }}
                 >
                     <div 
+                        className={`${styles.modalContent} ${styles.modalContentSmall}`}
                         onClick={(e) => e.stopPropagation()}
-                        style={{
-                            background: 'var(--card)',
-                            borderRadius: 'var(--radius-lg)',
-                            padding: '48px 32px',
-                            maxWidth: '500px',
-                            width: '100%',
-                            maxHeight: '90vh',
-                            overflowY: 'auto',
-                            position: 'relative',
-                            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-                            animation: 'modalSlideIn 0.3s ease forwards',
-                            textAlign: 'center'
-                        }}
                     >
                         <button
                             onClick={() => setShowCompletionModal(false)}
-                            style={{
-                                position: 'absolute',
-                                top: '16px',
-                                right: '16px',
-                                background: 'var(--muted)',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '32px',
-                                height: '32px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.background = 'var(--destructive)'
-                                e.currentTarget.style.transform = 'scale(1.1)'
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'var(--muted)'
-                                e.currentTarget.style.transform = 'scale(1)'
-                            }}
+                            className={styles.modalCloseButton}
                         >
-                            <X style={{ width: '20px', height: '20px' }} />
+                            <X className={styles.modalCloseIcon} />
                         </button>
 
-                        <h2 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '12px' }}>
+                        <h2 className={styles.completionTitle}>
                             Chúc mừng!
                         </h2>
 
-                        <p style={{ fontSize: '16px', color: 'var(--muted-foreground)', marginBottom: '24px', lineHeight: 1.6 }}>
+                        <p className={styles.completionDescription}>
                             Bạn đã hoàn thành khóa học<br />
                             <strong style={{ color: 'var(--foreground)' }}>{selectedCourse.title}</strong>
                         </p>
 
-                        <div style={{
-                            background: 'var(--muted)',
-                            padding: '16px',
-                            borderRadius: 'var(--radius-md)',
-                            marginBottom: '24px'
-                        }}>
-                            <CheckCircle style={{
-                                width: '40px',
-                                height: '40px',
-                                color: 'var(--primary)',
-                                marginBottom: '12px'
-                            }} />
-                            <p style={{ margin: 0, fontSize: '14px', color: 'var(--muted-foreground)' }}>
+                        <div className={styles.completionInfo}>
+                            <CheckCircle className={styles.completionIcon} />
+                            <p className={styles.completionInfoText}>
                                 Hoàn thành {selectedCourse.totalLessons} bài học
                             </p>
-                            <p style={{ margin: '8px 0 0 0', fontSize: '14px', color: 'var(--muted-foreground)' }}>
+                            <p className={`${styles.completionInfoText} ${styles.completionInfoTextMargin}`}>
                                 Tổng thời lượng: {selectedCourse.duration}
                             </p>
                         </div>
@@ -624,81 +397,22 @@ export default function CourseProgress({
                         {selectedCourse.certificate && (
                             <button
                                 onClick={handleViewCertificate}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px',
-                                    background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: 'var(--radius-md)',
-                                    fontSize: '16px',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '8px',
-                                    marginBottom: '12px'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-2px)'
-                                    e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)'
-                                    e.currentTarget.style.boxShadow = 'none'
-                                }}
+                                className={`${styles.completionButton} ${styles.completionButtonPrimary}`}
                             >
-                                <Award style={{ width: '20px', height: '20px' }} />
+                                <Award className={styles.completionButtonIcon} />
                                 Nhận chứng chỉ
                             </button>
                         )}
 
                         <button
                             onClick={() => setShowCompletionModal(false)}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                background: 'var(--muted)',
-                                color: 'var(--foreground)',
-                                border: '1px solid var(--border)',
-                                borderRadius: 'var(--radius-md)',
-                                fontSize: '16px',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.background = 'var(--border)'
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'var(--muted)'
-                            }}
+                            className={`${styles.completionButton} ${styles.completionButtonSecondary}`}
                         >
                             Đóng
                         </button>
                     </div>
                 </div>
             )}
-
-            {/* Add animations */}
-            <style>{`
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                @keyframes modalSlideIn {
-                    from {
-                        opacity: 0;
-                        transform: scale(0.95) translateY(10px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: scale(1) translateY(0);
-                    }
-                }
-            `}</style>
         </>
     )
 }

@@ -8,6 +8,8 @@ import SocialAuthButtons from '../components/molecules/SocialAuthButtons'
 import { validateEmail, validatePassword, validateName, validateUsername, validateConfirmPassword, checkPasswordStrength } from '../utils/authValidation'
 import { useFormValidation } from '../hooks/useFormValidation'
 import { registerUser, clearError } from '../store/slices/authSlice'
+import styles from '../assets/css/RegisterPage.module.css'
+import authFormStyles from '../assets/css/AuthForm.module.css'
 
 export default function RegisterPage(): JSX.Element {
 	const dispatch = useAppDispatch()
@@ -155,41 +157,35 @@ export default function RegisterPage(): JSX.Element {
 	}
 
 	return (
-		<AuthForm
-			title="Tạo tài khoản"
-			subtitle="Đăng ký để bắt đầu với EduPlatform"
-			onSubmit={(e) => handleSubmit(onSubmit, e)}
-			buttonText="Tạo tài khoản"
-			loading={loading}
-			error={error}
-			afterButton={
-				<div>
-					<SocialAuthButtons
-						onGoogleAuth={handleGoogleAuth}
-						onGitHubAuth={handleGitHubAuth}
-					/>
-				</div>
-			}
-			footer={
-				<p style={{ margin: 0 }}>
-					Đã có tài khoản?{' '}
-					<Link 
-						to="/auth/login"
-						style={{
-							background: 'none',
-							border: 'none',
-							color: 'var(--primary)',
-							cursor: 'pointer',
-							textDecoration: 'underline',
-							fontSize: 'inherit',
-							fontFamily: 'inherit'
-						}}
-					>
-						Đăng nhập
-					</Link>
-				</p>
-			}
-		>
+		<div className={styles.page}>
+			<div className={styles.container}>
+				<AuthForm
+					title="Tạo tài khoản"
+					subtitle="Đăng ký để bắt đầu với EduPlatform"
+					onSubmit={(e) => handleSubmit(onSubmit, e)}
+					buttonText="Tạo tài khoản"
+					loading={loading}
+					error={error}
+					afterButton={
+						<div>
+							<SocialAuthButtons
+								onGoogleAuth={handleGoogleAuth}
+								onGitHubAuth={handleGitHubAuth}
+							/>
+						</div>
+					}
+					footer={
+						<p>
+							Đã có tài khoản?{' '}
+							<Link 
+								to="/auth/login"
+								className={authFormStyles.footerLink}
+							>
+								Đăng nhập
+							</Link>
+						</p>
+					}
+				>
 			<Input
 				id="username"
 				name="username"
@@ -288,6 +284,8 @@ export default function RegisterPage(): JSX.Element {
 				autoComplete="new-password"
 				required
 			/>
-		</AuthForm>
+				</AuthForm>
+			</div>
+		</div>
 	)
 }
