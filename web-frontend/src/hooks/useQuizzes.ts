@@ -20,10 +20,10 @@ const getProctoringWSUrl = () => {
   
   // 3. Try API Gateway first (Socket.IO path)
   const gatewayUrl = import.meta.env.VITE_API_BASE_URL?.replace('http://', 'ws://').replace('https://', 'wss://') || 'ws://localhost:8080';
-  const gatewayWS = `${gatewayUrl}/socket.io`;
+  const gatewayWS = gatewayUrl;
   
   // 4. Fallback to direct proctoring-service (port 8082)
-  const directWS = 'ws://localhost:8082/socket.io';
+  const directWS = 'ws://localhost:8082';
   
   // Return Gateway URL, but frontend can fallback if connection fails
   return gatewayWS;
@@ -287,7 +287,7 @@ export function useQuizzes() {
         const createSocket = (retryCount = 0, useDirectConnection = false) => {
           // Fallback to direct proctoring-service if Gateway fails
           const wsUrl = useDirectConnection 
-            ? 'ws://localhost:8082/socket.io'
+            ? 'ws://localhost:8082'
             : DEFAULT_PROCTORING_WS_URL;
           
           const socket = io(wsUrl, {
