@@ -122,6 +122,9 @@
 .main-content {
   flex: 1;
   overflow-y: auto;
+  /* Hide scrollbar across browsers */
+  -ms-overflow-style: none;      /* IE and Edge */
+  scrollbar-width: none;         /* Firefox */
   padding: clamp(16px, 3vw, 24px);
   display: flex;
   flex-direction: column;
@@ -129,6 +132,12 @@
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
+}
+
+.main-content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;                 /* Chrome, Safari, Opera */
 }
 
 /* Material Content */
@@ -346,7 +355,7 @@
 
 .material-header {
   display: flex;
-  align-items: start;
+  align-items: center;
   gap: clamp(12px, 2vw, 16px);
   padding-bottom: clamp(16px, 2.5vw, 20px);
   border-bottom: 1px solid var(--border);
@@ -463,6 +472,24 @@
   width: clamp(18px, 2.5vw, 20px);
   height: clamp(18px, 2.5vw, 20px);
   flex-shrink: 0;
+}
+
+/* Quiz hint inside material info - balanced card */
+.quiz-completion-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(8px, 2vw, 10px);
+  padding: clamp(10px, 2vw, 12px);
+  border: 1px dashed var(--border);
+  background: var(--muted);
+  border-radius: var(--radius-md);
+  color: var(--muted-foreground);
+}
+
+.quiz-completion-hint svg {
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 /* Navigation */
@@ -794,6 +821,18 @@
 }
 
 /* Responsive */
+@media (max-width: 1366px) {
+  .materials-sidebar {
+    width: clamp(260px, 26vw, 340px);
+  }
+}
+
+@media (max-width: 1200px) {
+  .materials-sidebar {
+    width: clamp(240px, 28vw, 320px);
+  }
+}
+
 @media (max-width: 1024px) {
   .materials-sidebar {
     width: clamp(280px, 35vw, 350px);
@@ -833,7 +872,8 @@
     right: 0;
     top: clamp(60px, 10vw, 73px);
     bottom: 0;
-    width: 100%;
+    /* Drawer width on mobile: avoid covering full screen */
+    width: min(400px, 85vw);
     max-width: min(400px, 85vw);
     z-index: 99;
     box-shadow: var(--shadow-xl);

@@ -382,6 +382,135 @@ export const grantCourseCompletionTokens = async ({
   });
 };
 
+// ==================== Gift Operations ====================
+
+export interface GiftItem {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl?: string;
+  tokenPrice: number;
+  stockQuantity: number;
+  category?: string;
+}
+
+/**
+ * Get all available gifts
+ */
+export const getGifts = async (category?: string): Promise<GiftItem[]> => {
+  try {
+    const params = category && category !== 'all' ? { category } : {};
+    const response = await tokenRewardAxios.get(`/gifts`, { params });
+    return Array.isArray(response.data) ? response.data : (response.data?.gifts ?? []);
+  } catch (error: any) {
+    console.error('Error getting gifts:', error);
+    throw new Error(error.response?.data?.message || 'Failed to get gifts');
+  }
+};
+
+/**
+ * Get gift details by ID
+ */
+export const getGiftById = async (giftId: string): Promise<GiftItem> => {
+  try {
+    const response = await tokenRewardAxios.get(`/gifts/${giftId}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error getting gift:', error);
+    if (error.response?.status === 404) {
+      throw new Error('Gift not found');
+    }
+    throw new Error(error.response?.data?.message || 'Failed to get gift');
+  }
+};
+
+// ==================== Admin Operations ====================
+
+export interface AdminStatsResponse {
+  totalTokensIssued: number;
+  totalTokensSpent: number;
+  currentBalance: number;
+  totalUsers: number;
+  totalTransactions: number;
+  totalEarnTransactions: number;
+  totalSpendTransactions: number;
+  todayTransactions: number;
+  todayTokensDistributed: number;
+}
+
+export interface TopUser {
+  studentId: string;
+  totalEarned: number;
+  totalSpent: number;
+  balance: number;
+  transactionCount: number;
+}
+
+export interface RulePerformance {
+  ruleId: string;
+  ruleName: string;
+  usageCount: number;
+  totalTokensDistributed: number;
+  successRate: number;
+  averageReward: number;
+}
+
+/**
+ * Get admin statistics (requires admin role)
+ */
+export const getAdminStats = async (): Promise<AdminStatsResponse> => {
+  try {
+    const response = await tokenRewardAxios.get(`/admin/stats`);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error getting admin stats:', error);
+    throw new Error(error.response?.data?.message || 'Failed to get admin stats');
+  }
+};
+
+/**
+ * Get top users by token balance (requires admin role)
+ */
+export const getTopUsers = async (limit: number = 10): Promise<TopUser[]> => {
+  try {
+    const response = await tokenRewardAxios.get(`/admin/top-users`, {
+      params: { limit }
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('Error getting top users:', error);
+    throw new Error(error.response?.data?.message || 'Failed to get top users');
+  }
+};
+
+/**
+ * Get reward rule performance (requires admin role)
+ */
+export const getRulePerformance = async (): Promise<RulePerformance[]> => {
+  try {
+    const response = await tokenRewardAxios.get(`/admin/rule-performance`);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error getting rule performance:', error);
+    throw new Error(error.response?.data?.message || 'Failed to get rule performance');
+  }
+};
+
+/**
+ * Get all transactions (requires admin role)
+ */
+export const getAllTransactions = async (page: number = 1, limit: number = 50): Promise<HistoryResponse> => {
+  try {
+    const response = await tokenRewardAxios.get(`/admin/transactions`, {
+      params: { page, limit }
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('Error getting all transactions:', error);
+    throw new Error(error.response?.data?.message || 'Failed to get all transactions');
+  }
+};
+
 // ==================== Default Export ====================
 
 const tokenRewardApi = {
@@ -397,6 +526,16 @@ const tokenRewardApi = {
   getBalance,
   getHistory,
   grantCourseCompletionTokens,
+  
+  // Gift Operations
+  getGifts,
+  getGiftById,
+  
+  // Admin Operations
+  getAdminStats,
+  getTopUsers,
+  getRulePerformance,
+  getAllTransactions,
 };
 
 export default tokenRewardApi;

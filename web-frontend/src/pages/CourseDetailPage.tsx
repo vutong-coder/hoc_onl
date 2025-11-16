@@ -1,23 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { 
-  BookOpen, 
-  Clock, 
-  Users, 
-  Star,
-  Award,
-  ChevronRight,
-  Play,
-  FileText,
-  CheckCircle,
-  ArrowLeft,
-  TrendingUp,
-  Clapperboard,
-  ClipboardList,
-  PlayCircle,
-  BadgeCheck,
-  LockKeyhole
-} from 'lucide-react'
+import { BookOpen, Clock, Users, Star, Award, ChevronRight, Play, FileText, CheckCircle, TrendingUp, Clapperboard, ClipboardList, PlayCircle, BadgeCheck, LockKeyhole } from 'lucide-react'
 import courseApi, { Course, Material, Progress } from '../services/api/courseApi'
 import { useAppSelector } from '../store/hooks'
 import '../assets/css/CourseDetailPage.css'
@@ -43,6 +26,13 @@ export default function CourseDetailPage(): JSX.Element {
   const [isEnrolled, setIsEnrolled] = useState(false)
   const [hasFetched, setHasFetched] = useState(false)
 
+  const getDerivedCompletedCount = (total: number, percent: number): number => {
+    if (!Number.isFinite(percent) || total <= 0) return 0
+    if (percent >= 100) return total
+    const approx = Math.round((percent / 100) * total)
+    return Math.min(Math.max(approx, 0), total)
+  }
+
   const getPercentComplete = (value?: ProgressState | null): number => {
     if (!value) {
       return 0
@@ -50,7 +40,7 @@ export default function CourseDetailPage(): JSX.Element {
     const rawPercent =
       value.percentComplete ??
       value.progressPercentage ??
-      (value as Record<string, unknown>).progress ??
+      ((value as unknown) as Record<string, unknown>).progress ??
       0
     const numeric = Number(rawPercent)
     return Number.isFinite(numeric) ? numeric : 0
@@ -92,12 +82,12 @@ export default function CourseDetailPage(): JSX.Element {
       
       // Fetch course details
       const courseResponse = await courseApi.getCourseById(courseId)
-      setCourse(courseResponse.data)
+      setCourse(courseResponse.data ?? null)
 
       // Fetch materials
       try {
         const materialsResponse = await courseApi.getCourseMaterials(courseId)
-        setMaterials(materialsResponse.data)
+        setMaterials(materialsResponse.data ?? [])
       } catch (err) {
         console.log('No materials found or error fetching materials')
       }
@@ -231,7 +221,13 @@ export default function CourseDetailPage(): JSX.Element {
 
   const isMaterialCompleted = (materialId: string) => {
     const completed = progress?.completedMaterials ?? []
-    return Array.isArray(completed) ? completed.includes(materialId) : false
+    if (Array.isArray(completed) && completed.includes(materialId)) return true
+    const total = materials.length
+    if (total === 0) return false
+    const derivedCount = getDerivedCompletedCount(total, getPercentComplete(progress))
+    if (derivedCount <= 0) return false
+    const index = materials.findIndex(m => m.id === materialId)
+    return index > -1 && index < derivedCount
   }
 
   const getMaterialStatusMeta = (materialId: string) => {
@@ -259,7 +255,11 @@ export default function CourseDetailPage(): JSX.Element {
   }
 
   const percentComplete = getPercentComplete(progress)
-  const completedMaterialsCount = progress?.completedMaterials?.length ?? 0
+  const completedMaterialsCount = (() => {
+    const listCount = Array.isArray(progress?.completedMaterials) ? progress!.completedMaterials!.length : 0
+    const derived = getDerivedCompletedCount(materials.length, percentComplete)
+    return Math.max(listCount, derived)
+  })()
 
   if (loading) {
     return (
@@ -313,16 +313,16 @@ export default function CourseDetailPage(): JSX.Element {
                 </div>
               )}
 
-              {course.enrollmentCount !== undefined && (
+              {(course as any).enrollmentCount !== undefined || (course as any).studentsCount !== undefined || (course as any).learnersCount !== undefined ? (
                 <div className="stat">
                   <Users size={20} />
-                  <span>{course.enrollmentCount} học viên</span>
+                  <span>{(course as any).enrollmentCount ?? (course as any).studentsCount ?? (course as any).learnersCount} học viên</span>
                 </div>
-              )}
+              ) : null}
 
               <div className="stat">
                 <Clock size={20} />
-                <span>{formatDuration(course.duration)}</span>
+                <span>{formatDuration((course as any).duration ?? (course as any).totalDurationMinutes ?? (course as any).durationMinutes)}</span>
               </div>
 
               {course.certificateAvailable && (
@@ -386,11 +386,11 @@ export default function CourseDetailPage(): JSX.Element {
             </div>
           </div>
 
-          <div className="course-summary-side">
+            <div className="course-summary-side">
             {/* Thumbnail */}
             <div className="course-thumbnail">
-              {course.thumbnail ? (
-                <img src={course.thumbnail} alt={course.title} />
+              {course.thumbnailUrl || (course as any).thumbnail ? (
+                <img src={(course as any).thumbnailUrl || (course as any).thumbnail} alt={course.title} />
               ) : (
                 <div className="thumbnail-placeholder">
                   <BookOpen size={64} />
@@ -547,13 +547,14 @@ export default function CourseDetailPage(): JSX.Element {
                           <div className={`material-icon ${typeMeta.className}`}>
                             {typeMeta.icon}
                           </div>
-                          <div className="material-info">
-                            <div className="material-header">
-                              <h3>{material.title}</h3>
-                              <span className={`material-type-badge ${typeMeta.className}`}>
-                                {typeMeta.label}
-                              </span>
-                            </div>
+                          <div
+                            className="material-info"
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}
+                          >
+                            <h3 style={{ margin: 0, flex: 1 }}>{material.title}</h3>
+                            <span className={`material-type-badge ${typeMeta.className}`}>
+                              {typeMeta.label}
+                            </span>
                             {material.description && (
                               <p>{material.description}</p>
                             )}

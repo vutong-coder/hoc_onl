@@ -81,11 +81,12 @@ export default function CourseCard({ course, onContinueCourse, onViewCourse }: C
 
 				<div className={styles.contentRight}>
 					<button
-						onClick={() => onContinueCourse?.(course.id)}
+						onClick={() => course.progress < 100 && onContinueCourse?.(course.id)}
 						className={styles.continueButton}
+						disabled={course.progress === 100}
 					>
 						<Play className={styles.continueButtonIcon} />
-						Tiếp tục
+						{course.progress === 100 ? 'Hoàn thành' : 'Tiếp tục'}
 					</button>
 
 					<button

@@ -50,6 +50,13 @@ export default function CourseProgress({
         }
     }
 
+    const getDerivedCompletedCount = (total: number, percent: number): number => {
+        if (!Number.isFinite(percent) || total <= 0) return 0
+        if (percent >= 100) return total
+        const approx = Math.round((percent / 100) * total)
+        return Math.min(Math.max(approx, 0), total)
+    }
+
     const formatDuration = (duration: number | string | null | undefined) => {
         const numeric = Number(duration)
 
@@ -103,12 +110,16 @@ export default function CourseProgress({
                         ? materialsResult.value.data
                         : []
 
+                    const derivedCompleted = getDerivedCompletedCount(materials.length, normalizedProgress.percentComplete)
+                    const completedLessons = Math.max(normalizedProgress.completedMaterials.length, derivedCompleted)
+                    const finalCompletedLessons = normalizedProgress.percentComplete >= 100 ? materials.length : completedLessons
+
                     return {
                         id: course.id,
                         title: course.title,
                         progress: normalizedProgress.percentComplete,
                         totalLessons: materials.length,
-                        completedLessons: normalizedProgress.completedMaterials.length,
+                        completedLessons: finalCompletedLessons,
                         duration: formatDuration(course.duration ?? course.totalDuration),
                         certificate: Boolean(course.certificateAvailable ?? course.certificate)
                     }

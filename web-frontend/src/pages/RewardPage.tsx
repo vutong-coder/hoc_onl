@@ -33,8 +33,7 @@ import {
 	removeChainListener
 } from '../services/blockchain/walletService';
 import { useAppSelector } from '../store/hooks';
-import { getAvailableGifts, type GiftItem } from '../services/api/tokenApi';
-import { getLinkedWallet, linkWallet as linkWalletAddress, type LinkedWalletResponse } from '../services/api/tokenRewardApi';
+import { getLinkedWallet, linkWallet as linkWalletAddress, type LinkedWalletResponse, getGifts, type GiftItem } from '../services/api/tokenRewardApi';
 import styles from '../assets/css/RewardPage.module.css';
 
 interface ToastMessage {
@@ -152,7 +151,8 @@ export default function RewardPage(): JSX.Element {
 			setLoadingStoreItems(true);
 			setStoreError(null);
 			try {
-				const items = await getAvailableGifts();
+				// ✅ Sử dụng API từ tokenRewardApi (tích hợp với token-reward-service)
+				const items = await getGifts();
 				setStoreItems(items.slice(0, 4));
 			} catch (storeLoadError: any) {
 				console.error('Failed to load store items:', storeLoadError);
@@ -177,8 +177,12 @@ export default function RewardPage(): JSX.Element {
 					setWalletAddress(result.address);
 					setWithdrawAddress(result.address);
 				}
-			} catch (walletError) {
+			} catch (walletError: any) {
 				console.error('Failed to fetch linked wallet:', walletError);
+				// Không hiển thị error nếu chưa có wallet linked (404 là bình thường)
+				if (walletError?.message && !walletError.message.includes('404') && !walletError.message.includes('No wallet linked')) {
+					console.warn('Wallet API error (non-critical):', walletError.message);
+				}
 			} finally {
 				setLoadingWalletLink(false);
 			}
@@ -194,6 +198,23 @@ export default function RewardPage(): JSX.Element {
 				if (address) {
 					setWalletAddress(address);
 					setWithdrawAddress(address);
+					// Tự động link wallet nếu chưa có linked wallet
+					if (linkedWallet === null && user) {
+						await persistWalletLink(address, { silent: true });
+					}
+				} else if (metamaskInstalled && linkedWallet) {
+					// Nếu đã có linked wallet nhưng MetaMask chưa connect, tự động prompt
+					console.log('Đã có linked wallet, đang yêu cầu kết nối MetaMask...');
+					// Auto-connect nếu user đã từng link wallet
+					try {
+						const connectedAddress = await connectWallet();
+						if (connectedAddress) {
+							setWalletAddress(connectedAddress);
+							setWithdrawAddress(connectedAddress);
+						}
+					} catch (autoConnectError) {
+						console.log('User chưa cho phép kết nối tự động MetaMask');
+					}
 				}
 			} catch (walletError) {
 				console.error('Failed to load wallet state:', walletError);
@@ -212,7 +233,7 @@ export default function RewardPage(): JSX.Element {
 		};
 
 		loadWalletState();
-	}, [metamaskInstalled, user]);
+	}, [metamaskInstalled, user, linkedWallet]);
 
 	useEffect(() => {
 		const updateOnchainBalance = async () => {
@@ -229,8 +250,12 @@ export default function RewardPage(): JSX.Element {
 				]);
 				setOnchainBalance(balanceValue);
 				setEthBalance(nativeBalanceValue);
-			} catch (balanceError) {
+			} catch (balanceError: any) {
 				console.error('Failed to fetch on-chain balance:', balanceError);
+				// Nếu là lỗi BAD_DATA (smart contract chưa deploy hoặc sai address), set 0 và thông báo
+				if (balanceError?.code === 'BAD_DATA' || balanceError?.message?.includes('could not decode')) {
+					console.warn('Smart contract chưa được deploy hoặc địa chỉ không đúng. On-chain balance sẽ hiển thị 0.');
+				}
 				setOnchainBalance('0');
 				setEthBalance('0');
 			}
@@ -624,13 +649,24 @@ export default function RewardPage(): JSX.Element {
 					detail: response.message
 				});
 				setWithdrawAmount('');
-				if (response.txHash) {
+				const txHash = (response as any).transactionHash || (response as any).txHash;
+				if (txHash) {
 					setToast({
-						type: 'info',
-						message: 'Đang chờ xác nhận on-chain',
-						detail: `Tx hash: ${response.txHash}`
+						type: 'success',
+						message: 'Rút token thành công',
+						detail: `Tx hash: ${txHash}`
+					});
+				} else {
+					setToast({
+						type: 'success',
+						message: 'Rút token thành công',
+						detail: response.message || ''
 					});
 				}
+				// làm mới lịch sử/số dư sau một chút
+				window.setTimeout(() => {
+					void refresh();
+				}, 1500);
 			} else {
 				setWithdrawNote({
 					type: 'error',

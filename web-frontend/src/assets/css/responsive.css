@@ -51,6 +51,20 @@
   }
 }
 
+/* Prevent horizontal overflow globally */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  position: relative;
+}
+
 /* Common Responsive Container */
 .responsive-container {
   width: 100%;
@@ -58,6 +72,7 @@
   margin: 0 auto;
   padding: 16px;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 @media (min-width: 640px) {
@@ -216,3 +231,21 @@
   }
 }
 
+
+
+/* Fix for cards and containers to prevent overflow */
+.card,
+[class*="card"],
+[class*="Card"],
+[class*="container"],
+[class*="Container"] {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure all flex and grid children don't overflow */
+[style*="display: flex"] > *,
+[style*="display: grid"] > * {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}

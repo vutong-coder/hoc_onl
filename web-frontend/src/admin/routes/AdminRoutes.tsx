@@ -7,6 +7,7 @@ import ExamsPage from '../pages/ExamsPage'
 import ProctoringPage from '../pages/ProctoringPage'
 import SecurityPage from '../pages/SecurityPage'
 import RewardPage from '../pages/RewardPage'
+import TokenManagementPage from '../pages/TokenManagementPage'
 import CoursesPage from '../pages/CoursesPage'
 import OrganizationsPage from '../pages/OrganizationsPage'
 import AdminPage from '../pages/AdminPage'
@@ -26,6 +27,7 @@ export default function AdminRoutes(): JSX.Element {
 				<Route path="proctoring" element={<ProctoringPage />} />
 				<Route path="security" element={<SecurityPage />} />
 				<Route path="reward" element={<RewardPage />} />
+				<Route path="tokens" element={<TokenManagementPage />} />
 				<Route path="multisig" element={<MultisigPage />} />
 				<Route path="courses" element={<CoursesPage />} />
 				<Route path="organizations" element={<OrganizationsPage />} />
