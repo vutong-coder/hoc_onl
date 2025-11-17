@@ -570,14 +570,14 @@ export default function RewardPage(): JSX.Element {
 
 			setDepositNote({
 				type: 'success',
-				message: 'Giao dịch nạp đã được gửi',
-				detail: 'Số dư nội bộ sẽ được cộng khi giao dịch được xác nhận trên blockchain.'
+				message: 'Nạp token thành công',
+				detail: `Giao dịch đã được gửi thành công. Tx hash: ${txHash}. Số dư nội bộ sẽ được cộng khi giao dịch được xác nhận trên blockchain.`
 			});
 			setDepositAmount('');
 			setToast({
-				type: 'info',
-				message: 'Đang chờ đồng bộ on-chain',
-				detail: `Tx hash: ${txHash}`
+				type: 'success',
+				message: 'Nạp token thành công',
+				detail: `Transaction hash: ${txHash}. Số dư sẽ được cập nhật sau khi giao dịch được xác nhận.`
 			});
 
 			window.setTimeout(() => {

@@ -270,12 +270,22 @@ export async function estimateTokenTransferCost(
 	}
 
 	const contract = await getLearnTokenContract()
+	if (!contract) {
+		throw new Error('Contract not available')
+	}
+
 	const amountWei = ethers.parseEther(amount)
 
-	const [gasLimit, feeData] = await Promise.all([
-		(contract.estimateGas as any).transfer(toAddress, amountWei) as Promise<bigint>,
-		provider.getFeeData()
-	])
+	// In ethers v6, use contract.transfer.estimateGas() instead of contract.estimateGas.transfer()
+	let gasLimit: bigint
+	try {
+		gasLimit = await contract.transfer.estimateGas(toAddress, amountWei)
+	} catch (error: any) {
+		console.error('Gas estimation error:', error)
+		throw new Error(`Cannot estimate gas: ${error?.message || 'Unknown error'}`)
+	}
+
+	const feeData = await provider.getFeeData()
 
 	let gasPrice: bigint | null = feeData.maxFeePerGas ?? feeData.gasPrice ?? null
 	let gasCostWei = 0n
